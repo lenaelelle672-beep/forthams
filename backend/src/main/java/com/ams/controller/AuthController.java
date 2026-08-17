@@ -5,9 +5,11 @@ import com.ams.dto.AuthResponse;
 import com.ams.dto.LoginRequest;
 import com.ams.dto.RegisterRequest;
 import com.ams.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.BadCredentialsException;
 
 @RestController
 @RequestMapping("/auth")
@@ -17,8 +19,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public Result<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        AuthResponse response = authService.login(request);
+    public Result<AuthResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest) {
+        AuthResponse response = authService.login(request, servletRequest.getRemoteAddr());
         return Result.success("登录成功", response);
     }
 
@@ -29,8 +31,12 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public Result<String> logout() {
-        authService.logout();
+    public Result<String> logout(HttpServletRequest request) {
+        String authorization = request.getHeader("Authorization");
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            throw new BadCredentialsException("认证失败");
+        }
+        authService.logout(authorization.substring(7));
         return Result.success("登出成功");
     }
 

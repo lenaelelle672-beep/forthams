@@ -12,12 +12,15 @@ import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
-import { submitTransferApplication } from '@/api/disposal';
-import { workflowApi, type WorkflowStartAvailability } from '@/api/workflow';
+import { buildTransferDisposalReason, submitTransferApplication } from '@/api/disposal';
+import {
+  workflowApi,
+  type WorkflowStartAvailability,
+} from '@/api/workflow';
 import { getDeptTree, getLocationCascade } from '@/api/base';
 import AssetPickerModal from '@/components/AssetPickerModal';
 import type { AssetListItem } from '@/types/asset';
-import type { Department, Location, PageData } from '@/types/common';
+import type { Department, Location } from '@/types/common';
 
 const schema = z.object({
   transferType: z.string().min(1, '请选择调拨类型'),
@@ -49,6 +52,24 @@ function toSelectedAsset(asset: AssetListItem): SelectedAsset {
     location: asset.location ?? '',
     status: asset.status ?? '',
   };
+}
+
+function isAssetListItem(value: unknown): value is AssetListItem {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  const id = Reflect.get(value, 'id');
+  return Number.isSafeInteger(id) && id > 0
+    && typeof Reflect.get(value, 'assetNo') === 'string'
+    && typeof Reflect.get(value, 'assetName') === 'string';
+}
+
+function getAssetRecords(response: unknown): AssetListItem[] {
+  if (response === null || typeof response !== 'object' || Array.isArray(response)) {
+    return [];
+  }
+  const records = Reflect.get(response, 'records');
+  return Array.isArray(records) ? records.filter(isAssetListItem) : [];
 }
 
 const STEPS = [
@@ -142,7 +163,7 @@ export default function AssetTransferFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
-  const availableAssets: AssetListItem[] = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
+  const availableAssets = getAssetRecords(assetListData);
 
   useEffect(() => {
     if (!preselectKey || appliedPreselectKey === preselectKey || availableAssets.length === 0) {
@@ -274,11 +295,24 @@ export default function AssetTransferFormPage() {
         notes: data.notes,
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['transfers'] });
-      qc.invalidateQueries({ queryKey: ['disposals'] });
-      toast.success('资产转移申请提交成功');
-      navigate('/disposals');
+    onSuccess: (result) => {
+      if (result.successes.length > 0) {
+        qc.invalidateQueries({ queryKey: ['transfers'] });
+        qc.invalidateQueries({ queryKey: ['disposals'] });
+      }
+      if (result.failures.length === 0) {
+        toast.success(`资产转移申请提交成功（${result.successes.length} 项）`);
+        navigate('/disposals');
+        return;
+      }
+      if (result.successes.length > 0) {
+        const successfulIds = new Set(result.successes.map(({ assetId }) => String(assetId)));
+        setSelectedAssets((current) => current.filter((asset) => !successfulIds.has(asset.id)));
+        toast.success(`已成功提交 ${result.successes.length} 项资产转移申请`);
+        toast.error(`${result.failures.length} 项提交失败，已保留失败资产以便重试`);
+        return;
+      }
+      toast.error('所选资产均未提交成功，请检查后重试');
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : '提交失败，请重试');
@@ -293,6 +327,12 @@ export default function AssetTransferFormPage() {
     }
     if (submitBlocked) {
       toast.error(workflowBlockReason);
+      return;
+    }
+    try {
+      buildTransferDisposalReason(values);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '处置事由校验失败，请缩短说明后重试');
       return;
     }
     mutation.mutate(values);

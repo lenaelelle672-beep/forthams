@@ -1,5 +1,6 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.dto.RolePermissionCatalogDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class RolePermissionCatalogService {
 
     private static final List<String> RISK_TIPS = List.of(
             READONLY_NOTICE,
-            "仅基于 sys_role、sys_permission、sys_role_permission 聚合只读目录，不读取用户、租户或数据权限策略。",
+            "仅基于当前租户角色及系统权限库存聚合只读目录，不读取用户或数据权限策略。",
             "权限库存来自当前数据库记录，缺少 seed 时不会自动补齐。"
     );
 
@@ -30,9 +31,10 @@ public class RolePermissionCatalogService {
     }
 
     public RolePermissionCatalogDTO getCatalog() {
-        List<RolePermissionCatalogDTO.RolePermissionRoleDTO> roles = loadRoles();
+        String tenantId = TenantContext.requireTenantId();
+        List<RolePermissionCatalogDTO.RolePermissionRoleDTO> roles = loadRoles(tenantId);
         List<RolePermissionCatalogDTO.RolePermissionPermissionDTO> permissions = loadPermissions();
-        List<RolePermissionBinding> bindings = loadBindings();
+        List<RolePermissionBinding> bindings = loadBindings(tenantId);
 
         Map<Long, RolePermissionCatalogDTO.RolePermissionRoleDTO> rolesById = new LinkedHashMap<>();
         roles.forEach(role -> rolesById.put(role.getRoleId(), role));
@@ -84,11 +86,12 @@ public class RolePermissionCatalogService {
         return catalog;
     }
 
-    private List<RolePermissionCatalogDTO.RolePermissionRoleDTO> loadRoles() {
+    private List<RolePermissionCatalogDTO.RolePermissionRoleDTO> loadRoles(String tenantId) {
         return jdbcTemplate.query("""
                 SELECT id, role_name, role_code, description, status
                 FROM sys_role
                 WHERE COALESCE(deleted, 0) = 0
+                  AND tenant_id = ?
                 ORDER BY id
                 """, (rs, rowNum) -> {
             RolePermissionCatalogDTO.RolePermissionRoleDTO role = new RolePermissionCatalogDTO.RolePermissionRoleDTO();
@@ -98,7 +101,7 @@ public class RolePermissionCatalogService {
             role.setDescription(rs.getString("description"));
             role.setStatus(rs.getObject("status", Integer.class));
             return role;
-        });
+        }, tenantId);
     }
 
     private List<RolePermissionCatalogDTO.RolePermissionPermissionDTO> loadPermissions() {
@@ -118,15 +121,18 @@ public class RolePermissionCatalogService {
         });
     }
 
-    private List<RolePermissionBinding> loadBindings() {
+    private List<RolePermissionBinding> loadBindings(String tenantId) {
         return jdbcTemplate.query("""
-                SELECT role_id, permission_id
-                FROM sys_role_permission
-                ORDER BY role_id, permission_id
+                SELECT rp.role_id, rp.permission_id
+                FROM sys_role_permission rp
+                INNER JOIN sys_role r ON r.id = rp.role_id
+                WHERE COALESCE(r.deleted, 0) = 0
+                  AND r.tenant_id = ?
+                ORDER BY rp.role_id, rp.permission_id
                 """, (rs, rowNum) -> new RolePermissionBinding(
                 rs.getLong("role_id"),
                 rs.getLong("permission_id")
-        ));
+        ), tenantId);
     }
 
     private record RolePermissionBinding(Long roleId, Long permissionId) {

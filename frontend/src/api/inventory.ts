@@ -13,6 +13,9 @@ import http from '@/utils/http';
 // 类型定义
 // ============================================================
 
+/** 后端盘点类型：全盘 / 抽盘 / 循环盘点 */
+export type InventoryType = 'FULL' | 'PARTIAL' | 'CYCLE';
+
 /** 盘点范围类型：按位置、按分类或全部资产 */
 export type ScopeType = 'location' | 'category' | 'all';
 
@@ -87,10 +90,10 @@ export interface TaskListQuery {
 export interface CreateTaskPayload {
   /** 任务名称，1-50 字符，必填 */
   taskName: string;
-  /** 盘点范围类型 */
-  scopeType: ScopeType;
-  /** 位置/分类 ID 列表，scopeType 非 all 时必填且 ≥1 */
-  scopeIds: string[];
+  /** 盘点类型，对应后端 inventoryType */
+  inventoryType: InventoryType;
+  /** 逗号分隔的部门 ID，对应后端 deptIds */
+  deptIds?: string;
 }
 
 /** 更新任务状态请求载荷 */
@@ -194,8 +197,32 @@ export interface SurplusDeficitDetail {
 // API 路由常量
 // ============================================================
 
-/** 盘点任务 API 基础路径 */
-const INVENTORY_TASKS_BASE = '/api/v1/inventory/tasks';
+/** 盘点任务 API 基础路径。http client 已带 /api 前缀，这里不能再写 /api/v1。 */
+const INVENTORY_TASKS_BASE = '/inventory/tasks';
+
+export function toInventoryCreateBody(payload: CreateTaskPayload): {
+  taskName: string;
+  inventoryType: InventoryType;
+  deptIds?: string;
+} {
+  const taskName = payload.taskName.trim();
+  const inventoryType = payload.inventoryType.trim().toUpperCase() as InventoryType;
+  if (!taskName) {
+    throw new Error('盘点任务名称不能为空');
+  }
+  if (inventoryType !== 'FULL' && inventoryType !== 'PARTIAL' && inventoryType !== 'CYCLE') {
+    throw new Error('盘点类型必须为FULL、PARTIAL或CYCLE');
+  }
+  const deptIds = payload.deptIds?.trim();
+  if (deptIds && !/^[1-9]\d*(?:\s*,\s*[1-9]\d*)*$/.test(deptIds)) {
+    throw new Error('盘点部门范围必须是逗号分隔的正整数ID');
+  }
+  return {
+    taskName,
+    inventoryType,
+    ...(deptIds ? { deptIds } : {}),
+  };
+}
 
 // ============================================================
 // API 调用函数 — 盘点任务 (CRUD + 状态流转)
@@ -230,7 +257,7 @@ export async function getInventoryTasks(
 export async function createInventoryTask(
   payload: CreateTaskPayload,
 ): Promise<InventoryTask> {
-  return http.post(INVENTORY_TASKS_BASE, payload);
+  return http.post(INVENTORY_TASKS_BASE, toInventoryCreateBody(payload));
 }
 
 /**

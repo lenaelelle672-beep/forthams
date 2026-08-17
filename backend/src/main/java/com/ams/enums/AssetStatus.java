@@ -21,6 +21,10 @@ public enum AssetStatus {
         return terminal;
     }
 
+    public boolean requiresDedicatedWorkflow() {
+        return this == PENDING_RETIREMENT || terminal;
+    }
+
     public boolean canTransitionTo(AssetStatus nextStatus) {
         if (nextStatus == null) {
             return false;

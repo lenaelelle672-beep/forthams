@@ -19,6 +19,8 @@ public class InventoryTask implements Serializable {
     private String inventoryType;
     private String tenantId;
     private String status;
+    private String cancellationReason;
+    private LocalDateTime cancelledAt;
     private String deptIds;
     private LocalDate startDate;
     private LocalDate endDate;

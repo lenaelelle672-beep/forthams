@@ -78,10 +78,36 @@ export interface IApproveRequest {
  * - 请求拦截器注入 Bearer Token
  * - 响应拦截器统一解包 data 并处理 401/5xx 错误
  */
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 const http: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: API_BASE_URL,
   timeout: 15000,
 });
+
+let sessionRevokeInFlight: Promise<void> | null = null;
+
+function revokeCurrentSession(): Promise<void> {
+  const token = getToken();
+  if (!token) {
+    return Promise.resolve();
+  }
+  if (sessionRevokeInFlight) {
+    return sessionRevokeInFlight;
+  }
+  sessionRevokeInFlight = fetch(`${API_BASE_URL}/auth/logout`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .catch(() => undefined)
+    .then(() => undefined)
+    .finally(() => {
+      sessionRevokeInFlight = null;
+    });
+  return sessionRevokeInFlight;
+}
 
 type ResultEnvelope<T = unknown> = {
   code: number;
@@ -150,23 +176,25 @@ http.interceptors.response.use(
     }
 
     if (status === 401) {
-      clearAuthStorage();
-      localStorage.removeItem('ams_auth_token');
-      localStorage.removeItem('ams_auth_user');
-
-      // Avoid redirect loops: if the failing request is the login call itself,
-      // or we are already on /login (e.g. token refresh race), just reject.
       const requestUrl = error.config?.url ?? '';
       const isLoginRequest = requestUrl.includes('/auth/login');
+      const isLogoutRequest = requestUrl.includes('/auth/logout');
       const isOnLoginPage =
         typeof window !== 'undefined' && window.location.pathname === '/login';
 
-      if (!isLoginRequest && !isOnLoginPage) {
-        // Hard redirect is still required here (outside React tree, inside an
-        // axios interceptor), but we carry ?expired=1 so the login page can
-        // surface a "session expired" notice instead of silently reloading.
-        window.location.href = '/login?expired=1';
+      const finishUnauthorized = () => {
+        clearAuthStorage();
+        localStorage.removeItem('ams_auth_token');
+        localStorage.removeItem('ams_auth_user');
+        if (!isLoginRequest && !isOnLoginPage) {
+          window.location.href = '/login?expired=1';
+        }
+      };
+
+      if (!isLoginRequest && !isLogoutRequest) {
+        return revokeCurrentSession().finally(finishUnauthorized).then(() => Promise.reject(error));
       }
+      finishUnauthorized();
     } else if (status && status >= 500) {
       console.error('Server error, please try again later.');
     }

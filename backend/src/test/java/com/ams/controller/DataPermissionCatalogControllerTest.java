@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,13 +64,14 @@ class DataPermissionCatalogControllerTest {
     }
 
     @Test
-    void catalogShouldAcceptSuperAdmin() throws Exception {
+    void catalogShouldRejectSuperAdminWithoutExplicitPermission() throws Exception {
         grant("ROLE_SUPER_ADMIN");
         when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
-        when(dataPermissionCatalogService.getCatalog()).thenReturn(catalog());
 
         mockMvc.perform(get("/system/data-permissions/catalog").header("Authorization", "Bearer token"))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(dataPermissionCatalogService);
     }
 
     @Test

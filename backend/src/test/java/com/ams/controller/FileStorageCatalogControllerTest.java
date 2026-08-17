@@ -2,22 +2,19 @@ package com.ams.controller;
 
 import com.ams.common.GlobalExceptionHandler;
 import com.ams.dto.FileStorageAttachmentCatalogDTO;
+import com.ams.entity.User;
 import com.ams.service.FileStorageCatalogService;
-import com.ams.utils.JwtUtil;
-import org.junit.jupiter.api.AfterEach;
+import com.ams.service.TenantAuthorityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -35,26 +32,20 @@ class FileStorageCatalogControllerTest {
     private FileStorageCatalogService fileStorageCatalogService;
 
     @Mock
-    private JwtUtil jwtUtil;
+    private TenantAuthorityService tenantAuthorityService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new FileStorageCatalogController(fileStorageCatalogService, jwtUtil))
+        mockMvc = MockMvcBuilders.standaloneSetup(new FileStorageCatalogController(fileStorageCatalogService, tenantAuthorityService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
 
-    @AfterEach
-    void tearDown() {
-        SecurityContextHolder.clearContext();
-    }
-
     @Test
-    void getCatalogShouldRequireFileStorageQueryPermissionAndReturnMetadataOnly() throws Exception {
-        grant("system:file-storage:query");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+    void getCatalogShouldRequireExplicitPlatformAdminAndReturnMetadataOnly() throws Exception {
+        when(tenantAuthorityService.requirePlatformAdmin()).thenReturn(platformAdmin());
         when(fileStorageCatalogService.getAttachmentCatalog(eq("审批"), eq("workflow"), eq("application/pdf"), eq(1), eq(20)))
                 .thenReturn(sampleCatalog());
 
@@ -76,37 +67,13 @@ class FileStorageCatalogControllerTest {
                 .andExpect(jsonPath("$.data.readonlyNotice").value("当前仅为 /system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环。"));
 
         verify(fileStorageCatalogService).getAttachmentCatalog("审批", "workflow", "application/pdf", 1, 20);
+        verify(tenantAuthorityService).requirePlatformAdmin();
     }
 
     @Test
-    void getCatalogShouldAllowSuperAdminAuthority() throws Exception {
-        grant("ROLE_SUPER_ADMIN");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
-        when(fileStorageCatalogService.getAttachmentCatalog(null, null, null, null, null)).thenReturn(sampleCatalog());
-
-        mockMvc.perform(get("/system/file-storage/attachments/catalog")
-                        .header("Authorization", "Bearer token"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.riskTips[0]").value("当前仅为 /system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环。"));
-
-        verify(fileStorageCatalogService).getAttachmentCatalog(null, null, null, null, null);
-    }
-
-    @Test
-    void getCatalogShouldRejectMissingBearerToken() throws Exception {
-        grant("system:file-storage:query");
-
-        mockMvc.perform(get("/system/file-storage/attachments/catalog"))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value(403));
-
-        verifyNoInteractions(fileStorageCatalogService);
-    }
-
-    @Test
-    void getCatalogShouldRejectUserWithoutFileStorageQueryPermission() throws Exception {
-        grant("system:user:query");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+    void getCatalogShouldRejectNonPlatformCallerBeforeServiceInvocation() throws Exception {
+        when(tenantAuthorityService.requirePlatformAdmin())
+                .thenThrow(new AccessDeniedException("仅显式平台管理员可以管理租户"));
 
         mockMvc.perform(get("/system/file-storage/attachments/catalog")
                         .header("Authorization", "Bearer token"))
@@ -114,6 +81,7 @@ class FileStorageCatalogControllerTest {
                 .andExpect(jsonPath("$.code").value(403));
 
         verifyNoInteractions(fileStorageCatalogService);
+        verify(tenantAuthorityService).requirePlatformAdmin();
     }
 
     private FileStorageAttachmentCatalogDTO sampleCatalog() {
@@ -152,11 +120,12 @@ class FileStorageCatalogControllerTest {
         return catalog;
     }
 
-    private void grant(String... authorities) {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-                "admin",
-                "n/a",
-                Arrays.stream(authorities).map(SimpleGrantedAuthority::new).toList()
-        ));
+    private User platformAdmin() {
+        User user = new User();
+        user.setId(42L);
+        user.setUsername("platform-admin");
+        user.setTenantId("T001");
+        user.setPlatformAdmin(true);
+        return user;
     }
 }

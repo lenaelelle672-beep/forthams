@@ -15,6 +15,12 @@
  */
 
 import http from '@/utils/http';
+import {
+  findApprovalProcessId,
+  MISSING_APPROVAL_PROCESS_MESSAGE,
+  resolveApprovalProcessId,
+  submitApprovalDecision,
+} from '@/api/approval';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -373,14 +379,31 @@ export async function getWorkOrderDetail(orderId: string | number): Promise<Work
  * @throws {BusinessErrorResponse} 状态流转非法时返回 409 INVALID_STATE_TRANSITION
  * @throws {BusinessErrorResponse} 乐观锁冲突时返回 409 OPTIMISTIC_LOCK_CONFLICT
  */
+async function requireWorkOrderApprovalId(
+  orderId: string | number,
+  data: Record<string, unknown> = {},
+): Promise<number> {
+  const explicitId = resolveApprovalProcessId(data);
+  if (explicitId) {
+    return explicitId;
+  }
+  const processId = await findApprovalProcessId('WORK_ORDER', orderId);
+  if (!processId) {
+    throw new Error(MISSING_APPROVAL_PROCESS_MESSAGE);
+  }
+  return processId;
+}
+
 export async function approveWorkOrder(
   orderId: string | number,
   data: Partial<ApproveRequest> & Record<string, unknown> = {},
 ): Promise<ApprovalResponse> {
-  return http.post<ApprovalResponse>(
-    `${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/approve`,
-    data,
-  );
+  const processId = await requireWorkOrderApprovalId(orderId, data);
+  return submitApprovalDecision(
+    processId,
+    'APPROVED',
+    typeof data.comment === 'string' ? data.comment : typeof data.opinion === 'string' ? data.opinion : '',
+  ) as Promise<ApprovalResponse>;
 }
 
 /**
@@ -405,10 +428,15 @@ export async function rejectWorkOrder(
   orderId: string | number,
   data: Partial<RejectRequest> & Record<string, unknown> = {},
 ): Promise<ApprovalResponse> {
-  return http.post<ApprovalResponse>(
-    `${WORKORDER_BASE_URL}/${encodeURIComponent(String(orderId))}/reject`,
-    data,
-  );
+  const processId = await requireWorkOrderApprovalId(orderId, data);
+  const opinion = typeof data.rejectionReason === 'string'
+    ? data.rejectionReason
+    : typeof data.comment === 'string'
+      ? data.comment
+      : typeof data.opinion === 'string'
+        ? data.opinion
+        : '';
+  return submitApprovalDecision(processId, 'REJECTED', opinion) as Promise<ApprovalResponse>;
 }
 
 export async function submitForAcceptance(

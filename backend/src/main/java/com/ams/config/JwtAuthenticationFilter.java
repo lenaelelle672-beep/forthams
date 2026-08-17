@@ -1,6 +1,7 @@
 package com.ams.config;
 
 import com.ams.context.TenantContext;
+import com.ams.service.impl.UserDetailsServiceImpl;
 import com.ams.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -25,9 +25,10 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+    private static final String AUTHENTICATION_FAILURE_RESPONSE = "认证失败";
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -42,28 +43,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
+            // 同一线程上的旧认证绝不能为当前 Bearer token 复用或兜底。
+            SecurityContextHolder.clearContext();
+
             String token = authHeader.substring(7);
             String username;
+            Long userId;
             String tenantId;
+            Integer tokenVersion;
             try {
                 username = jwtUtil.getUsernameFromToken(token);
+                userId = jwtUtil.getUserIdFromToken(token);
                 tenantId = jwtUtil.getTenantIdFromToken(token);
+                tokenVersion = jwtUtil.getTokenVersionFromToken(token);
             } catch (AuthenticationException ex) {
-                log.warn("jwt_authentication_failed clientIp={} method={} path={} message={}",
-                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), ex.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                log.warn("jwt_authentication_failed clientIp={} method={} path={}",
+                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI());
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, AUTHENTICATION_FAILURE_RESPONSE);
                 return;
             } catch (RuntimeException ex) {
-                log.warn("jwt_token_invalid clientIp={} method={} path={} message={}",
-                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), ex.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                log.warn("jwt_token_invalid clientIp={} method={} path={}",
+                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI());
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, AUTHENTICATION_FAILURE_RESPONSE);
+                return;
+            }
+
+            if (username == null || username.isBlank() || userId == null || userId <= 0
+                    || tokenVersion == null || tokenVersion < 0) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, AUTHENTICATION_FAILURE_RESPONSE);
                 return;
             }
 
             if (isTenantProtectedRequest(request) && (tenantId == null || tenantId.isBlank())) {
                 log.warn("tenant_missing_on_protected_request clientIp={} method={} path={}",
                         request.getRemoteAddr(), request.getMethod(), request.getRequestURI());
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing tenant identifier");
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, AUTHENTICATION_FAILURE_RESPONSE);
                 return;
             }
 
@@ -72,38 +86,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             try {
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsernameAndTenantId(username, userId, tenantId);
+                Integer currentTokenVersion = userDetailsService.getCurrentTokenVersion(username, userId, tenantId);
 
-                    if (!jwtUtil.validateToken(token, username)) {
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                        return;
-                    }
-
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    userDetails.getAuthorities()
-                            );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (!jwtUtil.validateToken(token, username, userId, tenantId, tokenVersion)
+                        || !tokenVersion.equals(currentTokenVersion)) {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, AUTHENTICATION_FAILURE_RESPONSE);
+                    return;
                 }
+
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             } catch (AuthenticationException ex) {
-                log.warn("jwt_authentication_failed clientIp={} method={} path={} message={}",
-                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), ex.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                log.warn("jwt_authentication_failed clientIp={} method={} path={}",
+                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI());
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, AUTHENTICATION_FAILURE_RESPONSE);
                 return;
             } catch (RuntimeException ex) {
-                log.warn("jwt_token_invalid clientIp={} method={} path={} message={}",
-                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI(), ex.getMessage());
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                log.warn("jwt_token_invalid clientIp={} method={} path={}",
+                        request.getRemoteAddr(), request.getMethod(), request.getRequestURI());
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, AUTHENTICATION_FAILURE_RESPONSE);
                 return;
             }
 
             filterChain.doFilter(request, response);
         } finally {
             TenantContext.clear();
+            SecurityContextHolder.clearContext();
         }
     }
 

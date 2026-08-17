@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DataPermissionCatalogController {
 
     private static final String PERMISSION_QUERY = "system:role-permission:query";
-    private static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
 
     private final DataPermissionCatalogService dataPermissionCatalogService;
     private final JwtUtil jwtUtil;
@@ -58,7 +57,7 @@ public class DataPermissionCatalogController {
         }
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(authority -> PERMISSION_QUERY.equals(authority) || ROLE_SUPER_ADMIN.equals(authority));
+                .anyMatch(PERMISSION_QUERY::equals);
     }
 
     private String extractToken(HttpServletRequest request) {

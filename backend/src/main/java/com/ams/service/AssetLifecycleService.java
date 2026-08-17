@@ -30,6 +30,7 @@ public class AssetLifecycleService {
 
     private final AssetMapper assetMapper;
     private final AssetChangeLogMapper assetChangeLogMapper;
+    private final AssetDataPermissionEvaluator assetDataPermissionEvaluator;
 
     @Transactional(rollbackFor = Exception.class)
     public Asset transitionStatus(Long assetId, AssetStatus targetStatus, String changeType, String reason, Long operatorId) {
@@ -56,26 +57,36 @@ public class AssetLifecycleService {
     public Asset transitionLoadedAsset(Asset asset, AssetStatus targetStatus, String changeType, String reason,
                                        Long operatorId, Consumer<Asset> mutator) {
         String tenantId = verifyAssetTenant(asset, "transitionLoadedAsset");
+        assetDataPermissionEvaluator.assertCanWrite(asset);
         if (targetStatus == null) {
             throw new BusinessException("目标资产状态不能为空");
         }
 
         AssetStatus currentStatus = parseCurrentStatus(asset.getStatus());
+        validateTransitionSource(currentStatus, targetStatus, changeType);
         if (!currentStatus.canTransitionTo(targetStatus)) {
             throw new BusinessException("资产状态不允许从" + currentStatus.name() + "变更为" + targetStatus.name());
         }
 
+        String expectedStoredStatus = asset.getStatus();
+        int expectedVersion = versionOf(asset.getVersion());
         String oldValue = buildAssetSnapshot(asset);
         if (mutator != null) {
             mutator.accept(asset);
         }
         asset.setStatus(targetStatus.name());
+        assetDataPermissionEvaluator.assertCanWrite(asset);
         String newValue = buildAssetSnapshot(asset);
 
         if (!oldValue.equals(newValue)) {
-            int updated = assetMapper.update(asset, assetById(asset.getId(), tenantId));
+            asset.setVersion(expectedVersion + 1);
+            LambdaQueryWrapper<Asset> updateWrapper = assetById(asset.getId(), tenantId);
+            updateWrapper.eq(Asset::getStatus, expectedStoredStatus)
+                    .eq(Asset::getVersion, expectedVersion);
+            assetDataPermissionEvaluator.applyTo(updateWrapper);
+            int updated = assetMapper.update(asset, updateWrapper);
             if (updated == 0) {
-                throw new AccessDeniedException("Asset belongs to another tenant");
+                throw new BusinessException("资产已变更、版本过期或不在当前数据范围内");
             }
             createChangeLog(asset.getId(), normalizeChangeType(changeType), oldValue, newValue, reason, operatorId);
         }
@@ -86,6 +97,7 @@ public class AssetLifecycleService {
         String tenantId = TenantContext.requireTenantId();
         Asset asset = assetMapper.selectOne(assetById(assetId, tenantId));
         if (asset != null) {
+            assetDataPermissionEvaluator.assertCanAccess(asset);
             return asset;
         }
         Asset existingAsset = assetMapper.selectById(assetId);
@@ -141,6 +153,44 @@ public class AssetLifecycleService {
         return changeType;
     }
 
+    private void validateTransitionSource(AssetStatus currentStatus, AssetStatus targetStatus, String changeType) {
+        String normalizedChangeType = normalizeChangeType(changeType);
+        boolean targetIsRetirementTerminal = targetStatus == AssetStatus.RETIRED || targetStatus == AssetStatus.SCRAPPED;
+        switch (normalizedChangeType) {
+            case CHANGE_TYPE_STATUS -> {
+                if (currentStatus.requiresDedicatedWorkflow() || targetStatus.requiresDedicatedWorkflow()) {
+                    throw new BusinessException("退役、报废和清退状态只能通过对应业务流程变更");
+                }
+            }
+            case "RETIREMENT_SUBMIT" -> {
+                requireTargetStatus(targetStatus, AssetStatus.PENDING_RETIREMENT, normalizedChangeType);
+                if (currentStatus.requiresDedicatedWorkflow()) {
+                    throw new BusinessException("退役申请只能从普通资产状态提交");
+                }
+            }
+            case "RETIREMENT_APPROVED", "RETIREMENT_COMPLETED" -> {
+                if (currentStatus != AssetStatus.PENDING_RETIREMENT || !targetIsRetirementTerminal) {
+                    throw new BusinessException("退役审批只能将待退役资产迁移至退役或报废状态");
+                }
+            }
+            case "RETIREMENT_CANCELLED", "RETIREMENT_REJECTED", "RETIREMENT_REQUIRES_RESUBMISSION" -> {
+                if (currentStatus != AssetStatus.PENDING_RETIREMENT || targetStatus.requiresDedicatedWorkflow()) {
+                    throw new BusinessException("退役撤回只能将待退役资产恢复至普通资产状态");
+                }
+            }
+            case "TRANSFER" -> requireTargetStatus(targetStatus, AssetStatus.IN_USE, normalizedChangeType);
+            case "SCRAP" -> requireTargetStatus(targetStatus, AssetStatus.SCRAPPED, normalizedChangeType);
+            case "CLEARANCE" -> requireTargetStatus(targetStatus, AssetStatus.CLEARED, normalizedChangeType);
+            default -> throw new BusinessException("未授权的资产状态迁移类型");
+        }
+    }
+
+    private void requireTargetStatus(AssetStatus targetStatus, AssetStatus expectedStatus, String changeType) {
+        if (targetStatus != expectedStatus) {
+            throw new BusinessException(changeType + "不允许迁移至" + targetStatus.name());
+        }
+    }
+
     private String buildAssetSnapshot(Asset asset) {
         return String.format("deptId=%s,userId=%s,location=%s,status=%s",
                 asset.getDeptId(), asset.getUserId(), asset.getLocation(), asset.getStatus());
@@ -171,5 +221,9 @@ public class AssetLifecycleService {
         }
         Matcher matcher = SNAPSHOT_STATUS_PATTERN.matcher(snapshot);
         return matcher.find() ? matcher.group(1) : null;
+    }
+
+    private int versionOf(Integer version) {
+        return version == null ? 0 : version;
     }
 }

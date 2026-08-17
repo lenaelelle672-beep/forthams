@@ -26,6 +26,7 @@ public class AssetCompensation implements Serializable {
     private String description;
     private String status;
     private Long createBy;
+    private Integer version;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

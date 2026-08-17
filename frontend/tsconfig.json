@@ -24,6 +24,7 @@
 
     /* Path alias — must match vite.config.ts resolve.alias */
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"]
     },

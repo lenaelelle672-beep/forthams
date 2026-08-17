@@ -24,7 +24,7 @@ public class DataPermissionCatalogDTO {
         private Long roleId;
         private String roleName;
         private String roleCode;
-        /** ALL/DEPT/DEPT_AND_SUB/SELF/CUSTOM */
+        /** ALL/DEPT/DEPT_AND_SUB/SELF/CUSTOM；DENY 仅表示无效或缺失规则的默认拒绝状态。 */
         private String dataScope;
         private String dataScopeLabel;
         private boolean customScope;

@@ -250,6 +250,8 @@ export interface LoginResponse {
   realName: string;
   roles: string[];
   permissions?: string[];
+  platformAdmin?: boolean;
+  platform_admin?: boolean;
 }
 
 // ---------------------------------------------------------------------------

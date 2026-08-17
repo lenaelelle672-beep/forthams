@@ -3,6 +3,8 @@ USE ams_db;
 
 CREATE TABLE IF NOT EXISTS sys_user (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64),
+    platform_admin TINYINT NOT NULL DEFAULT 0,
     username VARCHAR(64) NOT NULL UNIQUE,
     password VARCHAR(128) NOT NULL,
     real_name VARCHAR(64) NOT NULL,
@@ -11,25 +13,43 @@ CREATE TABLE IF NOT EXISTS sys_user (
     avatar VARCHAR(512),
     status TINYINT DEFAULT 1,
     dept_id BIGINT,
+    token_version INT NOT NULL DEFAULT 0,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
     INDEX idx_username (username),
+    INDEX idx_sys_user_tenant_status (tenant_id, status, id),
     INDEX idx_dept_id (dept_id),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS sys_user_tenant (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    tenant_id VARCHAR(64) NOT NULL,
+    status TINYINT NOT NULL DEFAULT 1,
+    created_by BIGINT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_sys_user_tenant_user_tenant (user_id, tenant_id),
+    INDEX idx_sys_user_tenant_tenant_status_user (tenant_id, status, user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS sys_role (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64),
     role_name VARCHAR(64) NOT NULL,
-    role_code VARCHAR(64) NOT NULL UNIQUE,
+    role_code VARCHAR(64) NOT NULL,
     description VARCHAR(512),
     sort_order INT DEFAULT 0,
     status TINYINT DEFAULT 1,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
-    INDEX idx_role_code (role_code)
+    UNIQUE KEY uk_sys_role_tenant_role_code (tenant_id, role_code),
+    INDEX idx_role_code (role_code),
+    INDEX idx_sys_role_tenant_status (tenant_id, status, deleted, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS sys_user_role (
@@ -42,19 +62,43 @@ CREATE TABLE IF NOT EXISTS sys_user_role (
     INDEX idx_role_id (role_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS sys_role_data_scope (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    role_id BIGINT NOT NULL,
+    data_scope VARCHAR(32) NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_sys_role_data_scope_tenant_role (tenant_id, role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS sys_role_dept (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    role_id BIGINT NOT NULL,
+    dept_id BIGINT NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_sys_role_dept_tenant_role_dept (tenant_id, role_id, dept_id),
+    INDEX idx_sys_role_dept_tenant_dept (tenant_id, dept_id, role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS sys_dept (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64),
     dept_name VARCHAR(128) NOT NULL,
-    dept_code VARCHAR(64) UNIQUE,
+    dept_code VARCHAR(64),
     parent_id BIGINT DEFAULT 0,
     sort_order INT DEFAULT 0,
     leader VARCHAR(64),
     phone VARCHAR(32),
     status TINYINT DEFAULT 1,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
-    INDEX idx_parent_id (parent_id)
+    UNIQUE KEY uk_sys_dept_tenant_dept_code (tenant_id, dept_code),
+    INDEX idx_parent_id (parent_id),
+    INDEX idx_sys_dept_tenant_parent (tenant_id, parent_id, status, id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS sys_permission (
@@ -160,12 +204,15 @@ CREATE TABLE IF NOT EXISTS asset (
     description TEXT,
     remark TEXT,
     create_by BIGINT,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
     UNIQUE KEY uk_asset_tenant_asset_no (tenant_id, asset_no),
     INDEX idx_asset_no (asset_no),
     INDEX idx_asset_tenant (tenant_id),
+    INDEX idx_asset_tenant_dept (tenant_id, dept_id),
+    INDEX idx_asset_tenant_user (tenant_id, user_id),
     INDEX idx_asset_category (category_id),
     INDEX idx_asset_location_coordinates (location_lat, location_lng)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -206,6 +253,7 @@ CREATE TABLE IF NOT EXISTS work_order (
     estimated_cost DECIMAL(15,2),
     actual_cost DECIMAL(15,2),
     completion_note TEXT,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
@@ -274,6 +322,7 @@ CREATE TABLE IF NOT EXISTS retirement_application (
     status VARCHAR(32) DEFAULT 'DRAFT',
     current_approval_step INT DEFAULT 0,
     total_approval_steps INT DEFAULT 1,
+    version INT NOT NULL DEFAULT 0,
     attachments TEXT,
     remark TEXT,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -297,6 +346,7 @@ CREATE TABLE IF NOT EXISTS maintenance_record (
     result VARCHAR(32),
     remark TEXT,
     create_by BIGINT,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
@@ -310,7 +360,9 @@ CREATE TABLE IF NOT EXISTS inventory_task (
     task_no VARCHAR(128) NOT NULL UNIQUE,
     task_name VARCHAR(256) NOT NULL,
     inventory_type VARCHAR(32) NOT NULL,
-    status VARCHAR(32) DEFAULT 'PENDING',
+    status VARCHAR(32) NOT NULL DEFAULT 'DRAFT',
+    cancellation_reason VARCHAR(128),
+    cancelled_at DATETIME,
     dept_ids TEXT,
     start_date DATE,
     end_date DATE,
@@ -324,6 +376,8 @@ CREATE TABLE IF NOT EXISTS inventory_task (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
     INDEX idx_inventory_task_tenant (tenant_id),
+    INDEX idx_inventory_task_tenant_created (tenant_id, create_time, id),
+    INDEX idx_inventory_task_tenant_status_created (tenant_id, status, create_time, id),
     INDEX idx_inventory_task_no (task_no)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -331,7 +385,7 @@ CREATE TABLE IF NOT EXISTS inventory_detail (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     task_id BIGINT NOT NULL,
     tenant_id VARCHAR(64) NOT NULL,
-    asset_id BIGINT,
+    asset_id BIGINT NOT NULL,
     rfid_tag VARCHAR(128),
     status VARCHAR(32),
     expected_location VARCHAR(256),
@@ -340,8 +394,82 @@ CREATE TABLE IF NOT EXISTS inventory_detail (
     remark VARCHAR(512),
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_inventory_detail_tenant (tenant_id),
-    INDEX idx_inventory_detail_task (task_id)
+    INDEX idx_inventory_detail_task (task_id),
+    UNIQUE KEY uk_inventory_detail_tenant_task_asset (tenant_id, task_id, asset_id),
+    INDEX idx_inventory_detail_task_tenant_asset (task_id, tenant_id, asset_id),
+    INDEX idx_inventory_detail_tenant_task_scan (tenant_id, task_id, scan_time),
+    INDEX idx_inventory_detail_tenant_task_status_scan (tenant_id, task_id, status, scan_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS inventory_detail_archive (
+    archive_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    id BIGINT NOT NULL,
+    task_id BIGINT NOT NULL,
+    tenant_id VARCHAR(64) NOT NULL,
+    asset_id BIGINT NULL,
+    rfid_tag VARCHAR(128),
+    status VARCHAR(32),
+    expected_location VARCHAR(256),
+    actual_location VARCHAR(256),
+    scan_time DATETIME,
+    remark VARCHAR(512),
+    create_time DATETIME,
+    archive_reason VARCHAR(128) NOT NULL,
+    archived_at DATETIME NOT NULL,
+    UNIQUE KEY uk_inventory_detail_archive_origin (tenant_id, task_id, id),
+    INDEX idx_inventory_detail_archive_task (tenant_id, task_id, asset_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS login_attempt_tracker (
+    account_hash CHAR(64) NOT NULL,
+    client_ip_hash CHAR(64) NOT NULL,
+    failure_count INT NOT NULL,
+    next_allowed_at DATETIME NOT NULL,
+    last_failure_at DATETIME NOT NULL,
+    expires_at DATETIME NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (account_hash, client_ip_hash),
+    INDEX idx_login_attempt_tracker_expires (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS login_attempt_tracker_guard (
+    id TINYINT NOT NULL PRIMARY KEY
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO login_attempt_tracker_guard (id) VALUES (1);
+
+CREATE TABLE IF NOT EXISTS login_attempt_bucket (
+    bucket_type VARCHAR(16) NOT NULL,
+    bucket_hash CHAR(64) NOT NULL,
+    failure_count INT NOT NULL DEFAULT 0,
+    reserved_count INT NOT NULL DEFAULT 0,
+    next_allowed_at DATETIME NOT NULL,
+    last_failure_at DATETIME NULL,
+    expires_at DATETIME NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (bucket_type, bucket_hash),
+    INDEX idx_login_attempt_bucket_expires (expires_at),
+    INDEX idx_login_attempt_bucket_next_allowed (next_allowed_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS login_attempt_reservation (
+    reservation_id CHAR(36) NOT NULL,
+    account_hash CHAR(64) NOT NULL,
+    client_ip_hash CHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (reservation_id),
+    INDEX idx_login_attempt_reservation_expires (expires_at),
+    INDEX idx_login_attempt_reservation_account_ip (account_hash, client_ip_hash)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS login_attempt_bucket_guard (
+    id TINYINT NOT NULL PRIMARY KEY
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO login_attempt_bucket_guard (id) VALUES (1);
 
 CREATE TABLE IF NOT EXISTS idle_asset_notice (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -353,6 +481,7 @@ CREATE TABLE IF NOT EXISTS idle_asset_notice (
     claimant_id BIGINT,
     claim_date DATE,
     create_by BIGINT,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
@@ -373,11 +502,33 @@ CREATE TABLE IF NOT EXISTS asset_compensation (
     description TEXT,
     status VARCHAR(32) DEFAULT 'PENDING',
     create_by BIGINT,
+    version INT NOT NULL DEFAULT 0,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted TINYINT DEFAULT 0,
     INDEX idx_compensation_tenant (tenant_id),
     INDEX idx_compensation_no (compensation_no)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS disposal_application (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    application_no VARCHAR(128) NOT NULL,
+    asset_id BIGINT NOT NULL,
+    disposal_type VARCHAR(32) NOT NULL,
+    target_dept_id BIGINT,
+    target_user_id BIGINT,
+    target_location VARCHAR(256),
+    reason VARCHAR(512) NOT NULL,
+    applicant_id BIGINT NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    version INT NOT NULL DEFAULT 0,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    UNIQUE KEY uk_disposal_tenant_no (tenant_id, application_no),
+    INDEX idx_disposal_tenant_status (tenant_id, status, id),
+    INDEX idx_disposal_tenant_asset (tenant_id, asset_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS approval_process (
@@ -388,8 +539,11 @@ CREATE TABLE IF NOT EXISTS approval_process (
     business_data TEXT,
     tenant_id VARCHAR(64) NOT NULL,
     status VARCHAR(32) DEFAULT 'PENDING',
+    cancellation_reason VARCHAR(128),
+    cancelled_at DATETIME,
     current_step INT DEFAULT 1,
     applicant_id BIGINT NOT NULL,
+    version INT NOT NULL DEFAULT 0,
     apply_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -419,6 +573,23 @@ CREATE TABLE IF NOT EXISTS approval_record (
     INDEX idx_approval_record_tenant (tenant_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS approval_node_assignment (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    process_id BIGINT NOT NULL,
+    step_no INT NOT NULL,
+    assignee_id BIGINT NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
+    workflow_definition_id BIGINT NOT NULL,
+    workflow_version INT NOT NULL,
+    decided_at DATETIME NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_approval_assignment_tenant_process_step_assignee (tenant_id, process_id, step_no, assignee_id),
+    INDEX idx_approval_assignment_tenant_assignee_status (tenant_id, assignee_id, status, process_id, step_no),
+    INDEX idx_approval_assignment_tenant_process_step (tenant_id, process_id, step_no, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD COLUMN tenant_id VARCHAR(64) NOT NULL DEFAULT ''T001'' AFTER process_id', 'SELECT 1') FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND column_name = 'tenant_id');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 SET @sql = (SELECT IF(COUNT(*) = 0, 'ALTER TABLE approval_record ADD INDEX idx_approval_record_tenant (tenant_id)', 'SELECT 1') FROM information_schema.statistics WHERE table_schema = DATABASE() AND table_name = 'approval_record' AND index_name = 'idx_approval_record_tenant');
@@ -443,6 +614,24 @@ CREATE TABLE IF NOT EXISTS workflow_definition (
     INDEX idx_workflow_tenant_status (tenant_id, status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 设计器草稿与已发布 workflow_definition projection 分离；新库 baseline 已含该表，
+-- staged V2_116 使用 IF NOT EXISTS 保持新库链不会重复建表。
+CREATE TABLE IF NOT EXISTS workflow_definition_draft (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    tenant_id VARCHAR(64) NOT NULL,
+    business_type VARCHAR(64) NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    description TEXT,
+    definition_json LONGTEXT NOT NULL,
+    revision INT NOT NULL DEFAULT 0,
+    updated_by BIGINT,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted TINYINT DEFAULT 0,
+    UNIQUE KEY uk_workflow_draft_tenant_business (tenant_id, business_type),
+    INDEX idx_workflow_draft_tenant_updated (tenant_id, update_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS sys_attachment (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     business_type VARCHAR(64) NOT NULL,
@@ -457,16 +646,7 @@ CREATE TABLE IF NOT EXISTS sys_attachment (
     INDEX idx_attachment_business (business_type, business_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO sys_dept (id, dept_name, dept_code, parent_id, sort_order, leader, status)
-VALUES
-    (1, '总公司', 'HQ', 0, 1, '系统管理员', 1)
-ON DUPLICATE KEY UPDATE dept_name = VALUES(dept_name);
-
-INSERT INTO sys_role (id, role_name, role_code, description, sort_order, status)
-VALUES
-    (1, '超级管理员', 'SUPER_ADMIN', '系统超级管理员', 1, 1),
-    (2, '普通用户', 'USER', '普通业务用户', 2, 1)
-ON DUPLICATE KEY UPDATE role_name = VALUES(role_name);
+-- 不创建默认部门、用户或角色。租户、成员关系和初始 tenant-admin 必须经受控 bootstrap 或平台管理员开通。
 
 INSERT INTO sys_permission (permission_name, permission_code, description, status)
 VALUES
@@ -479,27 +659,69 @@ ON DUPLICATE KEY UPDATE
     description = VALUES(description),
     status = VALUES(status);
 
-INSERT INTO sys_role_permission (role_id, permission_id)
-SELECT r.id, p.id
-FROM sys_role r
-INNER JOIN sys_permission p ON p.permission_code IN (
-    'system:integration:query',
-    'system:integration:edit',
-    'system:integration:delete',
-    'system:integration:test'
-)
-WHERE r.role_code = 'SUPER_ADMIN'
-ON DUPLICATE KEY UPDATE role_id = VALUES(role_id);
-
-INSERT INTO sys_user (id, username, password, real_name, email, phone, status, dept_id)
+-- 动作权限仅登记到权限库存；不为任何角色自动创建绑定。
+INSERT IGNORE INTO sys_permission (permission_name, permission_code, description, status)
 VALUES
-    (1, 'admin', '$2y$10$9omJ8OjfUif9yjfAI6/opOGJ66YaoaKQjDcDGtP5jv13v5I7FG1Zi', '系统管理员', 'admin@ams.com', '13800138000', 1, 1)
-ON DUPLICATE KEY UPDATE username = VALUES(username);
-
-INSERT INTO sys_user_role (id, user_id, role_id)
-VALUES
-    (1, 1, 1)
-ON DUPLICATE KEY UPDATE user_id = VALUES(user_id);
+    ('资产查询', 'asset:query', '资产查询动作权限', 1),
+    ('资产新建', 'asset:create', '资产新建动作权限', 1),
+    ('资产更新', 'asset:update', '资产更新动作权限', 1),
+    ('资产审批', 'asset:approve', '资产审批动作权限', 1),
+    ('资产删除', 'asset:delete', '资产删除动作权限', 1),
+    ('资产分类查询', 'asset:category:query', '平台全局资产分类查询动作权限', 1),
+    ('退役查询', 'retirement:query', '退役查询动作权限', 1),
+    ('退役新建', 'retirement:create', '退役新建动作权限', 1),
+    ('退役更新', 'retirement:update', '退役更新动作权限', 1),
+    ('退役审批', 'retirement:approve', '退役审批动作权限', 1),
+    ('退役删除', 'retirement:delete', '退役删除动作权限', 1),
+    ('赔偿查询', 'compensation:query', '赔偿查询动作权限', 1),
+    ('赔偿新建', 'compensation:create', '赔偿新建动作权限', 1),
+    ('赔偿更新', 'compensation:update', '赔偿更新动作权限', 1),
+    ('赔偿审批', 'compensation:approve', '赔偿审批动作权限', 1),
+    ('赔偿删除', 'compensation:delete', '赔偿删除动作权限', 1),
+    ('处置查询', 'disposal:query', '处置查询动作权限', 1),
+    ('处置新建', 'disposal:create', '处置新建动作权限', 1),
+    ('处置更新', 'disposal:update', '处置更新动作权限', 1),
+    ('处置审批', 'disposal:approve', '处置审批动作权限', 1),
+    ('处置删除', 'disposal:delete', '处置删除动作权限', 1),
+    ('工单查询', 'workorder:query', '工单查询动作权限', 1),
+    ('工单新建', 'workorder:create', '工单新建动作权限', 1),
+    ('工单更新', 'workorder:update', '工单更新动作权限', 1),
+    ('工单删除', 'workorder:delete', '工单删除动作权限', 1),
+    ('工单提交', 'workorder:submit', '工单提交动作权限', 1),
+    ('工单审批', 'workorder:approve', '工单审批动作权限', 1),
+    ('工单执行', 'workorder:execute', '工单执行动作权限', 1),
+    ('工单取消', 'workorder:cancel', '工单取消动作权限', 1),
+    ('审批查询', 'approval:query', '审批查询动作权限', 1),
+    ('审批创建', 'approval:create', '审批创建动作权限', 1),
+    ('审批处理', 'approval:approve', '审批处理动作权限', 1),
+    ('维护查询', 'maintenance:query', '维护查询动作权限', 1),
+    ('维护新建', 'maintenance:create', '维护新建动作权限', 1),
+    ('维护更新', 'maintenance:update', '维护更新动作权限', 1),
+    ('维护删除', 'maintenance:delete', '维护删除动作权限', 1),
+    ('闲置资产查询', 'idleasset:query', '闲置资产查询动作权限', 1),
+    ('闲置资产发布', 'idleasset:create', '闲置资产发布动作权限', 1),
+    ('闲置资产更新', 'idleasset:update', '闲置资产更新动作权限', 1),
+    ('闲置资产删除', 'idleasset:delete', '闲置资产删除动作权限', 1),
+    ('闲置资产认领', 'idleasset:claim', '闲置资产认领动作权限', 1),
+    ('盘点查询', 'inventory:query', '盘点任务及明细查询动作权限', 1),
+    ('盘点新建', 'inventory:create', '盘点任务新建动作权限', 1),
+    ('盘点状态更新', 'inventory:update', '盘点任务状态更新动作权限', 1),
+    ('盘点扫描', 'inventory:scan', '盘点扫描录入动作权限', 1),
+    ('用户查询', 'user:query', '用户查询动作权限', 1),
+    ('用户新建', 'user:create', '用户新建动作权限', 1),
+    ('用户更新', 'user:update', '用户更新动作权限', 1),
+    ('用户重置密码', 'user:reset-password', '用户重置密码动作权限', 1),
+    ('用户删除', 'user:delete', '用户删除动作权限', 1),
+    ('角色查询', 'role:query', '角色查询动作权限', 1),
+    ('角色新建', 'role:create', '角色新建动作权限', 1),
+    ('角色更新', 'role:update', '角色更新动作权限', 1),
+    ('角色删除', 'role:delete', '角色删除动作权限', 1),
+    ('部门查询', 'dept:query', '部门查询动作权限', 1),
+    ('部门新建', 'dept:create', '部门新建动作权限', 1),
+    ('部门更新', 'dept:update', '部门更新动作权限', 1),
+    ('部门删除', 'dept:delete', '部门删除动作权限', 1),
+    ('供应商查询', 'vendor:vendor:query', '平台全局供应商查询动作权限', 1),
+    ('位置查询', 'location:query', '平台全局位置查询动作权限', 1);
 
 -- Workbench platform menu entry
 INSERT INTO sys_menu (id, menu_name, parent_id, sort_order, menu_type, perms, icon, visible, status)
@@ -522,9 +744,3 @@ component = CASE id
     ELSE component
 END
 WHERE id = 310;
-
-INSERT INTO sys_role_menu (role_id, menu_id)
-VALUES
-    (1, 310),
-    (1, 311)
-ON DUPLICATE KEY UPDATE menu_id = VALUES(menu_id);

@@ -22,6 +22,7 @@ public class IdleAssetNotice implements Serializable {
     private Long claimantId;
     private LocalDate claimDate;
     private Long createBy;
+    private Integer version;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

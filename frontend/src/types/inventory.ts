@@ -21,6 +21,8 @@
  * - category: 按分类多选
  * - all: 全部资产
  */
+export type InventoryType = 'FULL' | 'PARTIAL' | 'CYCLE';
+
 export type ScopeType = 'location' | 'category' | 'all';
 
 /**
@@ -31,6 +33,8 @@ export type ScopeType = 'location' | 'category' | 'all';
  * - submitted:  已提交（不可逆）
  */
 export type TaskStatus = 'draft' | 'in_progress' | 'completed' | 'submitted';
+
+export type InventoryTaskStatus = TaskStatus;
 
 /**
  * 实盘状态
@@ -160,10 +164,10 @@ export interface SurplusDeficitItem {
 export interface CreateTaskPayload {
   /** 任务名称（1–50 字符，必填） */
   taskName: string;
-  /** 盘点范围类型 */
-  scopeType: ScopeType;
-  /** 位置 / 分类 ID 列表；scopeType 为 all 时可为空数组 */
-  scopeIds: string[];
+  /** 盘点类型，对应后端 inventoryType */
+  inventoryType: InventoryType;
+  /** 逗号分隔的部门 ID，对应后端 deptIds */
+  deptIds?: string;
 }
 
 /**

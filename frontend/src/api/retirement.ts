@@ -6,6 +6,12 @@
 
 import http from '@/utils/http';
 import type { PaginatedResponse } from '@/types/common';
+import {
+  findApprovalProcessId,
+  MISSING_APPROVAL_PROCESS_MESSAGE,
+  resolveApprovalProcessId,
+  submitApprovalDecision,
+} from '@/api/approval';
 
 export interface RetirementApplication {
   id: number;
@@ -86,10 +92,40 @@ export const getAssetRetirementHistory = (assetId: number) =>
 export const withdrawRetirement = (id: number) =>
   http.post<RetirementApplication>(`/retirement/${id}/cancel`);
 
+async function requireRetirementApprovalId(
+  id: number,
+  data: Record<string, unknown> = {},
+): Promise<number> {
+  const explicitId = resolveApprovalProcessId(data);
+  if (explicitId) {
+    return explicitId;
+  }
+  const processId = await findApprovalProcessId('RETIREMENT', id);
+  if (!processId) {
+    throw new Error(MISSING_APPROVAL_PROCESS_MESSAGE);
+  }
+  return processId;
+}
+
 /** 审批通过退役申请 */
-export const approveRetirement = (id: number) =>
-  http.post<RetirementApplication>(`/retirement/${id}/approve`);
+export const approveRetirement = async (
+  id: number,
+  data: Record<string, unknown> = {},
+) => {
+  const processId = await requireRetirementApprovalId(id, data);
+  return submitApprovalDecision(
+    processId,
+    'APPROVED',
+    typeof data.opinion === 'string' ? data.opinion : typeof data.comment === 'string' ? data.comment : '',
+  ) as Promise<RetirementApplication>;
+};
 
 /** 驳回退役申请 */
-export const rejectRetirement = (id: number, reason: string) =>
-  http.post<RetirementApplication>(`/retirement/${id}/reject`, { reason });
+export const rejectRetirement = async (
+  id: number,
+  reason: string,
+  data: Record<string, unknown> = {},
+) => {
+  const processId = await requireRetirementApprovalId(id, data);
+  return submitApprovalDecision(processId, 'REJECTED', reason) as Promise<RetirementApplication>;
+};

@@ -10,24 +10,28 @@ import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
 import { getAssetList } from '@/api/asset';
-import { createCompensation } from '@/api/disposal';
+import {
+  MAX_COMPENSATION_DESCRIPTION_LENGTH,
+  getCompensationAmountError,
+  submitCompensationApplications,
+  type BatchApplicationResult,
+  type Compensation,
+} from '@/api/disposal';
 import { getDeptList } from '@/api/base';
-import type { AssetListItem } from '@/types/asset';
-import type { ApiResponse, PageData, Department } from '@/types/common';
 import { toast } from 'sonner';
 
 const schema = z.object({
   applyDate: z.string().min(1, '请选择申请日期'),
   damageType: z.string().min(1, '请选择损坏类型'),
-  damageDesc: z.string().min(10, '损坏描述至少 10 个字').max(500),
+  damageDesc: z.string().trim().min(1, '请填写赔偿事由').max(MAX_COMPENSATION_DESCRIPTION_LENGTH),
   damageDate: z.string().min(1, '请选择损坏日期'),
-  responsiblePerson: z.string().min(1, '请输入责任人').max(50),
+  responsiblePerson: z.coerce.number().int().positive('请输入有效责任人 ID'),
   responsibleDept: z.string().min(1, '请选择责任部门'),
-  discoverer: z.string().max(50).optional(),
+  discoverer: z.string().trim().max(50).optional(),
   insured: z.enum(['yes', 'no']),
   compensationType: z.enum(['cash', 'equivalent', 'repair']),
   approvalProcess: z.string().min(1, '请选择审批流程'),
-  remark: z.string().max(500).optional(),
+  remark: z.string().trim().max(MAX_COMPENSATION_DESCRIPTION_LENGTH).optional(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -40,6 +44,11 @@ interface AssetRow {
   originalValue: number;
   damageLevel: string;
   compensationAmount: number;
+}
+
+interface AssetValidationResult {
+  selectionError?: string;
+  errors: Record<string, string>;
 }
 
 const DAMAGE_LEVEL_OPTIONS = [
@@ -67,17 +76,125 @@ function formatCurrency(n: number): string {
   return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-/** Map an API AssetListItem to the local AssetRow used in the table */
-function toAssetRow(a: AssetListItem): AssetRow {
+/** 安全映射 API 资产记录到表格使用的 AssetRow。 */
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function readString(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function readNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
+function toAssetRow(value: unknown): AssetRow | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+  const id = readNumber(value.id);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return null;
+  }
   return {
-    id: String(a.id),
-    assetNo: a.assetNo ?? '',
-    assetName: a.assetName ?? '',
-    category: a.categoryName ?? '',
-    originalValue: a.originalValue ?? 0,
+    id: String(id),
+    assetNo: readString(value.assetNo),
+    assetName: readString(value.assetName),
+    category: readString(value.categoryName),
+    originalValue: readNumber(value.originalValue),
     damageLevel: 'medium',
     compensationAmount: 0,
   };
+}
+
+function getAssetRows(response: unknown): AssetRow[] {
+  if (!isRecord(response) || !Array.isArray(response.records)) {
+    return [];
+  }
+  return response.records.flatMap((asset) => {
+    const row = toAssetRow(asset);
+    return row ? [row] : [];
+  });
+}
+
+function getDepartmentOptions(response: unknown): Array<{ value: string; label: string }> {
+  if (!Array.isArray(response)) {
+    return [];
+  }
+  return response.flatMap((department) => {
+    if (!isRecord(department)) {
+      return [];
+    }
+    const id = readNumber(department.id);
+    const label = readString(department.deptName);
+    return Number.isSafeInteger(id) && id > 0 && label ? [{ value: String(id), label }] : [];
+  });
+}
+
+export function buildCompensationDescription(
+  values: Pick<FormValues, 'damageType' | 'damageDesc' | 'discoverer' | 'insured' | 'remark'>,
+): string {
+  return [
+    `损坏类型：${values.damageType}`,
+    `赔偿事由：${values.damageDesc.trim()}`,
+    values.discoverer?.trim() ? `发现人：${values.discoverer.trim()}` : null,
+    `是否报险：${values.insured === 'yes' ? '是' : '否'}`,
+    values.remark?.trim() ? `备注：${values.remark.trim()}` : null,
+  ].filter((part): part is string => part !== null).join('；');
+}
+
+function validateSelectedAssets(assets: AssetRow[]): AssetValidationResult {
+  if (assets.length === 0) {
+    return { selectionError: '请至少选择一项资产', errors: {} };
+  }
+
+  const errors: Record<string, string> = {};
+  assets.forEach((asset) => {
+    const assetId = Number(asset.id);
+    if (!Number.isSafeInteger(assetId) || assetId <= 0) {
+      errors[asset.id] = '资产无效，请重新选择';
+    } else {
+      const amountError = getCompensationAmountError(asset.compensationAmount);
+      if (amountError) {
+        errors[asset.id] = `该资产的${amountError}`;
+      }
+    }
+  });
+  return { errors };
+}
+
+export function mergeCompensationSubmissionResult(
+  previous: BatchApplicationResult<Compensation> | null,
+  current: BatchApplicationResult<Compensation>,
+): BatchApplicationResult<Compensation> {
+  const successes = new Map(previous?.successes.map((result) => [result.assetId, result]) ?? []);
+  const failures = new Map(previous?.failures.map((result) => [result.assetId, result]) ?? []);
+
+  current.successes.forEach((result) => {
+    successes.set(result.assetId, result);
+    failures.delete(result.assetId);
+  });
+  current.failures.forEach((result) => {
+    if (!successes.has(result.assetId)) {
+      failures.set(result.assetId, result);
+    }
+  });
+  return { successes: Array.from(successes.values()), failures: Array.from(failures.values()) };
+}
+
+function formatFailureReason(reason: unknown): string {
+  if (reason instanceof Error && reason.message) {
+    return reason.message;
+  }
+  return typeof reason === 'string' && reason ? reason : '提交失败，请检查后重试';
 }
 
 /**
@@ -96,6 +213,9 @@ export default function AssetCompensationFormPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [assetData, setAssetData] = useState<AssetRow[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [assetErrors, setAssetErrors] = useState<Record<string, string>>({});
+  const [assetSelectionError, setAssetSelectionError] = useState<string>();
+  const [submissionResult, setSubmissionResult] = useState<BatchApplicationResult<Compensation> | null>(null);
 
   // Fetch assets from real API
   const { data: assetListData } = useQuery({
@@ -109,15 +229,10 @@ export default function AssetCompensationFormPage() {
     queryFn: () => getDeptList(),
     staleTime: 5 * 60 * 1000,
   });
-  const deptOptions: { value: string; label: string }[] = (
-    deptRes as unknown as Department[] | undefined ?? []
-  ).map((d) => ({ value: String(d.id), label: d.deptName }));
+  const deptOptions = getDepartmentOptions(deptRes);
 
   // Derive the full asset list from API response
-  const apiAssets: AssetRow[] = useMemo(
-    () => ((assetListData as unknown as PageData<AssetListItem> | undefined)?.records ?? []).map(toAssetRow),
-    [assetListData],
-  );
+  const apiAssets = useMemo(() => getAssetRows(assetListData), [assetListData]);
 
   // Keep assetData in sync with the API list; preserve user edits
   const syncedAssetData = useMemo(() => {
@@ -134,6 +249,8 @@ export default function AssetCompensationFormPage() {
     register,
     handleSubmit,
     control,
+    setError,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -162,6 +279,7 @@ export default function AssetCompensationFormPage() {
   }, [displayAssets, selectedIds]);
 
   const toggleAsset = (id: string) => {
+    setAssetSelectionError(undefined);
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -175,10 +293,18 @@ export default function AssetCompensationFormPage() {
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(filteredAssets.map((a) => a.id)));
+      setAssetSelectionError(undefined);
     }
   };
 
   const updateAsset = (id: string, field: keyof AssetRow, value: string | number) => {
+    if (field === 'compensationAmount' && typeof value === 'number') {
+      const amountError = getCompensationAmountError(value);
+      setAssetErrors((current) => {
+        const { [id]: _, ...rest } = current;
+        return amountError ? { ...rest, [id]: `该资产的${amountError}` } : rest;
+      });
+    }
     setAssetData((prev) => {
       const map = new Map(prev.map((a) => [a.id, a]));
       const existing = map.get(id);
@@ -198,6 +324,7 @@ export default function AssetCompensationFormPage() {
   // Add selected assets from search results to the working set
   const addSelectedAssets = useCallback(() => {
     const filtered = filteredAssets;
+    setAssetSelectionError(undefined);
     setSelectedIds((prev) => {
       const next = new Set(prev);
       filtered.forEach((a) => next.add(a.id));
@@ -216,34 +343,62 @@ export default function AssetCompensationFormPage() {
   }, [filteredAssets]);
 
   const mutation = useMutation({
-    mutationFn: async (data: FormValues & { assets: AssetRow[]; totalCompensation: number }) => {
-      // Submit each selected asset as a compensation request via the approval flow
-      const results = await Promise.all(
-        data.assets.map((asset) =>
-          createCompensation({
-            assetId: Number(asset.id),
-            compensationType: data.compensationType,
-            compensationAmount: asset.compensationAmount,
-            description: data.damageDesc,
-            incidentDate: data.damageDate,
-          }),
-        ),
-      );
-      return results;
+    mutationFn: (data: FormValues & { assets: AssetRow[]; description: string }) => {
+      return submitCompensationApplications({
+        assets: data.assets.map((asset) => ({
+          assetId: Number(asset.id),
+          compensationAmount: asset.compensationAmount,
+        })),
+        compensationType: data.compensationType,
+        description: data.description,
+        incidentDate: data.damageDate,
+        responsibleUserId: data.responsiblePerson,
+        responsibleDeptId: Number(data.responsibleDept),
+      });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['compensation'] });
-      navigate('/disposals');
+    onSuccess: (result) => {
+      setSubmissionResult((previous) => mergeCompensationSubmissionResult(previous, result));
+      if (result.successes.length > 0) {
+        const successfulIds = new Set(result.successes.map(({ assetId }) => String(assetId)));
+        setSelectedIds((current) => new Set(
+          Array.from(current).filter((assetId) => !successfulIds.has(assetId)),
+        ));
+        qc.invalidateQueries({ queryKey: ['compensations'] });
+      }
+      if (result.failures.length === 0) {
+        toast.success(`已成功提交 ${result.successes.length} 项赔偿申请`);
+      } else if (result.successes.length > 0) {
+        toast.success(`已成功提交 ${result.successes.length} 项赔偿申请`);
+        toast.error(`${result.failures.length} 项提交失败，已保留失败资产以便重试`);
+      } else {
+        toast.error('所选资产均未提交成功，请检查后重试');
+      }
     },
     onError: () => toast.error('提交失败，请重试'),
   });
 
   const onSubmit = (values: FormValues) => {
     const selectedAssets = displayAssets.filter((a) => selectedIds.has(a.id));
+    const validation = validateSelectedAssets(selectedAssets);
+    setAssetSelectionError(validation.selectionError);
+    setAssetErrors(validation.errors);
+    if (validation.selectionError || Object.keys(validation.errors).length > 0) {
+      return;
+    }
+
+    const description = buildCompensationDescription(values);
+    if (description.length > MAX_COMPENSATION_DESCRIPTION_LENGTH) {
+      setError('damageDesc', {
+        type: 'manual',
+        message: `赔偿事由及附加信息不能超过 ${MAX_COMPENSATION_DESCRIPTION_LENGTH} 个字符`,
+      });
+      return;
+    }
+    clearErrors('damageDesc');
     mutation.mutate({
       ...values,
       assets: selectedAssets,
-      totalCompensation,
+      description,
     });
   };
 
@@ -252,7 +407,7 @@ export default function AssetCompensationFormPage() {
       <PageHeader
         title="资产赔偿申请"
         breadcrumbs={[
-          { label: '资产处置', href: '/disposal' },
+          { label: '资产处置', href: '/disposals' },
           { label: '赔偿申请' },
         ]}
         actions={
@@ -300,7 +455,7 @@ export default function AssetCompensationFormPage() {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Section 1: Basic Info */}
         <Card>
           <CardHeader>
@@ -368,10 +523,12 @@ export default function AssetCompensationFormPage() {
               {/* 责任人 — 高可读性强调字段 */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-[#1e293b]">
-                  责任人 <span className="text-red-500">*</span>
+                  责任人 ID <span className="text-red-500">*</span>
                 </label>
                 <input
-                  placeholder="输入责任人姓名"
+                  type="number"
+                  min="1"
+                  placeholder="输入责任人 ID"
                   className={`w-full px-3 py-2 text-sm font-medium border rounded-lg bg-white transition-all placeholder:text-[#94a3b8] placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] ${
                     errors.responsiblePerson ? 'border-red-400 ring-2 ring-red-100' : 'border-[#e2e8f0]'
                   }`}
@@ -451,6 +608,9 @@ export default function AssetCompensationFormPage() {
               </Button>
             </div>
           </CardHeader>
+          {assetSelectionError && (
+            <p role="alert" className="px-6 pb-3 text-sm text-red-600">{assetSelectionError}</p>
+          )}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="bg-[#f3f3fe] border-b border-[#e2e8f0]">
@@ -499,15 +659,20 @@ export default function AssetCompensationFormPage() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <input
-                        type="text"
+                         type="number"
+                         min="0.01"
+                         max="99999999.99"
+                         step="0.01"
+                        aria-label={`${asset.assetName || asset.assetNo || asset.id}赔偿金额`}
                         className="w-36 border border-[#bfdbfe] bg-[#eff6ff] rounded-md text-sm text-right font-semibold text-[#1e40af] py-1.5 px-3 focus:ring-2 focus:ring-blue-200 focus:border-[#3b82f6] outline-none"
-                        value={formatCurrency(asset.compensationAmount)}
+                        value={asset.compensationAmount || ''}
                         onChange={(e) => {
-                          const raw = e.target.value.replace(/[^\d.]/g, '');
-                          const num = parseFloat(raw) || 0;
-                          updateAsset(asset.id, 'compensationAmount', num);
+                          updateAsset(asset.id, 'compensationAmount', e.target.valueAsNumber || 0);
                         }}
                       />
+                      {assetErrors[asset.id] && (
+                        <p role="alert" className="mt-1 text-xs font-medium text-red-600">{assetErrors[asset.id]}</p>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -599,6 +764,31 @@ export default function AssetCompensationFormPage() {
         {mutation.isError && (
           <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
             {(mutation.error instanceof Error ? mutation.error.message : '提交失败，请重试')}
+          </div>
+        )}
+
+        {submissionResult && (
+          <div role="status" aria-live="polite" className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
+            {submissionResult.successes.length > 0 && (
+              <div>
+                <p className="font-semibold text-emerald-700">已成功提交的赔偿申请</p>
+                <ul className="mt-1 list-disc pl-5 text-emerald-700">
+                  {submissionResult.successes.map(({ assetId, response }) => (
+                    <li key={assetId}>资产 {assetId}：{response.compensationNo}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {submissionResult.failures.length > 0 && (
+              <div>
+                <p className="font-semibold text-red-700">仍待重试的资产</p>
+                <ul className="mt-1 list-disc pl-5 text-red-700">
+                  {submissionResult.failures.map(({ assetId, reason }) => (
+                    <li key={assetId}>资产 {assetId}：{formatFailureReason(reason)}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
 

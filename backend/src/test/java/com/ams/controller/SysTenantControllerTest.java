@@ -2,8 +2,10 @@ package com.ams.controller;
 
 import com.ams.common.GlobalExceptionHandler;
 import com.ams.dto.SysTenantDTO;
+import com.ams.entity.User;
 import com.ams.service.SysTenantService;
-import com.ams.utils.JwtUtil;
+import com.ams.service.TenantAuthorityService;
+import com.ams.service.TenantProvisioningService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,13 +34,17 @@ class SysTenantControllerTest {
     private SysTenantService sysTenantService;
 
     @Mock
-    private JwtUtil jwtUtil;
+    private TenantAuthorityService tenantAuthorityService;
+
+    @Mock
+    private TenantProvisioningService tenantProvisioningService;
 
     private MockMvc mockMvc;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new SysTenantController(sysTenantService, jwtUtil))
+        mockMvc = MockMvcBuilders.standaloneSetup(new SysTenantController(
+                        sysTenantService, tenantAuthorityService, tenantProvisioningService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
@@ -48,9 +55,8 @@ class SysTenantControllerTest {
     }
 
     @Test
-    void listShouldReturnTenantsForSuperAdmin() throws Exception {
-        grant("ROLE_SUPER_ADMIN");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+    void listShouldReturnTenantsForExplicitPlatformAdmin() throws Exception {
+        when(tenantAuthorityService.requirePlatformAdmin()).thenReturn(user());
         SysTenantDTO.PageResult page = new SysTenantDTO.PageResult();
         page.setTotal(1);
         page.setRecords(List.of(tenant("T001", "默认租户")));
@@ -65,8 +71,8 @@ class SysTenantControllerTest {
 
     @Test
     void listShouldRejectWithoutPermissionFailClosed() throws Exception {
-        grant("some-other-permission");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+        when(tenantAuthorityService.requirePlatformAdmin())
+                .thenThrow(new AccessDeniedException("仅显式平台管理员可以管理租户"));
 
         mockMvc.perform(get("/tenants").header("Authorization", "Bearer token"))
                 .andExpect(status().isForbidden())
@@ -75,9 +81,7 @@ class SysTenantControllerTest {
 
     @Test
     void currentShouldReturnOwnTenantForAnyAuthenticatedUser() throws Exception {
-        // 普通用户无 system:tenant:query，但 /current 仍可访问自己的租户
-        grant("asset:query");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+        when(tenantAuthorityService.requireCurrentTenantMember()).thenReturn(user());
         when(sysTenantService.current()).thenReturn(tenant("T001", "默认租户"));
 
         mockMvc.perform(get("/tenants/current").header("Authorization", "Bearer token"))
@@ -88,8 +92,7 @@ class SysTenantControllerTest {
 
     @Test
     void detailShouldRequireTenantQueryPermission() throws Exception {
-        grant("system:tenant:query");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+        when(tenantAuthorityService.requirePlatformAdmin()).thenReturn(user());
         when(sysTenantService.detail("T002")).thenReturn(tenant("T002", "子公司"));
 
         mockMvc.perform(get("/tenants/T002").header("Authorization", "Bearer token"))
@@ -99,8 +102,7 @@ class SysTenantControllerTest {
 
     @Test
     void metaShouldReturnReadOnlyNotice() throws Exception {
-        grant("ROLE_SUPER_ADMIN");
-        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+        when(tenantAuthorityService.requirePlatformAdmin()).thenReturn(user());
         SysTenantDTO.Meta meta = new SysTenantDTO.Meta();
         meta.setPlans(List.of("STANDARD"));
         meta.setStatuses(List.of("ACTIVE"));
@@ -121,6 +123,14 @@ class SysTenantControllerTest {
         dto.setMaxAssets(10000);
         dto.setStatus("ACTIVE");
         return dto;
+    }
+
+    private User user() {
+        User user = new User();
+        user.setId(42L);
+        user.setUsername("platform-admin");
+        user.setTenantId("T001");
+        return user;
     }
 
     private void grant(String... authorities) {

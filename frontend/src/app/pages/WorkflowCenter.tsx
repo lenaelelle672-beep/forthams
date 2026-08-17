@@ -70,7 +70,12 @@ export function WorkflowCenter() {
   const handlePublish = async (businessType: string, name: string) => {
     try {
       setError(null);
-      const result = await workflowDefinitionService.publish(businessType);
+      const reviewedDraft = await workflowDefinitionService.getDesigner(businessType);
+      const expectedDraftRevision = reviewedDraft.revision ?? reviewedDraft.draftRevision;
+      if (typeof expectedDraftRevision !== "number") {
+        throw new Error("请先保存并重新审阅流程草稿后再发布");
+      }
+      const result = await workflowDefinitionService.publish(businessType, expectedDraftRevision);
       setMessage(`${name}已发布，当前版本 v${result.version}`);
       await loadDefinitions();
     } catch (publishError) {

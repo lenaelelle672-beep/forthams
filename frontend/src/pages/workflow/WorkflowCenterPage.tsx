@@ -24,7 +24,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import {
+  roleApi,
   workflowApi,
+  type RoleRecord,
+  type WorkflowAssigneePreviewResponse,
   type WorkflowDefinitionDTO,
   type WorkflowDefinitionVersionDTO,
   type WorkflowStartAvailability,
@@ -40,7 +43,7 @@ import {
 } from '@/components/ui/Dialog';
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
 import { useAuth, type AuthUser } from '@/context/AuthContext';
-import { initialFlowEdges, initialFlowNodes } from '@/types/flow';
+import { isPlatformAdmin } from '@/utils/routePermissions';
 
 type WorkflowFilter = 'all' | 'PUBLISHED' | 'DRAFT' | 'DISABLED';
 
@@ -112,13 +115,26 @@ function statusBadge(s?: string) {
   return map[s ?? ''] ?? map.UNCONFIGURED;
 }
 
+function hasWorkflowDesignerPermission(user: AuthUser | null, permission: string) {
+  return isPlatformAdmin(user) && (user?.permissions ?? []).includes(permission);
+}
+
 function canEditWorkflowDefinitions(user: AuthUser | null) {
-  if (!user) return true;
-  const roles = user.roles ?? [];
-  if (roles.some((role) => ['ADMIN', 'SUPER_ADMIN'].includes(role.toUpperCase()))) return true;
-  const permissions = user.permissions ?? [];
-  if (permissions.length === 0) return true;
-  return permissions.includes('*') || permissions.includes('*:*:*') || permissions.includes('workflow:definition:edit');
+  return hasWorkflowDesignerPermission(user, 'workflow:designer:edit');
+}
+
+function canPublishWorkflowDefinitions(user: AuthUser | null) {
+  return hasWorkflowDesignerPermission(user, 'workflow:designer:publish');
+}
+
+function canRollbackWorkflowDefinitions(user: AuthUser | null) {
+  return hasWorkflowDesignerPermission(user, 'workflow:designer:rollback');
+}
+
+function canOpenWorkflowDesigner(user: AuthUser | null) {
+  return canEditWorkflowDefinitions(user)
+    || canPublishWorkflowDefinitions(user)
+    || canRollbackWorkflowDefinitions(user);
 }
 
 function matchesStatus(flow: WorkflowListItem, filter: WorkflowFilter) {
@@ -165,6 +181,129 @@ function buildPageWindow(current: number, total: number) {
   return Array.from({ length: windowSize }, (_, index) => start + index);
 }
 
+type WorkflowCenterApi = Pick<typeof workflowApi, 'getDesignerDraft' | 'saveDraft' | 'publish' | 'previewAssignees'> & {
+  listRoles?: () => Promise<RoleRecord[]>;
+};
+
+export type DefaultWorkflowAssignee = {
+  approverType: 'role';
+  approverRole: string;
+};
+
+export const MISSING_RESOLVABLE_ASSIGNEE_MESSAGE =
+  '无法解析有效处理人，禁止发布无处理人的默认流程。请由平台管理员在流程设计器中配置处理人后再发布。';
+
+const BLOCKED_DEFAULT_ROLES = new Set(['SUPER_ADMIN', 'ADMIN']);
+
+function hasResolvableApprover(preview: WorkflowAssigneePreviewResponse): boolean {
+  return preview.calculable && preview.nodes.some((node) => {
+    const count = node.assigneeCount ?? node.assignees.length;
+    return node.resolved && count > 0;
+  });
+}
+
+function isDraftRevision(value: number | null | undefined): value is number {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}
+
+export function createDefaultWorkflowDefinition(
+  businessType: string,
+  name: string,
+  description: string,
+  assignee?: DefaultWorkflowAssignee,
+): Record<string, unknown> {
+  const approverRole = assignee?.approverRole.trim();
+  return {
+    id: `WF-${businessType}`,
+    name,
+    description,
+    nodes: [
+      { id: 'start', type: 'START', label: '开始' },
+      {
+        id: 'approval',
+        type: 'APPROVAL',
+        label: '默认审批',
+        config: {
+          approverType: 'role',
+          ...(approverRole ? { approverRole } : {}),
+          approvalMode: 'sequence',
+        },
+      },
+      { id: 'end', type: 'END', label: '结束' },
+    ],
+    edges: [
+      { id: 'edge-start-approval', source: 'start', target: 'approval' },
+      { id: 'edge-approval-end', source: 'approval', target: 'end' },
+    ],
+  };
+}
+
+export async function resolvePublishableDefaultDefinition(
+  api: WorkflowCenterApi,
+  businessType: string,
+  name: string,
+  description: string,
+): Promise<Record<string, unknown>> {
+  const roles = await (api.listRoles ?? roleApi.getAll)();
+  for (const role of roles) {
+    const approverRole = role.roleCode?.trim();
+    if (!approverRole || BLOCKED_DEFAULT_ROLES.has(approverRole.toUpperCase())) {
+      continue;
+    }
+    const definition = createDefaultWorkflowDefinition(businessType, name, description, {
+      approverType: 'role',
+      approverRole,
+    });
+    const preview = await api.previewAssignees(businessType, { definition });
+    if (hasResolvableApprover(preview)) {
+      return definition;
+    }
+  }
+  throw new Error(MISSING_RESOLVABLE_ASSIGNEE_MESSAGE);
+}
+
+export async function publishWorkflowFromCenter(
+  api: WorkflowCenterApi,
+  businessType: string,
+  name: string,
+  description: string,
+  options: { createDefaultDraft?: boolean } = {},
+) {
+  const reviewedDraft = await api.getDesignerDraft(businessType);
+  if (isDraftRevision(reviewedDraft.revision)) {
+    return api.publish(businessType, {
+      expectedDraftRevision: reviewedDraft.revision,
+      publishNote: `${name}发布`,
+      impactScope: '仅影响后续新发起审批实例',
+      rollbackPlan: '通过版本历史恢复至已发布稳定版本',
+    });
+  }
+  if (reviewedDraft.status === 'DRAFT') {
+    throw new Error('流程草稿响应缺少可审阅 revision，请刷新后重试');
+  }
+  if (!options.createDefaultDraft) {
+    throw new Error('请先保存并重新审阅流程草稿后再发布');
+  }
+
+  const definition = await resolvePublishableDefaultDefinition(api, businessType, name, description);
+  const savedDraft = await api.saveDraft(businessType, {
+    name,
+    description,
+    definition,
+    expectedRevision: null,
+  });
+  if (!isDraftRevision(savedDraft.draftRevision)) {
+    throw new Error('默认流程草稿保存后未返回 revision，已停止发布');
+  }
+
+  return api.publish(businessType, {
+    expectedDraftRevision: savedDraft.draftRevision,
+    publishNote: `${name}发布`,
+    impactScope: '仅影响后续新发起审批实例',
+    rollbackPlan: '通过版本历史恢复至已发布稳定版本',
+  });
+}
+
 export default function WorkflowCenterPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -193,6 +332,11 @@ export default function WorkflowCenterPage() {
   const [rollbackPlan, setRollbackPlan] = useState('');
   const [rollingBack, setRollingBack] = useState(false);
   const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
+  const canPublishWorkflow = useMemo(() => canPublishWorkflowDefinitions(user), [user]);
+  const canRollbackWorkflow = useMemo(() => canRollbackWorkflowDefinitions(user), [user]);
+  const canOpenDesigner = useMemo(() => canOpenWorkflowDesigner(user), [user]);
+  const canCreateAndPublishWorkflow = canEditWorkflow && canPublishWorkflow;
+  const canManageWorkflow = canEditWorkflow || canPublishWorkflow || canRollbackWorkflow;
 
   const load = async () => {
     try {
@@ -375,10 +519,21 @@ export default function WorkflowCenterPage() {
     if (firstVersion) setSelectedVersionNumber(firstVersion.version);
   };
 
-  const handlePublish = async (bt: string, name: string) => {
+  const handlePublish = async (
+    bt: string,
+    name: string,
+    description: string,
+    createDefaultDraft = false,
+  ) => {
+    if (!canPublishWorkflow || (createDefaultDraft && !canEditWorkflow)) {
+      setErr(createDefaultDraft
+        ? '创建并发布默认流程需要 platform_admin、workflow:designer:edit 和 workflow:designer:publish 权限。'
+        : '发布流程需要 platform_admin 和 workflow:designer:publish 权限。');
+      return;
+    }
     try {
       setErr(null);
-      const result = await workflowApi.publish(bt);
+      const result = await publishWorkflowFromCenter(workflowApi, bt, name, description, { createDefaultDraft });
       setMsg(`${name}已发布，当前版本 v${result.version}`);
       await load();
     } catch (e) {
@@ -387,11 +542,24 @@ export default function WorkflowCenterPage() {
   };
 
   const handleRollback = async () => {
+    if (!canRollbackWorkflow) {
+      setErr('回滚流程需要 platform_admin 和 workflow:designer:rollback 权限。');
+      return;
+    }
     if (!rollbackTarget || !selectedFlow) return;
     setRollingBack(true);
     try {
       setErr(null);
+      const reviewedDraft = await workflowApi.getDesignerDraft(selectedFlow.businessType);
+      const expectedPublishedVersion = reviewedDraft.publishedVersion ?? selectedFlow.server?.version;
+      if (typeof expectedPublishedVersion !== 'number' || expectedPublishedVersion <= 0) {
+        throw new Error('当前没有可审阅的已发布版本，无法回滚');
+      }
       const result = await workflowApi.rollback(selectedFlow.businessType, rollbackTarget.version, {
+        ...(typeof reviewedDraft.revision === 'number'
+          ? { expectedDraftRevision: reviewedDraft.revision }
+          : { expectedDraftAbsent: true }),
+        expectedPublishedVersion,
         reason: rollbackReason.trim() || `回滚到 v${rollbackTarget.version}`,
         impactScope: '影响后续新发起审批，已发起实例保持原版本快照',
         rollbackPlan: rollbackPlan.trim() || '如回滚后发现问题，可在版本历史中再次回滚到其他已发布快照',
@@ -409,6 +577,10 @@ export default function WorkflowCenterPage() {
   };
 
   const handleToggle = async (bt: string, name: string, isDisabled: boolean) => {
+    if (!canPublishWorkflow) {
+      setErr('启用或停用流程需要 platform_admin 和 workflow:designer:publish 权限。');
+      return;
+    }
     try {
       setErr(null);
       await workflowApi.updateStatus(bt, isDisabled ? 'ENABLED' : 'DISABLED');
@@ -437,7 +609,7 @@ export default function WorkflowCenterPage() {
                 <Button
                   type="button"
                   disabled={!canEditWorkflow}
-                  title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
+                  title={!canEditWorkflow ? '需要 platform_admin 和 workflow:designer:edit 权限' : undefined}
                   onClick={() => setShowNewDropdown((v) => !v)}
                 >
                   <Plus className="h-4 w-4" />
@@ -458,7 +630,8 @@ export default function WorkflowCenterPage() {
                             await workflowApi.saveDraft(f.businessType, {
                               name: f.name,
                               description: f.description,
-                              definition: { nodes: initialFlowNodes, edges: initialFlowEdges },
+                              definition: createDefaultWorkflowDefinition(f.businessType, f.name, f.description),
+                              expectedRevision: null,
                             });
                             setMsg(`"${f.name}"草稿已创建，跳转设计器中...`);
                             navigate(`/workflow-designer?businessType=${f.businessType}`);
@@ -520,7 +693,7 @@ export default function WorkflowCenterPage() {
             <DialogFooter>
               <button
                 type="button"
-                disabled={rollingBack}
+                disabled={rollingBack || !canRollbackWorkflow}
                 className="flex-1 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 onClick={() => {
                   setRollbackTarget(null);
@@ -558,9 +731,9 @@ export default function WorkflowCenterPage() {
             </button>
           </div>
         )}
-        {!canEditWorkflow && (
+        {!canManageWorkflow && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-            当前账号只有流程查看权限，无法新建、发布或编辑流程。
+            当前账号只有流程查看权限。流程配置、发布和回滚需要 platform_admin 标记及对应的设计器操作权限。
           </div>
         )}
 
@@ -667,15 +840,16 @@ export default function WorkflowCenterPage() {
                       {!selectedFlow.server || selectedFlow.server.status === 'UNCONFIGURED' ? (
                         <button
                           type="button"
-                          disabled={!canEditWorkflow}
-                          onClick={() => handlePublish(selectedFlow.businessType, selectedFlow.name)}
+                          disabled={!canCreateAndPublishWorkflow}
+                          onClick={() => handlePublish(selectedFlow.businessType, selectedFlow.name, selectedFlow.description, true)}
+                          title={!canCreateAndPublishWorkflow ? '需要 platform_admin、workflow:designer:edit 和 workflow:designer:publish 权限' : undefined}
                           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {canEditWorkflow ? '创建并发布默认流程' : '需要编辑权限'}
+                          {canCreateAndPublishWorkflow ? '创建并发布默认流程' : '需要编辑和发布权限'}
                         </button>
                       ) : (
                         <>
-                          {canEditWorkflow && (
+                          {canOpenDesigner && (
                             <button
                               type="button"
                               onClick={() => navigate(`/workflow-designer?businessType=${selectedFlow.businessType}`)}
@@ -713,16 +887,16 @@ export default function WorkflowCenterPage() {
                               配置表单源码
                             </button>
                           )}
-                          {canEditWorkflow && selectedFlow.server?.status !== 'DISABLED' && (
+                          {canPublishWorkflow && selectedFlow.server?.status !== 'DISABLED' && (
                             <button
                               type="button"
-                              onClick={() => handlePublish(selectedFlow.businessType, selectedFlow.name)}
+                              onClick={() => handlePublish(selectedFlow.businessType, selectedFlow.name, selectedFlow.description)}
                               className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-100"
                             >
                               {selectedFlow.server?.status === 'DRAFT' ? '发布流程' : '重新发布'}
                             </button>
                           )}
-                          {canEditWorkflow && selectedFlow.server && selectedFlow.server.version > 0 && (
+                          {canPublishWorkflow && selectedFlow.server && selectedFlow.server.version > 0 && (
                             <button
                               type="button"
                               onClick={() => handleToggle(selectedFlow.businessType, selectedFlow.name, selectedFlow.server?.status === 'DISABLED')}
@@ -840,7 +1014,7 @@ export default function WorkflowCenterPage() {
                       <div className="space-y-4 p-4">
                         <div className="max-h-64 space-y-2 overflow-y-auto pr-1">
                           {pagedVersions.map((version) => {
-                            const canRollbackVersion = canEditWorkflow && selectedFlow.server
+                            const canRollbackVersion = canRollbackWorkflow && selectedFlow.server
                               && version.version < (selectedFlow.server.version ?? 0);
                             const activeVersion = selectedVersion?.version === version.version;
                             return (
@@ -921,7 +1095,7 @@ export default function WorkflowCenterPage() {
                               </div>
                               {selectedFlow.server && selectedVersion.version === selectedFlow.server.version ? (
                                 <span className="rounded bg-green-50 px-2 py-1 text-xs font-medium text-green-700">当前发布头</span>
-                              ) : canEditWorkflow && selectedFlow.server && selectedVersion.version < (selectedFlow.server.version ?? 0) ? (
+                              ) : canRollbackWorkflow && selectedFlow.server && selectedVersion.version < (selectedFlow.server.version ?? 0) ? (
                                 <button
                                   type="button"
                                   aria-label={`回滚到版本 v${selectedVersion.version}`}
@@ -1057,15 +1231,16 @@ export default function WorkflowCenterPage() {
                       {isUnconfigured ? (
                         <button
                           type="button"
-                          disabled={!canEditWorkflow}
-                          onClick={() => handlePublish(flow.businessType, flow.name)}
+                          disabled={!canCreateAndPublishWorkflow}
+                          onClick={() => handlePublish(flow.businessType, flow.name, flow.description, true)}
+                          title={!canCreateAndPublishWorkflow ? '需要 platform_admin、workflow:designer:edit 和 workflow:designer:publish 权限' : undefined}
                           className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {canEditWorkflow ? '创建并发布默认流程' : '需要编辑权限'}
+                          {canCreateAndPublishWorkflow ? '创建并发布默认流程' : '需要编辑和发布权限'}
                         </button>
                       ) : (
                         <>
-                          {canEditWorkflow && (
+                          {canOpenDesigner && (
                             <button
                               type="button"
                               onClick={() => navigate(`/workflow-designer?businessType=${flow.businessType}`)}
@@ -1092,16 +1267,16 @@ export default function WorkflowCenterPage() {
                               配置表单源码
                             </button>
                           )}
-                          {canEditWorkflow && !isDisabled && (
+                          {canPublishWorkflow && !isDisabled && (
                             <button
                               type="button"
-                              onClick={() => handlePublish(flow.businessType, flow.name)}
+                              onClick={() => handlePublish(flow.businessType, flow.name, flow.description)}
                               className="inline-flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-100"
                             >
                               {isDraft ? '发布流程' : '重新发布'}
                             </button>
                           )}
-                          {canEditWorkflow && flow.server && flow.server.version > 0 && (
+                          {canPublishWorkflow && flow.server && flow.server.version > 0 && (
                             <button
                               type="button"
                               onClick={() => handleToggle(flow.businessType, flow.name, isDisabled)}

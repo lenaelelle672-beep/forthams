@@ -1,14 +1,20 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.dto.CategoryTreeDTO;
 import com.ams.entity.AssetCategory;
 import com.ams.mapper.AssetCategoryMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,8 +29,26 @@ class AssetCategoryServiceTest {
     @Mock
     private AssetCategoryMapper assetCategoryMapper;
 
+    @Mock
+    private TenantAuthorityService tenantAuthorityService;
+
     @InjectMocks
     private AssetCategoryService assetCategoryService;
+
+    @BeforeEach
+    void setUpSecurityContext() {
+        TenantContext.setTenantId("T001");
+        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
+                "category-test-user",
+                "N/A",
+                List.of(new SimpleGrantedAuthority("asset:category:query"))));
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        TenantContext.clear();
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void testGetCategoryTree() {

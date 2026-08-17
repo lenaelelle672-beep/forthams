@@ -7,10 +7,11 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { FlowCanvas } from '@/components/flow/FlowCanvas';
 import { NodeConfigPanel } from '@/components/flow/NodeConfigPanel';
 import { NodePanel } from '@/components/flow/NodePanel';
-import { workflowApi, roleApi, type RoleRecord, type WorkflowAssigneePreviewResponse, type WorkflowDefinitionDTO } from '@/api/workflow';
+import { workflowApi, roleApi, type RoleRecord, type WorkflowAssigneePreviewResponse, type WorkflowDefinitionDTO, type WorkflowDesignerDraftDTO } from '@/api/workflow';
 import { useAuth, type AuthUser } from '@/context/AuthContext';
 import { businessFlowOptions, getDraftStorageKey, isBusinessType, isCustomBusinessType } from '@/constants/workflowBusiness';
 import { normalizeWorkflowDefinition, validateWorkflowDefinition } from '@/utils/workflowDefinition';
+import { isPlatformAdmin } from '@/utils/routePermissions';
 import { createFlowEdge, initialFlowEdges, initialFlowNodes, type FlowEdge, type FlowDefinition, type FlowNode, type FlowNodeData, type FlowNodeType } from '@/types/flow';
 
 function cloneNodes() { return initialFlowNodes.map((n) => ({ ...n, position: { ...n.position }, data: { ...n.data } })); }
@@ -77,6 +78,10 @@ function workflowStatusLabel(status: string) {
   return STATUS_STYLES[status]?.label ?? status;
 }
 
+function draftRevisionOf(definition: WorkflowDefinitionDTO | WorkflowDesignerDraftDTO): number | null {
+  return 'revision' in definition ? definition.revision : definition.draftRevision ?? null;
+}
+
 /* ---------- undo/redo 快照 ---------- */
 interface DesignerSnapshot {
   nodes: FlowNode[];
@@ -98,11 +103,16 @@ function isInputFocused(): boolean {
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
 }
 
+function hasWorkflowDesignerPermission(user: AuthUser | null, permission: string) {
+  return isPlatformAdmin(user) && (user?.permissions ?? []).includes(permission);
+}
+
 function canEditWorkflowDefinitions(user: AuthUser | null) {
-  if (!user) return false;
-  const permissions = user.permissions ?? [];
-  if (permissions.length === 0) return true;
-  return permissions.includes('*') || permissions.includes('*:*:*') || permissions.includes('workflow:definition:edit');
+  return hasWorkflowDesignerPermission(user, 'workflow:designer:edit');
+}
+
+function canPublishWorkflowDefinitions(user: AuthUser | null) {
+  return hasWorkflowDesignerPermission(user, 'workflow:designer:publish');
 }
 
 type AssigneePreviewSource = 'auto' | 'manual' | null;
@@ -255,6 +265,7 @@ export default function WorkflowDesignerPage() {
   const [saveErr, setSaveErr] = useState<string | null>(null);
   const [srvStatus, setSrvStatus] = useState('UNCONFIGURED');
   const [srvVersion, setSrvVersion] = useState(0);
+  const [draftRevision, setDraftRevision] = useState<number | null>(null);
   const [approverRoles, setApproverRoles] = useState<string[]>([]);
   const [roleDetails, setRoleDetails] = useState<Array<{ roleCode: string; roleName: string }>>([]);
   const [formSource, setFormSource] = useState('');
@@ -270,13 +281,14 @@ export default function WorkflowDesignerPage() {
   const [previewBusinessData, setPreviewBusinessData] = useState('{}');
   const [loadedAssigneePreviewKey, setLoadedAssigneePreviewKey] = useState('');
   const canEditWorkflow = useMemo(() => canEditWorkflowDefinitions(user), [user]);
+  const canPublishWorkflow = useMemo(() => canPublishWorkflowDefinitions(user), [user]);
 
   /* ---- undo / redo 历史栈 ---- */
   const pastStates = useRef<DesignerSnapshot[]>([]);
   const futureStates = useRef<DesignerSnapshot[]>([]);
   const autoPreviewedKeyRef = useRef<string | null>(null);
 
-  const applyLoadedDefinition = useCallback((def: WorkflowDefinitionDTO, message: string | null) => {
+  const applyLoadedDefinition = useCallback((def: WorkflowDefinitionDTO | WorkflowDesignerDraftDTO, message: string | null) => {
     const defData = def.definition as Record<string, unknown> | undefined;
     const parsed = fromApi(defData, businessType);
     const nn = parsed?.nodes ?? cloneNodes();
@@ -288,6 +300,7 @@ export default function WorkflowDesignerPage() {
     setSelId(nn.find((n) => n.type === 'approval')?.id ?? 'approval-1');
     setSrvStatus(def.status);
     setSrvVersion(def.version);
+    setDraftRevision(draftRevisionOf(def));
     setSrvName(def.name ?? null);
     setSrvDesc(def.description ?? null);
     setFormSource(loadedFormSource);
@@ -343,8 +356,7 @@ export default function WorkflowDesignerPage() {
     (async () => {
       setSaveErr(null);
       try {
-        const raw = await workflowApi.get(businessType);
-        const def = raw as WorkflowDefinitionDTO;
+        const def = await workflowApi.getDesignerDraft(businessType);
         if (cancelled) return;
         applyLoadedDefinition(def, def.id ? `已读取后端定义：${workflowStatusLabel(def.status)} v${def.version}` : null);
       } catch {
@@ -356,7 +368,7 @@ export default function WorkflowDesignerPage() {
         setAssigneePreview(null);
         setNodes(nn); setEdges(ne);
         setSelId(nn.find((n) => n.type === 'approval')?.id ?? 'approval-1');
-        setSrvStatus('UNCONFIGURED'); setSrvVersion(0);
+        setSrvStatus('UNCONFIGURED'); setSrvVersion(0); setDraftRevision(null);
         setSrvName(null); setSrvDesc(null);
         setFormSource(draftFormSource);
         setLoadedAssigneePreviewKey(createAssigneePreviewKey(businessType, 'UNCONFIGURED', 0, nn, ne, draftFormSource));
@@ -413,7 +425,12 @@ export default function WorkflowDesignerPage() {
   const handleConnect = useCallback((conn: Connection) => {
     if (!canEditWorkflow) return;
     const edge = createFlowEdge(conn);
-    if (!edge || edge.source === edge.target) { if (edge?.source === edge.target) { setSaveMsg(null); setSaveErr('同一节点不能连接自身'); } return; }
+    if (!edge) return;
+    if (edge.source === edge.target) {
+      setSaveMsg(null);
+      setSaveErr('同一节点不能连接自身');
+      return;
+    }
     setAssigneePreview(null);
     pushSnapshot();
     setEdges((cur) => cur.some((e) => e.source === edge.source && e.target === edge.target && e.sourceHandle === edge.sourceHandle) ? cur : addEdge(edge, cur));
@@ -466,8 +483,7 @@ export default function WorkflowDesignerPage() {
     setSaveMsg(null);
     setSaveErr(null);
     try {
-      const raw = await workflowApi.get(businessType);
-      const def = raw as WorkflowDefinitionDTO;
+      const def = await workflowApi.getDesignerDraft(businessType);
       applyLoadedDefinition(def, `已重新读取后端定义：${workflowStatusLabel(def.status)} v${def.version}`);
     } catch (e) {
       setSaveMsg(null);
@@ -480,42 +496,71 @@ export default function WorkflowDesignerPage() {
   const handleSaveDraft = useCallback(async () => {
     if (!canEditWorkflow) {
       setSaveMsg(null);
-      setSaveErr('当前账号只有流程查看权限，无法保存流程草稿。');
+      setSaveErr('保存流程草稿需要 platform_admin 和 workflow:designer:edit 权限。');
       return;
     }
     setSaving(true);
     try {
-      const raw = await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: defPayload });
-      const saved = raw as WorkflowDefinitionDTO;
+      const saved = await workflowApi.saveDraft(businessType, {
+        name: normDef.name,
+        description: normDef.description,
+        definition: defPayload,
+        expectedRevision: draftRevision,
+      });
       localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
-      setSrvStatus(saved.status); setSrvVersion(saved.version); setSaveErr(null);
+      setSrvStatus(saved.status); setSrvVersion(saved.version); setDraftRevision(saved.draftRevision ?? null); setSaveErr(null);
       setSaveMsg(valErrors.length > 0 ? `${flow.name}已保存草稿，发布前需补全校验项` : `${flow.name}已保存草稿`);
-    } catch {
+    } catch (e) {
+      const error = e as Error & { status?: number };
+      if (error.status === 409) {
+        setSaveMsg(null);
+        setSaveErr(error.message || '草稿已被其他编辑者更新，请刷新后重试');
+        return;
+      }
       localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
       setSaveMsg(null); setSaveErr(`${flow.name}仅保存为本地草稿，后端未同步，请稍后重试`);
     } finally { setSaving(false); }
-  }, [businessType, canEditWorkflow, flow.name, normDef, defPayload, formSource, valErrors.length]);
+  }, [businessType, canEditWorkflow, draftRevision, flow.name, normDef, defPayload, formSource, valErrors.length]);
 
   const handlePublish = useCallback(async () => {
-    if (!canEditWorkflow) {
+    if (!canPublishWorkflow) {
       setSaveMsg(null);
-      setSaveErr('当前账号只有流程查看权限，无法发布流程。');
+      setSaveErr('发布流程需要 platform_admin 和 workflow:designer:publish 权限。');
       return;
     }
-    if (!ensureValid('发布')) return;
     setPublishing(true);
     try {
-      await workflowApi.saveDraft(businessType, { name: normDef.name, description: normDef.description, definition: defPayload });
-      localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
-      await workflowApi.publish(businessType);
-      const raw = await workflowApi.get(businessType);
-      const pub = raw as WorkflowDefinitionDTO;
+      let reviewedDraftRevision = draftRevision;
+      if (canEditWorkflow) {
+        if (!ensureValid('发布')) return;
+        const savedDraft = await workflowApi.saveDraft(businessType, {
+          name: normDef.name,
+          description: normDef.description,
+          definition: defPayload,
+          expectedRevision: draftRevision,
+        });
+        reviewedDraftRevision = savedDraft.draftRevision ?? null;
+        localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...normDef, formSource, savedAt: new Date().toISOString() }));
+        setDraftRevision(reviewedDraftRevision);
+      }
+      if (typeof reviewedDraftRevision !== 'number') {
+        throw new Error('请先保存并重新审阅流程草稿后再发布');
+      }
+      await workflowApi.publish(businessType, {
+        expectedDraftRevision: reviewedDraftRevision,
+        publishNote: `${flow.name}发布`,
+        impactScope: '仅影响后续新发起审批实例',
+        rollbackPlan: '通过版本历史恢复至已发布稳定版本',
+      });
+      const pub = await workflowApi.getDesignerDraft(businessType);
       applyLoadedDefinition(pub, `${flow.name}已发布为 v${pub.version}`);
+      setDraftRevision(reviewedDraftRevision);
     } catch (e) { setSaveMsg(null); setSaveErr(e instanceof Error ? e.message : '发布失败'); }
     finally { setPublishing(false); }
-  }, [applyLoadedDefinition, businessType, canEditWorkflow, ensureValid, flow.name, normDef, defPayload, formSource]);
+  }, [applyLoadedDefinition, businessType, canEditWorkflow, canPublishWorkflow, draftRevision, ensureValid, flow.name, normDef, defPayload, formSource]);
 
   const handlePreviewAssignees = useCallback(async (mode: PreviewMode = 'manual') => {
+    if (!canEditWorkflow) return;
     const parsedBusinessData = parsePreviewBusinessData(previewBusinessData);
     if (!parsedBusinessData.ok) {
       if (mode === 'manual') {
@@ -541,13 +586,13 @@ export default function WorkflowDesignerPage() {
     } finally {
       setPreviewingAssignees(false);
     }
-  }, [businessType, defPayload, previewBusinessData]);
+  }, [businessType, canEditWorkflow, defPayload, previewBusinessData]);
 
   useEffect(() => {
-    if (!loadedAssigneePreviewKey || autoPreviewedKeyRef.current === loadedAssigneePreviewKey) return;
+    if (!canEditWorkflow || !loadedAssigneePreviewKey || autoPreviewedKeyRef.current === loadedAssigneePreviewKey) return;
     autoPreviewedKeyRef.current = loadedAssigneePreviewKey;
     void handlePreviewAssignees('auto');
-  }, [handlePreviewAssignees, loadedAssigneePreviewKey]);
+  }, [canEditWorkflow, handlePreviewAssignees, loadedAssigneePreviewKey]);
 
   const statusStyle = STATUS_STYLES[srvStatus] ?? STATUS_STYLES.UNCONFIGURED;
 
@@ -632,7 +677,8 @@ export default function WorkflowDesignerPage() {
           <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => handlePreviewAssignees('manual')}
-              disabled={previewingAssignees}
+              disabled={previewingAssignees || !canEditWorkflow}
+              title={!canEditWorkflow ? '需要 platform_admin 和 workflow:designer:edit 权限' : undefined}
               className="inline-flex items-center gap-1.5 h-9 rounded-lg border border-blue-200 bg-blue-50 px-4 text-sm font-medium text-blue-700 hover:bg-blue-100 transition-colors disabled:opacity-50"
             >
               {previewingAssignees ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCheck className="w-4 h-4" />}
@@ -650,7 +696,7 @@ export default function WorkflowDesignerPage() {
             <button
               onClick={handleSaveDraft}
               disabled={saving || !canEditWorkflow}
-              title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
+              title={!canEditWorkflow ? '需要 platform_admin 和 workflow:designer:edit 权限' : undefined}
               className="inline-flex items-center gap-1.5 h-9 rounded-lg border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -658,8 +704,8 @@ export default function WorkflowDesignerPage() {
             </button>
             <button
               onClick={handlePublish}
-              disabled={publishing || !canEditWorkflow}
-              title={!canEditWorkflow ? '缺少 workflow:definition:edit 权限' : undefined}
+              disabled={publishing || !canPublishWorkflow}
+              title={!canPublishWorkflow ? '需要 platform_admin 和 workflow:designer:publish 权限' : undefined}
               className="inline-flex items-center gap-1.5 h-9 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700 transition-colors shadow-sm disabled:opacity-50"
             >
               {publishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
@@ -669,9 +715,9 @@ export default function WorkflowDesignerPage() {
         </div>
 
         {/* Messages */}
-        {!canEditWorkflow && (
+        {!canEditWorkflow && !canPublishWorkflow && (
           <div className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-            当前账号只有流程查看权限，无法保存、发布或编辑流程。请返回流程列表查看已配置流程，或联系管理员授予 workflow:definition:edit 权限。
+            当前账号仅可审阅流程。保存需要 platform_admin 和 workflow:designer:edit 权限，发布需要 platform_admin 和 workflow:designer:publish 权限。
           </div>
         )}
         {saveMsg && (

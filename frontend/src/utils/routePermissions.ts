@@ -1,12 +1,16 @@
-type PermissionUser = {
+export type PermissionUser = {
   roles?: string[];
   permissions?: string[];
+  platformAdmin?: boolean;
+  platform_admin?: boolean;
 } | null | undefined;
 
 type RoutePermissionRule = {
   prefix?: string;
   exact?: string;
   any: string[];
+  requirePlatformAdmin?: boolean;
+  requireExplicitPermission?: boolean;
 };
 
 const SUPER_ROLES = new Set(['ADMIN', 'SUPER_ADMIN']);
@@ -36,8 +40,8 @@ const ROUTE_PERMISSION_RULES: RoutePermissionRule[] = [
   { prefix: '/settings', any: ['system:config', 'system:config:query'] },
   { prefix: '/settings-v2/mail-template', any: ['mail:template:list'] },
   { prefix: '/settings-v2', any: ['system:config', 'system:config:query'] },
-  { exact: '/workflows', any: ['workflow:definition:query'] },
-  { prefix: '/workflow-designer', any: ['workflow:definition:edit'] },
+  { exact: '/workflows', any: ['system:flow:query'], requireExplicitPermission: true },
+  { prefix: '/workflow-designer', any: ['workflow:designer:edit', 'workflow:designer:publish', 'workflow:designer:rollback'], requirePlatformAdmin: true, requireExplicitPermission: true },
   { prefix: '/workflow-form', any: ['workflow:definition:query'] },
   { exact: '/assets/new', any: ['asset:ledger:create'] },
   { prefix: '/assets/import-export', any: ['asset:ledger:query', 'asset:ledger:create'] },
@@ -69,10 +73,14 @@ const ROUTE_PERMISSION_RULES: RoutePermissionRule[] = [
   { prefix: '/energy', any: ['asset:query'] },
   { prefix: '/licenses', any: ['license:query'] },
   { prefix: '/sam', any: ['license:query'] },
-  { prefix: '/disposals/transfer', any: ['disposal:transfer'] },
-  { prefix: '/disposals/clearance', any: ['disposal:clearance'] },
-  { prefix: '/disposals/scrap', any: ['disposal:scrap'] },
-  { prefix: '/disposals', any: ['disposal:query', 'asset:retirement:query'] },
+  { exact: '/disposals', any: ['disposal:query', 'compensation:query'] },
+  { exact: '/disposals/transfer/new', any: ['disposal:create'] },
+  { exact: '/disposals/clearance/new', any: ['disposal:create'] },
+  { exact: '/disposals/scrap/new', any: ['disposal:create'] },
+  { exact: '/disposals/compensation/new', any: ['compensation:create'] },
+  { prefix: '/disposals', any: ['disposal:query'] },
+  { exact: '/compensation', any: ['compensation:query'] },
+  { exact: '/compensation/new', any: ['compensation:create'] },
   { prefix: '/compensation', any: ['compensation:query'] },
   { prefix: '/insurances', any: ['insurance:list:query'] },
   { prefix: '/inspection-templates', any: ['inspection:template:query'] },
@@ -108,6 +116,10 @@ function hasSuperRole(user: PermissionUser) {
   return (user?.roles ?? []).some((role) => SUPER_ROLES.has(role.toUpperCase()));
 }
 
+export function isPlatformAdmin(user: PermissionUser) {
+  return user?.platformAdmin === true || user?.platform_admin === true;
+}
+
 function findRule(path: string) {
   const normalized = normalizePath(path);
   return ROUTE_PERMISSION_RULES.find((rule) => {
@@ -122,17 +134,25 @@ function findRule(path: string) {
 }
 
 export function canAccessRoute(path: string, user: PermissionUser) {
-  if (!user || hasSuperRole(user)) {
-    return true;
-  }
-
-  const permissions = user.permissions ?? [];
-  if (permissions.length === 0) {
+  if (!user) {
     return true;
   }
 
   const rule = findRule(path);
   if (!rule) {
+    return true;
+  }
+
+  if (rule.requirePlatformAdmin && !isPlatformAdmin(user)) {
+    return false;
+  }
+
+  const permissions = user.permissions ?? [];
+  if (rule.requireExplicitPermission) {
+    return rule.any.some((permission) => permissions.includes(permission));
+  }
+
+  if (hasSuperRole(user) || permissions.length === 0) {
     return true;
   }
 

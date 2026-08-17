@@ -278,12 +278,85 @@ export async function getApprovalDetail(id: string | number) {
   return http.get<ApprovalItem>(`/approvals/${encodeURIComponent(String(id))}`);
 }
 
+export type ApprovalDecisionResult = 'APPROVED' | 'REJECTED';
+
+export const MISSING_APPROVAL_PROCESS_MESSAGE =
+  '当前业务没有可用的审批流程。请先提交并确认平台管理员已发布对应流程后，再从审批中心处理。';
+
+function readApprovalRecords(value: unknown): Record<string, unknown>[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
+  }
+  if (value && typeof value === 'object') {
+    const page = value as Record<string, unknown>;
+    if (Array.isArray(page.records)) {
+      return page.records.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object');
+    }
+  }
+  return [];
+}
+
+export async function findApprovalProcessId(
+  processType: string,
+  businessId: string | number,
+): Promise<number | null> {
+  const targetId = Number(businessId);
+  if (!Number.isSafeInteger(targetId) || targetId <= 0) {
+    return null;
+  }
+
+  const response: unknown = await http.get('/approvals/list', {
+    params: { processType, page: 1, pageSize: 100 },
+  });
+  const match = readApprovalRecords(response).find((item) => {
+    const type = String(item.processType ?? '').toUpperCase();
+    const id = Number(item.businessId);
+    const status = String(item.status ?? '').toUpperCase();
+    return type === processType.toUpperCase() && id === targetId && status === 'PENDING';
+  });
+  const processId = Number(match?.id);
+  return Number.isSafeInteger(processId) && processId > 0 ? processId : null;
+}
+
+export function resolveApprovalProcessId(data: Record<string, unknown> = {}): number | null {
+  const processId = Number(data.approvalId ?? data.processId ?? data.approvalProcessId);
+  return Number.isSafeInteger(processId) && processId > 0 ? processId : null;
+}
+
+export async function submitApprovalDecision(
+  processId: string | number,
+  result: ApprovalDecisionResult,
+  opinion = '',
+) {
+  const id = Number(processId);
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    throw new Error(MISSING_APPROVAL_PROCESS_MESSAGE);
+  }
+  return http.post(`/approvals/${encodeURIComponent(String(id))}/approve`, {
+    result,
+    opinion,
+  });
+}
+
 export async function approveItem(id: string | number, data: Record<string, unknown> = {}) {
-  return http.post(`/approvals/${encodeURIComponent(String(id))}/approve`, data);
+  const result = data.result === 'REJECTED' ? 'REJECTED' : 'APPROVED';
+  const opinion = typeof data.opinion === 'string'
+    ? data.opinion
+    : typeof data.comment === 'string'
+      ? data.comment
+      : '';
+  return submitApprovalDecision(id, result, opinion);
 }
 
 export async function rejectItem(id: string | number, data: Record<string, unknown> = {}) {
-  return http.post(`/approvals/${encodeURIComponent(String(id))}/reject`, data);
+  const opinion = typeof data.opinion === 'string'
+    ? data.opinion
+    : typeof data.comment === 'string'
+      ? data.comment
+      : typeof data.rejectionReason === 'string'
+        ? data.rejectionReason
+        : '';
+  return submitApprovalDecision(id, 'REJECTED', opinion);
 }
 
 export async function submitApproval(data: Record<string, unknown>) {

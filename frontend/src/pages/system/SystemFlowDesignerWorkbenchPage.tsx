@@ -319,6 +319,7 @@ export default function SystemFlowDesignerWorkbenchPage({
         name: draftName,
         description: draftDescription,
         graph: buildGraph(),
+        expectedRevision: selectedDefinition?.revision ?? null,
       });
       setSelectedDefinition(saved);
       setMessage('草稿已通过 /workflows/{businessType}/designer/draft 保存。');
@@ -333,8 +334,12 @@ export default function SystemFlowDesignerWorkbenchPage({
     setSaving(true);
     setError(null);
     try {
+      if (typeof selectedDefinition?.revision !== 'number') {
+        throw new Error('请先保存并重新审阅流程草稿后再发布');
+      }
       const published = await flowDesignerApi.publish(selectedBusinessType, {
         confirmed: true,
+        expectedDraftRevision: selectedDefinition.revision,
         publishNote: '流程设计器发布复核通过',
         impactScope: '仅影响后续新发起审批实例',
         rollbackPlan: '通过版本历史恢复到上一稳定版本',
@@ -355,8 +360,16 @@ export default function SystemFlowDesignerWorkbenchPage({
     setSaving(true);
     setError(null);
     try {
+      const expectedPublishedVersion = selectedDefinition?.publishedVersion ?? selectedDefinition?.version;
+      if (typeof expectedPublishedVersion !== 'number' || expectedPublishedVersion <= 0) {
+        throw new Error('当前没有可审阅的已发布版本，无法回滚');
+      }
       const rolledBack = await flowDesignerApi.rollback(selectedBusinessType, selectedVersion.version, {
         confirmed: true,
+        ...(typeof selectedDefinition?.revision === 'number'
+          ? { expectedDraftRevision: selectedDefinition.revision }
+          : { expectedDraftAbsent: true }),
+        expectedPublishedVersion,
         reason: `恢复到 v${selectedVersion.version} 稳定版本`,
         impactScope: '仅影响后续新发起审批实例',
         rollbackPlan: '必要时再次恢复到发布前版本',

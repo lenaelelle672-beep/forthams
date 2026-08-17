@@ -1,12 +1,16 @@
 import { useParams, useNavigate } from 'react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Undo2, Info, MapPin, User, Lightbulb, CheckCircle2, XCircle, AlertTriangle, Clock, FileText, ShieldAlert } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { ArrowLeft, Undo2, Info, MapPin, User, Lightbulb, AlertTriangle, Clock, FileText, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { getDisposalDetail, type DisposalType, type DisposalStatus } from '@/api/disposal';
-import { approveItem, rejectItem } from '@/api/approval';
-import { toast } from 'sonner';
+import {
+  DISPOSAL_RESUBMISSION_HINT,
+  getDisposalDetail,
+  isDisposalResubmissionStatus,
+  type DisposalType,
+  type DisposalStatus,
+} from '@/api/disposal';
 
 /** 处置类型中文映射 */
 const DISPOSAL_TYPE_LABEL: Record<DisposalType, string> = {
@@ -20,7 +24,8 @@ const STATUS_LABEL: Record<DisposalStatus, string> = {
   PENDING: '待审批',
   APPROVED: '已审批',
   REJECTED: '已拒绝',
-  COMPLETED: '已完成',
+  CANCELLED: '已取消',
+  CANCELLED_REQUIRES_RESUBMISSION: '需重提/恢复',
 };
 
 /**
@@ -199,17 +204,15 @@ function buildApprovalSteps(status: DisposalStatus): ApprovalStep[] {
     steps[0].status = 'done';
     steps[1].status = 'active';
   } else if (status === 'APPROVED') {
-    steps[0].status = 'done';
-    steps[1].status = 'done';
-    steps[2].status = 'done';
-    steps[3].status = 'active';
-  } else if (status === 'COMPLETED') {
     steps.forEach((s) => { s.status = 'done'; });
   } else if (status === 'REJECTED') {
     steps[0].status = 'done';
     steps[1].status = 'done';
     steps[2].status = 'rejected';
     // steps[3] remains pending — 审批流程在此终止
+  } else if (status === 'CANCELLED' || status === 'CANCELLED_REQUIRES_RESUBMISSION') {
+    steps[0].status = 'done';
+    steps[1].status = 'rejected';
   }
 
   return steps;
@@ -221,30 +224,11 @@ function buildApprovalSteps(status: DisposalStatus): ApprovalStep[] {
 export default function DisposalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const qc = useQueryClient();
 
   const { data: detail, isLoading, isError } = useQuery({
     queryKey: ['disposal', id],
     queryFn: () => getDisposalDetail(Number(id)),
     enabled: !!id,
-  });
-
-  const approveMutation = useMutation({
-    mutationFn: () => approveItem(Number(id), {}),
-    onSuccess: () => {
-      toast.success('审批通过');
-      qc.invalidateQueries({ queryKey: ['disposal', id] });
-    },
-    onError: () => toast.error('审批操作失败，请重试'),
-  });
-
-  const rejectMutation = useMutation({
-    mutationFn: () => rejectItem(Number(id), { rejectionReason: '不符合处置条件' }),
-    onSuccess: () => {
-      toast.success('已驳回申请');
-      qc.invalidateQueries({ queryKey: ['disposal', id] });
-    },
-    onError: () => toast.error('驳回操作失败，请重试'),
   });
 
   if (isLoading) {
@@ -300,6 +284,12 @@ export default function DisposalDetailPage() {
           </div>
         </div>
       </div>
+
+      {isDisposalResubmissionStatus(detail.status) && (
+        <div className="mb-6 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+          {DISPOSAL_RESUBMISSION_HINT}
+        </div>
+      )}
 
       <div className="grid grid-cols-12 gap-6">
         {/* 左侧主内容区 */}
@@ -417,30 +407,6 @@ export default function DisposalDetailPage() {
                 返回上一页
               </Button>
             </div>
-            {/* 主要操作组 — 审批按钮（仅 PENDING 时显示） */}
-            {detail.status === 'PENDING' && (
-              <>
-                <Button
-                  variant="primary"
-                  size="md"
-                  loading={approveMutation.isPending}
-                  onClick={() => approveMutation.mutate()}
-                >
-                  <CheckCircle2 className="w-4 h-4" />
-                  审批通过
-                </Button>
-                <Button
-                  variant="outline"
-                  size="md"
-                  loading={rejectMutation.isPending}
-                  onClick={() => rejectMutation.mutate()}
-                  className="text-red-600 border-red-300 hover:bg-red-50"
-                >
-                  <XCircle className="w-4 h-4" />
-                  驳回申请
-                </Button>
-              </>
-            )}
           </div>
         </div>
       </div>

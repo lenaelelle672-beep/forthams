@@ -83,12 +83,13 @@ export function WorkflowDesigner() {
   const businessType = isBusinessType(requestedBusinessType) ? requestedBusinessType : "ASSET_TRANSFER";
   const businessFlow = businessFlowOptions.find((option) => option.businessType === businessType) ?? businessFlowOptions[0];
   const [nodes, setNodes, onNodesChange] = useNodesState<FlowNode>(cloneInitialNodes());
-  const [edges, setEdges, onEdgesChange] = useEdgesState(cloneInitialEdges());
+  const [edges, setEdges, onEdgesChange] = useEdgesState<FlowEdge>(cloneInitialEdges());
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>("approval-1");
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [serverStatus, setServerStatus] = useState<string>("UNCONFIGURED");
   const [serverVersion, setServerVersion] = useState(0);
+  const [draftRevision, setDraftRevision] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isBusinessType(requestedBusinessType)) {
@@ -102,7 +103,7 @@ export function WorkflowDesigner() {
     async function loadDefinition() {
       setSaveError(null);
       try {
-        const serverDefinition = await workflowDefinitionService.get(businessType);
+        const serverDefinition = await workflowDefinitionService.getDesigner(businessType);
         if (cancelled) return;
         const parsedDefinition = definitionFromApi(serverDefinition.definition);
         const nextNodes = parsedDefinition?.nodes ?? cloneInitialNodes();
@@ -112,6 +113,7 @@ export function WorkflowDesigner() {
         setSelectedNodeId(nextNodes.find((node) => node.type === "approval")?.id ?? "approval-1");
         setServerStatus(serverDefinition.status);
         setServerVersion(serverDefinition.version);
+        setDraftRevision(serverDefinition.revision ?? serverDefinition.draftRevision ?? null);
         setSaveMessage(serverDefinition.id ? "已从后端恢复该业务类型的流程定义。" : null);
       } catch {
         if (cancelled) return;
@@ -123,6 +125,7 @@ export function WorkflowDesigner() {
         setSelectedNodeId(nextNodes.find((node) => node.type === "approval")?.id ?? "approval-1");
         setServerStatus("UNCONFIGURED");
         setServerVersion(0);
+        setDraftRevision(null);
         setSaveMessage(storedDraft ? "后端暂不可用，已恢复本地流程定义草稿。" : null);
       }
     }
@@ -235,10 +238,12 @@ export function WorkflowDesigner() {
         name: flowDefinition.name,
         description: flowDefinition.description,
         definition: { ...flowDefinition, businessType },
+        expectedRevision: draftRevision,
       });
       localStorage.setItem(getDraftStorageKey(businessType), JSON.stringify({ ...flowDefinition, businessType, savedAt: new Date().toISOString() }));
       setServerStatus(savedDefinition.status);
       setServerVersion(savedDefinition.version);
+      setDraftRevision(savedDefinition.draftRevision ?? null);
       setSaveError(null);
       setSaveMessage(`${businessFlow.name}已保存到后端流程定义草稿。`);
     } catch (error) {
@@ -251,7 +256,7 @@ export function WorkflowDesigner() {
         setSaveError(storageError instanceof Error ? storageError.message : "保存流程草稿失败");
       }
     }
-  }, [businessFlow.name, businessType, flowDefinition]);
+  }, [businessFlow.name, businessType, draftRevision, flowDefinition]);
 
   return (
     <div className="space-y-6" style={designerTokens}>

@@ -1,5 +1,6 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.dto.WorkflowAssigneePreviewDTO;
 import com.ams.mapper.UserRoleMapper;
 import lombok.RequiredArgsConstructor;
@@ -79,7 +80,9 @@ public class WorkflowAssigneePreviewService {
                 assignees.add(new WorkflowAssigneePreviewDTO.Assignee(approverId));
                 nodeAssignee.setResolved(true);
             } else if (approverRole != null && !approverRole.isBlank()) {
-                List<String> userIds = userRoleMapper.selectUserIdsByRoleCode(approverRole);
+                List<String> userIds = userRoleMapper.selectUserIdsByRoleCode(
+                        approverRole,
+                        TenantContext.requireTenantId());
                 for (String uid : userIds) {
                     assignees.add(new WorkflowAssigneePreviewDTO.Assignee(uid));
                 }
@@ -105,6 +108,72 @@ public class WorkflowAssigneePreviewService {
         response.setMissingFields(missingFields);
         if (!allResolved) {
             response.setReason("部分节点处理人未解析完成");
+        }
+        return response;
+    }
+
+    /**
+     * 运行时预览只接受已经由调用方从 immutable published snapshot 读取的定义；按明确边顺序
+     * 解析，不能把节点数组静默当作运行时路径。
+     */
+    public WorkflowAssigneePreviewDTO.Response previewPublished(String businessType,
+                                                                Map<String, Object> definition,
+                                                                Object businessData) {
+        WorkflowAssigneePreviewDTO.Response response = new WorkflowAssigneePreviewDTO.Response();
+        response.setBusinessType(businessType);
+        LinearWorkflowDefinitionValidator.ValidationResult validation =
+                LinearWorkflowDefinitionValidator.validate(definition);
+        if (!validation.valid()) {
+            response.setCalculable(false);
+            response.setReason("已发布流程定义不受当前运行时支持: " + String.join("；", validation.errors()));
+            response.setMissingFields(new ArrayList<>(validation.errors()));
+            return response;
+        }
+
+        boolean allResolved = true;
+        int stepNo = 0;
+        for (Map<?, ?> node : validation.orderedApprovalNodes()) {
+            stepNo++;
+            Map<?, ?> config = LinearWorkflowDefinitionValidator.configurationFor(node);
+            WorkflowAssigneePreviewDTO.NodeAssignee nodeAssignee = new WorkflowAssigneePreviewDTO.NodeAssignee();
+            nodeAssignee.setStepNo(stepNo);
+            nodeAssignee.setNodeId(textOf(node, "id"));
+            nodeAssignee.setLabel(textOf(node, "label"));
+            nodeAssignee.setNodeCode(textOf(config, "nodeCode"));
+            String approverType = textOf(config, "approverType");
+            String approverRole = textOf(config, "approverRole");
+            String approverId = textOf(config, "approverId");
+            nodeAssignee.setApproverType(approverType);
+            nodeAssignee.setApproverRole(approverRole);
+            nodeAssignee.setApproverId(approverId);
+
+            List<WorkflowAssigneePreviewDTO.Assignee> assignees = new ArrayList<>();
+            if ("user".equalsIgnoreCase(approverType)) {
+                assignees.add(new WorkflowAssigneePreviewDTO.Assignee(approverId));
+            } else if ("role".equalsIgnoreCase(approverType)) {
+                List<String> userIds = userRoleMapper.selectUserIdsByRoleCode(
+                        approverRole, TenantContext.requireTenantId());
+                if (userIds != null) {
+                    userIds.forEach(userId -> assignees.add(new WorkflowAssigneePreviewDTO.Assignee(userId)));
+                }
+            }
+            nodeAssignee.setAssignees(assignees);
+            nodeAssignee.setAssigneeCount(assignees.size());
+            nodeAssignee.setResolved(assignees.size() == 1);
+            if (assignees.isEmpty()) {
+                nodeAssignee.setReason("审批节点没有可解析的处理人");
+                response.getMissingFields().add(nodeAssignee.getNodeId());
+                allResolved = false;
+            } else if (assignees.size() > 1) {
+                nodeAssignee.setReason("当前线性审批运行时每个节点只能解析一名处理人");
+                response.getMissingFields().add(nodeAssignee.getNodeId());
+                allResolved = false;
+            }
+            response.getNodes().add(nodeAssignee);
+        }
+        response.setCalculable(allResolved);
+        if (!allResolved) {
+            response.setReason("部分审批节点处理人未解析为唯一处理人");
         }
         return response;
     }

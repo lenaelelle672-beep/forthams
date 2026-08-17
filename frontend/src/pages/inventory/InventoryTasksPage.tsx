@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { getInventoryTasks, createInventoryTask } from '@/api/inventory';
-import type { InventoryTaskStatus, CreateTaskPayload, InventoryTask } from '@/types/inventory';
+import type { InventoryTaskStatus, CreateTaskPayload, InventoryTask, InventoryType } from '@/types/inventory';
 import type { PageData } from '@/types/common';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -309,11 +309,12 @@ export default function InventoryTasksPage() {
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [chartOpen, setChartOpen] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const [newTask, setNewTask] = useState<Partial<CreateTaskPayload>>({
+  const [newTask, setNewTask] = useState<CreateTaskPayload>({
     taskName: '',
-    scopeType: 'all',
-    scopeIds: [],
+    inventoryType: 'FULL',
+    deptIds: '',
   });
+  const [createError, setCreateError] = useState<string | null>(null);
 
   // ── 数据查询 ─────────────────────────────────────────────────────────────
 
@@ -333,7 +334,11 @@ export default function InventoryTasksPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['inventory', 'tasks'] });
       setCreateOpen(false);
-      setNewTask({ taskName: '', scopeType: 'all', scopeIds: [] });
+      setCreateError(null);
+      setNewTask({ taskName: '', inventoryType: 'FULL', deptIds: '' });
+    },
+    onError: (error: unknown) => {
+      setCreateError(error instanceof Error ? error.message : '创建盘点任务失败');
     },
   });
 
@@ -1069,55 +1074,55 @@ export default function InventoryTasksPage() {
                 onChange={(e) => setNewTask((t) => ({ ...t, taskName: e.target.value }))}
               />
               <Select
-                label={t('inventory:dialog.scopeType')}
-                value={newTask.scopeType}
+                label={t('inventory:dialog.inventoryType')}
+                value={newTask.inventoryType}
                 onValueChange={(v) =>
-                  setNewTask((t) => ({
-                    ...t,
-                    scopeType: v as 'all' | 'location' | 'category',
+                  setNewTask((current) => ({
+                    ...current,
+                    inventoryType: v as InventoryType,
                   }))
                 }
               >
-                <SelectItem value="all">{t('inventory:dialog.selectScopeAll')}</SelectItem>
-                <SelectItem value="location">
-                  {t('inventory:dialog.selectScopeLocation')}
-                </SelectItem>
-                <SelectItem value="category">
-                  {t('inventory:dialog.selectScopeCategory')}
-                </SelectItem>
+                <SelectItem value="FULL">{t('inventory:dialog.typeFull')}</SelectItem>
+                <SelectItem value="PARTIAL">{t('inventory:dialog.typePartial')}</SelectItem>
+                <SelectItem value="CYCLE">{t('inventory:dialog.typeCycle')}</SelectItem>
               </Select>
-              {newTask.scopeType !== 'all' && (
+              {newTask.inventoryType !== 'FULL' && (
                 <Input
-                  label={t('inventory:dialog.scopeIds')}
-                  placeholder={t('inventory:dialog.scopeIdsPlaceholder')}
+                  label={t('inventory:dialog.deptIds')}
+                  placeholder={t('inventory:dialog.deptIdsPlaceholder')}
+                  value={newTask.deptIds ?? ''}
                   onChange={(e) =>
-                    setNewTask((t) => ({
-                      ...t,
-                      scopeIds: e.target.value
-                        .split(',')
-                        .map((s) => s.trim())
-                        .filter(Boolean),
+                    setNewTask((current) => ({
+                      ...current,
+                      deptIds: e.target.value,
                     }))
                   }
                 />
               )}
+              {createError && (
+                <p className="text-sm text-red-600" data-testid="inventory-create-error">
+                  {createError}
+                </p>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setCreateOpen(false)}>
-                {t('common:actions.cancel')}
+                {t('inventory:dialog.cancel')}
               </Button>
               <Button
                 disabled={!newTask.taskName?.trim()}
                 loading={createMutation.isPending}
-                onClick={() =>
+                onClick={() => {
+                  setCreateError(null);
                   createMutation.mutate({
-                    taskName: newTask.taskName!,
-                    scopeType: newTask.scopeType ?? 'all',
-                    scopeIds: newTask.scopeIds ?? [],
-                  } as any)
-                }
+                    taskName: newTask.taskName,
+                    inventoryType: newTask.inventoryType,
+                    deptIds: newTask.inventoryType === 'FULL' ? undefined : newTask.deptIds,
+                  });
+                }}
               >
-                {t('inventory:createTaskModal.actions.confirm')}
+                {t('inventory:dialog.confirm')}
               </Button>
             </DialogFooter>
           </DialogContent>

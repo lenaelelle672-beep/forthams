@@ -33,4 +33,22 @@ class JwtUtilTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("tenantId");
     }
+
+    @Test
+    void validateTokenRequiresMatchingUserAndTenantClaims() {
+        String token = jwtUtil.generateToken("alice", 1L, "T001");
+
+        assertThat(jwtUtil.validateToken(token, "alice", 1L, "T001")).isTrue();
+        assertThat(jwtUtil.validateToken(token, "alice", 2L, "T001")).isFalse();
+        assertThat(jwtUtil.validateToken(token, "alice", 1L, "T002")).isFalse();
+    }
+
+    @Test
+    void validateSecretRejectsSecretShorterThanThirtyTwoUtf8Bytes() {
+        ReflectionTestUtils.setField(jwtUtil, "secret", "short-secret");
+
+        assertThatThrownBy(jwtUtil::validateSecret)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("32个UTF-8字节");
+    }
 }

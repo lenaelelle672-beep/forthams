@@ -1,8 +1,10 @@
 package com.ams.service;
 
 import com.ams.dto.FileStorageAttachmentCatalogDTO;
+import com.ams.entity.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -11,11 +13,16 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 class FileStorageCatalogServiceTest {
 
     private JdbcTemplate jdbcTemplate;
     private FileStorageCatalogService service;
+    private TenantAuthorityService tenantAuthorityService;
 
     @BeforeEach
     void setUp() {
@@ -26,7 +33,9 @@ class FileStorageCatalogServiceTest {
         dataSource.setPassword("");
         jdbcTemplate = new JdbcTemplate(dataSource);
         createSchema();
-        service = new FileStorageCatalogService(jdbcTemplate);
+        tenantAuthorityService = mock(TenantAuthorityService.class);
+        when(tenantAuthorityService.requirePlatformAdmin()).thenReturn(platformAdmin());
+        service = new FileStorageCatalogService(jdbcTemplate, tenantAuthorityService);
     }
 
     @Test
@@ -82,6 +91,20 @@ class FileStorageCatalogServiceTest {
         assertTrue(catalog.getRiskTips().stream().anyMatch(tip -> tip.contains("不写库")));
     }
 
+    @Test
+    void getAttachmentCatalogShouldRequirePlatformAdminBeforeExecutingAnyQuery() {
+        JdbcTemplate queryTemplate = mock(JdbcTemplate.class);
+        TenantAuthorityService deniedAuthorityService = mock(TenantAuthorityService.class);
+        when(deniedAuthorityService.requirePlatformAdmin())
+                .thenThrow(new AccessDeniedException("仅显式平台管理员可以管理租户"));
+        FileStorageCatalogService deniedService = new FileStorageCatalogService(queryTemplate, deniedAuthorityService);
+
+        assertThatThrownBy(() -> deniedService.getAttachmentCatalog(null, null, null, 1, 20))
+                .isInstanceOf(AccessDeniedException.class);
+
+        verifyNoInteractions(queryTemplate);
+    }
+
     private void createSchema() {
         jdbcTemplate.execute("""
                 CREATE TABLE sys_attachment(
@@ -115,5 +138,14 @@ class FileStorageCatalogServiceTest {
                 createTime,
                 deleted
         );
+    }
+
+    private User platformAdmin() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("platform-admin");
+        user.setTenantId("T001");
+        user.setPlatformAdmin(true);
+        return user;
     }
 }

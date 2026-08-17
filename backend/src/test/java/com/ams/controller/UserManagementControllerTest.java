@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.common.GlobalExceptionHandler;
+import com.ams.dto.AuthResponse;
 import com.ams.dto.UserCreateDTO;
 import com.ams.dto.UserUpdateDTO;
 import com.ams.entity.User;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -24,6 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -64,6 +68,24 @@ class UserManagementControllerTest {
     }
 
     @Test
+    void currentShouldReturnRolesPermissionsAndPlatformAdminWithoutPassword() throws Exception {
+        when(userManagementService.getCurrentUser()).thenReturn(new AuthResponse(
+                null, 7L, "alice", "爱丽丝", List.of("TENANT_ADMIN"), List.of("user:query"), Boolean.TRUE));
+
+        mockMvc.perform(get("/user-management/current"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.userId").value(7))
+                .andExpect(jsonPath("$.data.username").value("alice"))
+                .andExpect(jsonPath("$.data.roles[0]").value("TENANT_ADMIN"))
+                .andExpect(jsonPath("$.data.permissions[0]").value("user:query"))
+                .andExpect(jsonPath("$.data.platformAdmin").value(true))
+                .andExpect(jsonPath("$.data.password").doesNotExist());
+
+        verify(userManagementService).getCurrentUser();
+    }
+
+    @Test
     void listShouldReturnPaginatedUsers() throws Exception {
         when(userManagementService.queryUsers(eq(1), eq(10), eq("alice"), eq(null), eq(null)))
                 .thenReturn(page());
@@ -96,8 +118,8 @@ class UserManagementControllerTest {
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"bob\",\"password\":\"Secret123\",\"realName\":\"Bob\",\"email\":\"bob@example.com\",\"phone\":\"13800000000\",\"deptId\":2}"))
-                .andExpect(status().isOk())
+                        .content("{\"username\":\"bob\",\"password\":\"Secret123456\",\"realName\":\"Bob\",\"email\":\"bob@example.com\",\"phone\":\"13800000000\",\"deptId\":2}"))
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(11))
                 .andExpect(jsonPath("$.data.username").value("bob"));
@@ -118,6 +140,7 @@ class UserManagementControllerTest {
                 .andExpect(jsonPath("$.data.id").value(7));
 
         verify(userManagementService).updateUser(eq(7L), any(UserUpdateDTO.class));
+        verify(userManagementService).requireTargetManagementAuthority(7L);
         verify(auditService).save(any());
     }
 
@@ -132,6 +155,7 @@ class UserManagementControllerTest {
                 .andExpect(jsonPath("$.message").value("临时密码已生成，请安全传达给用户"));
 
         verify(userManagementService).resetPassword(7L);
+        verify(userManagementService).requireTargetManagementAuthority(7L);
         verify(auditService).save(any());
     }
 
@@ -142,7 +166,23 @@ class UserManagementControllerTest {
                 .andExpect(jsonPath("$.code").value(200));
 
         verify(userManagementService).deleteUser(7L);
+        verify(userManagementService).requireTargetManagementAuthority(7L);
         verify(auditService).save(any());
+    }
+
+    @Test
+    void updateStatusShouldRejectPlatformAdminTargetBeforeServiceMutation() throws Exception {
+        doThrow(new AccessDeniedException("需要平台管理员权限"))
+                .when(userManagementService).requireTargetManagementAuthority(7L);
+
+        mockMvc.perform(put("/users/7/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":0}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+
+        verify(userManagementService).requireTargetManagementAuthority(7L);
+        verify(userManagementService, never()).updateStatus(7L, 0);
     }
 
     private Page<User> page() {

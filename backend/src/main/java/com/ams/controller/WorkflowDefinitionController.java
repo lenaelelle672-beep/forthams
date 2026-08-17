@@ -8,10 +8,12 @@ import com.ams.dto.FlowDesignerValidationResultDTO;
 import com.ams.dto.WorkflowDefinitionDTO;
 import com.ams.dto.WorkflowDefinitionSaveDTO;
 import com.ams.dto.WorkflowDefinitionVersionDTO;
+import com.ams.dto.WorkflowDesignerDraftDTO;
 import com.ams.dto.WorkflowStatusUpdateDTO;
 import com.ams.dto.WorkflowAssigneePreviewDTO;
 import com.ams.entity.GeneralAuditEntry;
 import com.ams.service.AuditService;
+import com.ams.service.TenantAuthorityService;
 import com.ams.service.WorkflowAssigneePreviewService;
 import com.ams.service.WorkflowDefinitionService;
 import com.ams.utils.AuditHelper;
@@ -42,11 +44,11 @@ public class WorkflowDefinitionController {
     private static final String PERMISSION_EDIT = "workflow:designer:edit";
     private static final String PERMISSION_PUBLISH = "workflow:designer:publish";
     private static final String PERMISSION_ROLLBACK = "workflow:designer:rollback";
-    private static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
     private static final String RESOURCE_TYPE = "WORKFLOW_DEFINITION";
 
     private final WorkflowDefinitionService workflowDefinitionService;
     private final WorkflowAssigneePreviewService workflowAssigneePreviewService;
+    private final TenantAuthorityService tenantAuthorityService;
     private final JwtUtil jwtUtil;
     private final AuditService auditService;
     private final AuditHelper auditHelper;
@@ -64,9 +66,9 @@ public class WorkflowDefinitionController {
     }
 
     @GetMapping("/{businessType}/designer")
-    public Result<WorkflowDefinitionDTO> getDesigner(@PathVariable String businessType, HttpServletRequest request) {
-        requirePermission(request, PERMISSION_QUERY);
-        return Result.success(workflowDefinitionService.getDefinition(businessType));
+    public Result<WorkflowDesignerDraftDTO> getDesigner(@PathVariable String businessType, HttpServletRequest request) {
+        requireDesignerReadPermission(request);
+        return Result.success(workflowDefinitionService.getDesignerDraft(businessType));
     }
 
     @PutMapping("/{businessType}/draft")
@@ -74,16 +76,16 @@ public class WorkflowDefinitionController {
             @PathVariable String businessType,
             @RequestBody WorkflowDefinitionSaveDTO dto,
             HttpServletRequest request) {
-        dto.setOperatorId(requirePermission(request, PERMISSION_EDIT));
+        dto.setOperatorId(requireConfigurationPermission(request, PERMISSION_EDIT));
         return Result.success(workflowDefinitionService.saveDraft(businessType, dto));
     }
 
     @PutMapping("/{businessType}/designer/draft")
-    public Result<WorkflowDefinitionDTO> saveDesignerDraft(
+    public Result<WorkflowDesignerDraftDTO> saveDesignerDraft(
             @PathVariable String businessType,
             @RequestBody FlowDesignerDraftDTO dto,
             HttpServletRequest request) {
-        Long operatorId = requirePermission(request, PERMISSION_EDIT);
+        Long operatorId = requireConfigurationPermission(request, PERMISSION_EDIT);
         return Result.success(workflowDefinitionService.saveDesignerDraft(businessType, dto, operatorId));
     }
 
@@ -92,7 +94,7 @@ public class WorkflowDefinitionController {
             @PathVariable String businessType,
             @RequestBody FlowDesignerGraphDTO dto,
             HttpServletRequest request) {
-        requirePermission(request, PERMISSION_EDIT);
+        requireConfigurationPermission(request, PERMISSION_EDIT);
         return Result.success(workflowDefinitionService.validateDesignerGraph(dto));
     }
 
@@ -101,7 +103,7 @@ public class WorkflowDefinitionController {
             @PathVariable String businessType,
             @RequestBody(required = false) WorkflowAssigneePreviewDTO.Request dto,
             HttpServletRequest request) {
-        requirePermission(request, PERMISSION_QUERY);
+        requireConfigurationPermission(request, PERMISSION_EDIT);
         return Result.success(workflowAssigneePreviewService.preview(businessType, dto));
     }
 
@@ -111,7 +113,7 @@ public class WorkflowDefinitionController {
             @RequestBody(required = false) FlowDesignerOperationDTO dto,
             HttpServletRequest request) {
         FlowDesignerOperationDTO operation = dto == null ? new FlowDesignerOperationDTO() : dto;
-        operation.setOperatorId(requirePermission(request, PERMISSION_PUBLISH));
+        operation.setOperatorId(requireConfigurationPermission(request, PERMISSION_PUBLISH));
         GeneralAuditEntry audit = auditHelper.buildEntry(request, "WORKFLOW_PUBLISH", "publish_workflow",
                 RESOURCE_TYPE, businessType, "发布流程定义: " + businessType, "SUCCESS");
         try {
@@ -149,7 +151,7 @@ public class WorkflowDefinitionController {
             @RequestBody FlowDesignerOperationDTO dto,
             HttpServletRequest request) {
         FlowDesignerOperationDTO operation = dto == null ? new FlowDesignerOperationDTO() : dto;
-        operation.setOperatorId(requirePermission(request, PERMISSION_ROLLBACK));
+        operation.setOperatorId(requireConfigurationPermission(request, PERMISSION_ROLLBACK));
         GeneralAuditEntry audit = auditHelper.buildEntry(request, "WORKFLOW_ROLLBACK", "rollback_workflow",
                 RESOURCE_TYPE, businessType + ":v" + version, "回滚流程定义: " + businessType + " 到版本 " + version, "SUCCESS");
         try {
@@ -168,7 +170,7 @@ public class WorkflowDefinitionController {
             @PathVariable String businessType,
             @RequestBody WorkflowStatusUpdateDTO dto,
             HttpServletRequest request) {
-        dto.setOperatorId(requirePermission(request, PERMISSION_EDIT));
+        dto.setOperatorId(requireConfigurationPermission(request, PERMISSION_PUBLISH));
         return Result.success(workflowDefinitionService.updateStatus(businessType, dto));
     }
 
@@ -184,13 +186,33 @@ public class WorkflowDefinitionController {
         throw new AccessDeniedException("缺少流程设计器权限: " + permission);
     }
 
+    private Long requireConfigurationPermission(HttpServletRequest request, String permission) {
+        Long userId = requirePermission(request, permission);
+        tenantAuthorityService.requirePlatformAdmin();
+        return userId;
+    }
+
+    /** 发布或回滚者必须能读取其将要审阅的草稿，但该读取权限不授予编辑能力。 */
+    private Long requireDesignerReadPermission(HttpServletRequest request) {
+        Long userId = requireCurrentUserId(request);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken
+                || (!hasPermission(authentication, PERMISSION_EDIT)
+                && !hasPermission(authentication, PERMISSION_PUBLISH)
+                && !hasPermission(authentication, PERMISSION_ROLLBACK))) {
+            throw new AccessDeniedException("缺少流程设计器草稿审阅权限");
+        }
+        tenantAuthorityService.requirePlatformAdmin();
+        return userId;
+    }
+
     private boolean hasPermission(Authentication authentication, String permission) {
         if (!authentication.isAuthenticated()) {
             return false;
         }
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(authority -> permission.equals(authority) || ROLE_SUPER_ADMIN.equals(authority));
+                .anyMatch(permission::equals);
     }
 
     private Long requireCurrentUserId(HttpServletRequest request) {

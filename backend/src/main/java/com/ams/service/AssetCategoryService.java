@@ -2,6 +2,7 @@ package com.ams.service;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ams.common.exception.BusinessException;
+import com.ams.context.TenantContext;
 import com.ams.dto.CategoryCreateDTO;
 import com.ams.dto.CategoryUpdateDTO;
 import com.ams.entity.AssetCategory;
@@ -9,6 +10,10 @@ import com.ams.mapper.AssetCategoryMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +27,13 @@ import com.ams.dto.CategoryTreeDTO;
 @RequiredArgsConstructor
 public class AssetCategoryService {
 
+    private static final String ASSET_CATEGORY_QUERY_PERMISSION = "asset:category:query";
+
     private final AssetCategoryMapper assetCategoryMapper;
+    private final TenantAuthorityService tenantAuthorityService;
 
     public Page<AssetCategory> queryCategories(Integer page, Integer pageSize, String keyword) {
+        requireQueryPermission();
         Page<AssetCategory> pageParam = new Page<>(page == null ? 1 : page, pageSize == null ? 10 : pageSize);
 
         LambdaQueryWrapper<AssetCategory> wrapper = new LambdaQueryWrapper<>();
@@ -37,6 +46,11 @@ public class AssetCategoryService {
     }
 
     public AssetCategory getCategoryById(Long id) {
+        requireQueryPermission();
+        return getCategoryEntityById(id);
+    }
+
+    private AssetCategory getCategoryEntityById(Long id) {
         AssetCategory category = assetCategoryMapper.selectById(id);
         if (category == null) {
             throw new BusinessException("资产分类不存在");
@@ -46,6 +60,7 @@ public class AssetCategoryService {
 
     @Transactional(rollbackFor = Exception.class)
     public AssetCategory createCategory(CategoryCreateDTO createDTO) {
+        tenantAuthorityService.requirePlatformAdmin();
         if (createDTO.getCategoryCode() != null && !createDTO.getCategoryCode().isEmpty()) {
             AssetCategory existingCategory = assetCategoryMapper.selectOne(
                 new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getCategoryCode, createDTO.getCategoryCode())
@@ -67,7 +82,8 @@ public class AssetCategoryService {
 
     @Transactional(rollbackFor = Exception.class)
     public AssetCategory updateCategory(Long id, CategoryUpdateDTO updateDTO) {
-        AssetCategory category = getCategoryById(id);
+        tenantAuthorityService.requirePlatformAdmin();
+        AssetCategory category = getCategoryEntityById(id);
 
         AssetCategory existingCategory = assetCategoryMapper.selectOne(
             new LambdaQueryWrapper<AssetCategory>()
@@ -85,17 +101,20 @@ public class AssetCategoryService {
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteCategory(Long id) {
-        getCategoryById(id);
+        tenantAuthorityService.requirePlatformAdmin();
+        getCategoryEntityById(id);
         assetCategoryMapper.deleteById(id);
     }
 
     public List<AssetCategory> listAllCategories() {
+        requireQueryPermission();
         LambdaQueryWrapper<AssetCategory> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByAsc(AssetCategory::getSortOrder).orderByDesc(AssetCategory::getCreateTime);
         return assetCategoryMapper.selectList(wrapper);
     }
 
     public List<CategoryTreeDTO> getCategoryTree() {
+        requireQueryPermission();
         // 1. 全量扫描并排序 (依托本机强缓存与 M2 内存直接发酵)
         LambdaQueryWrapper<AssetCategory> wrapper = new LambdaQueryWrapper<>();
         wrapper.orderByAsc(AssetCategory::getSortOrder).orderByDesc(AssetCategory::getCreateTime);
@@ -123,5 +142,21 @@ public class AssetCategoryService {
             }
         }
         return rootNodes;
+    }
+
+    private void requireQueryPermission() {
+        TenantContext.requireTenantId();
+        if (!hasPermission(ASSET_CATEGORY_QUERY_PERMISSION)) {
+            throw new AccessDeniedException("缺少资产分类查询权限");
+        }
+    }
+
+    private boolean hasPermission(String permission) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null
+                && !(authentication instanceof AnonymousAuthenticationToken)
+                && authentication.isAuthenticated()
+                && authentication.getAuthorities().stream()
+                .anyMatch(authority -> permission.equals(authority.getAuthority()));
     }
 }

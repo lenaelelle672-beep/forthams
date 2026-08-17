@@ -36,7 +36,12 @@ describe('api/retirement', () => {
     const params = { page: 1, pageSize: 20, status: 'PENDING' as const };
     const payload = { assetId: 8, reason: '设备老化', residualValue: 200, notes: '批量退役' };
 
-    mockedHttp.get.mockResolvedValue({});
+    mockedHttp.get
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({ records: [{ id: 77, processType: 'RETIREMENT', businessId: 12, status: 'PENDING' }] })
+      .mockResolvedValueOnce({ records: [{ id: 77, processType: 'RETIREMENT', businessId: 12, status: 'PENDING' }] });
     mockedHttp.post.mockResolvedValue({});
 
     await createRetirement(payload);
@@ -58,7 +63,9 @@ describe('api/retirement', () => {
     expect(mockedHttp.get).toHaveBeenNthCalledWith(2, '/retirement/12');
     expect(mockedHttp.get).toHaveBeenNthCalledWith(3, '/retirement/asset/8');
     expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/retirement/12/cancel');
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/retirement/12/approve');
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(4, '/retirement/12/reject', { reason: '资料不完整' });
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/approvals/77/approve', { result: 'APPROVED', opinion: '' });
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(4, '/approvals/77/approve', { result: 'REJECTED', opinion: '资料不完整' });
+    expect(mockedHttp.post).not.toHaveBeenCalledWith('/retirement/12/approve');
+    expect(mockedHttp.post).not.toHaveBeenCalledWith('/retirement/12/reject', expect.anything());
   });
 });

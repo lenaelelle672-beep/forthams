@@ -81,8 +81,9 @@ class MailTemplateControllerTest {
         verify(mailTemplateService).meta();
         verify(mailTemplateService).preview(any());
 
+        mockMvc.perform(post("/mail-templates").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isNotFound());
         for (var builder : List.of(
-                post("/mail-templates"),
                 put("/mail-templates/5"),
                 patch("/mail-templates/5"),
                 delete("/mail-templates/5"),
@@ -91,7 +92,7 @@ class MailTemplateControllerTest {
                 post("/mail-templates/export")
         )) {
             mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON).content("{}"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(status().isMethodNotAllowed());
         }
     }
 

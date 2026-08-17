@@ -14,7 +14,7 @@ import java.util.List;
  * 租户主数据只读查询。
  *
  * 提供租户目录列表、详情与"当前租户"查询（后者供 UserProfilePage 展示租户名）。
- * 全部只读，不提供 create/update/suspend/activate（V3 只读 catalog 边界）。
+ * 目录查询保持只读；受控开通由 TenantProvisioningService 单独处理。
  */
 @Service
 @RequiredArgsConstructor
@@ -61,7 +61,7 @@ public class SysTenantService {
         SysTenantDTO.Meta meta = new SysTenantDTO.Meta();
         meta.setPlans(List.of("STANDARD", "PROFESSIONAL", "ENTERPRISE"));
         meta.setStatuses(List.of("ACTIVE", "SUSPENDED"));
-        meta.setReadOnlyNotice("租户管理为只读 catalog；新建、编辑、停用、启用等写操作不在 V3 只读边界内。");
+        meta.setReadOnlyNotice("租户目录为只读 catalog；仅显式平台管理员可通过受控 provision 开通新租户，编辑、停用、启用不开放。");
         return meta;
     }
 

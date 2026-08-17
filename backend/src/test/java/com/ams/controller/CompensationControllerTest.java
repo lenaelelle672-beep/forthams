@@ -1,8 +1,11 @@
 package com.ams.controller;
 
 import com.ams.common.GlobalExceptionHandler;
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.CompensationCreateDTO;
+import com.ams.dto.CompensationValuationDTO;
 import com.ams.entity.AssetCompensation;
+import com.ams.enums.CompensationStatus;
 import com.ams.service.CompensationService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -77,12 +81,73 @@ class CompensationControllerTest {
         mockMvc.perform(post("/compensation")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"assetId\":1,\"compensationType\":\"DAMAGE\",\"compensationAmount\":1500.00,\"responsibleUserId\":2}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(7))
                 .andExpect(jsonPath("$.data.compensationNo").value("CMP-20260728-0001"));
 
         verify(compensationService).createCompensation(any(CompensationCreateDTO.class));
+    }
+
+    @Test
+    void createShouldRejectMissingResponsibleUserBeforeCallingService() throws Exception {
+        mockMvc.perform(post("/compensation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"assetId\":1,\"compensationType\":\"DAMAGE\",\"compensationAmount\":1500.00}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        org.mockito.Mockito.verifyNoInteractions(compensationService);
+    }
+
+    @Test
+    void createShouldRejectOutOfRangeCompensationAmountBeforeCallingService() throws Exception {
+        mockMvc.perform(post("/compensation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"assetId\":1,\"compensationType\":\"DAMAGE\",\"compensationAmount\":100000000.00,\"responsibleUserId\":2}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        org.mockito.Mockito.verifyNoInteractions(compensationService);
+    }
+
+    @Test
+    void statusUpdateShouldRejectDirectTerminalTransition() throws Exception {
+        mockMvc.perform(put("/compensation/7/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"APPROVED\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+
+        org.mockito.Mockito.verifyNoInteractions(compensationService);
+    }
+
+    @Test
+    void submittedCompensationUpdateShouldSurfaceFrozenFieldRejection() throws Exception {
+        when(compensationService.updateCompensation(eq(7L), any()))
+                .thenThrow(new BusinessException("赔偿申请一旦提交进入审批即不可修改"));
+
+        mockMvc.perform(put("/compensation/7")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"assetId\":2,\"compensationAmount\":999.00,\"responsibleUserId\":3,\"description\":\"修改原因\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        verify(compensationService).updateCompensation(eq(7L), any());
+    }
+
+    @Test
+    void valuationShouldNotRequireCreateOnlyResponsibleUser() throws Exception {
+        CompensationValuationDTO valuation = new CompensationValuationDTO();
+        when(compensationService.estimateCompensation(any(CompensationCreateDTO.class))).thenReturn(valuation);
+
+        mockMvc.perform(post("/compensation/valuation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"assetId\":1,\"compensationType\":\"DAMAGE\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(compensationService).estimateCompensation(any(CompensationCreateDTO.class));
     }
 
     private Page<AssetCompensation> page() {

@@ -1,7 +1,15 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.dto.DataPermissionCatalogDTO;
+import com.ams.entity.Dept;
 import com.ams.entity.Role;
+import com.ams.entity.RoleDataScopeRule;
+import com.ams.entity.RoleDept;
+import com.ams.mapper.DeptMapper;
+import com.ams.mapper.RoleDataScopeMapper;
+import com.ams.mapper.RoleDeptMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -17,9 +25,7 @@ import static org.mockito.Mockito.when;
 /**
  * 数据权限只读 catalog 服务测试。
  *
- * 安全重点：normalizeScope() 对 null/blank/未知值采用"放宽到 ALL"的默认策略
- * （default -> SCOPE_ALL），即把未知/空数据范围视作最宽权限。该行为是刻意设计
- * （catalog 只读，先暴露风险），必须在测试中显式锁定并文档化，避免后续被静默收紧/放宽。
+ * 安全重点：空、未知及无效 CUSTOM 关联必须展示为 DENY，目录和执行策略保持一致。
  */
 @ExtendWith(MockitoExtension.class)
 class DataPermissionCatalogServiceTest {
@@ -27,46 +33,55 @@ class DataPermissionCatalogServiceTest {
     @Mock
     private RoleService roleService;
 
+    @Mock
+    private RoleDataScopeMapper roleDataScopeMapper;
+
+    @Mock
+    private RoleDeptMapper roleDeptMapper;
+
+    @Mock
+    private DeptMapper deptMapper;
+
     private DataPermissionCatalogService service;
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        service = new DataPermissionCatalogService(roleService);
+        TenantContext.setTenantId("T001");
+        service = new DataPermissionCatalogService(roleService, roleDataScopeMapper, roleDeptMapper, deptMapper);
+    }
+
+    @AfterEach
+    void tearDown() {
+        TenantContext.clear();
     }
 
     @Test
-    void normalizeScopeShouldWidenNullOrBlankOrUnknownToAllAsSecurityDefault() {
-        // null / blank / 未知值 → ALL（最宽权限）。这是刻意的"放宽默认"策略：
-        // catalog 只读，优先把潜在的最宽权限暴露出来由人工收紧，而不是隐藏风险。
-        // 锁定该行为，防止被悄悄改成收紧默认（会漏报风险）或抛异常（catalog 只读，不应阻断）。
-        when(roleService.listAllRoles()).thenReturn(List.of(
+    void normalizeScopeShouldDenyNullOrBlankOrUnknown() {
+        givenRoles(
                 role(1L, "null-scope-role", "NULL_SCOPE", null),
                 role(2L, "blank-scope-role", "BLANK_SCOPE", "   "),
                 role(3L, "unknown-scope-role", "UNKNOWN_SCOPE", "WAT")
-        ));
+        );
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
         assertEquals(3, catalog.getRoles().size());
-        assertEquals("ALL", catalog.getRoles().get(0).getDataScope());
-        assertEquals("ALL", catalog.getRoles().get(1).getDataScope());
-        assertEquals("ALL", catalog.getRoles().get(2).getDataScope());
-        // ALL 角色计数=3，受限=0，自定义=0
-        assertEquals(3, catalog.getSummary().getAllScopeCount());
-        assertEquals(0, catalog.getSummary().getRestrictedScopeCount());
+        assertEquals("DENY", catalog.getRoles().get(0).getDataScope());
+        assertEquals("DENY", catalog.getRoles().get(1).getDataScope());
+        assertEquals("DENY", catalog.getRoles().get(2).getDataScope());
+        assertEquals(0, catalog.getSummary().getAllScopeCount());
+        assertEquals(3, catalog.getSummary().getRestrictedScopeCount());
         assertEquals(0, catalog.getSummary().getCustomScopeCount());
-        // 全部归一为 ALL → 产生风险提示
-        assertTrue(catalog.getRiskTips().stream().anyMatch(tip -> tip.contains("3") && tip.contains("ALL")));
+        assertTrue(catalog.getRiskTips().stream().anyMatch(tip -> tip.contains("3") && tip.contains("默认拒绝")));
         assertFalse(catalog.getRiskTips().stream().anyMatch(tip -> tip.contains("CUSTOM")));
     }
 
     @Test
     void normalizeScopeShouldUppercaseKnownScopes() {
-        // 已知范围的大小写归一（trim + toUpperCase），不改变语义。
-        when(roleService.listAllRoles()).thenReturn(List.of(
+        givenRoles(
                 role(1L, "self", "SELF_ROLE", "  self  "),
                 role(2L, "dept", "DEPT_ROLE", "dept_and_sub")
-        ));
+        );
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
@@ -83,9 +98,9 @@ class DataPermissionCatalogServiceTest {
 
     @Test
     void allScopeShouldIncrementCountAndGenerateRiskTip() {
-        when(roleService.listAllRoles()).thenReturn(List.of(
+        givenRoles(
                 role(1L, "超级管理员", "SUPER_ADMIN", "ALL")
-        ));
+        );
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
@@ -101,16 +116,16 @@ class DataPermissionCatalogServiceTest {
 
     @Test
     void customScopeShouldIncrementCountGenerateRiskTipAndFlagCustom() {
-        when(roleService.listAllRoles()).thenReturn(List.of(
+        givenRoles(
                 role(7L, "自定义角色", "CUSTOM_ROLE", "CUSTOM")
-        ));
+        );
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
         assertEquals("CUSTOM", catalog.getRoles().get(0).getDataScope());
         assertEquals("自定义", catalog.getRoles().get(0).getDataScopeLabel());
         assertTrue(catalog.getRoles().get(0).isCustomScope());
-        assertEquals("自定义角色 为自定义范围，需配合数据权限规则。", catalog.getRoles().get(0).getRiskNote());
+        assertEquals("自定义角色 为自定义范围，仅显式角色-部门关联会参与授权。", catalog.getRoles().get(0).getRiskNote());
         assertEquals(1, catalog.getSummary().getCustomScopeCount());
         assertEquals(0, catalog.getSummary().getAllScopeCount());
         assertTrue(catalog.getRiskTips().stream().anyMatch(tip -> tip.contains("1") && tip.contains("CUSTOM")));
@@ -118,10 +133,10 @@ class DataPermissionCatalogServiceTest {
 
     @Test
     void deptAndSelfScopesShouldBeCountedAsRestrictedWithoutRiskTip() {
-        when(roleService.listAllRoles()).thenReturn(List.of(
+        givenRoles(
                 role(1L, "部门角色", "DEPT_ROLE", "DEPT"),
                 role(2L, "个人角色", "SELF_ROLE", "SELF")
-        ));
+        );
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
@@ -140,7 +155,7 @@ class DataPermissionCatalogServiceTest {
 
     @Test
     void summaryCountsShouldReflectMixedScopeDistribution() {
-        when(roleService.listAllRoles()).thenReturn(List.of(
+        givenRoles(
                 role(1L, "A", "A", "ALL"),
                 role(2L, "B", "B", "ALL"),
                 role(3L, "C", "C", "CUSTOM"),
@@ -148,22 +163,20 @@ class DataPermissionCatalogServiceTest {
                 role(5L, "E", "E", "DEPT_AND_SUB"),
                 role(6L, "F", "F", "SELF"),
                 role(7L, "G", "G", "LEGACY")
-        ));
+        );
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
-        // ALL: 真实 ALL(2) + 未知 LEGACY(1) = 3
         assertEquals(7, catalog.getSummary().getRoleCount());
-        assertEquals(3, catalog.getSummary().getAllScopeCount());
+        assertEquals(2, catalog.getSummary().getAllScopeCount());
         assertEquals(1, catalog.getSummary().getCustomScopeCount());
-        assertEquals(3, catalog.getSummary().getRestrictedScopeCount());
-        // ALL + CUSTOM 风险提示各一条
-        assertEquals(2, catalog.getRiskTips().size());
+        assertEquals(4, catalog.getSummary().getRestrictedScopeCount());
+        assertEquals(3, catalog.getRiskTips().size());
     }
 
     @Test
     void emptyRolesShouldProduceZeroCountsAndReadOnlyNotice() {
-        when(roleService.listAllRoles()).thenReturn(List.of());
+        givenRoles();
 
         DataPermissionCatalogDTO catalog = service.getCatalog();
 
@@ -173,7 +186,36 @@ class DataPermissionCatalogServiceTest {
         assertEquals(0, catalog.getSummary().getRestrictedScopeCount());
         assertEquals(0, catalog.getSummary().getCustomScopeCount());
         assertTrue(catalog.getRiskTips().isEmpty());
-        assertTrue(catalog.getReadOnlyNotice().contains("只读 catalog"));
+        assertTrue(catalog.getReadOnlyNotice().contains("数据权限目录为只读"));
+    }
+
+    @Test
+    void customScopeWithMissingOrDisabledDepartmentShouldBeReportedAsDeny() {
+        Role customRole = role(7L, "自定义角色", "CUSTOM_ROLE", "CUSTOM");
+        when(roleService.listAllRoles()).thenReturn(List.of(customRole));
+        when(roleDataScopeMapper.selectByTenantId("T001")).thenReturn(List.of(rule(7L, "CUSTOM")));
+        when(roleDeptMapper.selectByTenantIdAndRoleIds("T001", List.of(7L))).thenReturn(List.of());
+
+        DataPermissionCatalogDTO catalog = service.getCatalog();
+
+        assertEquals("DENY", catalog.getRoles().get(0).getDataScope());
+        assertFalse(catalog.getRoles().get(0).isCustomScope());
+    }
+
+    @Test
+    void duplicateCustomDepartmentAssociationShouldBeReportedAsDeny() {
+        Role customRole = role(7L, "自定义角色", "CUSTOM_ROLE", "CUSTOM");
+        when(roleService.listAllRoles()).thenReturn(List.of(customRole));
+        when(roleDataScopeMapper.selectByTenantId("T001")).thenReturn(List.of(rule(7L, "CUSTOM")));
+        RoleDept duplicate = roleDept(7L, 10L);
+        when(roleDeptMapper.selectByTenantIdAndRoleIds("T001", List.of(7L)))
+                .thenReturn(List.of(duplicate, duplicate));
+        when(deptMapper.selectList(org.mockito.ArgumentMatchers.any())).thenReturn(List.of(dept(10L)));
+
+        DataPermissionCatalogDTO catalog = service.getCatalog();
+
+        assertEquals("DENY", catalog.getRoles().get(0).getDataScope());
+        assertFalse(catalog.getRoles().get(0).isCustomScope());
     }
 
     private Role role(Long id, String name, String code, String dataScope) {
@@ -183,5 +225,49 @@ class DataPermissionCatalogServiceTest {
         role.setRoleCode(code);
         role.setDataScope(dataScope);
         return role;
+    }
+
+    private void givenRoles(Role... roles) {
+        List<Role> roleList = List.of(roles);
+        when(roleService.listAllRoles()).thenReturn(roleList);
+        when(roleDataScopeMapper.selectByTenantId("T001")).thenReturn(roleList.stream()
+                .map(role -> rule(role.getId(), role.getDataScope()))
+                .toList());
+        List<RoleDept> associations = roleList.stream()
+                .filter(role -> "CUSTOM".equals(role.getDataScope()))
+                .map(role -> roleDept(role.getId(), role.getId() + 100L))
+                .toList();
+        if (!associations.isEmpty()) {
+            when(roleDeptMapper.selectByTenantIdAndRoleIds("T001", associations.stream()
+                    .map(RoleDept::getRoleId)
+                    .toList())).thenReturn(associations);
+            when(deptMapper.selectList(org.mockito.ArgumentMatchers.any())).thenReturn(associations.stream()
+                    .map(association -> dept(association.getDeptId()))
+                    .toList());
+        }
+    }
+
+    private RoleDataScopeRule rule(Long roleId, String dataScope) {
+        RoleDataScopeRule rule = new RoleDataScopeRule();
+        rule.setTenantId("T001");
+        rule.setRoleId(roleId);
+        rule.setDataScope(dataScope);
+        return rule;
+    }
+
+    private RoleDept roleDept(Long roleId, Long deptId) {
+        RoleDept roleDept = new RoleDept();
+        roleDept.setTenantId("T001");
+        roleDept.setRoleId(roleId);
+        roleDept.setDeptId(deptId);
+        return roleDept;
+    }
+
+    private Dept dept(Long id) {
+        Dept dept = new Dept();
+        dept.setId(id);
+        dept.setTenantId("T001");
+        dept.setStatus("1");
+        return dept;
     }
 }

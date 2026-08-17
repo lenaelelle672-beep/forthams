@@ -17,10 +17,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -74,12 +76,25 @@ class AssetControllerTest {
         mockMvc.perform(post("/assets")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"assetName\":\"笔记本电脑\",\"categoryId\":1}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(7))
                 .andExpect(jsonPath("$.data.assetName").value("笔记本电脑"));
 
         verify(assetService).createAsset(any(AssetCreateDTO.class));
+    }
+
+    @Test
+    void updateShouldAcceptPayloadThatIncludesTransferFieldsWithoutFailingValidation() throws Exception {
+        when(assetService.updateAsset(eq(7L), any())).thenReturn(asset(7L));
+
+        mockMvc.perform(put("/assets/7")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"assetName\":\"笔记本电脑\",\"deptId\":99,\"userId\":12,\"location\":\"机房\",\"locationId\":5}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200));
+
+        verify(assetService).updateAsset(eq(7L), any());
     }
 
     @Test

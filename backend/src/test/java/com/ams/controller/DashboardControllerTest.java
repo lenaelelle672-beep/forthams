@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,6 +60,15 @@ class DashboardControllerTest {
         mockMvc.perform(get("/dashboard/trends").param("days", "7"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
+    }
+
+    @Test
+    void getValueTrendsShouldRejectDaysAboveBoundBeforeCallingService() throws Exception {
+        mockMvc.perform(get("/dashboard/trends").param("days", "366"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        verifyNoInteractions(dashboardService);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.ams.controller;
 
 import com.ams.dto.ApprovalCreateDTO;
+import com.ams.dto.ApprovalRecoveryDTO;
 import com.ams.entity.ApprovalProcess;
 import com.ams.service.ApprovalService;
 import com.ams.utils.JwtUtil;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties = "server.servlet.context-path=/api")
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@WithMockUser(authorities = {"approval:query", "approval:create", "approval:approve"})
 @DisplayName("Approval Controller Tests")
 class ApprovalControllerTest {
 
@@ -53,7 +56,7 @@ class ApprovalControllerTest {
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"processType\":\"ASSET_APPROVAL\",\"title\":\"Approval\",\"applicantId\":1}"))
+                        .content("{\"processType\":\"WORK_ORDER\",\"title\":\"Approval\",\"businessId\":7,\"applicantId\":1}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200));
 
@@ -93,5 +96,23 @@ class ApprovalControllerTest {
                 .andExpect(jsonPath("$.code").value(200));
 
         verify(approvalService).getMyPendingApprovals(42L);
+    }
+
+    @Test
+    @DisplayName("Should return recovery guidance for an audited cancelled approval")
+    void recoveryReturnsServiceGuidance() throws Exception {
+        ApprovalRecoveryDTO recovery = new ApprovalRecoveryDTO();
+        recovery.setProcessId(7L);
+        recovery.setResubmissionAction("RESUBMIT_EXISTING");
+        when(approvalService.getRecoveryGuidance(7L)).thenReturn(recovery);
+
+        mockMvc.perform(get("/api/approvals/{id}/recovery", 7L)
+                        .contextPath("/api"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.processId").value(7))
+                .andExpect(jsonPath("$.data.resubmissionAction").value("RESUBMIT_EXISTING"));
+
+        verify(approvalService).getRecoveryGuidance(7L);
     }
 }

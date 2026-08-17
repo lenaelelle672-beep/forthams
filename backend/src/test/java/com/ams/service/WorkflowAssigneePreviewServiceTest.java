@@ -1,6 +1,8 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
 import com.ams.dto.WorkflowAssigneePreviewDTO;
+import org.junit.jupiter.api.AfterEach;
 import com.ams.mapper.UserRoleMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +42,13 @@ class WorkflowAssigneePreviewServiceTest {
 
     @BeforeEach
     void setUp() {
+        TenantContext.setTenantId("T001");
         service = new WorkflowAssigneePreviewService(userRoleMapper);
+    }
+
+    @AfterEach
+    void tearDown() {
+        TenantContext.clear();
     }
 
     @Test
@@ -69,7 +77,7 @@ class WorkflowAssigneePreviewServiceTest {
 
     @Test
     void previewWithRoleBasedApprovalNodeShouldResolveAssigneesFromMapper() {
-        when(userRoleMapper.selectUserIdsByRoleCode("ASSET_MANAGER"))
+        when(userRoleMapper.selectUserIdsByRoleCode("ASSET_MANAGER", "T001"))
                 .thenReturn(List.of("101", "102"));
 
         Map<String, Object> approverNode = node("approve-1", "审批", Map.of(
@@ -92,12 +100,12 @@ class WorkflowAssigneePreviewServiceTest {
         assertEquals("101", assignee.getAssignees().get(0).getUserId());
         assertEquals("102", assignee.getAssignees().get(1).getUserId());
 
-        verify(userRoleMapper).selectUserIdsByRoleCode("ASSET_MANAGER");
+        verify(userRoleMapper).selectUserIdsByRoleCode("ASSET_MANAGER", "T001");
     }
 
     @Test
     void previewWithRoleBasedApprovalNodeHavingNoUsersShouldBeUnresolved() {
-        when(userRoleMapper.selectUserIdsByRoleCode("EMPTY_ROLE"))
+        when(userRoleMapper.selectUserIdsByRoleCode("EMPTY_ROLE", "T001"))
                 .thenReturn(List.of());
 
         Map<String, Object> approverNode = node("approve-1", "审批", Map.of(
@@ -189,7 +197,7 @@ class WorkflowAssigneePreviewServiceTest {
 
     @Test
     void previewWithMixedNodesWhereSomeUnresolvedShouldBeNotCalculable() {
-        when(userRoleMapper.selectUserIdsByRoleCode("ROLE_A"))
+        when(userRoleMapper.selectUserIdsByRoleCode("ROLE_A", "T001"))
                 .thenReturn(List.of("1"));
 
         Map<String, Object> startNode = node("start-1", "开始", new LinkedHashMap<>(Map.of("type", "START")));
@@ -217,7 +225,63 @@ class WorkflowAssigneePreviewServiceTest {
         // 未配置节点 unresolved
         assertFalse(response.getNodes().get(2).isResolved());
 
-        verify(userRoleMapper).selectUserIdsByRoleCode("ROLE_A");
+        verify(userRoleMapper).selectUserIdsByRoleCode("ROLE_A", "T001");
+    }
+
+    @Test
+    void publishedPreviewMustRejectUnsupportedGraphRuntimeSemantics() {
+        WorkflowAssigneePreviewDTO.Response response = service.previewPublished("asset_transfer", Map.of(
+                "nodes", List.of(
+                        Map.of("id", "start", "type", "START"),
+                        Map.of("id", "task", "type", "TASK"),
+                        Map.of("id", "end", "type", "END")),
+                "edges", List.of(
+                        Map.of("source", "start", "target", "task"),
+                        Map.of("source", "task", "target", "end"))), null);
+
+        assertFalse(response.isCalculable());
+        assertTrue(response.getReason().contains("不受当前运行时支持"));
+        assertTrue(response.getReason().contains("TASK"));
+        verifyNoInteractions(userRoleMapper);
+    }
+
+    @Test
+    void publishedPreviewMustRejectConditionHiddenInNodeData() {
+        WorkflowAssigneePreviewDTO.Response response = service.previewPublished("asset_transfer", Map.of(
+                "nodes", List.of(
+                        Map.of("id", "start", "type", "START"),
+                        Map.of("id", "approval", "type", "APPROVAL", "config", Map.of(
+                                        "approverType", "user", "approverId", "8", "approvalMode", "sequence"),
+                                "data", Map.of("conditionExpression", "amount > 1000")),
+                        Map.of("id", "end", "type", "END")),
+                "edges", List.of(
+                        Map.of("source", "start", "target", "approval"),
+                        Map.of("source", "approval", "target", "end"))), null);
+
+        assertFalse(response.isCalculable());
+        assertTrue(response.getReason().contains("条件语义"));
+        verifyNoInteractions(userRoleMapper);
+    }
+
+    @Test
+    void publishedPreviewMustFollowEdgesRatherThanNodeArrayOrder() {
+        WorkflowAssigneePreviewDTO.Response response = service.previewPublished("asset_transfer", Map.of(
+                "nodes", List.of(
+                        Map.of("id", "end", "type", "END"),
+                        Map.of("id", "approval-2", "type", "APPROVAL", "config", Map.of(
+                                "approverType", "user", "approverId", "10", "approvalMode", "sequence")),
+                        Map.of("id", "start", "type", "START"),
+                        Map.of("id", "approval-1", "type", "APPROVAL", "config", Map.of(
+                                "approverType", "user", "approverId", "8", "approvalMode", "sequence"))),
+                "edges", List.of(
+                        Map.of("source", "start", "target", "approval-1"),
+                        Map.of("source", "approval-1", "target", "approval-2"),
+                        Map.of("source", "approval-2", "target", "end"))), null);
+
+        assertTrue(response.isCalculable());
+        assertEquals(List.of("approval-1", "approval-2"), response.getNodes().stream()
+                .map(WorkflowAssigneePreviewDTO.NodeAssignee::getNodeId).toList());
+        verifyNoInteractions(userRoleMapper);
     }
 
     // ---- helpers ----

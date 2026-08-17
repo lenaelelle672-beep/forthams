@@ -197,6 +197,7 @@ const AssetTransferFormPage    = React.lazy(() => import('@/pages/disposal/Asset
 const AssetClearanceFormPage   = React.lazy(() => import('@/pages/disposal/AssetClearanceFormPage'));
 const AssetScrapFormPage       = React.lazy(() => import('@/pages/disposal/AssetScrapFormPage'));
 const AssetCompensationFormPage = React.lazy(() => import('@/pages/disposal/AssetCompensationFormPage'));
+const CompensationDetailPage   = React.lazy(() => import('@/pages/disposal/CompensationDetailPage'));
 const RetirementListPage       = React.lazy(() => import('@/pages/retirement/RetirementListPage'));
 const RetirementFormPage       = React.lazy(() => import('@/pages/retirement/RetirementFormPage'));
 const RetirementDetailPage     = React.lazy(() => import('@/pages/retirement/RetirementDetailPage'));
@@ -437,9 +438,10 @@ const router = createBrowserRouter([
           // 资产处置
           { path: 'disposals',              element: S(DisposalListPage) },
           { path: 'disposals/:id',          element: S(DisposalDetailPage) },
-          { path: 'disposals/transfer/new',  element: S(AssetTransferFormPage) },
-          { path: 'disposals/clearance/new', element: S(AssetClearanceFormPage) },
-          { path: 'disposals/scrap/new',     element: S(AssetScrapFormPage) },
+           { path: 'disposals/transfer/new',  element: S(AssetTransferFormPage) },
+           { path: 'disposals/clearance/new', element: S(AssetClearanceFormPage) },
+           { path: 'disposals/scrap/new',     element: S(AssetScrapFormPage) },
+           { path: 'disposals/compensation/new', element: <Navigate to="/compensation/new" replace /> },
 
           // 闲置资产
           { path: 'idle', element: S(IdleAssetsPage) },
@@ -448,9 +450,9 @@ const router = createBrowserRouter([
           { path: 'asset-models', element: S(AssetModelPage) },
 
           // 赔偿管理
-          { path: 'compensation',      element: S(AssetCompensationFormPage) },
-          { path: 'compensation/new',  element: S(AssetCompensationFormPage) },
-          { path: 'compensation/:id',  element: S(AssetCompensationFormPage) },
+           { path: 'compensation',      element: <Navigate to="/disposals?tab=COMPENSATION" replace /> },
+           { path: 'compensation/new',  element: S(AssetCompensationFormPage) },
+           { path: 'compensation/:id',  element: S(CompensationDetailPage) },
 
           // 折旧管理
           { path: 'depreciation', element: S(DepreciationListPage) },

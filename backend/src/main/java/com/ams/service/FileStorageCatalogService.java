@@ -25,9 +25,11 @@ public class FileStorageCatalogService {
     );
 
     private final JdbcTemplate jdbcTemplate;
+    private final TenantAuthorityService tenantAuthorityService;
 
-    public FileStorageCatalogService(JdbcTemplate jdbcTemplate) {
+    public FileStorageCatalogService(JdbcTemplate jdbcTemplate, TenantAuthorityService tenantAuthorityService) {
         this.jdbcTemplate = jdbcTemplate;
+        this.tenantAuthorityService = tenantAuthorityService;
     }
 
     public FileStorageAttachmentCatalogDTO getAttachmentCatalog(
@@ -37,6 +39,7 @@ public class FileStorageCatalogService {
             Integer page,
             Integer pageSize
     ) {
+        tenantAuthorityService.requirePlatformAdmin();
         FilterClause filterClause = buildFilterClause(keyword, businessType, fileType);
         int safePage = normalizePage(page);
         int safePageSize = normalizePageSize(pageSize);

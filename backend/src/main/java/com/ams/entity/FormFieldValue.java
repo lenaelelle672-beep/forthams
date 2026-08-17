@@ -24,6 +24,7 @@ public class FormFieldValue implements Serializable {
     private String valueType;
     private String valueText;
     private String valueJson;
+    @TableField("`sensitive`")
     private Boolean sensitive;
     private String maskedValue;
 

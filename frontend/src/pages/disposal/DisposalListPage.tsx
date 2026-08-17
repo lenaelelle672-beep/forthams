@@ -6,15 +6,15 @@
  *
  * 功能：
  * - 5 个处置类型 Tab（调拨 / 清退 / 报废 / 赔偿 / 工单）
- * - 搜索 + 状态过滤（通过 API 参数传递）
+ * - 处置与工单支持搜索 + 状态过滤；赔偿接口仅支持分页
  * - 新建各类处置单的入口
  * - 列表展示（通过 getDisposalList / getCompensationList / getDisposalStats 真实 API 对接）
  * - 分页绑定真实 total
  * - 统计卡片数据从 API 聚合
  */
 
-import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRightLeft, LogOut, Trash2, DollarSign, Plus, Search,
@@ -29,6 +29,8 @@ import {
   getDisposalList,
   getDisposalStats,
   getCompensationList,
+  DISPOSAL_RESUBMISSION_HINT,
+  isDisposalResubmissionStatus,
   type Disposal,
   type DisposalType,
   type DisposalStatus,
@@ -38,6 +40,7 @@ import {
 import type { ApiResponse, PageData } from '@/types/common';
 import { getWorkOrderList } from '@/api/workorder';
 import type { WorkOrderListItem } from '@/types/workorder';
+import { useAuth, type AuthUser } from '@/context/AuthContext';
 
 // ── Tab 配置 ──────────────────────────────────────────────────────────────────
 const TABS = [
@@ -50,10 +53,59 @@ const TABS = [
 
 type TabId = typeof TABS[number]['id'];
 
+type DisposalListAccess = {
+  canReadDisposals: boolean;
+  canReadCompensations: boolean;
+  canReadWorkOrders: boolean;
+};
+
+export function getDisposalListAccess(user: AuthUser | null): DisposalListAccess {
+  const permissions = user?.permissions ?? [];
+  const isUnrestricted = !user
+    || user.roles.some((role) => role.toUpperCase() === 'ADMIN' || role.toUpperCase() === 'SUPER_ADMIN')
+    || permissions.length === 0
+    || permissions.includes('*')
+    || permissions.includes('*:*:*');
+  return {
+    canReadDisposals: isUnrestricted || permissions.includes('disposal:query'),
+    canReadCompensations: isUnrestricted || permissions.includes('compensation:query'),
+    canReadWorkOrders: isUnrestricted || permissions.includes('workorder:query'),
+  };
+}
+
+function toTabId(value: string | null): TabId | null {
+  switch (value) {
+    case 'TRANSFER':
+    case 'CLEARANCE':
+    case 'SCRAP':
+    case 'COMPENSATION':
+    case 'WORK_ORDER':
+      return value;
+    default:
+      return null;
+  }
+}
+
+function canShowTab(tab: TabId, access: DisposalListAccess): boolean {
+  if (tab === 'COMPENSATION') return access.canReadCompensations;
+  if (tab === 'WORK_ORDER') return access.canReadWorkOrders;
+  return access.canReadDisposals;
+}
+
+function getInitialTab(requestedTab: TabId | null, access: DisposalListAccess): TabId {
+  if (requestedTab && canShowTab(requestedTab, access)) {
+    return requestedTab;
+  }
+  if (access.canReadDisposals) return 'CLEARANCE';
+  if (access.canReadCompensations) return 'COMPENSATION';
+  if (access.canReadWorkOrders) return 'WORK_ORDER';
+  return 'CLEARANCE';
+}
+
 // ── 状态配置 ──────────────────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string; border: string; ring: string; risk: 'none' | 'warning' | 'danger' }> = {
   PENDING:   { label: '待审批',  dot: 'bg-amber-400',  text: 'text-amber-600',  bg: 'bg-amber-50',  border: 'border-amber-200',  ring: 'ring-amber-200',  risk: 'warning' },
-  APPROVED:  { label: '审批中',  dot: 'bg-blue-400',   text: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200',   ring: 'ring-blue-200',   risk: 'none' },
+  APPROVED:  { label: '已审批',  dot: 'bg-blue-400',   text: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200',   ring: 'ring-blue-200',   risk: 'none' },
   COMPLETED: { label: '已完成',  dot: 'bg-emerald-400', text: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200', ring: 'ring-emerald-200', risk: 'none' },
   REJECTED:  { label: '已拒绝',  dot: 'bg-red-400',    text: 'text-red-600',    bg: 'bg-red-50',    border: 'border-red-200',    ring: 'ring-red-200',    risk: 'danger' },
   '待审批':   { label: '待审批',  dot: 'bg-amber-400',  text: 'text-amber-600',  bg: 'bg-amber-50',  border: 'border-amber-200',  ring: 'ring-amber-200',  risk: 'warning' },
@@ -68,6 +120,15 @@ const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; 
   APPROVING_LEVEL_1: { label: '一级审批', dot: 'bg-blue-400',   text: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200',   ring: 'ring-blue-200',   risk: 'warning' },
   APPROVING_LEVEL_2: { label: '二级审批', dot: 'bg-indigo-400', text: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-200', ring: 'ring-indigo-200', risk: 'warning' },
   CANCELLED:  { label: '已取消',  dot: 'bg-slate-400',  text: 'text-slate-500',  bg: 'bg-slate-50',  border: 'border-slate-200',  ring: 'ring-slate-200',  risk: 'none' },
+  CANCELLED_REQUIRES_RESUBMISSION: {
+    label: '需重提',
+    dot: 'bg-orange-400',
+    text: 'text-orange-700',
+    bg: 'bg-orange-50',
+    border: 'border-orange-200',
+    ring: 'ring-orange-200',
+    risk: 'warning',
+  },
 };
 
 // ── 各处置类型风险提示文案 ──────────────────────────────────────────────────────
@@ -102,31 +163,37 @@ interface RowData {
   applyDate: string;
   currentStatus: string;
   reason: string;
+  compensationType?: string;
+  compensationAmount?: number;
 }
 
 function disposalToRow(d: Disposal): RowData {
   return {
     id: d.id,
-    disposalNo: `DSP-${String(d.id).padStart(6, '0')}`,
+    disposalNo: d.applicationNo ?? `DSP-${String(d.id).padStart(6, '0')}`,
     assetName: d.assetName ?? '',
     assetNo: d.assetNo ?? '',
     applicant: d.applicantName ?? '',
     applyDate: d.createdAt?.split('T')[0] ?? '',
     currentStatus: d.status,
-    reason: d.reason ?? '',
+    reason: isDisposalResubmissionStatus(d.status)
+      ? `${d.reason ?? ''} ${DISPOSAL_RESUBMISSION_HINT}`.trim()
+      : d.reason ?? '',
   };
 }
 
 function compensationToRow(c: Compensation): RowData {
   return {
     id: c.id,
-    disposalNo: `CMP-${String(c.id).padStart(6, '0')}`,
-    assetName: c.assetName ?? '',
-    assetNo: c.assetNo ?? '',
-    applicant: c.responsibleUserName ?? '',
-    applyDate: c.createdAt?.split('T')[0] ?? '',
+    disposalNo: c.compensationNo,
+    assetName: `资产 ID ${c.assetId}`,
+    assetNo: '',
+    applicant: `责任人 ID ${c.responsibleUserId}`,
+    applyDate: c.createTime?.split('T')[0] ?? '',
     currentStatus: c.status,
-    reason: c.reason,
+    reason: c.description ?? '',
+    compensationType: c.compensationType,
+    compensationAmount: c.compensationAmount,
   };
 }
 
@@ -145,7 +212,15 @@ function workorderToRow(w: WorkOrderListItem): RowData {
 
 export default function DisposalListPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<TabId>('CLEARANCE');
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const access = useMemo(() => getDisposalListAccess(user), [user]);
+  const requestedTab = toTabId(searchParams.get('tab'));
+  const visibleTabs = useMemo(
+    () => TABS.filter((tab) => canShowTab(tab.id, access)),
+    [access],
+  );
+  const [activeTab, setActiveTab] = useState<TabId>(() => getInitialTab(requestedTab, access));
   const [statusFilter, setStatusFilter] = useState<DisposalStatus | ''>('');
   const [keyword, setKeyword] = useState('');
   const [page, setPage] = useState(1);
@@ -156,13 +231,20 @@ export default function DisposalListPage() {
   const isWorkOrderTab = activeTab === 'WORK_ORDER';
   const isDisposalTab = !isCompensationTab && !isWorkOrderTab;
 
+  useEffect(() => {
+    if (!visibleTabs.some((tab) => tab.id === activeTab)) {
+      setActiveTab(getInitialTab(requestedTab, access));
+    }
+  }, [access, activeTab, requestedTab, visibleTabs]);
+
   // ── 统计数据 ──────────────────────────────────────────────────────────────
   const { data: statsRes } = useQuery({
     queryKey: ['disposal-stats'],
     queryFn: () => getDisposalStats(),
+    enabled: access.canReadDisposals,
     staleTime: 60_000,
   });
-  const stats: DisposalStats | null = statsRes as unknown as DisposalStats | undefined ?? null;
+  const stats: DisposalStats | null = statsRes ?? null;
 
   // ── 统计卡片 ──────────────────────────────────────────────────────────────
   const statCards = useMemo(() => [
@@ -211,22 +293,20 @@ export default function DisposalListPage() {
         status: statusFilter || undefined,
         keyword: keyword || undefined,
       }),
-    enabled: isDisposalTab,
+    enabled: isDisposalTab && access.canReadDisposals,
     retry: false,
     staleTime: 30_000,
   });
 
   // ── 赔偿列表 ─────────────────────────────────────────────────────────────
   const { data: compensationRes, isLoading: compensationLoading } = useQuery({
-    queryKey: ['compensations', statusFilter, page, keyword],
+    queryKey: ['compensations', page],
     queryFn: () =>
       getCompensationList({
         page,
         pageSize,
-        status: statusFilter || undefined,
-        keyword: keyword || undefined,
       }),
-    enabled: isCompensationTab,
+    enabled: isCompensationTab && access.canReadCompensations,
     retry: false,
     staleTime: 30_000,
   });
@@ -241,7 +321,7 @@ export default function DisposalListPage() {
         status: statusFilter || undefined,
         keyword: keyword || undefined,
       }),
-    enabled: isWorkOrderTab,
+    enabled: isWorkOrderTab && access.canReadWorkOrders,
     retry: false,
     staleTime: 30_000,
   });
@@ -249,31 +329,34 @@ export default function DisposalListPage() {
   // ── 解包列表数据 ─────────────────────────────────────────────────────────
   const records: RowData[] = useMemo(() => {
     if (isCompensationTab) {
-      const pageData = (compensationRes as PageData<Compensation> | undefined);
-      return pageData?.records?.map(compensationToRow) ?? [];
+      return compensationRes?.records.map(compensationToRow) ?? [];
     }
     if (isWorkOrderTab) {
       const pageData = (workorderRes as PageData<WorkOrderListItem> | undefined);
       return pageData?.records?.map(workorderToRow) ?? [];
     }
-    const pageData = (disposalRes as PageData<Disposal> | undefined);
-    return pageData?.records?.map(disposalToRow) ?? [];
+    return disposalRes?.records.map(disposalToRow) ?? [];
   }, [isCompensationTab, isWorkOrderTab, disposalRes, compensationRes, workorderRes]);
 
   const total: number = useMemo(() => {
     if (isCompensationTab) {
-      return (compensationRes as PageData<Compensation> | undefined)?.total ?? 0;
+      return compensationRes?.total ?? 0;
     }
     if (isWorkOrderTab) {
       return (workorderRes as PageData<WorkOrderListItem> | undefined)?.total ?? 0;
     }
-    return (disposalRes as PageData<Disposal> | undefined)?.total ?? 0;
+    return disposalRes?.total ?? 0;
   }, [isCompensationTab, isWorkOrderTab, disposalRes, compensationRes, workorderRes]);
 
   const loading = isCompensationTab ? compensationLoading : isWorkOrderTab ? workorderLoading : disposalLoading;
+  const detailRoute = (row: RowData) => {
+    if (isWorkOrderTab) return `/workorders/${row.id}`;
+    if (isCompensationTab) return `/compensation/${row.id}`;
+    return `/disposals/${row.id}`;
+  };
 
   // ── 筛选状态 ──────────────────────────────────────────────────────────────
-  const hasActiveFilters = statusFilter !== '' || keyword !== '';
+  const hasActiveFilters = !isCompensationTab && (statusFilter !== '' || keyword !== '');
 
   // ── 高风险项计数 ─────────────────────────────────────────────────────────
   const highRiskCount = useMemo(
@@ -305,8 +388,8 @@ export default function DisposalListPage() {
     }
     return [
       { key: 'PENDING', label: '待审批' },
-      { key: 'APPROVED', label: '审批中' },
-      { key: 'COMPLETED', label: '已完成' },
+      { key: 'APPROVED', label: '已审批' },
+      { key: 'CANCELLED', label: '已取消' },
       { key: 'REJECTED', label: '已拒绝' },
     ];
   }, [isWorkOrderTab]);
@@ -374,6 +457,30 @@ export default function DisposalListPage() {
       width: 120,
       render: (v) => <StatusBadge status={String(v ?? '')} />,
     },
+    ...(isCompensationTab ? [
+      {
+        key: 'compensationType',
+        title: '赔偿类型',
+        width: 110,
+        render: (value: unknown) => <span className="text-sm text-slate-600">{typeof value === 'string' ? value : '—'}</span>,
+      },
+      {
+        key: 'compensationAmount',
+        title: '赔偿金额',
+        width: 130,
+        align: 'right' as const,
+        render: (value: unknown) => (
+          <span className="whitespace-nowrap font-semibold text-slate-700">
+            {typeof value === 'number' ? `¥${value.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}
+          </span>
+        ),
+      },
+      {
+        key: 'reason',
+        title: '赔偿事由',
+        render: (value: unknown) => <span className="block max-w-[220px] truncate text-sm text-slate-600">{typeof value === 'string' && value ? value : '—'}</span>,
+      },
+    ] : []),
     {
       key: 'actions',
       title: '操作',
@@ -386,7 +493,7 @@ export default function DisposalListPage() {
             title={`查看${row.disposalNo}`}
             onClick={e => {
               e.stopPropagation();
-              navigate(isWorkOrderTab ? `/workorders/${row.id}` : `/disposals/${row.id}`);
+              navigate(detailRoute(row));
             }}
             className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-blue-200 hover:text-blue-600"
           >
@@ -459,7 +566,7 @@ export default function DisposalListPage() {
         {/* Tab Navigation — Modern pill tabs                                */}
         {/* ================================================================ */}
         <div className="flex items-center gap-1 rounded-lg bg-slate-100/80 p-0.5">
-          {TABS.map(({ id, label, icon: Icon, color }) => {
+          {visibleTabs.map(({ id, label, icon: Icon, color }) => {
             const isActive = activeTab === id;
             return (
               <button
@@ -514,81 +621,89 @@ export default function DisposalListPage() {
                   {currentTab.label}列表
                 </h2>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="relative min-w-[200px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <input
-                    type="text"
-                    value={keyword}
-                    onChange={e => { setKeyword(e.target.value); setPage(1); }}
-                    placeholder={`搜索${currentTab.label}单号 / 资产名称`}
-                    className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                  />
+              {isCompensationTab ? (
+                <p data-testid="compensation-filter-contract" className="text-xs text-slate-500">
+                  赔偿接口当前仅支持分页，状态和关键词筛选暂不可用。
+                </p>
+              ) : (
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="relative min-w-[200px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={e => { setKeyword(e.target.value); setPage(1); }}
+                      placeholder={`搜索${currentTab.label}单号 / 资产名称`}
+                      className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm shadow-sm transition-all placeholder:text-slate-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                    />
+                  </div>
+                  {hasActiveFilters && (
+                    <button
+                      type="button"
+                      onClick={clearAllFilters}
+                      className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
+                    >
+                      <X className="h-3 w-3" />
+                      清除筛选
+                    </button>
+                  )}
                 </div>
-                {hasActiveFilters && (
-                  <button
-                    type="button"
-                    onClick={clearAllFilters}
-                    className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 transition hover:bg-blue-100"
-                  >
-                    <X className="h-3 w-3" />
-                    清除筛选
-                  </button>
-                )}
-              </div>
+              )}
             </div>
 
             {/* Quick filter pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => { setStatusFilter(''); setPage(1); }}
-                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
-                  !statusFilter
-                    ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
-                    : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
-                }`}
-              >
-                全部
-                <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0 text-[10px]">
-                  {total}
-                </span>
-              </button>
-              {quickFilters.map(({ key, label }) => {
-                const cfg = STATUS_CONFIG[key];
-                const isActive = statusFilter === key;
-                const count = statusCounts[key] ?? 0;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => {
-                      setStatusFilter(isActive ? '' : key as DisposalStatus);
-                      setPage(1);
-                    }}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
-                      isActive
-                        ? 'border-blue-500 bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
-                    }`}
-                  >
-                    {cfg && <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />}
-                    {label}
-                    {count > 0 && (
-                      <span
-                        className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
-                          isActive
-                            ? 'bg-white/20 text-white'
-                            : 'bg-slate-100 text-slate-500'
-                        }`}
-                      >
-                        {count}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {!isCompensationTab && (
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => { setStatusFilter(''); setPage(1); }}
+                  className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                    !statusFilter
+                      ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
+                  }`}
+                >
+                  全部
+                  <span className="ml-1 rounded-full bg-white/20 px-1.5 py-0 text-[10px]">
+                    {total}
+                  </span>
+                </button>
+                {quickFilters.map(({ key, label }) => {
+                  const cfg = STATUS_CONFIG[key];
+                  const isActive = statusFilter === key;
+                  const count = statusCounts[key] ?? 0;
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => {
+                        setStatusFilter(isActive ? '' : key as DisposalStatus);
+                        setPage(1);
+                      }}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-semibold transition ${
+                        isActive
+                          ? 'border-blue-500 bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                          : 'border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:text-blue-700'
+                      }`}
+                    >
+                      {cfg && <span className={`h-1.5 w-1.5 rounded-full ${cfg.dot}`} />}
+                      {label}
+                      {count > 0 && (
+                        <span
+                          className={`ml-0.5 rounded-full px-1.5 py-0 text-[10px] ${
+                            isActive
+                              ? 'bg-white/20 text-white'
+                              : 'bg-slate-100 text-slate-500'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Result summary bar */}
@@ -626,9 +741,7 @@ export default function DisposalListPage() {
               data={records}
               loading={loading}
               rowKey={(row) => row.id}
-              onRowClick={(row) =>
-                navigate(isWorkOrderTab ? `/workorders/${row.id}` : `/disposals/${row.id}`)
-              }
+              onRowClick={(row) => navigate(detailRoute(row))}
               pagination={{
                 page,
                 pageSize,

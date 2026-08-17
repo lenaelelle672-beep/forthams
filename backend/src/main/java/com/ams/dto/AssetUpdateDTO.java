@@ -1,12 +1,17 @@
 package com.ams.dto;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@JsonIgnoreProperties({
+        "deptId", "userId", "location", "locationId",
+        "department", "user", "dept_id", "user_id", "location_id"
+})
 public class AssetUpdateDTO {
     @JsonAlias({"name", "assetName"})
     @NotBlank
@@ -24,12 +29,6 @@ public class AssetUpdateDTO {
     private Integer warrantyPeriod;
     private BigDecimal depreciationRate;
     private String status;
-    @JsonAlias({"department", "deptId"})
-    private Long deptId;
-    @JsonAlias({"user", "userId"})
-    private Long userId;
-    private Long locationId;
-    private String location;
     private BigDecimal locationLat;
     private BigDecimal locationLng;
     private String rfidTag;

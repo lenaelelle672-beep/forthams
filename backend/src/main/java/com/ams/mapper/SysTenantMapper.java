@@ -1,6 +1,7 @@
 package com.ams.mapper;
 
 import com.ams.entity.SysTenant;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -9,8 +10,8 @@ import java.util.List;
 /**
  * 租户主数据 mapper。
  *
- * sys_tenant 是租户主数据表本身（不是业务表），因此查询不做 tenant_id 过滤——
- * 租户管理页由 system:tenant:query 权限码控制可见性（超级管理员可见全部租户）。
+ * sys_tenant 是租户主数据表本身（不是业务表），因此查询不做 tenant_id 过滤；
+ * 跨租户目录访问由 controller 的显式 platform_admin 服务端标记控制。
  */
 public interface SysTenantMapper {
 
@@ -43,4 +44,12 @@ public interface SysTenantMapper {
 
     @Select("SELECT " + BASE_COLUMNS + " FROM sys_tenant ORDER BY created_at ASC, id ASC")
     List<SysTenant> selectAll();
+
+    @Insert("""
+            INSERT INTO sys_tenant (id, name, plan, max_users, max_assets, status,
+                                    contact_name, contact_phone, contact_email, created_at, updated_at)
+            VALUES (#{id}, #{name}, #{plan}, #{maxUsers}, #{maxAssets}, #{status},
+                    #{contactName}, #{contactPhone}, #{contactEmail}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            """)
+    int insertTenant(SysTenant tenant);
 }

@@ -19,7 +19,7 @@ public class WorkOrder {
     private String workOrderNo;
     private String title;
     private String description;
-    private String status;  // DRAFT/PENDING/APPROVED/EXECUTING/COMPLETED/REJECTED/CANCELLED
+    private String status;  // DRAFT/PENDING/APPROVED/EXECUTING/COMPLETED/REJECTED/CANCELLED_REQUIRES_RESUBMISSION/CANCELLED
     private String priority;  // NORMAL/URGENT/EMERGENCY
     private String tenantId;
     private Long assetId;
@@ -38,6 +38,7 @@ public class WorkOrder {
     private BigDecimal estimatedCost;
     private BigDecimal actualCost;
     private String completionNote;
+    private Integer version;
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     @TableField(fill = FieldFill.INSERT_UPDATE)

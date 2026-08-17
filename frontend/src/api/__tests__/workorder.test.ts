@@ -51,7 +51,12 @@ describe('api/workorder', () => {
       collaborators: ['李四'],
     };
 
-    mockedHttp.get.mockResolvedValue({ data: { records: [], total: 0, size: 10, current: 1 } });
+    mockedHttp.get
+      .mockResolvedValueOnce({ data: { records: [], total: 0, size: 10, current: 1 } })
+      .mockResolvedValueOnce({})
+      .mockResolvedValueOnce({ records: [{ id: 88, processType: 'WORK_ORDER', businessId: 12, status: 'PENDING' }] })
+      .mockResolvedValueOnce({ records: [{ id: 88, processType: 'WORK_ORDER', businessId: 12, status: 'PENDING' }] })
+      .mockResolvedValueOnce({ data: { items: [], total: 0, page: 2, pageSize: 20, totalPages: 0 } });
     mockedHttp.post.mockResolvedValue({});
     mockedHttp.put.mockResolvedValue({});
     mockedHttp.delete.mockResolvedValue({ data: {} });
@@ -78,8 +83,10 @@ describe('api/workorder', () => {
     expect(mockedHttp.put).toHaveBeenCalledWith('/workorders/12', { title: '维修打印机 A' });
     expect(mockedHttp.delete).toHaveBeenCalledWith('/workorders/12');
     expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/workorders/12/submit');
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/workorders/12/approve', { comment: '同意' });
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(4, '/workorders/12/reject', { rejectionReason: '资料不完整' });
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(3, '/approvals/88/approve', { result: 'APPROVED', opinion: '同意' });
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(4, '/approvals/88/approve', { result: 'REJECTED', opinion: '资料不完整' });
+    expect(mockedHttp.post).not.toHaveBeenCalledWith('/workorders/12/approve', expect.anything());
+    expect(mockedHttp.post).not.toHaveBeenCalledWith('/workorders/12/reject', expect.anything());
     expect(mockedHttp.post).toHaveBeenNthCalledWith(5, '/workorders/12/operate', {
       operation: 'cancel',
       reason: '重复提交',
@@ -92,7 +99,10 @@ describe('api/workorder', () => {
     expect(mockedHttp.post).toHaveBeenNthCalledWith(8, '/workorders/12/submit-acceptance', { comment: '请验收' });
     expect(mockedHttp.post).toHaveBeenNthCalledWith(9, '/workorders/12/accept', { comment: '通过' });
     expect(mockedHttp.post).toHaveBeenNthCalledWith(10, '/workorders/12/reject-acceptance', { comment: '返工' });
-    expect(mockedHttp.get).toHaveBeenNthCalledWith(3, '/api/orders/pending', {
+    expect(mockedHttp.get).toHaveBeenCalledWith('/approvals/list', {
+      params: { processType: 'WORK_ORDER', page: 1, pageSize: 100 },
+    });
+    expect(mockedHttp.get).toHaveBeenCalledWith('/api/orders/pending', {
       params: {
         page: 2,
         pageSize: 20,

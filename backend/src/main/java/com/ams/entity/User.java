@@ -13,6 +13,8 @@ public class User implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+    private Boolean platformAdmin;
     private String username;
     private String password;
     private String realName;
@@ -21,6 +23,8 @@ public class User implements Serializable {
     private String avatar;
     private Integer status;
     private Long deptId;
+    private Integer tokenVersion;
+    private Integer version;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

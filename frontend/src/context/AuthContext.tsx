@@ -19,20 +19,13 @@ export interface AuthUser {
   realName: string;
   roles: string[];
   permissions: string[];
+  platformAdmin?: boolean;
+  platform_admin?: boolean;
 }
 
 interface LoginPayload {
   username: string;
   password: string;
-}
-
-interface LoginResponse {
-  token: string;
-  userId: number;
-  username: string;
-  realName: string;
-  roles: string[];
-  permissions?: string[];
 }
 
 interface AuthContextValue {
@@ -41,11 +34,62 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   loading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   hasRole: (roleName: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+export const CURRENT_USER_PATH = "/user-management/current";
+
+function readStringArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) {
+    return undefined;
+  }
+  return value.filter((item): item is string => typeof item === "string");
+}
+
+function readOptionalBoolean(value: unknown): boolean | undefined {
+  return typeof value === "boolean" ? value : undefined;
+}
+
+export function isPlatformAdminFlag(source: {
+  platformAdmin?: unknown;
+  platform_admin?: unknown;
+} | null | undefined): boolean {
+  return source?.platformAdmin === true || source?.platform_admin === true;
+}
+
+export function toAuthUser(
+  source: Record<string, unknown> | null | undefined,
+  fallback?: AuthUser | null,
+): AuthUser {
+  const roles = readStringArray(source?.roles);
+  const permissions = readStringArray(source?.permissions);
+  const platformAdmin =
+    readOptionalBoolean(source?.platformAdmin)
+    ?? readOptionalBoolean(source?.platform_admin)
+    ?? fallback?.platformAdmin
+    ?? fallback?.platform_admin
+    ?? false;
+
+  return {
+    userId: Number(source?.userId ?? fallback?.userId ?? 0),
+    username: String(source?.username ?? fallback?.username ?? ""),
+    realName: String(source?.realName ?? fallback?.realName ?? ""),
+    roles: roles ?? fallback?.roles ?? [],
+    permissions: permissions ?? fallback?.permissions ?? [],
+    platformAdmin,
+    platform_admin: platformAdmin,
+  };
+}
+
+function persistSession(token: string, user: AuthUser) {
+  if (typeof window === "undefined") {
+    return;
+  }
+  window.sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
+  window.sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+}
 
 function readStoredUser() {
   if (typeof window === "undefined") {
@@ -61,10 +105,29 @@ function readStoredUser() {
   }
 
   try {
-    return JSON.parse(storedUser) as AuthUser;
+    return toAuthUser(JSON.parse(storedUser) as Record<string, unknown>);
   } catch {
     return null;
   }
+}
+
+async function fetchCurrentAuthority(): Promise<Record<string, unknown> | null> {
+  try {
+    const response: unknown = await http.get(CURRENT_USER_PATH);
+    if (response && typeof response === "object" && !Array.isArray(response)) {
+      return response as Record<string, unknown>;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function authorityLooksIncomplete(user: AuthUser | null): boolean {
+  if (!user) {
+    return true;
+  }
+  return user.roles.length === 0 || user.permissions.length === 0 || user.platformAdmin == null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -73,68 +136,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken =
-      typeof window === "undefined"
-        ? null
-        : window.sessionStorage.getItem(TOKEN_STORAGE_KEY) ||
-          window.localStorage.getItem(TOKEN_STORAGE_KEY);
-    const storedUser = readStoredUser();
+    let cancelled = false;
 
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(storedUser);
+    const restore = async () => {
+      const storedToken =
+        typeof window === "undefined"
+          ? null
+          : window.sessionStorage.getItem(TOKEN_STORAGE_KEY) ||
+            window.localStorage.getItem(TOKEN_STORAGE_KEY);
+      const storedUser = readStoredUser();
 
-      if (!storedUser.roles || storedUser.roles.length === 0) {
-        http.get<{ userId: number; username: string; realName: string; roles: string[]; permissions: string[] }>("/user-management/current")
-          .then((data) => {
-            const fixedUser: AuthUser = {
-              userId: data.userId ?? storedUser.userId,
-              username: data.username ?? storedUser.username,
-              realName: data.realName ?? storedUser.realName,
-              roles: data.roles ?? [],
-              permissions: data.permissions ?? [],
-            };
-            setUser(fixedUser);
-            if (typeof window !== "undefined") {
-              window.sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(fixedUser));
-            }
-          })
-          .catch(() => {
-            // 失败不阻断，保持原数据
-          });
+      if (!storedToken || !storedUser) {
+        clearAuthStorage();
+        if (!cancelled) {
+          setToken(null);
+          setUser(null);
+          setLoading(false);
+        }
+        return;
       }
-    } else {
-      clearAuthStorage();
-    }
 
-    setLoading(false);
+      persistSession(storedToken, storedUser);
+      if (!cancelled) {
+        setToken(storedToken);
+        setUser(storedUser);
+      }
+
+      const current = await fetchCurrentAuthority();
+      if (cancelled) {
+        return;
+      }
+      if (current) {
+        const nextUser = toAuthUser(current, storedUser);
+        persistSession(storedToken, nextUser);
+        setUser(nextUser);
+      }
+      setLoading(false);
+    };
+
+    void restore();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = async (payload: LoginPayload) => {
-    const response = await http.post<LoginResponse>("/auth/login", payload);
-
-    const nextUser: AuthUser = {
-      userId: response.userId,
-      username: response.username,
-      realName: response.realName,
-      roles: response.roles ?? [],
-      permissions: response.permissions ?? [],
-    };
+    const response = await http.post<Record<string, unknown>>("/auth/login", payload) as unknown;
+    const record = (response && typeof response === "object" ? response : {}) as Record<string, unknown>;
+    const nextToken = String(record.token ?? "");
+    if (!nextToken) {
+      throw new Error("登录响应缺少 token");
+    }
 
     if (typeof window !== "undefined") {
       clearAuthStorage();
+      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, nextToken);
     }
 
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, response.token);
-      window.sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+    let nextUser = toAuthUser(record);
+    if (authorityLooksIncomplete(nextUser)) {
+      const current = await fetchCurrentAuthority();
+      if (current) {
+        nextUser = toAuthUser(current, nextUser);
+      }
     }
 
-    setToken(response.token);
+    persistSession(nextToken, nextUser);
+    setToken(nextToken);
     setUser(nextUser);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await http.post("/auth/logout");
+    } catch {
+      // 后端撤销失败仍清本地会话，避免卡在已退出界面。
+    }
     clearAuthStorage();
     setToken(null);
     setUser(null);

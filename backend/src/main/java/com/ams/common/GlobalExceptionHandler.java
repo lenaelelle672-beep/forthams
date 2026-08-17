@@ -1,23 +1,35 @@
 package com.ams.common;
 
 import com.ams.common.exception.BusinessException;
+import com.ams.common.exception.ConflictException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Result<Void> handleConflictException(ConflictException e) {
+        log.warn("Conflict: {}", e.getMessage());
+        return Result.error(e.getCode(), e.getMessage());
+    }
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -38,11 +50,32 @@ public class GlobalExceptionHandler {
         return Result.error(400, errors);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result<Void> handleUnreadableRequestBody(HttpMessageNotReadableException e) {
+        log.warn("Unreadable request body: {}", e.getMessage());
+        return Result.error(400, "请求体格式不合法");
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result<Void> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
         log.warn("Type mismatch: {}", e.getMessage());
         return Result.error(400, "参数类型不合法: " + e.getParameter().getParameterName());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public Result<Void> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        log.warn("Unsupported request method: {}", e.getMethod());
+        return Result.error(405, "请求方法不被允许");
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result<Void> handleNoHandlerFound(NoHandlerFoundException e) {
+        log.warn("No endpoint: {} {}", e.getHttpMethod(), e.getRequestURL());
+        return Result.error(404, "请求路径不存在");
     }
 
     @ExceptionHandler(BindException.class)
@@ -78,6 +111,13 @@ public class GlobalExceptionHandler {
                 request.getRemoteAddr(), request.getRequestURI(), request.getMethod(),
                 tenantId, e.getMessage());
         return Result.error(403, "访问被拒绝");
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result<Void> handleAuthenticationException(AuthenticationException e) {
+        log.warn("Authentication failed");
+        return Result.error(401, "认证失败");
     }
 
     @ExceptionHandler(Exception.class)

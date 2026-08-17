@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { getWorkOrderDetail, approveWorkOrder, rejectWorkOrder, holdWorkOrder, resumeWorkOrder } from '@/api/workorder';
+import { findApprovalProcessId, MISSING_APPROVAL_PROCESS_MESSAGE } from '@/api/approval';
 import type { WorkOrderDetailResponse } from '@/types/workorder';
 import type { WorkOrder } from '@/types/workorder.types';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -162,14 +163,27 @@ export default function WorkOrderDetailPage() {
 
   const { workOrder, approvalRecords } = resolveWorkOrderDetail(res as unknown as WorkOrderDetailPayload | undefined);
 
+  const { data: approvalProcessId } = useQuery({
+    queryKey: ['approvals', 'WORK_ORDER', orderId],
+    queryFn: () => findApprovalProcessId('WORK_ORDER', orderId),
+    enabled: !!orderId && workOrder?.status === 'PENDING',
+    staleTime: 1000 * 30,
+  });
+
   const approveMutation = useMutation({
-    mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, data),
+    mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, {
+      ...data,
+      approvalId: approvalProcessId ?? undefined,
+    }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['workorders'] }),
     onError: (err: Error) => toast.error(err.message || '操作失败，请重试'),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (data: { version?: number; rejectionReason: string }) => rejectWorkOrder(orderId, data),
+    mutationFn: (data: { version?: number; rejectionReason: string }) => rejectWorkOrder(orderId, {
+      ...data,
+      approvalId: approvalProcessId ?? undefined,
+    }),
     onSuccess: () => { setRejectDialog(false); qc.invalidateQueries({ queryKey: ['workorders'] }); },
     onError: (err: Error) => toast.error(err.message || '操作失败，请重试'),
   });
@@ -191,6 +205,7 @@ export default function WorkOrderDetailPage() {
   }
 
   const canApprove = workOrder?.status === 'PENDING';
+  const hasApprovalProcess = typeof approvalProcessId === 'number' && approvalProcessId > 0;
   const priorityCfg = PRIORITY_CONFIG[workOrder?.priority ?? ''];
   const sla = resolveSlaDisplay(workOrder?.slaDeadline, workOrder?.slaStatus, workOrder?.priority, workOrder?.createTime);
 
@@ -253,16 +268,33 @@ export default function WorkOrderDetailPage() {
           {/* 现有审批按钮 */}
           {canApprove && (
             <>
-              <Button size="md" variant="destructive" onClick={() => setRejectDialog(true)}>
+              <Button
+                size="md"
+                variant="destructive"
+                disabled={!hasApprovalProcess}
+                title={!hasApprovalProcess ? MISSING_APPROVAL_PROCESS_MESSAGE : undefined}
+                onClick={() => setRejectDialog(true)}
+              >
                 <X className="w-4 h-4" /> 驳回
               </Button>
-              <Button size="md" variant="primary" onClick={() => setApproveDialog(true)}>
+              <Button
+                size="md"
+                variant="primary"
+                disabled={!hasApprovalProcess}
+                title={!hasApprovalProcess ? MISSING_APPROVAL_PROCESS_MESSAGE : undefined}
+                onClick={() => setApproveDialog(true)}
+              >
                 <Check className="w-4 h-4" /> 审批通过
               </Button>
             </>
           )}
         </div>
       </div>
+      {canApprove && !hasApprovalProcess && (
+        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+          {MISSING_APPROVAL_PROCESS_MESSAGE}
+        </p>
+      )}
 
       {/* ── 信息概览条 ── */}
       <div className="flex flex-wrap items-center gap-3 px-4 py-2.5 bg-[#f8fafc] dark:bg-gray-700 rounded-lg border border-[#e5e7eb] dark:border-gray-700">

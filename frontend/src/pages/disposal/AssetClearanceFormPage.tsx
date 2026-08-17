@@ -10,9 +10,8 @@ import { Card, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { getAssetList } from '@/api/asset';
-import { submitClearanceApplication, saveClearanceDraft } from '@/api/disposal';
+import { buildClearanceDisposalReason, submitClearanceApplication, saveClearanceDraft } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
-import type { PaginatedResponse, PageData } from '@/types/common';
 
 const schema = z.object({
   clearanceNo: z.string(),
@@ -80,14 +79,22 @@ function toAssetRow(a: AssetListItem): AssetRow {
   };
 }
 
-function getAssetRecords(
-  response: PaginatedResponse<AssetListItem> | PageData<AssetListItem> | undefined,
-): AssetListItem[] {
-  if (!response) {
+function isAssetListItem(value: unknown): value is AssetListItem {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  const id = Reflect.get(value, 'id');
+  return Number.isSafeInteger(id) && id > 0
+    && typeof Reflect.get(value, 'assetNo') === 'string'
+    && typeof Reflect.get(value, 'assetName') === 'string';
+}
+
+function getAssetRecords(response: unknown): AssetListItem[] {
+  if (response === null || typeof response !== 'object' || Array.isArray(response)) {
     return [];
   }
-
-  return response.records;
+  const records = Reflect.get(response, 'records');
+  return Array.isArray(records) ? records.filter(isAssetListItem) : [];
 }
 
 function getOptionalNumber(value: unknown): number | undefined {
@@ -183,11 +190,26 @@ export default function AssetClearanceFormPage() {
         applicationDate: data.applicationDate,
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['clearance'] });
-      qc.invalidateQueries({ queryKey: ['disposals'] });
-      toast.success('清退申请提交成功');
-      navigate('/disposals');
+    onSuccess: (result) => {
+      if (result.successes.length > 0) {
+        qc.invalidateQueries({ queryKey: ['clearance'] });
+        qc.invalidateQueries({ queryKey: ['disposals'] });
+      }
+      if (result.failures.length === 0) {
+        toast.success(`清退申请提交成功（${result.successes.length} 项）`);
+        navigate('/disposals');
+        return;
+      }
+      if (result.successes.length > 0) {
+        const successfulIds = new Set(result.successes.map(({ assetId }) => String(assetId)));
+        setSelectedAssetIds((current) => new Set(
+          Array.from(current).filter((assetId) => !successfulIds.has(assetId)),
+        ));
+        toast.success(`已成功提交 ${result.successes.length} 项清退申请`);
+        toast.error(`${result.failures.length} 项提交失败，已保留失败资产以便重试`);
+        return;
+      }
+      toast.error('所选资产均未提交成功，请检查后重试');
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : '提交失败，请重试');
@@ -217,6 +239,12 @@ export default function AssetClearanceFormPage() {
   const onSubmit = (values: FormValues) => {
     if (selectedAssetIds.size === 0) {
       toast.error('请至少选择一项资产');
+      return;
+    }
+    try {
+      buildClearanceDisposalReason(values);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '处置事由校验失败，请缩短说明后重试');
       return;
     }
     mutation.mutate({

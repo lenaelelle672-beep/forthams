@@ -17,6 +17,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import com.ams.dto.InventoryTaskCreateDTO;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,6 +84,21 @@ class InventoryControllerTest {
                 .andExpect(status().isOk());
 
         verify(inventoryService).updateTaskStatus(1L, "IN_PROGRESS");
+    }
+
+    @Test
+    void requestBodiesShouldRejectForgedStatesAndInvalidScanPayloads() throws Exception {
+        mockMvc.perform(put("/inventory/tasks/1/status")
+                        .contentType("application/json")
+                        .content("{\"status\":\"FORGED\"}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/inventory/tasks/1/scan")
+                        .contentType("application/json")
+                        .content("{\"assetId\":0,\"status\":\"FORGED\"}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(inventoryService);
     }
 
     private InventoryTask task(Long id) {

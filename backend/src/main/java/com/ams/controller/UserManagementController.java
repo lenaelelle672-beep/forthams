@@ -1,6 +1,8 @@
 package com.ams.controller;
 
+import com.ams.dto.AuthResponse;
 import com.ams.dto.UserCreateDTO;
+import com.ams.dto.UserStatusUpdateDTO;
 import com.ams.dto.UserUpdateDTO;
 import com.ams.entity.GeneralAuditEntry;
 import com.ams.entity.User;
@@ -15,8 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import org.springframework.http.HttpStatus;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping({"/user-management", "/users"})
@@ -30,8 +32,13 @@ public class UserManagementController {
     private final AuditService auditService;
     private final AuditHelper auditHelper;
 
+    @GetMapping("/current")
+    public Result<AuthResponse> current() {
+        return Result.success(userManagementService.getCurrentUser());
+    }
+
     @GetMapping("/list")
-    @PreAuthorize("hasAuthority('system:user:query') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('user:query')")
     public Result<Page<User>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
@@ -40,13 +47,14 @@ public class UserManagementController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:user:query') or hasRole('SUPER_ADMIN')")
-    public Result<User> getById(@PathVariable Long id) {
+    @PreAuthorize("hasAuthority('user:query')")
+    public Result<User> getById(@PathVariable @Positive Long id) {
         return Result.success(userManagementService.getUserById(id));
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('system:user:edit') or hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAuthority('user:create')")
+    @ResponseStatus(HttpStatus.CREATED)
     public Result<User> create(@Valid @RequestBody UserCreateDTO dto, HttpServletRequest request) {
         GeneralAuditEntry audit = auditHelper.buildEntry(request, "USER_CREATE", "create_user",
                 RESOURCE_TYPE, null, "创建用户: " + dto.getUsername(), "SUCCESS");
@@ -64,11 +72,12 @@ public class UserManagementController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:user:edit') or hasRole('SUPER_ADMIN')")
-    public Result<User> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto, HttpServletRequest request) {
+    @PreAuthorize("hasAuthority('user:update')")
+    public Result<User> update(@PathVariable @Positive Long id, @Valid @RequestBody UserUpdateDTO dto, HttpServletRequest request) {
         GeneralAuditEntry audit = auditHelper.buildEntry(request, "USER_UPDATE", "update_user",
                 RESOURCE_TYPE, String.valueOf(id), "更新用户: " + id, "SUCCESS");
         try {
+            userManagementService.requireTargetManagementAuthority(id);
             return Result.success(userManagementService.updateUser(id, dto));
         } catch (RuntimeException ex) {
             audit.setStatus("FAILURE");
@@ -80,11 +89,12 @@ public class UserManagementController {
     }
 
     @PutMapping("/{id}/reset-password")
-    @PreAuthorize("hasAuthority('system:user:delete') or hasRole('SUPER_ADMIN')")
-    public Result<String> resetPassword(@PathVariable Long id, HttpServletRequest request) {
+    @PreAuthorize("hasAuthority('user:reset-password')")
+    public Result<String> resetPassword(@PathVariable @Positive Long id, HttpServletRequest request) {
         GeneralAuditEntry audit = auditHelper.buildEntry(request, "USER_RESET_PASSWORD", "reset_password",
                 RESOURCE_TYPE, String.valueOf(id), "重置用户密码: " + id, "SUCCESS");
         try {
+            userManagementService.requireTargetManagementAuthority(id);
             return Result.success("临时密码已生成，请安全传达给用户", userManagementService.resetPassword(id));
         } catch (RuntimeException ex) {
             audit.setStatus("FAILURE");
@@ -96,18 +106,21 @@ public class UserManagementController {
     }
 
     @PutMapping("/{id}/status")
-    @PreAuthorize("hasAuthority('system:user:edit') or hasRole('SUPER_ADMIN')")
-    public Result<Void> updateStatus(@PathVariable Long id, @RequestBody Map<String, Integer> body, HttpServletRequest request) {
-        userManagementService.updateStatus(id, body.get("status"));
+    @PreAuthorize("hasAuthority('user:update')")
+    public Result<Void> updateStatus(@PathVariable @Positive Long id, @Valid @RequestBody UserStatusUpdateDTO body,
+                                      HttpServletRequest request) {
+        userManagementService.requireTargetManagementAuthority(id);
+        userManagementService.updateStatus(id, body.getStatus());
         return Result.success();
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('system:user:delete') or hasRole('SUPER_ADMIN')")
-    public Result<Void> delete(@PathVariable Long id, HttpServletRequest request) {
+    @PreAuthorize("hasAuthority('user:delete')")
+    public Result<Void> delete(@PathVariable @Positive Long id, HttpServletRequest request) {
         GeneralAuditEntry audit = auditHelper.buildEntry(request, "USER_DELETE", "delete_user",
                 RESOURCE_TYPE, String.valueOf(id), "删除用户: " + id, "SUCCESS");
         try {
+            userManagementService.requireTargetManagementAuthority(id);
             userManagementService.deleteUser(id);
             return Result.success();
         } catch (RuntimeException ex) {

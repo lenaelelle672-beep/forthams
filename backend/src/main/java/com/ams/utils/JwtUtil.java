@@ -15,6 +15,8 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
+    private static final int MIN_SECRET_UTF8_BYTES = 32;
+
     /**
      * JWT 签名密钥。必须通过 JWT_SECRET 环境变量设置（至少 256 位/32 字节）。
      * 此前 application.yml 有公开默认值，任何读代码的人都能伪造 token。
@@ -39,6 +41,9 @@ public class JwtUtil {
         if (KNOWN_INSECURE_DEFAULTS.contains(secret)) {
             throw new IllegalStateException("JWT_SECRET 使用了公开默认值，存在认证伪造风险：必须设置自定义 JWT_SECRET 环境变量");
         }
+        if (secret.getBytes(StandardCharsets.UTF_8).length < MIN_SECRET_UTF8_BYTES) {
+            throw new IllegalStateException("JWT_SECRET 至少需要32个UTF-8字节");
+        }
     }
 
     private SecretKey getSigningKey() {
@@ -46,13 +51,21 @@ public class JwtUtil {
     }
 
     public String generateToken(String username, Long userId, String tenantId) {
-        if (tenantId == null || tenantId.isBlank()) {
-            throw new IllegalArgumentException("tenantId must not be blank");
+        return generateToken(username, userId, tenantId, 0);
+    }
+
+    public String generateToken(String username, Long userId, String tenantId, Integer tokenVersion) {
+        if (username == null || username.isBlank() || userId == null || userId <= 0 || tenantId == null || tenantId.isBlank()) {
+            throw new IllegalArgumentException("username, userId and tenantId must not be blank");
+        }
+        if (tokenVersion == null || tokenVersion < 0) {
+            throw new IllegalArgumentException("tokenVersion must not be negative");
         }
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("tenant_id", tenantId);
+        claims.put("token_version", tokenVersion);
         return createToken(claims, username);
     }
 
@@ -83,9 +96,31 @@ public class JwtUtil {
         return claims.get("tenant_id", String.class);
     }
 
-    public boolean validateToken(String token, String username) {
+    public Integer getTokenVersionFromToken(String token) {
+        Object value = getClaimsFromToken(token).get("token_version");
+        if (!(value instanceof Number number)) {
+            return null;
+        }
+        return number.intValue();
+    }
+
+    public boolean validateToken(String token, String username, Long userId, String tenantId) {
+        return validateToken(token, username, userId, tenantId, 0);
+    }
+
+    public boolean validateToken(String token, String username, Long userId, String tenantId, Integer tokenVersion) {
+        if (username == null || username.isBlank() || userId == null || tenantId == null || tenantId.isBlank()) {
+            return false;
+        }
+        if (tokenVersion == null || tokenVersion < 0) {
+            return false;
+        }
         String tokenUsername = getUsernameFromToken(token);
-        return (tokenUsername.equals(username) && !isTokenExpired(token));
+        return tokenUsername.equals(username)
+                && userId.equals(getUserIdFromToken(token))
+                && tenantId.equals(getTenantIdFromToken(token))
+                && tokenVersion.equals(getTokenVersionFromToken(token))
+                && !isTokenExpired(token);
     }
 
     private Claims getClaimsFromToken(String token) {

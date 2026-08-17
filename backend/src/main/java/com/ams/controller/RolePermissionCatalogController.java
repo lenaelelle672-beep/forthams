@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class RolePermissionCatalogController {
 
     private static final String PERMISSION_QUERY = "system:role-permission:query";
-    private static final String ROLE_SUPER_ADMIN = "ROLE_SUPER_ADMIN";
 
     private final RolePermissionCatalogService rolePermissionCatalogService;
     private final JwtUtil jwtUtil;
@@ -50,7 +49,7 @@ public class RolePermissionCatalogController {
         }
         return authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .anyMatch(authority -> PERMISSION_QUERY.equals(authority) || ROLE_SUPER_ADMIN.equals(authority));
+                .anyMatch(PERMISSION_QUERY::equals);
     }
 
     private Long requireCurrentUserId(HttpServletRequest request) {

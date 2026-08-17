@@ -68,17 +68,16 @@ class RolePermissionCatalogControllerTest {
     }
 
     @Test
-    void getCatalogShouldAllowSuperAdminAuthority() throws Exception {
+    void getCatalogShouldRejectSuperAdminWithoutExplicitPermission() throws Exception {
         grant("ROLE_SUPER_ADMIN");
         when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
-        when(rolePermissionCatalogService.getCatalog()).thenReturn(sampleCatalog());
 
         mockMvc.perform(get("/system/role-permissions/catalog")
                         .header("Authorization", "Bearer token"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.riskTips[0]").value("本页不支持分配/编辑/删除，不代表菜单权限或数据权限闭环"));
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
 
-        verify(rolePermissionCatalogService).getCatalog();
+        verifyNoInteractions(rolePermissionCatalogService);
     }
 
     @Test

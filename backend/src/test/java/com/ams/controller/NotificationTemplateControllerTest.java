@@ -81,8 +81,9 @@ class NotificationTemplateControllerTest {
         verify(notificationTemplateService).meta();
         verify(notificationTemplateService).preview(any());
 
+        mockMvc.perform(post("/notification-templates").contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isNotFound());
         for (var builder : List.of(
-                post("/notification-templates"),
                 put("/notification-templates/3"),
                 patch("/notification-templates/3"),
                 delete("/notification-templates/3"),
@@ -91,7 +92,7 @@ class NotificationTemplateControllerTest {
                 post("/notification-templates/export")
         )) {
             mockMvc.perform(builder.contentType(MediaType.APPLICATION_JSON).content("{}"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(status().isMethodNotAllowed());
         }
     }
 

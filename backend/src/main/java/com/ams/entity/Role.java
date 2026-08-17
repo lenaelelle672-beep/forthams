@@ -1,6 +1,7 @@
 package com.ams.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -13,10 +14,12 @@ public class Role implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
     private String roleName;
     private String roleCode;
     private String description;
-    /** 数据权限范围：ALL/DEPT/DEPT_AND_SUB/SELF/CUSTOM */
+    /** 旧版全局列，不参与 tenant-scoped 数据权限评估。 */
+    @JsonIgnore
     private String dataScope;
     private Integer status;
 

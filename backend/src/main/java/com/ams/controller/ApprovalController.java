@@ -2,6 +2,8 @@ package com.ams.controller;
 
 import com.ams.common.exception.BusinessException;
 import com.ams.dto.ApprovalCreateDTO;
+import com.ams.dto.ApprovalDecisionDTO;
+import com.ams.dto.ApprovalRecoveryDTO;
 import com.ams.entity.ApprovalProcess;
 import com.ams.service.ApprovalService;
 import com.ams.utils.JwtUtil;
@@ -10,10 +12,10 @@ import com.ams.common.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 @RequestMapping("/approvals")
@@ -25,41 +27,52 @@ public class ApprovalController {
     private final JwtUtil jwtUtil;
 
     @GetMapping("/list")
+    @PreAuthorize("hasAuthority('approval:query')")
     public Result<Page<ApprovalProcess>> list(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String keyword) {
-        return Result.success(approvalService.queryProcesses(page, pageSize, status, keyword));
+            @RequestParam(required = false) String processType) {
+        return Result.success(approvalService.queryProcesses(page, pageSize, status, processType));
     }
 
     @GetMapping("/{id}")
-    public Result<?> getById(@PathVariable Long id) {
+    @PreAuthorize("hasAuthority('approval:query')")
+    public Result<?> getById(@PathVariable @Positive Long id) {
         return Result.success(approvalService.getProcessById(id));
     }
 
+    @GetMapping("/{id}/recovery")
+    @PreAuthorize("hasAuthority('approval:query')")
+    public Result<ApprovalRecoveryDTO> recovery(@PathVariable @Positive Long id) {
+        return Result.success(approvalService.getRecoveryGuidance(id));
+    }
+
     @PostMapping
+    @PreAuthorize("hasAuthority('approval:create')")
     public Result<ApprovalProcess> create(@Valid @RequestBody ApprovalCreateDTO dto, HttpServletRequest request) {
         dto.setApplicantId(getCurrentUserId(request));
         return Result.success(approvalService.createProcess(dto));
     }
 
     @PostMapping("/{id}/approve")
-    public Result<ApprovalProcess> approve(@PathVariable Long id, @RequestBody Map<String, Object> body,
-                                           HttpServletRequest request) {
-        String result = (String) body.getOrDefault("result", "APPROVED");
-        String opinion = (String) body.getOrDefault("opinion", "");
-        return Result.success(approvalService.approve(id, getCurrentUserId(request), result, opinion));
+    @PreAuthorize("hasAuthority('approval:approve')")
+    public Result<ApprovalProcess> approve(@PathVariable @Positive Long id, @Valid @RequestBody ApprovalDecisionDTO body,
+                                            HttpServletRequest request) {
+        return Result.success(approvalService.approve(
+                id, getCurrentUserId(request), body.getResult().name(), body.getOpinion()));
     }
 
     @GetMapping("/pending")
+    @PreAuthorize("hasAuthority('approval:query')")
     public Result<?> pending(HttpServletRequest request) {
         return Result.success(approvalService.getMyPendingApprovals(getCurrentUserId(request)));
     }
 
     @GetMapping("/pending/count")
-    public Result<Long> pendingCount() {
-        return Result.success(approvalService.getPendingCount());
+    @PreAuthorize("hasAuthority('approval:query')")
+    public Result<Long> pendingCount(HttpServletRequest request) {
+        return Result.success(approvalService.getPendingCount(getCurrentUserId(request)));
     }
 
     private Long getCurrentUserId(HttpServletRequest request) {

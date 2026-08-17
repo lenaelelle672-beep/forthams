@@ -1,8 +1,10 @@
 package com.ams.controller;
 
 import com.ams.entity.WorkOrder;
+import com.ams.dto.WorkOrderDTO;
 import com.ams.service.WorkOrderService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,11 +16,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties = "server.servlet.context-path=/api")
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@WithMockUser(authorities = {"workorder:query", "workorder:approve"})
 @DisplayName("WorkOrder Controller Tests")
 class WorkOrderControllerTest {
 
@@ -50,18 +55,22 @@ class WorkOrderControllerTest {
     }
 
     @Test
-    @DisplayName("Should route action style approve to operate logic")
+    @DisplayName("Should reject direct approval compatibility route")
     void testApproveActionRoute() throws Exception {
-        WorkOrder workOrder = new WorkOrder();
-        when(workOrderService.operateWorkOrder(eq(1L), eq("approve"), eq("ok"))).thenReturn(workOrder);
-
         mockMvc.perform(post("/api/v1/work-orders/{id}/approve", 1L)
                 .contextPath("/api")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"comment\":\"ok\"}"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.code").value(200));
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.code").value(403));
 
-        verify(workOrderService).operateWorkOrder(1L, "approve", "ok");
+        org.mockito.Mockito.verifyNoInteractions(workOrderService);
+    }
+
+    @Test
+    void statusMustNotBeDeserializedFromWritePayload() throws Exception {
+        WorkOrderDTO dto = new ObjectMapper().readValue("{\"status\":\"APPROVED\"}", WorkOrderDTO.class);
+
+        assertNull(dto.getStatus());
     }
 }

@@ -11,7 +11,16 @@ vi.mock('@/utils/http', () => ({
 }));
 
 import http from '@/utils/http';
-import { approveTask, batchConfirmAssets, confirmAsset, submitTask, updateTaskStatus } from '@/api/inventory';
+import {
+  approveTask,
+  batchConfirmAssets,
+  confirmAsset,
+  createInventoryTask,
+  getInventoryTasks,
+  submitTask,
+  toInventoryCreateBody,
+  updateTaskStatus,
+} from '@/api/inventory';
 
 const mockedHttp = {
   get: vi.mocked(http.get),
@@ -33,11 +42,11 @@ describe('api/inventory', () => {
     await confirmAsset(7, 11, { actualStatus: 'damaged', remark: '屏幕破损' });
     await batchConfirmAssets(7, { assetIds: [11, 12], actualStatus: 'normal', remark: '批量确认' });
 
-    expect(mockedHttp.patch).toHaveBeenCalledWith('/api/v1/inventory/tasks/7/assets/11/confirm', {
+    expect(mockedHttp.patch).toHaveBeenCalledWith('/inventory/tasks/7/assets/11/confirm', {
       actualStatus: 'damaged',
       remark: '屏幕破损',
     });
-    expect(mockedHttp.post).toHaveBeenCalledWith('/api/v1/inventory/tasks/7/assets/batch-confirm', {
+    expect(mockedHttp.post).toHaveBeenCalledWith('/inventory/tasks/7/assets/batch-confirm', {
       assetIds: [11, 12],
       actualStatus: 'normal',
       remark: '批量确认',
@@ -50,8 +59,8 @@ describe('api/inventory', () => {
     await submitTask(7);
     await approveTask(7);
 
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/api/v1/inventory/tasks/7/submit');
-    expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/api/v1/inventory/tasks/7/approve');
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(1, '/inventory/tasks/7/submit');
+    expect(mockedHttp.post).toHaveBeenNthCalledWith(2, '/inventory/tasks/7/approve');
   });
 
   it('patches task status through the route supported by the backend alias', async () => {
@@ -59,8 +68,34 @@ describe('api/inventory', () => {
 
     await updateTaskStatus(7, { status: 'COMPLETED' });
 
-    expect(mockedHttp.patch).toHaveBeenCalledWith('/api/v1/inventory/tasks/7/status', {
+    expect(mockedHttp.patch).toHaveBeenCalledWith('/inventory/tasks/7/status', {
       status: 'COMPLETED',
+    });
+  });
+
+  it('lists and creates inventory tasks against /inventory/tasks with inventoryType and deptIds', async () => {
+    mockedHttp.get.mockResolvedValueOnce({ records: [], total: 0, size: 20, current: 1 });
+    mockedHttp.post.mockResolvedValueOnce({ id: 9, taskName: '一季度抽盘' });
+
+    await getInventoryTasks({ page: 1, pageSize: 20 });
+    await createInventoryTask({
+      taskName: '一季度抽盘',
+      inventoryType: 'PARTIAL',
+      deptIds: '3,5',
+    });
+
+    expect(mockedHttp.get).toHaveBeenCalledWith('/inventory/tasks', { params: { page: 1, pageSize: 20 } });
+    expect(mockedHttp.post).toHaveBeenCalledWith('/inventory/tasks', {
+      taskName: '一季度抽盘',
+      inventoryType: 'PARTIAL',
+      deptIds: '3,5',
+    });
+    expect(toInventoryCreateBody({
+      taskName: '全盘',
+      inventoryType: 'FULL',
+    })).toEqual({
+      taskName: '全盘',
+      inventoryType: 'FULL',
     });
   });
 });

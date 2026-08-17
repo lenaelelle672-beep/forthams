@@ -13,10 +13,15 @@ public class ApprovalCreateDTO {
     @NotBlank
     @Size(max = 256)
     private String title;
+    @Size(max = 2000)
     private String description;
     @JsonAlias({"businessId", "assetId"})
-    private Long businessId = 0L;
+    @NotNull
+    @Positive
+    private Long businessId;
+    @Size(max = 64)
     private String businessType;
     private Long applicantId;
+    @Size(max = 4096)
     private String businessData;
 }

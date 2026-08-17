@@ -163,7 +163,7 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { hasRole, user } = useAuth();
+  const { hasRole, user, logout } = useAuth();
 
   // 大屏导航——仅 ADMIN 或 SUPER_ADMIN 角色可见
   const navGroups = useMemo(() => {
@@ -219,13 +219,9 @@ export default function AppLayout() {
   // 主题切换由 ThemeToggle 组件内部处理
 
   const handleLogout = () => {
-    sessionStorage.removeItem('auth_token');
-    sessionStorage.removeItem('user_info');
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_info');
-    localStorage.removeItem('ams_auth_token');
-    localStorage.removeItem('ams_auth_user');
-    navigate('/login');
+    void logout().finally(() => {
+      navigate('/login');
+    });
   };
 
   // ── 右上角用户下拉菜单 ────────────────────────────────────────────────

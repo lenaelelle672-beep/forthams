@@ -1,18 +1,19 @@
 package com.ams.service;
 
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.AssetValueTrendDTO;
 import com.ams.dto.DashboardStatsDTO;
 import com.ams.dto.DeptAssetDistributionDTO;
 import com.ams.context.TenantContext;
 import com.ams.entity.Asset;
-import com.ams.entity.ApprovalProcess;
 import com.ams.entity.Dept;
 import com.ams.entity.MaintenanceRecord;
+import com.ams.entity.RetirementApplication;
 import com.ams.enums.AssetStatus;
-import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.AssetMapper;
 import com.ams.mapper.DeptMapper;
 import com.ams.mapper.MaintenanceRecordMapper;
+import com.ams.mapper.RetirementApplicationMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DashboardService {
 
+    public static final int MAX_TREND_DAYS = 365;
+    private static final int DEFAULT_TREND_DAYS = 30;
+
     private final AssetMapper assetMapper;
     private final MaintenanceRecordMapper maintenanceRecordMapper;
-    private final ApprovalProcessMapper approvalProcessMapper;
+    private final RetirementApplicationMapper retirementApplicationMapper;
     private final DeptMapper deptMapper;
+    private final AssetDataPermissionEvaluator assetDataPermissionEvaluator;
 
     public DashboardStatsDTO getStats() {
         DashboardStatsDTO stats = new DashboardStatsDTO();
@@ -80,6 +85,7 @@ public class DashboardService {
      * 性能：原值/现值在循环外只计算一次（O(assets)），随后按天填充，避免 O(days * assets) 的重复扫描。
      */
     public List<AssetValueTrendDTO> getValueTrends(Integer days) {
+        int boundedDays = normalizeTrendDays(days);
         List<AssetValueTrendDTO> trends = new ArrayList<>();
         LocalDate today = LocalDate.now();
         List<Asset> allAssets = getCurrentTenantAssets();
@@ -94,7 +100,7 @@ public class DashboardService {
                 .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        for (int i = days - 1; i >= 0; i--) {
+        for (int i = boundedDays - 1; i >= 0; i--) {
             AssetValueTrendDTO trend = new AssetValueTrendDTO();
             trend.setDate(today.minusDays(i));
             trend.setTotalValue(totalValue);
@@ -116,12 +122,12 @@ public class DashboardService {
             return Collections.emptyList();
         }
 
-        // 注意：sys_dept 表为全局共享部门字典，无 tenant_id 列（见 schema.sql / Dept 实体），
-        // 因此这里不能按 tenant_id 过滤。租户隔离已由上游 getCurrentTenantAssets() 保证 ——
-        // 此处只解析当前租户资产所引用到的部门 ID 的名称。改用 QueryWrapper.in 而非
-        // selectBatchIds，使过滤条件显式且便于后续如新增 tenant_id 列时直接追加 .eq。
+        String tenantId = TenantContext.requireTenantId();
         Map<Long, String> deptNameMap = deptMapper.selectList(
-                        new QueryWrapper<Dept>().in("id", deptCountMap.keySet())).stream()
+                        new QueryWrapper<Dept>()
+                                .eq("tenant_id", tenantId)
+                                .eq("deleted", 0)
+                                .in("id", deptCountMap.keySet())).stream()
                 .collect(Collectors.toMap(Dept::getId, Dept::getName));
 
         return deptCountMap.entrySet().stream()
@@ -190,17 +196,21 @@ public class DashboardService {
 
     public Long getPendingApprovals() {
         String tenantId = TenantContext.requireTenantId();
-        return approvalProcessMapper.selectCount(
-                new LambdaQueryWrapper<ApprovalProcess>()
-                        .eq(ApprovalProcess::getTenantId, tenantId)
-                        .eq(ApprovalProcess::getStatus, "PENDING")
-        );
+        LambdaQueryWrapper<RetirementApplication> wrapper = new LambdaQueryWrapper<RetirementApplication>()
+                .eq(RetirementApplication::getTenantId, tenantId)
+                .in(RetirementApplication::getStatus, List.of("PENDING", "APPROVING"));
+        // approval_process 没有统一 asset_id，不能安全对所有流程复用资产范围；只计入可证明
+        // 与可见资产关联的退役审批，其他流程在此资产域 dashboard 中默认不展示。
+        assetDataPermissionEvaluator.applyToRelatedAsset(wrapper);
+        return retirementApplicationMapper.selectCount(wrapper);
     }
 
     private List<Asset> getCurrentTenantAssets() {
         String tenantId = TenantContext.requireTenantId();
-        return assetMapper.selectList(new LambdaQueryWrapper<Asset>()
-                .eq(Asset::getTenantId, tenantId));
+        LambdaQueryWrapper<Asset> wrapper = new LambdaQueryWrapper<Asset>()
+                .eq(Asset::getTenantId, tenantId);
+        assetDataPermissionEvaluator.applyTo(wrapper);
+        return assetMapper.selectList(wrapper);
     }
 
     private List<Long> getCurrentTenantAssetIds() {
@@ -208,5 +218,13 @@ public class DashboardService {
                 .map(Asset::getId)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    private int normalizeTrendDays(Integer days) {
+        int requestedDays = days == null ? DEFAULT_TREND_DAYS : days;
+        if (requestedDays < 1 || requestedDays > MAX_TREND_DAYS) {
+            throw new BusinessException("days必须在1到" + MAX_TREND_DAYS + "之间");
+        }
+        return requestedDays;
     }
 }

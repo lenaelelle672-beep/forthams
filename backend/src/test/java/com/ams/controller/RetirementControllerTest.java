@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(properties = "server.servlet.context-path=/api")
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
+@WithMockUser(authorities = {"retirement:query", "retirement:create", "retirement:update", "retirement:approve", "retirement:delete"})
 @DisplayName("Retirement Controller Tests")
 class RetirementControllerTest {
 
@@ -52,7 +54,7 @@ class RetirementControllerTest {
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"asset_id\":12,\"reason\":\"达到报废年限\",\"retirement_type\":\"SCRAP\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200));
 
         ArgumentCaptor<com.ams.dto.RetirementApplyDTO> captor =
@@ -89,10 +91,38 @@ class RetirementControllerTest {
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"assetId\":12,\"reason\":\"达到报废年限\",\"retirementType\":\"SCRAP\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200));
 
         verify(retirementApplicationService).submitApplication(any(), eq(42L));
+    }
+
+    @Test
+    @DisplayName("Should reject invalid retirement write input before calling service")
+    void applyShouldRejectInvalidPayload() throws Exception {
+        mockMvc.perform(post("/api/v1/retirement/apply")
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"asset_id\":12,\"reason\":\"\",\"retirement_type\":\"INVALID\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        org.mockito.Mockito.verifyNoInteractions(retirementApplicationService);
+    }
+
+    @Test
+    @DisplayName("Should reject oversized retirement rejection reason before calling service")
+    void rejectShouldRejectOversizedReason() throws Exception {
+        mockMvc.perform(post("/api/v1/retirement/99/reject")
+                        .contextPath("/api")
+                        .header("Authorization", "Bearer test-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"reason\":\"" + "a".repeat(501) + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
+
+        org.mockito.Mockito.verifyNoInteractions(retirementApplicationService);
     }
 
     @Test
@@ -115,23 +145,16 @@ class RetirementControllerTest {
     }
 
     @Test
-    @DisplayName("Should support body based retirement approve compatibility endpoint")
+    @DisplayName("Should reject body based retirement approve compatibility endpoint")
     void approveBodyCompatibilityEndpoint() throws Exception {
-        RetirementApplication application = new RetirementApplication();
-        application.setId(99L);
-        application.setStatus("APPROVED");
-        when(jwtUtil.getUserIdFromToken("test-token")).thenReturn(42L);
-        when(retirementApplicationService.approveApplication(99L, 42L)).thenReturn(application);
-
         mockMvc.perform(post("/api/v1/retirement/approve")
                         .contextPath("/api")
                         .header("Authorization", "Bearer test-token")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"task_id\":\"99\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.status").value("APPROVED"));
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
 
-        verify(retirementApplicationService).approveApplication(99L, 42L);
+        org.mockito.Mockito.verifyNoInteractions(retirementApplicationService, jwtUtil);
     }
 }

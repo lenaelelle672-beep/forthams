@@ -33,6 +33,9 @@ class AssetLifecycleServiceTest {
     @Mock
     private AssetChangeLogMapper assetChangeLogMapper;
 
+    @Mock
+    private AssetDataPermissionEvaluator assetDataPermissionEvaluator;
+
     @InjectMocks
     private AssetLifecycleService assetLifecycleService;
 
@@ -157,6 +160,38 @@ class AssetLifecycleServiceTest {
     void shouldRejectLifecycleTransitionWithoutTenantContext() {
         assertThrows(org.springframework.security.access.AccessDeniedException.class,
                 () -> assetLifecycleService.transitionStatus(6L, AssetStatus.SCRAPPED, "SCRAP", "blocked", 7L));
+    }
+
+    @Test
+    void shouldRejectGenericStatusTransitionToLifecycleManagedStatus() {
+        Asset asset = new Asset();
+        asset.setId(7L);
+        asset.setTenantId("T001");
+        asset.setStatus("IDLE");
+        TenantContext.setTenantId("T001");
+        when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
+
+        assertThrows(BusinessException.class,
+                () -> assetLifecycleService.transitionStatus(7L, AssetStatus.SCRAPPED,
+                        AssetLifecycleService.CHANGE_TYPE_STATUS, "bypass", 7L));
+
+        verify(assetMapper, never()).update(any(Asset.class), any(LambdaQueryWrapper.class));
+    }
+
+    @Test
+    void shouldRejectRetirementApprovalWhenAssetWasNotSubmittedForRetirement() {
+        Asset asset = new Asset();
+        asset.setId(8L);
+        asset.setTenantId("T001");
+        asset.setStatus("IDLE");
+        TenantContext.setTenantId("T001");
+        when(assetMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(asset);
+
+        assertThrows(BusinessException.class,
+                () -> assetLifecycleService.transitionStatus(8L, AssetStatus.RETIRED,
+                        "RETIREMENT_APPROVED", "bypass", 7L));
+
+        verify(assetMapper, never()).update(any(Asset.class), any(LambdaQueryWrapper.class));
     }
 
     private Asset eqAsset(Asset asset) {

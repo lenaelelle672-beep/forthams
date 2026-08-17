@@ -87,7 +87,7 @@
     "react-i18next": "^15.7.4",
     "react-leaflet": "^4.2.1",
     "react-resizable-panels": "2.1.7",
-    "react-router": "7.13.0",
+    "react-router": "7.18.2",
     "react-window": "^1.8.10",
     "recharts": "2.15.2",
     "sonner": "2.0.3",
@@ -112,7 +112,8 @@
     "happy-dom": "^20.9.0",
     "msw": "^2.8.3",
     "tailwindcss": "4.1.12",
-    "vite": "6.4.2",
+    "typescript": "6.0.2",
+    "vite": "6.4.3",
     "vitest": "^3.0.8"
   },
   "peerDependencies": {
@@ -127,9 +128,15 @@
       "optional": true
     }
   },
+  "overrides": {
+    "postcss": "8.5.18"
+  },
   "pnpm": {
     "overrides": {
-      "vite": "6.4.2"
+      "vite": "6.4.3",
+      "postcss": "8.5.18",
+      "minimatch@9>brace-expansion": "2.1.3",
+      "minimatch@10>brace-expansion": "5.0.8"
     }
   }
 }

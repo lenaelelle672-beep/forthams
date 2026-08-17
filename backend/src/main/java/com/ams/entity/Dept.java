@@ -30,6 +30,11 @@ public class Dept implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    private String tenantId;
+
+    @TableField("dept_code")
+    private String deptCode;
+
     /**
      * 部门名称
      */
@@ -67,6 +72,7 @@ public class Dept implements Serializable {
      * 部门状态（0-正常, 2-停用）
      */
     private String status;
+    private Integer version;
 
     /**
      * 创建时间（由 MyBatis-Plus MetaObjectHandler 自动填充）

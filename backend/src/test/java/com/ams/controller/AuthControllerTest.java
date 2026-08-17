@@ -1,7 +1,6 @@
 package com.ams.controller;
 
 import com.ams.common.GlobalExceptionHandler;
-import com.ams.common.exception.BusinessException;
 import com.ams.dto.AuthResponse;
 import com.ams.dto.LoginRequest;
 import com.ams.dto.RegisterRequest;
@@ -13,11 +12,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -58,8 +61,9 @@ class AuthControllerTest {
         request.setUsername("alice");
         request.setPassword("secret123");
 
-        AuthResponse authResponse = new AuthResponse("jwt.token.value", 7L, "alice", "爱丽丝");
-        when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
+        AuthResponse authResponse = new AuthResponse("jwt.token.value", 7L, "alice", "爱丽丝",
+                java.util.List.of("TENANT_ADMIN"), java.util.List.of("asset:query"), Boolean.FALSE);
+        when(authService.login(any(LoginRequest.class), anyString())).thenReturn(authResponse);
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -70,9 +74,13 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.data.token").value("jwt.token.value"))
                 .andExpect(jsonPath("$.data.userId").value(7))
                 .andExpect(jsonPath("$.data.username").value("alice"))
-                .andExpect(jsonPath("$.data.realName").value("爱丽丝"));
+                .andExpect(jsonPath("$.data.realName").value("爱丽丝"))
+                .andExpect(jsonPath("$.data.roles[0]").value("TENANT_ADMIN"))
+                .andExpect(jsonPath("$.data.permissions[0]").value("asset:query"))
+                .andExpect(jsonPath("$.data.platformAdmin").value(false))
+                .andExpect(jsonPath("$.data.password").doesNotExist());
 
-        verify(authService).login(any(LoginRequest.class));
+        verify(authService).login(any(LoginRequest.class), anyString());
     }
 
     @Test
@@ -81,24 +89,21 @@ class AuthControllerTest {
         request.setUsername("alice");
         request.setPassword("wrong-password");
 
-        // AuthService 通过 Spring Security 抛出 BadCredentials，控制器层
-        // 这里用 BusinessException 模拟"凭证无效"的业务侧表现，验证异常被
-        // GlobalExceptionHandler 转为 400 + envelope code。
-        when(authService.login(any(LoginRequest.class)))
-                .thenThrow(new BusinessException("用户名或密码错误"));
+        when(authService.login(any(LoginRequest.class), anyString()))
+                .thenThrow(new BadCredentialsException("账号不存在"));
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("用户名或密码错误"));
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401))
+                .andExpect(jsonPath("$.message").value("认证失败"));
 
-        verify(authService).login(any(LoginRequest.class));
+        verify(authService).login(any(LoginRequest.class), anyString());
     }
 
     @Test
-    void registerShouldCreateUserAndReturnToken() throws Exception {
+    void registerShouldReturnExplicitForbiddenWhenPublicRegistrationIsClosed() throws Exception {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("bob");
         request.setPassword("password123");
@@ -107,25 +112,21 @@ class AuthControllerTest {
         request.setPhone("13800000000");
         request.setDeptId(10L);
 
-        AuthResponse authResponse = new AuthResponse("jwt.token.bob", 11L, "bob", "鲍勃");
-        when(authService.register(any(RegisterRequest.class))).thenReturn(authResponse);
+        when(authService.register(any(RegisterRequest.class)))
+                .thenThrow(new AccessDeniedException("公开注册已关闭"));
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.message").value("注册成功"))
-                .andExpect(jsonPath("$.data.token").value("jwt.token.bob"))
-                .andExpect(jsonPath("$.data.userId").value(11))
-                .andExpect(jsonPath("$.data.username").value("bob"))
-                .andExpect(jsonPath("$.data.realName").value("鲍勃"));
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403))
+                .andExpect(jsonPath("$.message").value("访问被拒绝"));
 
         verify(authService).register(any(RegisterRequest.class));
     }
 
     @Test
-    void registerShouldRejectDuplicateUsername() throws Exception {
+    void registerShouldNotExposeRegistrationFailureDetails() throws Exception {
         RegisterRequest request = new RegisterRequest();
         request.setUsername("alice");
         request.setPassword("password123");
@@ -133,31 +134,40 @@ class AuthControllerTest {
         request.setDeptId(10L);
 
         when(authService.register(any(RegisterRequest.class)))
-                .thenThrow(new BusinessException("用户名已存在"));
+                .thenThrow(new AccessDeniedException("公开注册已关闭"));
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(OBJECT_MAPPER.writeValueAsString(request)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value(400))
-                .andExpect(jsonPath("$.message").value("用户名已存在"));
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403))
+                .andExpect(jsonPath("$.message").value("访问被拒绝"));
 
         verify(authService).register(any(RegisterRequest.class));
     }
 
     @Test
     void logoutShouldDelegateToServiceAndReturnSuccess() throws Exception {
-        when(authService.logout()).thenReturn(true);
+        when(authService.logout("token-to-revoke")).thenReturn(true);
 
         // Result.success("登出成功") 解析为 success(T data)，字符串作为 data 返回，
         // message 维持默认 "操作成功"。这里同时验证控制器委托给了 AuthService。
-        mockMvc.perform(post("/auth/logout"))
+        mockMvc.perform(post("/auth/logout").header("Authorization", "Bearer token-to-revoke"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("操作成功"))
                 .andExpect(jsonPath("$.data").value("登出成功"));
 
-        verify(authService).logout();
+        verify(authService).logout("token-to-revoke");
+    }
+
+    @Test
+    void logoutShouldRejectMissingBearerHeader() throws Exception {
+        mockMvc.perform(post("/auth/logout"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value(401));
+
+        verifyNoInteractions(authService);
     }
 
     @Test
@@ -180,6 +190,6 @@ class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
-        verify(authService, org.mockito.Mockito.never()).login(any(LoginRequest.class));
+        verify(authService, org.mockito.Mockito.never()).login(any(LoginRequest.class), anyString());
     }
 }

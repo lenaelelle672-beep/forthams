@@ -20,6 +20,7 @@ import {
   type RetirementApplication,
   type RetirementStatus,
 } from '@/api/retirement';
+import { findApprovalProcessId, MISSING_APPROVAL_PROCESS_MESSAGE } from '@/api/approval';
 import { getAssetById } from '@/api/asset';
 import type { Asset } from '@/types/asset';
 import { Button } from '@/components/ui/Button';
@@ -169,7 +170,7 @@ export default function RetirementDetailPage() {
     staleTime: 1000 * 30,
   });
 
-  const record: RetirementApplication = res as unknown as RetirementApplication | undefined;
+  const record = res as unknown as RetirementApplication | undefined;
 
   /** 查询关联资产详情 */
   const { data: assetRes } = useQuery({
@@ -193,9 +194,17 @@ export default function RetirementDetailPage() {
     },
   });
 
+  const { data: approvalProcessId } = useQuery({
+    queryKey: ['approvals', 'RETIREMENT', retirementId],
+    queryFn: () => findApprovalProcessId('RETIREMENT', retirementId),
+    enabled: !!retirementId && (record?.status === 'APPROVING' || record?.status === 'PENDING'),
+    staleTime: 1000 * 30,
+  });
+  const hasApprovalProcess = typeof approvalProcessId === 'number' && approvalProcessId > 0;
+
   /** 审批通过 mutation */
   const approveMutation = useMutation({
-    mutationFn: () => approveRetirement(retirementId),
+    mutationFn: () => approveRetirement(retirementId, { approvalId: approvalProcessId ?? undefined }),
     onSuccess: () => {
       toast.success('审批通过');
       qc.invalidateQueries({ queryKey: ['retirement'] });
@@ -205,7 +214,7 @@ export default function RetirementDetailPage() {
 
   /** 驳回操作 mutation */
   const rejectMutation = useMutation({
-    mutationFn: (reason: string) => rejectRetirement(retirementId, reason),
+    mutationFn: (reason: string) => rejectRetirement(retirementId, reason, { approvalId: approvalProcessId ?? undefined }),
     onSuccess: () => {
       toast.success('已驳回');
       setRejectDialog(false);
@@ -507,14 +516,20 @@ export default function RetirementDetailPage() {
           </SectionCard>
 
           {/* ④ 操作按钮区 */}
-          {(canWithdraw || record.status === 'APPROVING') && (
-            <div className="bg-white border border-gray-200 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.05)] p-4 flex gap-3">
-              {record.status === 'APPROVING' && (
-                <>
+          {(canWithdraw || record.status === 'APPROVING' || record.status === 'PENDING') && (
+            <div className="bg-white border border-gray-200 rounded-xl shadow-[0_1px_3px_rgba(15,23,42,0.05)] p-4 flex flex-col gap-3">
+              {(record.status === 'APPROVING' || record.status === 'PENDING') && !hasApprovalProcess && (
+                <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  {MISSING_APPROVAL_PROCESS_MESSAGE}
+                </p>
+              )}
+              {(record.status === 'APPROVING' || record.status === 'PENDING') && (
+                <div className="flex gap-3">
                   <Button
                     className="flex-1"
                     size="md"
-                    disabled={approveMutation.isPending}
+                    disabled={approveMutation.isPending || !hasApprovalProcess}
+                    title={!hasApprovalProcess ? MISSING_APPROVAL_PROCESS_MESSAGE : undefined}
                     onClick={() => approveMutation.mutate()}
                   >
                     {approveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
@@ -524,13 +539,14 @@ export default function RetirementDetailPage() {
                     variant="outline"
                     className="flex-1"
                     size="md"
-                    disabled={rejectMutation.isPending}
+                    disabled={rejectMutation.isPending || !hasApprovalProcess}
+                    title={!hasApprovalProcess ? MISSING_APPROVAL_PROCESS_MESSAGE : undefined}
                     onClick={() => { setRejectReason(''); setRejectDialog(true); }}
                   >
                     {rejectMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <AlertTriangle className="w-4 h-4" />}
                     驳回
                   </Button>
-                </>
+                </div>
               )}
               {canWithdraw && (
                 <Button

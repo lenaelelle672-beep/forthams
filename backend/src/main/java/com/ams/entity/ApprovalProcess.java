@@ -19,8 +19,11 @@ public class ApprovalProcess implements Serializable {
     private String businessData;
     private String tenantId;
     private String status;
+    private String cancellationReason;
+    private LocalDateTime cancelledAt;
     private Integer currentStep;
     private Long applicantId;
+    private Integer version;
     private LocalDateTime applyTime;
 
     @TableField(fill = FieldFill.INSERT)

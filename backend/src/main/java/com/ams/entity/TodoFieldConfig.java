@@ -21,6 +21,7 @@ public class TodoFieldConfig implements Serializable {
     private String fieldLabel;
     private Boolean visible;
     private Integer sortOrder;
+    @TableField("`sensitive`")
     private Boolean sensitive;
     private Boolean defaultField;
     private String auditSummary;

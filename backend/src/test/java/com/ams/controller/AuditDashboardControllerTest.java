@@ -105,7 +105,7 @@ class AuditDashboardControllerTest {
                 post("/audit-logs/export")
         )) {
             mockMvc.perform(builder.header("Authorization", "Bearer token").contentType(MediaType.APPLICATION_JSON).content("{}"))
-                    .andExpect(status().is5xxServerError());
+                    .andExpect(status().isMethodNotAllowed());
         }
     }
 

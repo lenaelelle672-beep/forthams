@@ -78,7 +78,7 @@ class MaintenanceControllerTest {
         mockMvc.perform(post("/maintenance")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"assetId\":1,\"maintenanceType\":\"ROUTINE\",\"executor\":\"张工\",\"content\":\"更换滤芯\",\"cost\":200.00}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(7))
                 .andExpect(jsonPath("$.data.maintenanceType").value("ROUTINE"));

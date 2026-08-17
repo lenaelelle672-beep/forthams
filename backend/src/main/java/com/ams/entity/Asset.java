@@ -47,6 +47,7 @@ public class Asset implements Serializable {
     private String tenantId;
 
     private Long createBy;
+    private Integer version;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

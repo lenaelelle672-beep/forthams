@@ -26,6 +26,7 @@ public class MaintenanceRecord implements Serializable {
     private String result;
     private String remark;
     private Long createBy;
+    private Integer version;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

@@ -74,7 +74,7 @@ class DeptControllerTest {
         mockMvc.perform(post("/depts")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"研发部\",\"deptCode\":\"RD\",\"parentId\":0}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data.id").value(1))
                 .andExpect(jsonPath("$.data.name").value("研发部"));

@@ -16,9 +16,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Select, SelectItem } from '@/components/ui/Select';
 import AssetPickerModal from '@/components/AssetPickerModal';
 import { getAssetList } from '@/api/asset';
-import { submitScrapApplication, saveScrapDraft } from '@/api/disposal';
+import { buildScrapDisposalReason, submitScrapApplication, saveScrapDraft } from '@/api/disposal';
 import type { AssetListItem } from '@/types/asset';
-import type { PaginatedResponse, PageData } from '@/types/common';
 
 /** Step definitions for the scrap form wizard indicator */
 const STEPS = [
@@ -91,14 +90,22 @@ function toSelectedAsset(a: AssetListItem): SelectedAsset {
 }
 
 /** Extract records from paginated response, handling both response shapes */
-function getAssetRecords(
-  response: PaginatedResponse<AssetListItem> | PageData<AssetListItem> | undefined,
-): AssetListItem[] {
-  if (!response) {
+function isAssetListItem(value: unknown): value is AssetListItem {
+  if (value === null || typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+  const id = Reflect.get(value, 'id');
+  return Number.isSafeInteger(id) && id > 0
+    && typeof Reflect.get(value, 'assetNo') === 'string'
+    && typeof Reflect.get(value, 'assetName') === 'string';
+}
+
+function getAssetRecords(response: unknown): AssetListItem[] {
+  if (response === null || typeof response !== 'object' || Array.isArray(response)) {
     return [];
   }
-
-  return response.records;
+  const records = Reflect.get(response, 'records');
+  return Array.isArray(records) ? records.filter(isAssetListItem) : [];
 }
 
 const schema = z.object({
@@ -219,10 +226,23 @@ export default function AssetScrapFormPage() {
         remark: data.remark ?? '',
       });
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['disposals'] });
-      toast.success('报废申请提交成功');
-      navigate('/disposals');
+    onSuccess: (result) => {
+      if (result.successes.length > 0) {
+        qc.invalidateQueries({ queryKey: ['disposals'] });
+      }
+      if (result.failures.length === 0) {
+        toast.success(`报废申请提交成功（${result.successes.length} 项）`);
+        navigate('/disposals');
+        return;
+      }
+      if (result.successes.length > 0) {
+        const successfulIds = new Set(result.successes.map(({ assetId }) => String(assetId)));
+        setSelectedAssets((current) => current.filter((asset) => !successfulIds.has(asset.id)));
+        toast.success(`已成功提交 ${result.successes.length} 项报废申请`);
+        toast.error(`${result.failures.length} 项提交失败，已保留失败资产以便重试`);
+        return;
+      }
+      toast.error('所选资产均未提交成功，请检查后重试');
     },
     onError: (error: unknown) => {
       toast.error(error instanceof Error ? error.message : '提交失败，请重试');
@@ -253,6 +273,12 @@ export default function AssetScrapFormPage() {
   const onSubmit = (values: FormValues) => {
     if (selectedAssets.length === 0) {
       toast.error('请至少选择一项资产');
+      return;
+    }
+    try {
+      buildScrapDisposalReason(values);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : '处置事由校验失败，请缩短说明后重试');
       return;
     }
     submitMutation.mutate({
