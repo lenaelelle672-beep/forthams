@@ -54,12 +54,20 @@ class RetirementApplicationServiceTest {
     @Mock
     private AssetLifecycleService assetLifecycleService;
 
+    @Mock
+    private DataScopeService dataScopeService;
+
     @InjectMocks
     private RetirementApplicationService retirementApplicationService;
 
     @BeforeAll
     static void initMybatisPlusTableInfo() {
         TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), RetirementApplication.class);
+    }
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUp() {
+        org.mockito.Mockito.lenient().when(dataScopeService.resolveCurrent()).thenReturn(com.ams.security.DataScope.all());
     }
 
     @AfterEach

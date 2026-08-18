@@ -41,12 +41,17 @@ class CompensationServiceTest {
     @Mock
     private WorkflowDefinitionService workflowDefinitionService;
 
+    @Mock
+    private DataScopeService dataScopeService;
+
     @InjectMocks
     private CompensationService compensationService;
 
     @BeforeEach
     void setUp() {
         TenantContext.setTenantId("T001");
+        org.mockito.Mockito.lenient().when(dataScopeService.resolveCurrent()).thenReturn(com.ams.security.DataScope.all());
+        org.mockito.Mockito.lenient().doNothing().when(dataScopeService).assertAllowsAsset(org.mockito.ArgumentMatchers.any());
     }
 
     @AfterEach

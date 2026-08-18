@@ -21,6 +21,7 @@ import java.util.List;
 public class MaintenanceService {
 
     private final MaintenanceRecordMapper maintenanceRecordMapper;
+    private final DataScopeService dataScopeService;
 
     public Page<MaintenanceRecord> queryRecords(Integer page, Integer pageSize, Long assetId, String maintenanceType) {
         String tenantId = TenantContext.requireTenantId();
@@ -34,6 +35,7 @@ public class MaintenanceService {
         if (maintenanceType != null && !maintenanceType.isEmpty()) {
             wrapper.eq(MaintenanceRecord::getMaintenanceType, maintenanceType);
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc(MaintenanceRecord::getMaintenanceDate).orderByDesc(MaintenanceRecord::getCreateTime);
 
         return maintenanceRecordMapper.selectPage(pageParam, wrapper);
@@ -47,6 +49,11 @@ public class MaintenanceService {
         if (record == null) {
             throw new BusinessException("维护记录不存在");
         }
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.allows(null, record.getCreateBy())) {
+            return record;
+        }
+        dataScopeService.assertAllowsAsset(record.getAssetId());
         return record;
     }
 
@@ -85,9 +92,23 @@ public class MaintenanceService {
         String tenantId = TenantContext.requireTenantId();
         LambdaQueryWrapper<MaintenanceRecord> wrapper = new LambdaQueryWrapper<MaintenanceRecord>()
             .eq(MaintenanceRecord::getTenantId, tenantId);
+        applyDataScope(wrapper);
         wrapper.between(MaintenanceRecord::getNextMaintenanceDate, start, end)
             .orderByAsc(MaintenanceRecord::getNextMaintenanceDate);
 
         return maintenanceRecordMapper.selectList(wrapper);
+    }
+
+    private void applyDataScope(LambdaQueryWrapper<MaintenanceRecord> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            w.inSql(MaintenanceRecord::getAssetId, dataScopeService.assetScopeSql());
+            if (scope.includeSelf() && scope.userId() != null) {
+                w.or().eq(MaintenanceRecord::getCreateBy, scope.userId());
+            }
+        });
     }
 }

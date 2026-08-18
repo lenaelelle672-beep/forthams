@@ -27,6 +27,7 @@ public class CompensationService {
     private final AssetCompensationMapper assetCompensationMapper;
     private final AssetMapper assetMapper;
     private final WorkflowDefinitionService workflowDefinitionService;
+    private final DataScopeService dataScopeService;
 
     public Page<AssetCompensation> queryCompensations(Integer page, Integer pageSize, String status, Long assetId) {
         String tenantId = TenantContext.requireTenantId();
@@ -40,6 +41,7 @@ public class CompensationService {
         if (assetId != null) {
             wrapper.eq("asset_id", assetId);
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc("create_time");
 
         return assetCompensationMapper.selectPage(pageParam, wrapper);
@@ -54,6 +56,11 @@ public class CompensationService {
         if (compensation == null) {
             throw new BusinessException("赔偿记录不存在");
         }
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.allows(compensation.getResponsibleDeptId(), compensation.getResponsibleUserId(), compensation.getCreateBy())) {
+            return compensation;
+        }
+        dataScopeService.assertAllowsAsset(compensation.getAssetId());
         return compensation;
     }
 
@@ -143,6 +150,22 @@ public class CompensationService {
         // 加随机后缀防止并发 createCompensation 产生相同编号（count+1 在并发下不安全）
         String randomSuffix = String.format("%04d", java.util.concurrent.ThreadLocalRandom.current().nextInt(10000));
         return prefix + String.format("%03d", sequence) + randomSuffix;
+    }
+
+    private void applyDataScope(QueryWrapper<AssetCompensation> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            w.inSql("asset_id", dataScopeService.assetScopeSql());
+            if (scope.includeSelf() && scope.userId() != null) {
+                w.or().eq("responsible_user_id", scope.userId()).or().eq("create_by", scope.userId());
+            }
+            if (!scope.deptIds().isEmpty()) {
+                w.or().in("responsible_dept_id", scope.deptIds());
+            }
+        });
     }
 
     private BigDecimal firstPositive(BigDecimal primary, BigDecimal fallback) {

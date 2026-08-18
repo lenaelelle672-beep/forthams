@@ -24,11 +24,13 @@ public class DisposalService {
     private final AssetLifecycleService assetLifecycleService;
     private final AssetChangeLogMapper assetChangeLogMapper;
     private final WorkflowDefinitionService workflowDefinitionService;
+    private final DataScopeService dataScopeService;
 
-    public DisposalService(AssetLifecycleService assetLifecycleService, AssetChangeLogMapper assetChangeLogMapper, WorkflowDefinitionService workflowDefinitionService) {
+    public DisposalService(AssetLifecycleService assetLifecycleService, AssetChangeLogMapper assetChangeLogMapper, WorkflowDefinitionService workflowDefinitionService, DataScopeService dataScopeService) {
         this.assetLifecycleService = assetLifecycleService;
         this.assetChangeLogMapper = assetChangeLogMapper;
         this.workflowDefinitionService = workflowDefinitionService;
+        this.dataScopeService = dataScopeService;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -66,8 +68,21 @@ public class DisposalService {
         } else {
             wrapper.in("change_type", DISPOSAL_TYPES);
         }
-
+        applyDataScope(wrapper);
         wrapper.orderByDesc("create_time");
         return assetChangeLogMapper.selectPage(pager, wrapper);
+    }
+
+    private void applyDataScope(QueryWrapper<AssetChangeLog> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            w.inSql("asset_id", dataScopeService.assetScopeSql());
+            if (scope.includeSelf() && scope.userId() != null) {
+                w.or().eq("operator_id", scope.userId());
+            }
+        });
     }
 }

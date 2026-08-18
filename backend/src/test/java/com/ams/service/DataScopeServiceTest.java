@@ -3,6 +3,7 @@ package com.ams.service;
 import com.ams.entity.Dept;
 import com.ams.entity.Role;
 import com.ams.entity.User;
+import com.ams.mapper.AssetMapper;
 import com.ams.mapper.DeptMapper;
 import com.ams.mapper.RoleDeptMapper;
 import com.ams.mapper.UserMapper;
@@ -31,12 +32,14 @@ class DataScopeServiceTest {
     private RoleDeptMapper roleDeptMapper;
     @Mock
     private DeptMapper deptMapper;
+    @Mock
+    private AssetMapper assetMapper;
 
     private DataScopeService service;
 
     @BeforeEach
     void setUp() {
-        service = new DataScopeService(userMapper, userRoleMapper, roleDeptMapper, deptMapper);
+        service = new DataScopeService(userMapper, userRoleMapper, roleDeptMapper, deptMapper, assetMapper);
     }
 
     @Test

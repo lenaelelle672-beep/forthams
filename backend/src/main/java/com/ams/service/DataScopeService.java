@@ -1,14 +1,18 @@
 package com.ams.service;
 
+import com.ams.context.TenantContext;
+import com.ams.entity.Asset;
 import com.ams.entity.Dept;
 import com.ams.entity.Role;
 import com.ams.entity.User;
+import com.ams.mapper.AssetMapper;
 import com.ams.mapper.DeptMapper;
 import com.ams.mapper.RoleDeptMapper;
 import com.ams.mapper.UserMapper;
 import com.ams.mapper.UserRoleMapper;
 import com.ams.security.DataScope;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -35,6 +39,7 @@ public class DataScopeService {
     private final UserRoleMapper userRoleMapper;
     private final RoleDeptMapper roleDeptMapper;
     private final DeptMapper deptMapper;
+    private final AssetMapper assetMapper;
 
     public DataScope resolveCurrent() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -70,6 +75,68 @@ public class DataScopeService {
             }
         }
         throw new AccessDeniedException("数据范围不足");
+    }
+
+    public void assertAllowsAsset(Long assetId) {
+        DataScope scope = resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        if (assetId == null || assetId <= 0) {
+            throw new AccessDeniedException("数据范围不足");
+        }
+        Asset asset = assetMapper.selectById(assetId);
+        if (asset == null) {
+            throw new AccessDeniedException("数据范围不足");
+        }
+        scope.assertAllows(asset.getDeptId(), asset.getUserId());
+    }
+
+    public void applyAssetLinked(QueryWrapper<?> wrapper, String assetColumn) {
+        DataScope scope = resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.inSql(assetColumn, assetScopeSql(scope));
+    }
+
+    public String assetScopeSql() {
+        return assetScopeSql(resolveCurrent());
+    }
+
+    private String assetScopeSql(DataScope scope) {
+        String tenantId = TenantContext.requireTenantId().replace("'", "''");
+        if (scope.seesAll()) {
+            return "SELECT id FROM asset WHERE deleted = 0 AND tenant_id = '" + tenantId + "'";
+        }
+        if (scope.deptIds().isEmpty() && !(scope.includeSelf() && scope.userId() != null)) {
+            return "SELECT id FROM asset WHERE 1 = 0";
+        }
+        StringBuilder sql = new StringBuilder("SELECT id FROM asset WHERE deleted = 0 AND tenant_id = '")
+                .append(tenantId)
+                .append("' AND (");
+        boolean started = false;
+        if (!scope.deptIds().isEmpty()) {
+            sql.append("dept_id IN (");
+            boolean first = true;
+            for (Long deptId : scope.deptIds()) {
+                if (!first) {
+                    sql.append(',');
+                }
+                sql.append(deptId);
+                first = false;
+            }
+            sql.append(')');
+            started = true;
+        }
+        if (scope.includeSelf() && scope.userId() != null) {
+            if (started) {
+                sql.append(" OR ");
+            }
+            sql.append("user_id = ").append(scope.userId());
+        }
+        sql.append(')');
+        return sql.toString();
     }
 
     DataScope resolve(User user, List<Role> roles) {

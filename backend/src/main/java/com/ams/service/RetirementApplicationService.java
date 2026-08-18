@@ -38,6 +38,7 @@ public class RetirementApplicationService {
     private final ApprovalProcessMapper approvalProcessMapper;
     private final AssetMapper assetMapper;
     private final AssetLifecycleService assetLifecycleService;
+    private final DataScopeService dataScopeService;
 
     @Transactional(rollbackFor = Exception.class)
     public RetirementApplication submitApplication(RetirementApplyDTO dto, Long applicantId) {
@@ -143,6 +144,7 @@ public class RetirementApplicationService {
             loadAssetForCurrentTenant(assetId, "queryRetirementApplications");
             wrapper.eq(RetirementApplication::getAssetId, assetId);
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc(RetirementApplication::getCreateTime);
         return retirementApplicationMapper.selectPage(pageObj, wrapper);
     }
@@ -155,6 +157,7 @@ public class RetirementApplicationService {
                         .eq(RetirementApplication::getTenantId, tenantId)
                         .last("limit 1"));
         if (application != null) {
+            dataScopeService.resolveCurrent().assertAllows(application.getDeptId(), application.getApplicantId());
             return application;
         }
 
@@ -485,6 +488,30 @@ public class RetirementApplicationService {
         process.setApplicantId(applicantId);
         process.setApplyTime(LocalDateTime.now());
         approvalProcessMapper.insert(process);
+    }
+
+    private void applyDataScope(LambdaQueryWrapper<RetirementApplication> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            boolean started = false;
+            if (!scope.deptIds().isEmpty()) {
+                w.in(RetirementApplication::getDeptId, scope.deptIds());
+                started = true;
+            }
+            if (scope.includeSelf() && scope.userId() != null) {
+                if (started) {
+                    w.or();
+                }
+                w.eq(RetirementApplication::getApplicantId, scope.userId());
+                started = true;
+            }
+            if (!started) {
+                w.apply("1 = 0");
+            }
+        });
     }
 
     private int normalizeApprovalSteps(Integer totalApprovalSteps) {

@@ -19,6 +19,7 @@ import java.time.LocalDate;
 public class IdleAssetService {
 
     private final IdleAssetNoticeMapper idleAssetNoticeMapper;
+    private final DataScopeService dataScopeService;
 
     public Page<IdleAssetNotice> queryIdleAssets(Integer page, Integer pageSize, String status) {
         String tenantId = TenantContext.requireTenantId();
@@ -29,6 +30,7 @@ public class IdleAssetService {
         if (status != null && !status.isEmpty()) {
             wrapper.eq("status", status);
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc("create_time");
 
         return idleAssetNoticeMapper.selectPage(pageParam, wrapper);
@@ -43,6 +45,11 @@ public class IdleAssetService {
         if (notice == null) {
             throw new BusinessException("闲置资产公告不存在");
         }
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.allows(null, notice.getCreateBy(), notice.getClaimantId())) {
+            return notice;
+        }
+        dataScopeService.assertAllowsAsset(notice.getAssetId());
         return notice;
     }
 
@@ -85,5 +92,18 @@ public class IdleAssetService {
     public void deleteNotice(Long id) {
         getById(id);
         idleAssetNoticeMapper.deleteById(id);
+    }
+
+    private void applyDataScope(QueryWrapper<IdleAssetNotice> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            w.inSql("asset_id", dataScopeService.assetScopeSql());
+            if (scope.includeSelf() && scope.userId() != null) {
+                w.or().eq("create_by", scope.userId()).or().eq("claimant_id", scope.userId());
+            }
+        });
     }
 }
