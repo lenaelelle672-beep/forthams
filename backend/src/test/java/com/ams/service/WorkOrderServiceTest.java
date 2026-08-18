@@ -5,6 +5,7 @@ import com.ams.entity.WorkOrder;
 import com.ams.context.TenantContext;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.WorkOrderMapper;
+import com.ams.security.DataScope;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
@@ -33,12 +34,16 @@ class WorkOrderServiceTest {
     @Mock
     private ApprovalProcessMapper approvalProcessMapper;
 
+    @Mock
+    private DataScopeService dataScopeService;
+
     @InjectMocks
     private WorkOrderService workOrderService;
 
     @BeforeEach
     void setUp() {
         TenantContext.setTenantId("T001");
+        lenient().when(dataScopeService.resolveCurrent()).thenReturn(DataScope.all());
         lenient().when(workOrderMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
         lenient().when(approvalProcessMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(Collections.emptyList());
     }
@@ -139,5 +144,19 @@ class WorkOrderServiceTest {
 
         assertEquals("CANCELLED", result.getStatus());
         verify(workOrderMapper).updateById(workOrder);
+    }
+
+    @Test
+    void shouldRejectWorkOrderOutsideDataScope() {
+        WorkOrder workOrder = new WorkOrder();
+        workOrder.setId(4L);
+        workOrder.setTenantId("T001");
+        workOrder.setDeptId(8L);
+        workOrder.setReporterId(2L);
+        when(workOrderMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(workOrder);
+        when(dataScopeService.resolveCurrent()).thenReturn(DataScope.filtered(9L, java.util.Set.of(3L), false));
+
+        assertThrows(org.springframework.security.access.AccessDeniedException.class,
+                () -> workOrderService.getWorkOrder(4L));
     }
 }

@@ -33,6 +33,7 @@ public class WorkOrderService {
 
     private final WorkOrderMapper workOrderMapper;
     private final ApprovalProcessMapper approvalProcessMapper;
+    private final DataScopeService dataScopeService;
 
     public Page<WorkOrder> queryWorkOrders(Integer page, Integer pageSize, String status, String keyword) {
         String tenantId = TenantContext.requireTenantId();
@@ -46,6 +47,7 @@ public class WorkOrderService {
             wrapper.and(w -> w.like(WorkOrder::getTitle, keyword)
                     .or().like(WorkOrder::getWorkOrderNo, keyword));
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc(WorkOrder::getCreateTime);
         return workOrderMapper.selectPage(pageObj, wrapper);
     }
@@ -168,6 +170,8 @@ public class WorkOrderService {
         String tenantId = TenantContext.requireTenantId();
         WorkOrder workOrder = workOrderMapper.selectOne(workOrderById(id, tenantId));
         if (workOrder != null) {
+            dataScopeService.resolveCurrent().assertAllows(
+                    workOrder.getDeptId(), workOrder.getReporterId(), workOrder.getAssigneeId());
             return workOrder;
         }
 
@@ -278,6 +282,32 @@ public class WorkOrderService {
 
     private boolean isCancellableStatus(String status) {
         return "DRAFT".equals(status) || "PENDING".equals(status) || "APPROVED".equals(status);
+    }
+
+    private void applyDataScope(LambdaQueryWrapper<WorkOrder> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            boolean started = false;
+            if (!scope.deptIds().isEmpty()) {
+                w.in(WorkOrder::getDeptId, scope.deptIds());
+                started = true;
+            }
+            if (scope.includeSelf() && scope.userId() != null) {
+                if (started) {
+                    w.or();
+                }
+                w.eq(WorkOrder::getReporterId, scope.userId())
+                        .or()
+                        .eq(WorkOrder::getAssigneeId, scope.userId());
+                started = true;
+            }
+            if (!started) {
+                w.apply("1 = 0");
+            }
+        });
     }
 
     private LambdaQueryWrapper<WorkOrder> workOrderById(Long id, String tenantId) {

@@ -29,6 +29,7 @@ public class InventoryService {
 
     private final InventoryTaskMapper inventoryTaskMapper;
     private final InventoryDetailMapper inventoryDetailMapper;
+    private final DataScopeService dataScopeService;
 
     public Page<InventoryTask> queryTasks(Integer page, Integer pageSize, String status) {
         String tenantId = TenantContext.requireTenantId();
@@ -39,6 +40,7 @@ public class InventoryService {
         if (status != null && !status.isEmpty()) {
             wrapper.eq(InventoryTask::getStatus, InventoryStatus.fromName(status).name());
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc(InventoryTask::getCreateTime);
 
         return inventoryTaskMapper.selectPage(pageParam, wrapper);
@@ -140,7 +142,48 @@ public class InventoryService {
         if (task == null) {
             throw new BusinessException("盘点任务不存在");
         }
+        assertVisible(task);
         return task;
+    }
+
+    private void applyDataScope(LambdaQueryWrapper<InventoryTask> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            boolean started = false;
+            for (Long deptId : scope.deptIds()) {
+                if (started) {
+                    w.or();
+                }
+                w.apply("FIND_IN_SET({0}, REPLACE(REPLACE(REPLACE(IFNULL(dept_ids,''), ' ', ''), '[', ''), ']', '')) > 0",
+                        String.valueOf(deptId));
+                started = true;
+            }
+            if (scope.includeSelf() && scope.userId() != null) {
+                if (started) {
+                    w.or();
+                }
+                w.eq(InventoryTask::getExecutorId, scope.userId())
+                        .or()
+                        .eq(InventoryTask::getCreateBy, scope.userId());
+                started = true;
+            }
+            if (!started) {
+                w.apply("1 = 0");
+            }
+        });
+    }
+
+    private void assertVisible(InventoryTask task) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()
+                || scope.allows(null, task.getExecutorId(), task.getCreateBy())
+                || scope.overlapsDeptCsv(task.getDeptIds())) {
+            return;
+        }
+        throw new org.springframework.security.access.AccessDeniedException("数据范围不足");
     }
 
     private String generateTaskNo() {

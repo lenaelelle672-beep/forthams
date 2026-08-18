@@ -5,6 +5,7 @@ import com.ams.entity.ApprovalRecord;
 import com.ams.context.TenantContext;
 import com.ams.mapper.ApprovalProcessMapper;
 import com.ams.mapper.ApprovalRecordMapper;
+import com.ams.security.DataScope;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +36,17 @@ class ApprovalServiceTest {
     @Mock
     private WorkOrderService workOrderService;
 
+    @Mock
+    private DataScopeService dataScopeService;
+
     @InjectMocks
     private ApprovalService approvalService;
 
     @BeforeEach
     void setUp() {
         TenantContext.setTenantId("T001");
+        org.mockito.Mockito.lenient().when(dataScopeService.resolveCurrent()).thenReturn(DataScope.all());
+        org.mockito.Mockito.lenient().doNothing().when(dataScopeService).assertAllowsApplicant(org.mockito.ArgumentMatchers.any());
     }
 
     @AfterEach

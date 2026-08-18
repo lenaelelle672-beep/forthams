@@ -33,6 +33,7 @@ public class ApprovalService {
     private final ApprovalRecordMapper approvalRecordMapper;
     private final RetirementApplicationService retirementApplicationService;
     private final WorkOrderService workOrderService;
+    private final DataScopeService dataScopeService;
 
     public Page<ApprovalProcess> queryProcesses(Integer page, Integer pageSize, String status, String processType) {
         String tenantId = TenantContext.requireTenantId();
@@ -46,6 +47,7 @@ public class ApprovalService {
         if (processType != null && !processType.isEmpty()) {
             wrapper.eq("process_type", processType);
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc("create_time");
 
         return approvalProcessMapper.selectPage(pageParam, wrapper);
@@ -60,6 +62,7 @@ public class ApprovalService {
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
+        dataScopeService.assertAllowsApplicant(process.getApplicantId());
 
         List<ApprovalRecord> records = approvalRecordMapper.selectList(
             new QueryWrapper<ApprovalRecord>()
@@ -100,6 +103,7 @@ public class ApprovalService {
         if (process == null) {
             throw new BusinessException("审批流程不存在");
         }
+        dataScopeService.assertAllowsApplicant(process.getApplicantId());
         if (!"PENDING".equals(BeanUtil.getProperty(process, "status"))) {
             throw new BusinessException("当前流程不可审批");
         }
@@ -228,6 +232,31 @@ public class ApprovalService {
         } catch (NumberFormatException ex) {
             return defaultValue;
         }
+    }
+
+    private void applyDataScope(QueryWrapper<ApprovalProcess> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            boolean started = false;
+            if (scope.includeSelf() && scope.userId() != null) {
+                w.eq("applicant_id", scope.userId());
+                started = true;
+            }
+            if (!scope.deptIds().isEmpty()) {
+                String inList = scope.deptIds().stream().map(String::valueOf).collect(Collectors.joining(","));
+                if (started) {
+                    w.or();
+                }
+                w.inSql("applicant_id", "SELECT id FROM sys_user WHERE deleted = 0 AND dept_id IN (" + inList + ")");
+                started = true;
+            }
+            if (!started) {
+                w.apply("1 = 0");
+            }
+        });
     }
 
     private Long parseLong(Object value, Long defaultValue) {

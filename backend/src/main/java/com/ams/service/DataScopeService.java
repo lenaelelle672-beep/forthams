@@ -58,6 +58,20 @@ public class DataScopeService {
         return resolve(user, userRoleMapper.selectRolesByUserId(user.getId()));
     }
 
+    public void assertAllowsApplicant(Long applicantId) {
+        DataScope scope = resolveCurrent();
+        if (scope.seesAll() || scope.allows(null, applicantId)) {
+            return;
+        }
+        if (applicantId != null && !scope.deptIds().isEmpty()) {
+            User applicant = userMapper.selectById(applicantId);
+            if (applicant != null && scope.allows(applicant.getDeptId(), applicantId)) {
+                return;
+            }
+        }
+        throw new AccessDeniedException("数据范围不足");
+    }
+
     DataScope resolve(User user, List<Role> roles) {
         if (user == null || user.getId() == null) {
             return DataScope.none();

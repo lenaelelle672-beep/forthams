@@ -46,18 +46,41 @@ public final class DataScope {
         return includeSelf;
     }
 
-    public boolean allows(Long assetDeptId, Long assetUserId) {
+    public boolean allows(Long recordDeptId, Long... recordUserIds) {
         if (all) {
             return true;
         }
-        if (includeSelf && userId != null && userId.equals(assetUserId)) {
-            return true;
+        if (includeSelf && userId != null && recordUserIds != null) {
+            for (Long candidate : recordUserIds) {
+                if (userId.equals(candidate)) {
+                    return true;
+                }
+            }
         }
-        return assetDeptId != null && deptIds.contains(assetDeptId);
+        return recordDeptId != null && deptIds.contains(recordDeptId);
     }
 
-    public void assertAllows(Long assetDeptId, Long assetUserId) {
-        if (!allows(assetDeptId, assetUserId)) {
+    public boolean overlapsDeptCsv(String rawDeptIds) {
+        if (all || deptIds.isEmpty() || rawDeptIds == null || rawDeptIds.isBlank()) {
+            return all;
+        }
+        for (String part : rawDeptIds.replace("[", "").replace("]", "").split("[,，;\\s]+")) {
+            if (part.isBlank()) {
+                continue;
+            }
+            try {
+                if (deptIds.contains(Long.parseLong(part.trim()))) {
+                    return true;
+                }
+            } catch (NumberFormatException ignored) {
+                // ignore malformed historical fragments
+            }
+        }
+        return false;
+    }
+
+    public void assertAllows(Long recordDeptId, Long... recordUserIds) {
+        if (!allows(recordDeptId, recordUserIds)) {
             throw new AccessDeniedException("数据范围不足");
         }
     }
