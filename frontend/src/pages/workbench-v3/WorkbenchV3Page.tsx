@@ -56,7 +56,7 @@ export const workbenchV3IntegrationMenus: WorkbenchV3MenuItem[] = [
   { id: 'system-menu-permissions', label: '菜单权限', description: '权限编码库存按域聚合的菜单权限只读覆盖视图', status: '已接入真组件' },
   { id: 'system-post-management', label: '岗位管理', description: '岗位 metadata-only catalog、详情与 no-persistence/no-assignment/no-permission-effect preview', status: '已接入真组件' },
   { id: 'system-tenant-management', label: '租户管理', description: '租户主数据只读 catalog、套餐状态与联系人摘要', status: '已接入真组件' },
-  { id: 'system-data-permissions', label: '数据权限', description: '角色数据范围只读 catalog、风险提示与只收紧边界', status: '已接入真组件' },
+  { id: 'system-data-permissions', label: '数据权限', description: '角色数据范围 catalog、可收紧 dataScope 与 CUSTOM 部门清单', status: '已接入真组件' },
   { id: 'system-import-export', label: '导入导出', description: '任务历史只读 catalog、脱敏错误摘要与导入导出行数上限', status: '已接入真组件' },
   { id: 'system-handover', label: '交接管理', description: '交接任务摘要只读 catalog、状态记录与未闭环风险提示', status: '已接入真组件' },
   { id: 'system-workflow-mail', label: '流程邮件', description: '流程节点邮件配置只读 catalog、触发事件与零业务调用风险提示', status: '已接入真组件' },

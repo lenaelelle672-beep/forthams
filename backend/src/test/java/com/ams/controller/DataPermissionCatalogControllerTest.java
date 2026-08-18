@@ -4,6 +4,7 @@ import com.ams.common.GlobalExceptionHandler;
 import com.ams.dto.DataPermissionCatalogDTO;
 import com.ams.service.DataPermissionCatalogService;
 import com.ams.utils.JwtUtil;
+import org.springframework.http.MediaType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,6 +84,55 @@ class DataPermissionCatalogControllerTest {
         mockMvc.perform(get("/system/data-permissions/catalog").header("Authorization", "Bearer token"))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value(403));
+    }
+
+    @Test
+    void updateScopeShouldPersistWhenEditGranted() throws Exception {
+        grant("system:role-permission:edit");
+        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+        DataPermissionCatalogDTO.RoleDataScope updated = new DataPermissionCatalogDTO.RoleDataScope();
+        updated.setRoleId(2L);
+        updated.setRoleCode("DEPT_USER");
+        updated.setDataScope("DEPT");
+        updated.setDataScopeLabel("本部门");
+        when(dataPermissionCatalogService.updateRoleDataScope(2L, "DEPT")).thenReturn(updated);
+
+        mockMvc.perform(put("/system/data-permissions/roles/2/scope")
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dataScope\":\"DEPT\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(200))
+                .andExpect(jsonPath("$.data.dataScope").value("DEPT"));
+        verify(dataPermissionCatalogService).updateRoleDataScope(2L, "DEPT");
+    }
+
+    @Test
+    void updateScopeShouldRejectQueryOnlyFailClosed() throws Exception {
+        grant("system:role-permission:query");
+        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+
+        mockMvc.perform(put("/system/data-permissions/roles/2/scope")
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"dataScope\":\"DEPT\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        verifyNoInteractions(dataPermissionCatalogService);
+    }
+
+    @Test
+    void updateDeptsShouldRejectQueryOnlyFailClosed() throws Exception {
+        grant("system:role-permission:query");
+        when(jwtUtil.getUserIdFromToken("token")).thenReturn(42L);
+
+        mockMvc.perform(put("/system/data-permissions/roles/3/depts")
+                        .header("Authorization", "Bearer token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"deptIds\":[11]}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403));
+        verifyNoInteractions(dataPermissionCatalogService);
     }
 
     private DataPermissionCatalogDTO catalog() {

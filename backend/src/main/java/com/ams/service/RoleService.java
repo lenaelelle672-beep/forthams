@@ -94,6 +94,25 @@ public class RoleService {
         return roleMapper.selectList(new QueryWrapper<Role>().orderByAsc("role_name"));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    public Role updateDataScope(Long id, String dataScope) {
+        Role role = getRoleById(id);
+        role.setDataScope(normalizeWritableDataScope(dataScope));
+        roleMapper.updateById(role);
+        return role;
+    }
+
+    static String normalizeWritableDataScope(String raw) {
+        if (raw == null || raw.isBlank()) {
+            throw new BusinessException("数据范围不能为空");
+        }
+        String value = raw.trim().toUpperCase();
+        return switch (value) {
+            case "ALL", "DEPT", "DEPT_AND_SUB", "SELF", "CUSTOM" -> value;
+            default -> throw new BusinessException("不支持的数据范围");
+        };
+    }
+
     private void validateRoleCodeUnique(String roleCode, Long excludeId) {
         QueryWrapper<Role> wrapper = new QueryWrapper<Role>().eq("role_code", roleCode);
         if (excludeId != null) {

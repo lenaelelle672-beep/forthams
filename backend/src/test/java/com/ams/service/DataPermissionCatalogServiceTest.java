@@ -1,7 +1,12 @@
 package com.ams.service;
 
+import com.ams.common.exception.BusinessException;
 import com.ams.dto.DataPermissionCatalogDTO;
+import com.ams.entity.Dept;
 import com.ams.entity.Role;
+import com.ams.entity.RoleDept;
+import com.ams.mapper.DeptMapper;
+import com.ams.mapper.RoleDeptMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -11,7 +16,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -27,11 +35,19 @@ class DataPermissionCatalogServiceTest {
     @Mock
     private RoleService roleService;
 
+    @Mock
+    private RoleDeptMapper roleDeptMapper;
+
+    @Mock
+    private DeptMapper deptMapper;
+
     private DataPermissionCatalogService service;
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        service = new DataPermissionCatalogService(roleService);
+        service = new DataPermissionCatalogService(roleService, roleDeptMapper, deptMapper);
+        lenient().when(roleDeptMapper.selectAllBindings()).thenReturn(List.of());
+        lenient().when(roleDeptMapper.selectDeptIdsByRoleId(org.mockito.ArgumentMatchers.anyLong())).thenReturn(List.of());
     }
 
     @Test
@@ -110,7 +126,7 @@ class DataPermissionCatalogServiceTest {
         assertEquals("CUSTOM", catalog.getRoles().get(0).getDataScope());
         assertEquals("自定义", catalog.getRoles().get(0).getDataScopeLabel());
         assertTrue(catalog.getRoles().get(0).isCustomScope());
-        assertEquals("自定义角色 为自定义范围，需配合数据权限规则。", catalog.getRoles().get(0).getRiskNote());
+        assertEquals("自定义角色 为自定义范围，尚未配置部门清单。", catalog.getRoles().get(0).getRiskNote());
         assertEquals(1, catalog.getSummary().getCustomScopeCount());
         assertEquals(0, catalog.getSummary().getAllScopeCount());
         assertTrue(catalog.getRiskTips().stream().anyMatch(tip -> tip.contains("1") && tip.contains("CUSTOM")));
@@ -157,8 +173,7 @@ class DataPermissionCatalogServiceTest {
         assertEquals(3, catalog.getSummary().getAllScopeCount());
         assertEquals(1, catalog.getSummary().getCustomScopeCount());
         assertEquals(3, catalog.getSummary().getRestrictedScopeCount());
-        // ALL + CUSTOM 风险提示各一条
-        assertEquals(2, catalog.getRiskTips().size());
+        assertEquals(3, catalog.getRiskTips().size());
     }
 
     @Test
@@ -173,7 +188,43 @@ class DataPermissionCatalogServiceTest {
         assertEquals(0, catalog.getSummary().getRestrictedScopeCount());
         assertEquals(0, catalog.getSummary().getCustomScopeCount());
         assertTrue(catalog.getRiskTips().isEmpty());
-        assertTrue(catalog.getReadOnlyNotice().contains("只读 catalog"));
+        assertTrue(catalog.getReadOnlyNotice().contains("可配置 CUSTOM 部门清单"));
+    }
+
+    @Test
+    void updateRoleDataScopeShouldPersistNormalizedWritableScope() {
+        when(roleService.updateDataScope(4L, "dept")).thenReturn(role(4L, "部门专员", "DEPT_USER", "DEPT"));
+
+        DataPermissionCatalogDTO.RoleDataScope updated = service.updateRoleDataScope(4L, "dept");
+
+        assertEquals(4L, updated.getRoleId());
+        assertEquals("DEPT", updated.getDataScope());
+        assertEquals("本部门", updated.getDataScopeLabel());
+        assertFalse(updated.isCustomScope());
+        verify(roleDeptMapper).deleteByRoleId(4L);
+    }
+
+    @Test
+    void replaceCustomDeptsShouldRejectNonCustomRole() {
+        when(roleService.getRoleById(2L)).thenReturn(role(2L, "部门专员", "DEPT_USER", "DEPT"));
+
+        assertThrows(BusinessException.class, () -> service.replaceCustomDepts(2L, List.of(11L)));
+    }
+
+    @Test
+    void replaceCustomDeptsShouldPersistValidDepartments() {
+        when(roleService.getRoleById(3L)).thenReturn(role(3L, "自定义角色", "CUSTOM_ROLE", "CUSTOM"));
+        Dept dept = new Dept();
+        dept.setId(11L);
+        when(deptMapper.selectById(11L)).thenReturn(dept);
+
+        DataPermissionCatalogDTO.RoleDataScope updated = service.replaceCustomDepts(3L, List.of(11L, 11L));
+
+        assertEquals(List.of(11L), updated.getCustomDeptIds());
+        assertEquals(1, updated.getCustomDeptCount());
+        assertTrue(updated.getRiskNote().contains("已配置 1 个部门"));
+        verify(roleDeptMapper).deleteByRoleId(3L);
+        verify(roleDeptMapper).insert(org.mockito.ArgumentMatchers.any(RoleDept.class));
     }
 
     private Role role(Long id, String name, String code, String dataScope) {

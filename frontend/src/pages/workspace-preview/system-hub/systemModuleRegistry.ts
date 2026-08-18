@@ -473,7 +473,9 @@ export const SYSTEM_DATA_PERMISSIONS_MODULE = {
   legacyRoute: '/fixed-assets/workbenchv3?menu=system-data-permissions',
   permissionMeta: {
     viewPermissions: ['system:role-permission:query'],
-    actionPermissions: {},
+    actionPermissions: {
+      edit: ['system:role-permission:edit'],
+    },
   },
 } as const satisfies SystemModuleRegistryItem;
 

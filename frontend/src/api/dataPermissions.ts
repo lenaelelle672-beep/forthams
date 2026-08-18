@@ -7,6 +7,8 @@ export interface RoleDataScope {
   dataScope: string;
   dataScopeLabel: string;
   customScope: boolean;
+  customDeptIds?: number[];
+  customDeptCount?: number;
   riskNote: string;
 }
 
@@ -26,4 +28,24 @@ export interface DataPermissionCatalog {
 
 export function getDataPermissionCatalog() {
   return api.get<DataPermissionCatalog>('/system/data-permissions/catalog');
+}
+
+export function updateDataPermissionScope(roleId: number, dataScope: string) {
+  return api.put<RoleDataScope>(`/system/data-permissions/roles/${roleId}/scope`, { dataScope });
+}
+
+export function updateDataPermissionDepts(roleId: number, deptIds: number[]) {
+  return api.put<RoleDataScope>(`/system/data-permissions/roles/${roleId}/depts`, { deptIds });
+}
+
+export interface AssignableDept {
+  id?: number;
+  deptId?: number;
+  deptName?: string;
+  name?: string;
+  children?: AssignableDept[];
+}
+
+export function listAssignableDepts() {
+  return api.get<AssignableDept[]>('/depts/tree');
 }

@@ -9,7 +9,7 @@ import java.util.List;
  * 数据权限只读 catalog DTO。
  *
  * 展示每个角色的数据权限范围（dataScope）与风险提示。
- * 只读：不提供修改 dataScope 的写操作（V3 只读边界）。
+ * 列表只读展示；范围变更走 PUT /system/data-permissions/roles/{id}/scope。
  */
 @Data
 public class DataPermissionCatalogDTO {
@@ -28,6 +28,8 @@ public class DataPermissionCatalogDTO {
         private String dataScope;
         private String dataScopeLabel;
         private boolean customScope;
+        private List<Long> customDeptIds = new ArrayList<>();
+        private int customDeptCount;
         private String riskNote;
     }
 

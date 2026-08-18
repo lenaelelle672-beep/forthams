@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   getDataPermissionCatalog,
+  listAssignableDepts,
+  updateDataPermissionDepts,
+  updateDataPermissionScope,
+  type AssignableDept,
   type DataPermissionCatalog,
   type RoleDataScope,
 } from '../../api/dataPermissions';
@@ -15,6 +19,13 @@ type SystemDataPermissionsWorkbenchPageProps = {
 type ScopeFilter = 'all' | 'ALL' | 'RESTRICTED' | 'CUSTOM';
 
 const RESTRICTED_SCOPES = new Set(['DEPT', 'DEPT_AND_SUB', 'SELF']);
+const WRITABLE_SCOPES = [
+  { value: 'ALL', label: '全部数据' },
+  { value: 'DEPT', label: '本部门' },
+  { value: 'DEPT_AND_SUB', label: '本部门及下属' },
+  { value: 'SELF', label: '仅本人' },
+  { value: 'CUSTOM', label: '自定义' },
+] as const;
 
 function scopeBadgeClass(scope: string | null | undefined) {
   const value = String(scope ?? '').toUpperCase();
@@ -39,6 +50,18 @@ function matchesKeyword(role: RoleDataScope, keyword: string) {
   return [role.roleName, role.roleCode].join(' ').toLowerCase().includes(normalized);
 }
 
+function flattenDepts(nodes: AssignableDept[] | undefined, acc: Array<{ id: number; name: string }> = []) {
+  for (const node of nodes ?? []) {
+    const id = Number(node.id ?? node.deptId);
+    const name = String(node.deptName ?? node.name ?? id);
+    if (Number.isFinite(id) && id > 0) {
+      acc.push({ id, name });
+    }
+    flattenDepts(node.children, acc);
+  }
+  return acc;
+}
+
 function emptyCatalog(): DataPermissionCatalog {
   return { roles: [], summary: { roleCount: 0, allScopeCount: 0, restrictedScopeCount: 0, customScopeCount: 0 }, riskTips: [], readOnlyNotice: '数据权限为只读 catalog。' };
 }
@@ -57,6 +80,24 @@ export default function SystemDataPermissionsWorkbenchPage({
 
   const [keyword, setKeyword] = useState('');
   const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('all');
+  const [savingRoleId, setSavingRoleId] = useState<number | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [depts, setDepts] = useState<Array<{ id: number; name: string }>>([]);
+
+  useEffect(() => {
+    if (!canView) return;
+    let cancelled = false;
+    listAssignableDepts()
+      .then((tree) => {
+        if (!cancelled) setDepts(flattenDepts(tree));
+      })
+      .catch(() => {
+        if (!cancelled) setDepts([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [canView]);
 
   const {
     records: roles,
@@ -107,6 +148,35 @@ export default function SystemDataPermissionsWorkbenchPage({
     setPage(Math.min(totalPages, page + 1));
   };
 
+  const handleScopeChange = async (role: RoleDataScope, nextScope: string) => {
+    if (nextScope === role.dataScope) return;
+    setSavingRoleId(role.roleId);
+    setSaveError(null);
+    try {
+      await updateDataPermissionScope(role.roleId, nextScope);
+      reload();
+    } catch {
+      setSaveError('敏感细节已脱敏');
+    } finally {
+      setSavingRoleId(null);
+    }
+  };
+
+  const handleDeptToggle = async (role: RoleDataScope, deptId: number, checked: boolean) => {
+    const current = role.customDeptIds ?? [];
+    const next = checked ? [...new Set([...current, deptId])] : current.filter((id) => id !== deptId);
+    setSavingRoleId(role.roleId);
+    setSaveError(null);
+    try {
+      await updateDataPermissionDepts(role.roleId, next);
+      reload();
+    } catch {
+      setSaveError('敏感细节已脱敏');
+    } finally {
+      setSavingRoleId(null);
+    }
+  };
+
   if (!canView) {
     return (
       <section className="space-y-4" data-embedded={embeddedInWorkbench}>
@@ -124,7 +194,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">数据权限</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /system/data-permissions/catalog 返回的角色数据范围与风险提示。</p>
+          <p className="mt-1 text-sm text-slate-500">展示并收紧角色 dataScope；CUSTOM 部门规则仍未接入。</p>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -137,7 +207,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       </div>
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-        只读边界：本页仅展示角色数据范围；修改 dataScope 与配置 CUSTOM 规则不在 V3 只读边界内，需后续权限专项处理。数据权限只收紧，CUSTOM 跳过投影。
+        可调整角色数据范围，并为 CUSTOM 配置部门清单。写入需 system:role-permission:edit。查询运行时仍未按部门清单过滤。
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -192,6 +262,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       </form>
 
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
+      {saveError ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{saveError}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">数据权限加载中...</div> : null}
       {!loading && !error && visibleRoles.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
@@ -210,6 +281,7 @@ export default function SystemDataPermissionsWorkbenchPage({
                 <th scope="col" className="py-2 pr-3">角色名称</th>
                 <th scope="col" className="py-2 pr-3">数据范围</th>
                 <th scope="col" className="py-2 pr-3">风险说明</th>
+                <th scope="col" className="py-2 pr-3">自定义部门</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -218,11 +290,45 @@ export default function SystemDataPermissionsWorkbenchPage({
                   <td className="py-2 pr-3 font-medium text-slate-800">{role.roleCode}</td>
                   <td className="py-2 pr-3 text-slate-600">{role.roleName}</td>
                   <td className="py-2 pr-3">
-                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${scopeBadgeClass(role.dataScope)}`}>
-                      {role.dataScopeLabel}
-                    </span>
+                    <label className="sr-only" htmlFor={`data-scope-${role.roleId}`}>{role.roleName}数据范围</label>
+                    <select
+                      id={`data-scope-${role.roleId}`}
+                      aria-label={`${role.roleName}数据范围`}
+                      className={`rounded-full border-0 px-2 py-0.5 text-xs font-medium outline-none focus:ring-2 focus:ring-blue-400 ${scopeBadgeClass(role.dataScope)}`}
+                      disabled={savingRoleId === role.roleId}
+                      value={role.dataScope}
+                      onChange={(event) => {
+                        void handleScopeChange(role, event.target.value);
+                      }}
+                    >
+                      {WRITABLE_SCOPES.map((scope) => (
+                        <option key={scope.value} value={scope.value}>{scope.label}</option>
+                      ))}
+                    </select>
                   </td>
                   <td className="py-2 pr-3 text-xs text-slate-500">{role.riskNote || '-'}</td>
+                  <td className="py-2 pr-3 text-xs text-slate-500">
+                    {role.dataScope === 'CUSTOM' ? (
+                      <fieldset className="space-y-1" disabled={savingRoleId === role.roleId}>
+                        <legend className="sr-only">{role.roleName}自定义部门</legend>
+                        {depts.length === 0 ? <span>暂无部门可选</span> : depts.map((dept) => (
+                          <label key={dept.id} className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              aria-label={`${role.roleName}部门${dept.name}`}
+                              checked={(role.customDeptIds ?? []).includes(dept.id)}
+                              onChange={(event) => {
+                                void handleDeptToggle(role, dept.id, event.target.checked);
+                              }}
+                            />
+                            <span>{dept.name}</span>
+                          </label>
+                        ))}
+                      </fieldset>
+                    ) : (
+                      <span>-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -238,7 +344,7 @@ export default function SystemDataPermissionsWorkbenchPage({
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <p className="text-xs text-slate-500">只读提示</p>
+        <p className="text-xs text-slate-500">边界提示</p>
         <p className="mt-1">{catalogMeta.readOnlyNotice}</p>
       </div>
     </section>

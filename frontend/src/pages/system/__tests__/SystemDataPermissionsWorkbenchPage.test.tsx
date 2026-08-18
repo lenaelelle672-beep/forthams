@@ -2,19 +2,25 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import SystemDataPermissionsWorkbenchPage from '../SystemDataPermissionsWorkbenchPage';
-import { getDataPermissionCatalog } from '../../../api/dataPermissions';
+import { getDataPermissionCatalog, listAssignableDepts, updateDataPermissionDepts, updateDataPermissionScope } from '../../../api/dataPermissions';
 
 vi.mock('../../../api/dataPermissions', () => ({
   getDataPermissionCatalog: vi.fn(),
+  updateDataPermissionScope: vi.fn(),
+  updateDataPermissionDepts: vi.fn(),
+  listAssignableDepts: vi.fn(),
 }));
 
 const mockedApi = vi.mocked(getDataPermissionCatalog);
+const mockedUpdate = vi.mocked(updateDataPermissionScope);
+const mockedUpdateDepts = vi.mocked(updateDataPermissionDepts);
+const mockedDepts = vi.mocked(listAssignableDepts);
 
 const catalog = {
   roles: [
     { roleId: 1, roleName: '管理员', roleCode: 'ADMIN', dataScope: 'ALL', dataScopeLabel: '全部数据', customScope: false, riskNote: '管理员 可见全部数据' },
     { roleId: 2, roleName: '部门专员', roleCode: 'DEPT_USER', dataScope: 'DEPT', dataScopeLabel: '本部门', customScope: false, riskNote: '' },
-    { roleId: 3, roleName: '自定义角色', roleCode: 'CUSTOM_ROLE', dataScope: 'CUSTOM', dataScopeLabel: '自定义', customScope: true, riskNote: '自定义范围' },
+    { roleId: 3, roleName: '自定义角色', roleCode: 'CUSTOM_ROLE', dataScope: 'CUSTOM', dataScopeLabel: '自定义', customScope: true, customDeptIds: [], customDeptCount: 0, riskNote: '自定义范围' },
   ],
   summary: { roleCount: 3, allScopeCount: 1, restrictedScopeCount: 1, customScopeCount: 1 },
   riskTips: ['有 1 个角色持有 ALL 范围。'],
@@ -25,6 +31,9 @@ describe('SystemDataPermissionsWorkbenchPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockedApi.mockResolvedValue(catalog);
+    mockedUpdate.mockResolvedValue(catalog.roles[1]);
+    mockedUpdateDepts.mockResolvedValue({ ...catalog.roles[2], customDeptIds: [11], customDeptCount: 1 });
+    mockedDepts.mockResolvedValue([{ id: 11, deptName: '研发部' }]);
   });
 
   it('加载并展示角色数据范围列表', async () => {
@@ -63,6 +72,36 @@ describe('SystemDataPermissionsWorkbenchPage', () => {
   it('无权限态展示只读拦截', () => {
     render(<SystemDataPermissionsWorkbenchPage canView={false} />);
     expect(screen.getByText(/无权限访问数据权限/)).toBeInTheDocument();
+  });
+
+  it('调整范围会调用写入接口并重新加载', async () => {
+    render(<SystemDataPermissionsWorkbenchPage canView />);
+    await screen.findByText('管理员');
+
+    await userEvent.selectOptions(screen.getByLabelText('管理员数据范围'), 'DEPT');
+
+    await waitFor(() => expect(mockedUpdate).toHaveBeenCalledWith(1, 'DEPT'));
+    expect(mockedApi).toHaveBeenCalledTimes(2);
+  });
+
+  it('写入失败展示脱敏错误提示', async () => {
+    mockedUpdate.mockRejectedValueOnce(new Error('token=raw-secret'));
+    render(<SystemDataPermissionsWorkbenchPage canView />);
+    await screen.findByText('管理员');
+
+    await userEvent.selectOptions(screen.getByLabelText('管理员数据范围'), 'SELF');
+
+    await waitFor(() => expect(screen.getAllByRole('alert').some((node) => node.textContent?.includes('敏感细节已脱敏'))).toBe(true));
+    expect(screen.queryByText(/raw-secret/)).not.toBeInTheDocument();
+  });
+
+  it('CUSTOM 角色可勾选部门并写入清单', async () => {
+    render(<SystemDataPermissionsWorkbenchPage canView />);
+    await screen.findByText('自定义角色');
+
+    await userEvent.click(screen.getByLabelText('自定义角色部门研发部'));
+
+    await waitFor(() => expect(mockedUpdateDepts).toHaveBeenCalledWith(3, [11]));
   });
 
   it('空态展示暂无提示', async () => {
