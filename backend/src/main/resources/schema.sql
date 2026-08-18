@@ -744,3 +744,18 @@ component = CASE id
     ELSE component
 END
 WHERE id = 310;
+
+CREATE TABLE IF NOT EXISTS sys_role_menu (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    role_id BIGINT NOT NULL,
+    menu_id BIGINT NOT NULL,
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_sys_role_menu_role_menu (role_id, menu_id),
+    INDEX idx_sys_role_menu_menu (menu_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO sys_role_menu (role_id, menu_id)
+VALUES
+    (1, 310),
+    (1, 311)
+ON DUPLICATE KEY UPDATE menu_id = VALUES(menu_id);

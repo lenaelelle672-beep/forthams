@@ -1,6 +1,8 @@
 # 权限修复 LOOP 页面图鉴
 
-截图由 `src/e2e/authority-loop-screenshot-audit.spec.ts` 对生产预览 `vite preview` 拍摄，API 为契约 mock，不是真实 MySQL 联调。
+截图由 `src/e2e/authority-loop-screenshot-audit.spec.ts` 对生产预览 `vite preview` 拍摄，API 为契约 mock。
+
+2026-08-17 真实后端重拍：已停止。当前环境 `DB_URL`/`JWT_SECRET` 未设置，`127.0.0.1:8080` 不可达。未发明新接口。
 
 | 文件 | 路径 | 验收点 |
 |---|---|---|
