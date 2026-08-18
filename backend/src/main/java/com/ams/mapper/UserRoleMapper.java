@@ -1,5 +1,6 @@
 package com.ams.mapper;
 
+import com.ams.entity.Role;
 import com.ams.entity.UserRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,6 +21,16 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
           AND r.deleted = 0
         """)
     List<String> selectRoleCodesByUserId(@Param("userId") Long userId);
+
+    @Select("""
+        SELECT r.id, r.role_name, r.role_code, r.data_scope, r.status
+        FROM sys_user_role ur
+        INNER JOIN sys_role r ON ur.role_id = r.id
+        WHERE ur.user_id = #{userId}
+          AND r.status = 1
+          AND r.deleted = 0
+        """)
+    List<Role> selectRolesByUserId(@Param("userId") Long userId);
 
     @Select("""
         SELECT DISTINCT p.permission_code

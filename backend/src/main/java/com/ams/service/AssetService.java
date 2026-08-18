@@ -27,6 +27,7 @@ public class AssetService {
 
     private final AssetMapper assetMapper;
     private final AssetLifecycleService assetLifecycleService;
+    private final DataScopeService dataScopeService;
 
     public Page<Asset> queryAssets(AssetQueryDTO queryDTO) {
         String tenantId = TenantContext.requireTenantId();
@@ -59,6 +60,7 @@ public class AssetService {
         if (queryDTO.getIsImportant() != null) {
             wrapper.eq(Asset::getIsImportant, queryDTO.getIsImportant());
         }
+        applyDataScope(wrapper);
         wrapper.orderByDesc(Asset::getCreateTime);
 
         return assetMapper.selectPage(page, wrapper);
@@ -70,6 +72,7 @@ public class AssetService {
         if (asset == null) {
             assertSameTenantOrMissing(id, tenantId, "getAssetById");
         }
+        dataScopeService.resolveCurrent().assertAllows(asset.getDeptId(), asset.getUserId());
         return asset;
     }
 
@@ -124,10 +127,35 @@ public class AssetService {
     @Transactional(rollbackFor = Exception.class)
     public void deleteAsset(Long id) {
         String tenantId = TenantContext.requireTenantId();
+        getAssetById(id);
         int deleted = assetMapper.delete(assetById(id, tenantId));
         if (deleted == 0) {
             assertSameTenantOrMissing(id, tenantId, "deleteAsset");
         }
+    }
+
+    private void applyDataScope(LambdaQueryWrapper<Asset> wrapper) {
+        var scope = dataScopeService.resolveCurrent();
+        if (scope.seesAll()) {
+            return;
+        }
+        wrapper.and(w -> {
+            boolean started = false;
+            if (!scope.deptIds().isEmpty()) {
+                w.in(Asset::getDeptId, scope.deptIds());
+                started = true;
+            }
+            if (scope.includeSelf() && scope.userId() != null) {
+                if (started) {
+                    w.or();
+                }
+                w.eq(Asset::getUserId, scope.userId());
+                started = true;
+            }
+            if (!started) {
+                w.apply("1 = 0");
+            }
+        });
     }
 
     private LambdaQueryWrapper<Asset> assetById(Long id, String tenantId) {
