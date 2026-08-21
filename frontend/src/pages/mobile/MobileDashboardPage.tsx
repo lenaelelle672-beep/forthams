@@ -78,7 +78,7 @@ function MobileDashboardContent() {
     queryKey: ['mobile', 'work-orders'],
     queryFn: async () => {
       const res = await http.get<{ records: WorkOrderItem[] }>('/mobile/work-orders', { params: { page: 1, pageSize: 5 } });
-      return res.records;
+      return Array.isArray(res?.records) ? res.records : [];
     },
     staleTime: 1000 * 60 * 2,
   });
