@@ -773,4 +773,5 @@
 | Q1583 | done | 桌面空态 **3 passed**（/disposals 清退风险提示、「资产清退」「工单管理」）。禁 /m。 |
 | Q1584 | done | 桌面空态 **3 passed**（/disposals 点调拨/报废/赔偿风险提示）。禁 /m。 |
 | Q1585 | done | 桌面空态 **3 passed**（/maintenance「设备维护」「维保列表」「维保记录管理」）。禁 /m。 |
-| Q1586 | in_progress | 桌面空态：/maintenance「计划中」「执行中」及下一状态。禁 /m。 |
+| Q1586 | done | 桌面空态 **3 passed**（/maintenance「计划中」「执行中」「逾期」）。禁 /m。 |
+| Q1587 | in_progress | 桌面空态：/maintenance 点新增维保表单文案。禁 /m。 |
