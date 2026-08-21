@@ -1,4 +1,4 @@
-# LOOP queue（08-21 08:00 停）
+# LOOP queue（08-22 08:00 停）
 
 | id | status | ticket |
 | --- | --- | --- |
@@ -660,3 +660,5 @@
 | Q1470 | done | 桌面空态 **3 passed**（/assets/1「暂无趋势数据」、/workflows「暂无发布快照」、/reports 点资产分类统计「暂无图表数据」）。禁 /m。 |
 | Q1471 | done | 桌面空态 **3 passed**（/intake/1「暂无入库资产」、/system/custom-fieldsets 点查看字段「该字段集暂无字段」、/audit 点筛选「暂无筛选项」）。禁 /m。 |
 | Q1472 | done | 桌面空态 **3 passed**（/maintenance/plans 点日历「暂无维保计划数据」、/disposals 点调拨「暂无资产调拨记录」、点报废「暂无报废转让记录」）。vendor-portal 非 AppLayout、audit 趋势 7 天补零不可达。禁 /m。 |
+| Q1473 | done | 桌面空态 **3 passed**（/compensation/new「暂无可选部门」、/sam 点查看详情「暂无详情」、/system/roles 点菜单权限「暂无菜单数据」）。DialogTitle console 忽略。禁 /m。 |
+| Q1474 | in_progress | 桌面空态：/system/roles 点数据权限「暂无部门数据」、/assignments/new「请选择资产」、/borrows/new「请选择资产」。禁 /m。 |
