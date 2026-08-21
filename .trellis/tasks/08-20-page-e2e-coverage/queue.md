@@ -851,4 +851,5 @@
 | Q1661 | done | 桌面空态 **3 passed**（/system/menus 点新增图标路径与父级）。禁 /m。 |
 | Q1662 | done | 桌面空态 **3 passed**（/system/menus 点新增组件路径与状态）。禁 /m。 |
 | Q1663 | done | 桌面空态 **3 passed**（/system/depts「组织架构」、点新增部门名称编码）。禁 /m。 |
-| Q1664 | in_progress | 桌面空态：/system/depts 点新增「上级部门」「部门领导」。禁 /m。 |
+| Q1664 | done | 桌面空态 **3 passed**（/system/depts 点新增上级类型与领导）。禁 /m。 |
+| Q1665 | in_progress | 桌面空态：/system/depts 点新增「秘书」「联系电话」。禁 /m。 |

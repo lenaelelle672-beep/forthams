@@ -5987,6 +5987,37 @@ test.describe('Q1663 桌面部门空态', () => {
   });
 });
 
+test.describe('Q1664 桌面部门空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/depts 点新增部门「上级部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('上级部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 点新增部门「部门类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('部门类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 点新增部门「部门领导」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('部门领导').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
