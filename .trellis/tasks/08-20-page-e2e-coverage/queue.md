@@ -754,4 +754,5 @@
 | Q1564 | done | 桌面空态 **3 passed**（/budgets「预算列表」「超支告警」「执行率」）。禁 /m。 |
 | Q1565 | done | 桌面空态 **3 passed**（/revaluations「总记录」「减值/重估合计」「需及时处理」）。禁 /m。 |
 | Q1566 | done | 桌面空态 **3 passed**（/revaluations「已通过」「本期已审批」「本期驳回」）。禁 /m。 |
-| Q1567 | in_progress | 桌面空态：/revaluations「已拒绝」「减值/重估列表」、/categories 未覆盖说明。禁 /m。 |
+| Q1567 | done | 桌面空态 **3 passed**（/revaluations「已拒绝」「减值/重估列表」、/categories「管理资产分类层级结构」）。禁 /m。 |
+| Q1568 | in_progress | 桌面空态：/categories「总分类数」及其余 stat。禁 /m。 |
