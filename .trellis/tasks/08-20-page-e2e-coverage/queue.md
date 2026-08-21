@@ -983,4 +983,5 @@
 | Q1793 | done | 桌面空态 **3 passed**（/insurances/new 保存与状态选项）。禁 /m。 |
 | Q1794 | done | 桌面空态 **3 passed**（/insurances/new 点保存校验）。禁 /m。 |
 | Q1795 | done | 桌面空态 **3 passed**（/spare-parts/new 备件编码名称）。禁 /m。 |
-| Q1796 | in_progress | 桌面空态：/spare-parts/new「请输入备件名称」「规格型号」「请输入规格型号」。禁 /m。 |
+| Q1796 | done | 桌面空态 **3 passed**（/spare-parts/new 名称规格）。禁 /m。 |
+| Q1797 | in_progress | 桌面空态：/spare-parts/new「计量单位」「件」「当前库存」。禁 /m。 |
