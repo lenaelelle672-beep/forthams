@@ -842,4 +842,5 @@
 | Q1652 | done | 桌面空态 **3 passed**（/system/posts「备注」、点新增岗位编码）。禁 /m。 |
 | Q1653 | done | 桌面空态 **3 passed**（/system/posts 点新增岗位名称与备注 placeholder）。禁 /m。 |
 | Q1654 | done | 桌面空态 **3 passed**（/system/users「邮箱/手机号」「部门」「创建时间」）。禁 /m。 |
-| Q1655 | in_progress | 桌面空态：/system/roles 未覆盖列标题。禁 /m。 |
+| Q1655 | done | 桌面空态 **3 passed**（/system/roles「角色名称」「角色编码」「数据权限」）。禁 /m。 |
+| Q1656 | in_progress | 桌面空态：/system/roles「新增角色」。禁 /m。 |

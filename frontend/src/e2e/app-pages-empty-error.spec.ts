@@ -5720,6 +5720,34 @@ test.describe('Q1654 桌面用户空态', () => {
   });
 });
 
+test.describe('Q1655 桌面角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/roles 空态「角色名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByText('角色名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles 空态「角色编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByText('角色编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles 空态「数据权限」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByText('数据权限').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
