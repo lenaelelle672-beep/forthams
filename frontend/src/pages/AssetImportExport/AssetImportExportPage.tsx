@@ -864,7 +864,7 @@ const AssetImportExportPage: React.FC = () => {
             treeData={categoryTree}
             value={exportCategoryCodes.length > 0 ? exportCategoryCodes : undefined}
             onChange={(val) => setExportCategoryCodes(val as string[])}
-            treeCheck
+            treeCheckable
             showCheckedStrategy={TreeSelect.SHOW_CHILD}
             placeholder="请选择资产分类"
             allowClear

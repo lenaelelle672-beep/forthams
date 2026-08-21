@@ -666,4 +666,5 @@
 | Q1476 | done | 桌面空态 **3 passed**（/gis「没有已定位的资产可在地图上显示」、/notifications 点系统通知「当前筛选条件下没有通知」、/energy「尚未采集到能耗数据」）。禁 /m。 |
 | Q1477 | done | 桌面空态 **3 passed**（/sam「执行合规扫描后显示许可类型分布」「执行合规扫描后显示席位使用率」「所有许可合规运行」）。禁 /m。 |
 | Q1478 | done | 桌面空态 **3 passed**（/fault-codes「点击「新增根节点」…」、/categories「点击上方按钮添加根分类」、/reports 点资产分类统计「当前报表暂无可用数据」）。资产状态分布有图点。禁 /m。 |
-| Q1479 | in_progress | 桌面空态：/report-builder「将字段拖拽到此处，或点击左侧字段添加」、/assets/import-export 点导出「请选择资产分类」、/locations「新增顶级位置」。禁 /m。 |
+| Q1479 | done | 桌面空态 **3 passed**（/report-builder 拖拽字段、/assets/import-export 点导出「请选择资产分类」、/locations「新增顶级位置」）。修 TreeSelect `treeCheckable`。禁 /m。 |
+| Q1480 | in_progress | 桌面空态：/assets/import-export 点导出「请选择资产状态（可多选）」「选择需要导出的资产范围，不选则导出全部数据」、/system/depts「新增部门」。禁 /m。 |
