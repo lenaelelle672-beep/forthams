@@ -799,4 +799,5 @@
 | Q1609 | done | 桌面空态 **3 passed**（/borrows「借用总数」「借用列表」「借用记录管理」）。禁 /m。 |
 | Q1610 | done | 桌面空态 **3 passed**（/borrows「已借出」「已逾期」「借用管理」）。禁 /m。 |
 | Q1611 | done | 桌面空态 **3 passed**（/assignments「领用列表」「领用归还管理」「长期领用」）。禁 /m。 |
-| Q1612 | in_progress | 桌面空态：/assignments 其余筛选。禁 /m。 |
+| Q1612 | done | 桌面空态 **3 passed**（/assignments「短期借用」「归还入库」「调拨转移」）。禁 /m。 |
+| Q1613 | in_progress | 桌面空态：/assignments 指标卡。禁 /m。 |
