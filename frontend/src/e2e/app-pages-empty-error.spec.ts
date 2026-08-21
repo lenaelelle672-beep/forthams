@@ -1463,6 +1463,35 @@ test.describe('Q1505 桌面 ABC 空态', () => {
   });
 });
 
+test.describe('Q1506 桌面 ABC/闲置空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/abc-classification 点批量重新分类「操作可能需要较长时间，请确认是否继续？」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await page.getByRole('button', { name: '批量重新分类' }).click();
+    await expect(page.getByText('操作可能需要较长时间，请确认是否继续？').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「总价值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('总价值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/idle 空态「闲置天数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/idle');
+    await expect(page.getByText('闲置天数').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
