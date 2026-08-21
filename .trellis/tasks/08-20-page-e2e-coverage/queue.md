@@ -807,4 +807,5 @@
 | Q1617 | done | 桌面空态 **3 passed**（/equipment「维保中」「正常运行」「设备状态:」）。禁 /m。 |
 | Q1618 | done | 桌面空态 **3 passed**（/equipment「维修中」「已过期」「即将到期」）。禁 /m。 |
 | Q1619 | done | 桌面空态 **3 passed**（/manufacturers「设备制造商信息维护」「全部制造商」「有官网」）。禁 /m。 |
-| Q1620 | in_progress | 桌面空态：/manufacturers 点新增制造商表单。禁 /m。 |
+| Q1620 | done | 桌面空态 **3 passed**（/manufacturers 点新增说明与名称 placeholder）。禁 /m。 |
+| Q1621 | in_progress | 桌面空态：/asset-models 未覆盖说明。禁 /m。 |
