@@ -3575,6 +3575,34 @@ test.describe('Q1580 桌面运营首页空态', () => {
   });
 });
 
+test.describe('Q1581 桌面运营首页空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/dashboard 空态「最近工单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/dashboard');
+    await expect(page.getByText('最近工单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/dashboard 空态「净值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/dashboard');
+    await expect(page.getByText('净值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/dashboard 空态「部门资产统计 (Top 5 部门)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/dashboard');
+    await expect(page.getByText('部门资产统计 (Top 5 部门)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
