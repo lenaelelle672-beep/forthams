@@ -844,4 +844,5 @@
 | Q1654 | done | 桌面空态 **3 passed**（/system/users「邮箱/手机号」「部门」「创建时间」）。禁 /m。 |
 | Q1655 | done | 桌面空态 **3 passed**（/system/roles「角色名称」「角色编码」「数据权限」）。禁 /m。 |
 | Q1656 | done | 桌面空态 **3 passed**（/system/roles「新增角色」、点新增名称与编码 placeholder）。禁 /m。 |
-| Q1657 | in_progress | 桌面空态：/system/roles 点新增「数据权限范围」「全部数据」。禁 /m。 |
+| Q1657 | done | 桌面空态 **3 passed**（/system/roles 点新增数据权限范围与描述）。禁 /m。 |
+| Q1658 | in_progress | 桌面空态：/system/menus 未覆盖列/树文案。禁 /m。 |
