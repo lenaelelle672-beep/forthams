@@ -770,4 +770,5 @@
 | Q1580 | done | 桌面空态 **3 passed**（/dashboard「总价值」「分类分布」「维保预警」）。禁 /m。 |
 | Q1581 | done | 桌面空态 **3 passed**（/dashboard「最近工单」「净值」「部门资产统计 (Top 5 部门)」）。禁 /m。 |
 | Q1582 | done | 桌面空态 **3 passed**（/disposals「全周期」「本月处置总量」「资产回收价值」）。禁 /m。 |
-| Q1583 | in_progress | 桌面空态：/disposals 清退风险提示与 tab。禁 /m。 |
+| Q1583 | done | 桌面空态 **3 passed**（/disposals 清退风险提示、「资产清退」「工单管理」）。禁 /m。 |
+| Q1584 | in_progress | 桌面空态：/disposals 点资产调拨/报废风险提示。禁 /m。 |
