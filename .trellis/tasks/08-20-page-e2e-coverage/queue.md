@@ -966,4 +966,5 @@
 | Q1776 | done | 桌面空态 **3 passed**（/purchase-orders 点新增单价确认取消）。禁 /m。 |
 | Q1777 | done | 桌面空态 **3 passed**（采购订单管理、点新增金额备注）。禁 /m。 |
 | Q1778 | done | 桌面空态 **3 passed**（/licenses 点新增软件名称厂商）。禁 /m。 |
-| Q1779 | in_progress | 桌面空态：/licenses 点新增「请输入厂商」「软件类型」「请输入软件类型」。禁 /m。 |
+| Q1779 | done | 桌面空态 **3 passed**（/licenses 点新增厂商软件类型）。禁 /m。 |
+| Q1780 | in_progress | 桌面空态：/licenses 点新增「版本」「请输入版本」「授权类型」。禁 /m。 |
