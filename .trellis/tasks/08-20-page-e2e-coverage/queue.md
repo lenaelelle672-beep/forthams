@@ -902,4 +902,5 @@
 | Q1712 | done | 桌面空态 **3 passed**（/login 账号密码与记住用户名）。禁 /m。 |
 | Q1713 | done | 桌面空态 **3 passed**（/login 忘记密码登录系统SSO）。禁 /m。 |
 | Q1714 | done | 桌面空态 **3 passed**（/login SSO说明与品牌名）。禁 /m。 |
-| Q1715 | in_progress | 桌面空态：/login「用户名」「密码」。禁 /m。 |
+| Q1715 | done | 桌面空态 **3 passed**（/login 用户名密码与台账文案）。禁 /m。 |
+| Q1716 | in_progress | 桌面空态：/login「帮助团队高效进入固定资产工作台」。禁 /m。 |
