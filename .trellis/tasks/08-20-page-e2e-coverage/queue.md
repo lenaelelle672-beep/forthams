@@ -822,4 +822,5 @@
 | Q1632 | done | 桌面空态 **3 passed**（/floorplans「2D/3D 平面图」「平面图列表」「请从左侧选择一个平面图」）。禁 /m。 |
 | Q1633 | done | 桌面空态 **3 passed**（/floorplans 副标题、「前往 GIS 地图」「请新建平面图」）。禁 /m。 |
 | Q1634 | done | 桌面空态 **3 passed**（/floorplans 点新建平面图说明与名称 placeholder）。禁 /m。 |
-| Q1635 | in_progress | 桌面空态：/floorplans 点新建「楼栋」「楼层」「图片URL」。禁 /m。 |
+| Q1635 | done | 桌面空态 **3 passed**（/floorplans 点新建「楼栋」「楼层」「图片URL」）。禁 /m。 |
+| Q1636 | in_progress | 桌面空态：/gis 未覆盖说明。禁 /m。 |
