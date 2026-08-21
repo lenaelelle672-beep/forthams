@@ -829,4 +829,5 @@
 | Q1639 | done | 桌面空态 **3 passed**（/reports 点财务分类价值、运维维保/退役描述）。禁 /m。 |
 | Q1640 | done | 桌面空态 **3 passed**（/reports 点工单/财务剩余卡片描述）。禁 /m。 |
 | Q1641 | done | 桌面空态 **3 passed**（/risk-matrix 点创建「概率维度」「严重度维度」「等级映射」）。禁 /m。 |
-| Q1642 | in_progress | 桌面空态：/risk-matrix 点创建「添加维度」「维度名称」。禁 /m。 |
+| Q1642 | done | 桌面空态 **3 passed**（/risk-matrix 点创建「添加维度」「维度名称」「概率维度配置」）。禁 /m。 |
+| Q1643 | in_progress | 桌面空态：/risk-matrix 点严重度维度 tab。禁 /m。 |

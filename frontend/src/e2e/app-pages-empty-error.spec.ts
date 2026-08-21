@@ -5337,6 +5337,37 @@ test.describe('Q1641 桌面风险矩阵空态', () => {
   });
 });
 
+test.describe('Q1642 桌面风险矩阵空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-matrix 点创建矩阵「添加维度」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: '创建矩阵' }).click();
+    await expect(page.getByText('添加维度').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/risk-matrix 点创建矩阵「维度名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: '创建矩阵' }).click();
+    await expect(page.getByPlaceholder('维度名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/risk-matrix 点创建矩阵「概率维度配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: '创建矩阵' }).click();
+    await expect(page.getByText('概率维度配置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
