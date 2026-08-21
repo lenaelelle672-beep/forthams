@@ -824,4 +824,5 @@
 | Q1634 | done | 桌面空态 **3 passed**（/floorplans 点新建平面图说明与名称 placeholder）。禁 /m。 |
 | Q1635 | done | 桌面空态 **3 passed**（/floorplans 点新建「楼栋」「楼层」「图片URL」）。禁 /m。 |
 | Q1636 | done | 桌面空态 **3 passed**（/gis 副标题、数据来源说明、无定位资产）。禁 /m。 |
-| Q1637 | in_progress | 桌面空态：/reports 未覆盖剩余卡片描述。禁 /m。 |
+| Q1637 | done | 桌面空态 **3 passed**（/reports 资产汇总/分类/状态卡片描述）。禁 /m。 |
+| Q1638 | in_progress | 桌面空态：/reports 部门排行与增长趋势描述。禁 /m。 |

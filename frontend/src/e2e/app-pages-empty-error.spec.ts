@@ -5187,6 +5187,34 @@ test.describe('Q1636 桌面 GIS 空态', () => {
   });
 });
 
+test.describe('Q1637 桌面报表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports 空态「全量资产数量、总价值、净值等核心指标概览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByText('全量资产数量、总价值、净值等核心指标概览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 空态「按资产分类统计数量和总价值的分布情况」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByText('按资产分类统计数量和总价值的分布情况').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 空态「各状态（在用/闲置/退役/待审批）资产数量占比」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByText('各状态（在用/闲置/退役/待审批）资产数量占比').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
