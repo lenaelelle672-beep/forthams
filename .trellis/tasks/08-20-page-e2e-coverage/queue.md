@@ -784,4 +784,5 @@
 | Q1594 | done | 桌面空态 **3 passed**（/inventory「盘点任务」「资产盘点管理」「决策摘要」）。禁 /m。 |
 | Q1595 | done | 桌面空态 **3 passed**（/inventory「进度趋势」「筛选」、点筛选「重置」）。禁 /m。 |
 | Q1596 | done | 桌面空态 **3 passed**（/spare-parts「备件总数」「备件列表」「备件库存管理」）。禁 /m。 |
-| Q1597 | in_progress | 桌面空态：/spare-parts 其余 KPI。禁 /m。 |
+| Q1597 | done | 桌面空态 **3 passed**（/spare-parts「库存告警」「已启用」「库存总价值」）。禁 /m。 |
+| Q1598 | in_progress | 桌面空态：/contracts 未覆盖说明。禁 /m。 |
