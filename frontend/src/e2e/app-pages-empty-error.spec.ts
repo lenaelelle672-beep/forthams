@@ -1130,6 +1130,35 @@ test.describe('Q1494 桌面 CTA 空态', () => {
   });
 });
 
+test.describe('Q1495 桌面 CTA/描述空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam 空态「触发合规扫描」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByText('触发合规扫描').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports/scheduled 空态「点击"新建定时报表"开始创建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByText('点击"新建定时报表"开始创建').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment 点新建维保「新建维保记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await page.getByRole('button', { name: '新建维保' }).click();
+    await expect(page.getByText('新建维保记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

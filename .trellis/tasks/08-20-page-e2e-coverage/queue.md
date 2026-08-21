@@ -682,4 +682,5 @@
 | Q1492 | done | 桌面空态 CTA **3 passed**（/disposals「新建资产清退」、/risk-assessments「新增评估」、/safety-checklists/config「新增模板」）。禁 /m。 |
 | Q1493 | done | 桌面空态 CTA **3 passed**（/disposals 点调拨/报废/赔偿对应「新建…」）。禁 /m。 |
 | Q1494 | done | 桌面空态 CTA **3 passed**（/disposals 点工单「新建工单管理」、/workflows「新建流程」、/equipment「新建维保」）。禁 /m。 |
-| Q1495 | in_progress | 桌面空态：/sam「触发合规扫描」、/reports/scheduled「点击"新建定时报表"开始创建」、/equipment 点新建维保「新建维保记录」。禁 /m。 |
+| Q1495 | done | 桌面空态 **3 passed**（/sam「触发合规扫描」、/reports/scheduled 点击新建提示、/equipment 点新建维保「新建维保记录」）。禁 /m。 |
+| Q1496 | in_progress | 桌面空态：/gis 点资产定位管理「新建资产定位」「关联已有资产」、/notifications「全部已读」。禁 /m。 |
