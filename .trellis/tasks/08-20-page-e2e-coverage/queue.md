@@ -680,4 +680,5 @@
 | Q1490 | done | 桌面空态 CTA **3 passed**（/inventory「新建任务」、/inventory/cycle-count「新增规则」、/categories「添加根分类」）。EmptyState「添加分类」不可达。禁 /m。 |
 | Q1491 | done | 桌面空态 CTA **3 passed**（/inspection-templates「新增模板」、/reports/scheduled「新建定时报表」、/inspection-records「新增检验」）。禁 /m。 |
 | Q1492 | done | 桌面空态 CTA **3 passed**（/disposals「新建资产清退」、/risk-assessments「新增评估」、/safety-checklists/config「新增模板」）。禁 /m。 |
-| Q1493 | in_progress | 桌面空态 CTA：/disposals 点调拨「新建资产调拨」、点报废「新建报废转让」、点赔偿「新建资产赔偿」。禁 /m。 |
+| Q1493 | done | 桌面空态 CTA **3 passed**（/disposals 点调拨/报废/赔偿对应「新建…」）。禁 /m。 |
+| Q1494 | in_progress | 桌面空态 CTA：/disposals 点工单管理「新建工单管理」、/workflows「新建流程」、/equipment 列表新建按钮。禁 /m。 |

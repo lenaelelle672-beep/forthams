@@ -1070,6 +1070,37 @@ test.describe('Q1492 桌面 CTA 空态', () => {
   });
 });
 
+test.describe('Q1493 桌面处置 tab CTA', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals 点资产调拨「新建资产调拨」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '资产调拨', exact: true }).click();
+    await expect(page.getByText('新建资产调拨').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals 点报废转让「新建报废转让」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '报废转让', exact: true }).click();
+    await expect(page.getByText('新建报废转让').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals 点资产赔偿「新建资产赔偿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '资产赔偿', exact: true }).click();
+    await expect(page.getByText('新建资产赔偿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
