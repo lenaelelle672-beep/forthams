@@ -904,4 +904,5 @@
 | Q1714 | done | 桌面空态 **3 passed**（/login SSO说明与品牌名）。禁 /m。 |
 | Q1715 | done | 桌面空态 **3 passed**（/login 用户名密码与台账文案）。禁 /m。 |
 | Q1716 | done | 桌面空态 **3 passed**（/login 工作台文案与演示账户）。禁 /m。 |
-| Q1717 | in_progress | 桌面空态：/login 演示账户剩余。禁 /m。 |
+| Q1717 | done | 桌面空态 **3 passed**（/login 演示账户角色）。禁 /m。 |
+| Q1718 | in_progress | 桌面空态：/login 演示账户描述。禁 /m。 |
