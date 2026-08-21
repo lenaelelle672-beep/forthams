@@ -849,4 +849,5 @@
 | Q1659 | done | 桌面空态 **3 passed**（/system/menus「权限标识」「路由」「按钮」）。禁 /m。 |
 | Q1660 | done | 桌面空态 **3 passed**（/system/menus「菜单」、点新增显示名称与类型）。禁 /m。 |
 | Q1661 | done | 桌面空态 **3 passed**（/system/menus 点新增图标路径与父级）。禁 /m。 |
-| Q1662 | in_progress | 桌面空态：/system/menus 点新增「组件路径」「可见状态」「菜单状态」。禁 /m。 |
+| Q1662 | done | 桌面空态 **3 passed**（/system/menus 点新增组件路径与状态）。禁 /m。 |
+| Q1663 | in_progress | 桌面空态：/system/depts 未覆盖剩余文案。禁 /m。 |
