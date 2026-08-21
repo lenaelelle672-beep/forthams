@@ -781,4 +781,5 @@
 | Q1591 | done | 桌面空态 **3 passed**（/maintenance/plans 点新建计划关联资产与名称标签）。禁 /m。 |
 | Q1592 | done | 桌面空态 **3 passed**（/inventory「实时同步」「任务总数」「平均进度」）。禁 /m。 |
 | Q1593 | done | 桌面空态 **3 passed**（/inventory「已盘资产」「盘亏预警」「RFID」）。禁 /m。 |
-| Q1594 | in_progress | 桌面空态：/inventory「盘点任务」及筛选。禁 /m。 |
+| Q1594 | done | 桌面空态 **3 passed**（/inventory「盘点任务」「资产盘点管理」「决策摘要」）。禁 /m。 |
+| Q1595 | in_progress | 桌面空态：/inventory「进度趋势」及筛选文案。禁 /m。 |
