@@ -870,4 +870,5 @@
 | Q1680 | done | 桌面空态 **3 passed**（字段只读副标题共 0 条、菜单取消）。禁 /m。 |
 | Q1681 | done | 桌面空态 **3 passed**（/403 权限说明与返回按钮）。禁 /m。 |
 | Q1682 | done | 桌面空态 **3 passed**（/403 联系管理员与角色缺失）。禁 /m。 |
-| Q1683 | in_progress | 桌面空态：/403?reason=roles_missing 剩余文案。禁 /m。 |
+| Q1683 | done | 桌面空态 **3 passed**（/403 角色缺失说明、/forbidden）。禁 /m。 |
+| Q1684 | in_progress | 桌面空态：/forbidden 剩余文案。禁 /m。 |
