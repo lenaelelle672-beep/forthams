@@ -194,10 +194,11 @@ export default function DeptManagement() {
   const [deleteTarget, setDeleteTarget] = useState<Department | null>(null);
   const [form, setForm] = useState<DeptForm>(emptyForm);
 
-  const { data: deptTree = [], isLoading } = useQuery({
+  const { data: deptTreeRes, isLoading } = useQuery({
     queryKey: ['system', 'depts'],
     queryFn: getDeptTree,
   });
+  const deptTree: Department[] = Array.isArray(deptTreeRes) ? deptTreeRes : [];
 
   const createMut = useMutation({
     mutationFn: createDept,

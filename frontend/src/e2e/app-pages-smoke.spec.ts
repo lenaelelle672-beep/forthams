@@ -1458,6 +1458,1049 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/idle records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/idle-assets/list*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/idle');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '闲置资产管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 handover records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/handover*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/handover') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 doc-center records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/doc-center*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/doc-center') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-doc-center');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 tech-support records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/tech-support*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/tech-support') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tech-support');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 workflow-mail records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/workflow-mail*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/workflow-mail') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-mail');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 import-export records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/import-export/tasks*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/import-export/tasks') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 tenants records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/tenants*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/tenants') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tenant-management');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 runtime-monitor records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/approvals/list*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 data-permissions roles 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/data-permissions/catalog*', async (apiRoute) => {
+      await fulfill(apiRoute, { roles: { unexpected: true }, summary: {}, riskTips: { unexpected: true } });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 channel-configs records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/channel-configs*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/channel-configs') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 dept-org list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/list*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 file-storage attachments 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/file-storage/attachments/catalog*', async (apiRoute) => {
+      await fulfill(apiRoute, { attachments: { unexpected: true }, summary: {}, page: {}, businessTypes: { unexpected: true }, fileTypes: { unexpected: true }, riskTips: { unexpected: true } });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 sla-config list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/sla-config*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/sla-config') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 notification-preferences list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/notification-preferences*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/notification-preferences') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 custom-fields records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/custom-fields*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/custom-fields') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/contracts records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/contracts*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/contracts') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/contracts');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '合同管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depreciation/schedules*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/depreciation');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '折旧管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reports/by-category*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/reports');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/dashboard/dept-distribution*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/analytics');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '数据分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-health records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/asset-health/unhealthy*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/asset-health');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产健康评分' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/locations records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/locations/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/locations');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '位置管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/categories/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/categories');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产分类管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/workflows*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workflows') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/workflows');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '业务流程管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/menus/admin/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/system/menus');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '菜单管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/depts records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/system/depts');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '部门管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reliability/trend*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.route('**/reliability/ranking*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/analytics/reliability');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '可靠性分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 flow-definition list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/workflows*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workflows') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-definition');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 form-config list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/form-definitions*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/form-definitions') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 notification-switches list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/notification-switches/list*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 role-permissions roles 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/role-permissions/catalog*', async (apiRoute) => {
+      await fulfill(apiRoute, { roles: { unexpected: true }, riskTips: { unexpected: true } });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 command-center records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/approvals/list*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 menu-permissions roles 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/role-permissions/catalog*', async (apiRoute) => {
+      await fulfill(apiRoute, { roles: { unexpected: true }, permissions: { unexpected: true }, riskTips: { unexpected: true } });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-menu-permissions');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 flow-designer list 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/workflows*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workflows') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '系统管理 V3 工作台' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Workbench V3 catalog 失败态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedAuthenticatedSession(page);
+  });
+
+  test('/fixed-assets/workbenchv3 handover 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/handover*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/handover') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 doc-center 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/doc-center*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/doc-center') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-doc-center');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 tech-support 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/tech-support*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/tech-support') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tech-support');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 workflow-mail 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/workflow-mail*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/workflow-mail') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-mail');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 import-export 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/import-export/tasks*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/import-export/tasks') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 tenants 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/tenants*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/tenants') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tenant-management');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 dept-org 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('部门组织加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 sla-config 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/sla-config*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/sla-config') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('SLA配置加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 file-storage 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/file-storage/attachments/catalog*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('文件存储附件元数据加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 notification-preferences 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/notification-preferences*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/notification-preferences') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('通知偏好只读目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 runtime-monitor 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/approvals/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByText('运行监控加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 flow-definition 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/workflows*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workflows') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-definition');
+    await expect(page.getByText('流程定义加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 form-config 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/form-definitions*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/form-definitions') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('表单配置加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 role-permissions 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/role-permissions/catalog*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('角色权限目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 custom-fields 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/custom-fields*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/custom-fields') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('自定义字段定义目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 menu-permissions 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/role-permissions/catalog*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-menu-permissions');
+    await expect(page.getByText('菜单权限目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 flow-designer 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/workflows*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workflows') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('流程设计器加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 channel-configs 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/channel-configs*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/channel-configs') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('通知渠道只读目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 mail-templates 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/mail-templates/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('邮件模板 catalog 加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 command-center 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/approvals/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('流程控制台只读聚合加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 mail-logs 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/mail-logs/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('邮件日志只读 catalog 加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 mail-gateway 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/mail-gateways*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/mail-gateways') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('邮件网关只读目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 interfaces 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/interfaces*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/interfaces') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-interfaces');
+    await expect(page.getByText('接口数据加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 cache 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/cache/namespaces*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-cache-management');
+    await expect(page.getByText('缓存命名空间加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 vendors 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/vendors/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('供应商加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 locations 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/locations/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('位置加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 field-mapping 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/field-mappings*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/field-mappings') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText('字段映射加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 sync-rules 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/sync-rules*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/sync-rules') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('同步规则加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 numbering-rules 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/numbering-rules*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/numbering-rules') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('编号规则只读目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 posts 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/posts*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/posts') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('岗位只读目录加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 users 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/user-management/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-user-management');
+    await expect(page.getByText('用户列表加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 audit-log 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/audit-logs*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/audit-logs') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('审计日志加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 asset-category 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/categories/list*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-asset-category');
+    await expect(page.getByText('资产分类加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 form-storage 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/form-storage*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/form-storage') {
+        await apiRoute.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-storage');
+    await expect(page.getByText('表单存储加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3 data-permissions 失败显示脱敏错误', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/data-permissions/catalog*', async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
+    });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('敏感细节已脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
 });
 
 async function seedAuthenticatedSession(page: Page) {

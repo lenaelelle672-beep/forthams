@@ -53,4 +53,4 @@ See `.trellis/spec/dwk/dev-runtime.md`. Probe health, start missing frontend/bac
 - 空态/403/失败态：`src/e2e/app-pages-empty-error.spec.ts`。失败态只测页面会渲染「加载失败」的路径；Dashboard KPI 失败不显示该文案，不要硬断言。
 - 登录变体：`src/e2e/login-variants-smoke.spec.ts`。`/login5` 走 `Login4Page` 且 h1 可能不是 role=heading，用 `region` landmark「UNIVIEW 固定资产平台登录」。
 - `locations`/`departments` 树展平必须 `Array.isArray` 再 `for...of`（`InventoryDetailPage`）；`paged({})` 当树会 `items is not iterable`。
-- 列表页 `data.records` 必须 `Array.isArray` 后再给表格（许可证/设备/备件/供应商/领用/借用/入库/采购/制造商/检验列表）。`records` 为对象时 heading 仍在、无 pageerror。
+- 列表页 `data.records` 必须 `Array.isArray` 后再给表格（许可证/设备/备件/供应商/领用/借用/入库/采购/制造商/检验/折旧/合同/报表/菜单树/部门树）。`records` 为对象时 heading 仍在、无 pageerror。桌面 e2e：`app-pages-smoke` grep `records 非数组`（不含 `/m`）。

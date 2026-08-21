@@ -212,7 +212,13 @@ export default function DepreciationListPage() {
       if (methodFilter)  filters.method  = methodFilter;
       const res = await getDepreciationSchedules(filters);
       const seenIds = new Set<number>();
-      const deduped = res.data.filter(item => {
+      const pageRes = res as { data?: DepreciationScheduleItem[]; records?: DepreciationScheduleItem[] };
+      const rows: DepreciationScheduleItem[] = Array.isArray(pageRes.data)
+        ? pageRes.data
+        : Array.isArray(pageRes.records)
+          ? pageRes.records
+          : [];
+      const deduped = rows.filter(item => {
         if (seenIds.has(item.id)) return false;
         seenIds.add(item.id);
         return true;

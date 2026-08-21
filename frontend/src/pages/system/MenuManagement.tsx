@@ -293,12 +293,14 @@ export default function MenuManagement() {
   const handleEdit = (item: MenuItem) => { setEditing(item); setFormOpen(true); };
   const handleNew = () => { setEditing(null); setFormOpen(true); };
 
-  const flattenTree = (items: MenuItem[], depth = 0): (MenuItem & { _depth: number })[] =>
-    items.flatMap((item) => {
+  const flattenTree = (items: MenuItem[], depth = 0): (MenuItem & { _depth: number })[] => {
+    if (!Array.isArray(items)) return [];
+    return items.flatMap((item) => {
       const r: (MenuItem & { _depth: number })[] = [{ ...item, _depth: depth }];
       if (item.children) r.push(...flattenTree(item.children, depth + 1));
       return r;
     });
+  };
 
   const displayData = menuTree ? flattenTree(menuTree) : [];
   const flatParentList = menuTree ? flattenTree(menuTree) : [];
