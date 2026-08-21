@@ -880,4 +880,5 @@
 | Q1690 | done | 桌面空态 **3 passed**（/system/roles 点新增保存取消与空表）。禁 /m。 |
 | Q1691 | done | 桌面空态 **3 passed**（/system/roles 点新增展开数据权限选项）。禁 /m。 |
 | Q1692 | done | 桌面空态 **3 passed**（角色仅本人、部门确认新增取消）。禁 /m。 |
-| Q1693 | in_progress | 桌面空态：/system/posts 点新增「保存」。禁 /m。 |
+| Q1693 | done | 桌面空态 **3 passed**（/system/posts 点新增确认取消标题）。禁 /m。 |
+| Q1694 | in_progress | 桌面空态：未覆盖桌面页继续。禁 /m。 |

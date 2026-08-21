@@ -6847,6 +6847,37 @@ test.describe('Q1692 桌面角色部门空态', () => {
   });
 });
 
+test.describe('Q1693 桌面岗位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/posts 点新增岗位「确认新增」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await page.getByRole('button', { name: '新增岗位' }).click();
+    await expect(page.getByRole('button', { name: '确认新增' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/posts 点新增岗位「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await page.getByRole('button', { name: '新增岗位' }).click();
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/posts 点新增岗位「新增岗位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await page.getByRole('button', { name: '新增岗位' }).click();
+    await expect(page.getByText('新增岗位').nth(1)).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
