@@ -1800,6 +1800,34 @@ test.describe('Q1517 桌面 TCO 查询空态', () => {
   });
 });
 
+test.describe('Q1518 桌面列表搜索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/manufacturers 空态「搜索名称/编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await expect(page.getByPlaceholder('搜索名称/编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/contracts 空态「搜索合同名称/编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await expect(page.getByPlaceholder('搜索合同名称/编号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances 空态「保单号/保险名称/保险公司」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances');
+    await expect(page.getByPlaceholder('保单号/保险名称/保险公司').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
