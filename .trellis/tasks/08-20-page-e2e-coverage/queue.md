@@ -677,4 +677,5 @@
 | Q1487 | done | 桌面空态 CTA **3 passed**（/maintenance/plans「新建计划」、/vendors「新增供应商」、/purchase-orders「新增采购单」）。禁 /m。 |
 | Q1488 | done | 桌面空态 CTA **3 passed**（/manufacturers「新增制造商」、/contracts「新增合同」、/asset-models「新增模型」）。禁 /m。 |
 | Q1489 | done | 桌面空态 CTA **3 passed**（/licenses「新增许可证」、/fault-codes「新增根节点」、/floorplans 按钮「新建」）。禁 /m。 |
-| Q1490 | in_progress | 桌面空态 CTA：/inventory「新建任务」、/inventory/cycle-count「新增规则」、/categories「添加分类」。禁 /m。 |
+| Q1490 | done | 桌面空态 CTA **3 passed**（/inventory「新建任务」、/inventory/cycle-count「新增规则」、/categories「添加根分类」）。EmptyState「添加分类」不可达。禁 /m。 |
+| Q1491 | in_progress | 桌面空态 CTA：/inspection-templates「新增模板」、/reports/scheduled「新建定时报表」、/inspection-records「新增检验」。禁 /m。 |
