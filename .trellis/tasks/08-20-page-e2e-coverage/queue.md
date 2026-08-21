@@ -707,4 +707,5 @@
 | Q1517 | done | 桌面空态 **3 passed**（/analytics/tco placeholder「输入资产ID」「输入部门ID」「输入分类ID」）。禁 /m。 |
 | Q1518 | done | 桌面空态 **3 passed**（/manufacturers「搜索名称/编码」、/contracts「搜索合同名称/编号」、/insurances 搜索 placeholder）。禁 /m。 |
 | Q1519 | done | 桌面空态 **3 passed**（/asset-models「搜索名称 / 型号」、/assignments「搜索编号、名称...」、/borrows「搜索用途/备注...」）。禁 /m。 |
-| Q1520 | in_progress | 桌面空态：/approvals「搜索编号、标题或发起人」、/maintenance「按资产ID搜索...」、/maintenance/plans「搜索计划名称...」。禁 /m。 |
+| Q1520 | done | 桌面空态 **3 passed**（/approvals「搜索编号、标题或发起人」、/maintenance「按资产ID搜索...」、/maintenance/plans「搜索计划名称...」）。禁 /m。 |
+| Q1521 | in_progress | 桌面空态：/licenses「搜索软件名称/厂商」、/spare-parts「搜索备件编码/名称...」、/audit「搜索操作记录...」。禁 /m。 |
