@@ -1492,6 +1492,34 @@ test.describe('Q1506 桌面 ABC/闲置空态', () => {
   });
 });
 
+test.describe('Q1507 桌面大屏空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen 空态「资产运营分析平台」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('资产运营分析平台').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('webgl'))).toEqual([]);
+  });
+
+  test('/bigscreen 空态「值班领导」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('值班领导').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('webgl'))).toEqual([]);
+  });
+
+  test('/bigscreen 空态「值班经理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('值班经理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('webgl'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
