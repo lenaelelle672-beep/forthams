@@ -3780,6 +3780,1627 @@ test.describe('Q167 详情失败态独立', () => {
   });
 });
 
+test.describe('Q168 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/14/edit',
+    '/borrows/14/edit',
+    '/inspections/14/edit',
+    '/inventory/scan/RFID-12',
+    '/safety-checklists/execute/12',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q169 详情失败态独立', () => {
+  test('/workorders/3/acceptance 失败显示工单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/workorders/3'));
+    await seedSession(page, adminUser);
+    await page.goto('/workorders/3/acceptance');
+    await expect(page.getByText('工单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/assets/4 失败显示获取数据失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/assets/4');
+    await expect(page.getByText('获取数据失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/m/assets/4 失败显示资产加载失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/mobile/assets/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/m/assets/4');
+    await expect(page.getByText('资产加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/spare-parts/4 失败显示备件不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/spare-parts/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/spare-parts/4');
+    await expect(page.getByText('备件不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/budgets/4 失败显示未找到预算信息', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/budgets/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/budgets/4');
+    await expect(page.getByText('未找到预算信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q170 详情失败态独立', () => {
+  test('/compensation/2 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/compensation/2'));
+    await seedSession(page, adminUser);
+    await page.goto('/compensation/2');
+    await expect(page.getByText('资产赔偿申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/stocktaking-cycles/2 失败显示盘点周期不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/stocktaking/cycles/2'));
+    await seedSession(page, adminUser);
+    await page.goto('/stocktaking-cycles/2');
+    await expect(page.getByText('盘点周期不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败') && !item.includes('获取盘点周期'))).toEqual([]);
+  });
+
+  test('/workorders/2 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/workorders/2'));
+    await seedSession(page, adminUser);
+    await page.goto('/workorders/2');
+    await expect(page.getByText('工单详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/inspections/3/upload 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/inspections/3'));
+    await seedSession(page, adminUser);
+    await page.goto('/inspections/3/upload');
+    await expect(page.getByText('检验照片上传').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => item !== '获取数据失败')).toEqual([]);
+  });
+
+  test('/inventory/tasks/3 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/inventory/tasks/3'));
+    await seedSession(page, adminUser);
+    await page.goto('/inventory/tasks/3');
+    await expect(page.getByText(/盘点详情|盘点/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q171 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/15/edit',
+    '/borrows/15/edit',
+    '/inspections/15/edit',
+    '/inventory/scan/RFID-13',
+    '/safety-checklists/execute/13',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q172 详情失败态独立', () => {
+  test('/insurances/4 失败显示未找到保险记录', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/insurance/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/insurances/4');
+    await expect(page.getByText('未找到保险记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/audit/4 失败显示未找到该审计记录', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/audit-logs/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/audit/4');
+    await expect(page.getByText('未找到该审计记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/retirement/4 失败显示未找到该退役申请记录', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/retirement/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/retirement/4');
+    await expect(page.getByText('未找到该退役申请记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/approvals/4 失败显示工单不存在或已删除', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/approvals/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/approvals/4');
+    await expect(page.getByText('工单不存在或已删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/disposals/4 失败显示加载失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/retirement/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/disposals/4');
+    await expect(page.getByText('加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q173 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/16/edit',
+    '/borrows/16/edit',
+    '/inspections/16/edit',
+    '/inventory/scan/RFID-14',
+    '/safety-checklists/execute/14',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q174 详情失败态独立', () => {
+  test('/intake/4 失败显示验收单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/intake-orders/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/intake/4');
+    await expect(page.getByText('验收单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/borrows/4 失败显示借用单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/borrows/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/borrows/4');
+    await expect(page.getByText('借用单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/assignments/4 失败显示领用单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assignments/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/assignments/4');
+    await expect(page.getByText('领用单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/inspections/4 失败显示检验记录不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/inspections/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/inspections/4');
+    await expect(page.getByText('检验记录不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/workorders/4/acceptance 失败显示工单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/workorders/4'));
+    await seedSession(page, adminUser);
+    await page.goto('/workorders/4/acceptance');
+    await expect(page.getByText('工单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q175 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/17/edit',
+    '/borrows/17/edit',
+    '/inspections/17/edit',
+    '/inventory/scan/RFID-15',
+    '/safety-checklists/execute/15',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q176 详情失败态独立', () => {
+  test('/assets/5 失败显示获取数据失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/assets/5');
+    await expect(page.getByText('获取数据失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/m/assets/5 失败显示资产加载失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/mobile/assets/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/m/assets/5');
+    await expect(page.getByText('资产加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/spare-parts/5 失败显示备件不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/spare-parts/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/spare-parts/5');
+    await expect(page.getByText('备件不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/budgets/5 失败显示未找到预算信息', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/budgets/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/budgets/5');
+    await expect(page.getByText('未找到预算信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/insurances/5 失败显示未找到保险记录', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/insurance/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/insurances/5');
+    await expect(page.getByText('未找到保险记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q177 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/18/edit',
+    '/borrows/18/edit',
+    '/inspections/18/edit',
+    '/inventory/scan/RFID-16',
+    '/safety-checklists/execute/16',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q178 详情失败态独立', () => {
+  test('/audit/5 失败显示未找到该审计记录', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/audit-logs/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/audit/5');
+    await expect(page.getByText('未找到该审计记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/retirement/5 失败显示未找到该退役申请记录', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/retirement/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/retirement/5');
+    await expect(page.getByText('未找到该退役申请记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/approvals/5 失败显示工单不存在或已删除', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/approvals/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/approvals/5');
+    await expect(page.getByText('工单不存在或已删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/disposals/5 失败显示加载失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/retirement/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/disposals/5');
+    await expect(page.getByText('加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/intake/5 失败显示验收单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/intake-orders/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/intake/5');
+    await expect(page.getByText('验收单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q179 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/19/edit',
+    '/borrows/19/edit',
+    '/inspections/19/edit',
+    '/inventory/scan/RFID-17',
+    '/safety-checklists/execute/17',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q180 详情失败态独立', () => {
+  test('/borrows/5 失败显示借用单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/borrows/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/borrows/5');
+    await expect(page.getByText('借用单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/assignments/5 失败显示领用单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assignments/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/assignments/5');
+    await expect(page.getByText('领用单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/inspections/5 失败显示检验记录不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/inspections/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/inspections/5');
+    await expect(page.getByText('检验记录不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/workorders/5/acceptance 失败显示工单不存在', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/workorders/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/workorders/5/acceptance');
+    await expect(page.getByText('工单不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/m/stocktaking-tasks/5 失败显示获取任务失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/stocktaking/tasks/5'));
+    await seedSession(page, adminUser);
+    await page.goto('/m/stocktaking-tasks/5');
+    await expect(page.getByText('获取任务失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('获取数据失败') && !item.includes('获取任务失败'))).toEqual([]);
+  });
+});
+
+test.describe('Q181 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/20/edit',
+    '/borrows/20/edit',
+    '/inspections/20/edit',
+    '/inventory/scan/RFID-18',
+    '/safety-checklists/execute/18',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q182 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/21/edit',
+    '/workorders/13/acceptance',
+    '/risk-assessments/9/edit',
+    '/inspections/12/upload',
+    '/inventory/smart-report/INV-006',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q183 USER 403 独立', () => {
+  for (const path of [
+    '/borrows/21/edit',
+    '/inspections/21/edit',
+    '/inventory/scan/RFID-19',
+    '/safety-checklists/execute/19',
+    '/workorders/14/acceptance',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q184 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/22/edit',
+    '/borrows/22/edit',
+    '/inspections/22/edit',
+    '/inventory/scan/RFID-20',
+    '/safety-checklists/execute/20',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q185 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/23/edit',
+    '/borrows/23/edit',
+    '/inspections/23/edit',
+    '/inventory/scan/RFID-21',
+    '/safety-checklists/execute/21',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q186 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/24/edit',
+    '/borrows/24/edit',
+    '/inspections/24/edit',
+    '/inventory/scan/RFID-22',
+    '/safety-checklists/execute/22',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q187 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/25/edit',
+    '/borrows/25/edit',
+    '/inspections/25/edit',
+    '/inventory/scan/RFID-23',
+    '/safety-checklists/execute/23',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q188 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/26/edit',
+    '/borrows/26/edit',
+    '/inspections/26/edit',
+    '/inventory/scan/RFID-24',
+    '/safety-checklists/execute/24',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q189 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/27/edit',
+    '/borrows/27/edit',
+    '/inspections/27/edit',
+    '/inventory/scan/RFID-25',
+    '/safety-checklists/execute/25',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q190 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/28/edit',
+    '/borrows/28/edit',
+    '/inspections/28/edit',
+    '/inventory/scan/RFID-26',
+    '/safety-checklists/execute/26',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q191 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/29/edit',
+    '/borrows/29/edit',
+    '/inspections/29/edit',
+    '/inventory/scan/RFID-27',
+    '/safety-checklists/execute/27',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q192 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/30/edit',
+    '/borrows/30/edit',
+    '/inspections/30/edit',
+    '/inventory/scan/RFID-28',
+    '/safety-checklists/execute/28',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q193 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/31/edit',
+    '/borrows/31/edit',
+    '/inspections/31/edit',
+    '/inventory/scan/RFID-29',
+    '/safety-checklists/execute/29',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q194 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/32/edit',
+    '/borrows/32/edit',
+    '/inspections/32/edit',
+    '/inventory/scan/RFID-30',
+    '/safety-checklists/execute/30',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q195 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/33/edit',
+    '/borrows/33/edit',
+    '/inspections/33/edit',
+    '/inventory/scan/RFID-31',
+    '/safety-checklists/execute/31',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q196 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/34/edit',
+    '/borrows/34/edit',
+    '/inspections/34/edit',
+    '/inventory/scan/RFID-32',
+    '/safety-checklists/execute/32',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q197 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/35/edit',
+    '/borrows/35/edit',
+    '/inspections/35/edit',
+    '/inventory/scan/RFID-33',
+    '/safety-checklists/execute/33',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q198 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/36/edit',
+    '/borrows/36/edit',
+    '/inspections/36/edit',
+    '/inventory/scan/RFID-34',
+    '/safety-checklists/execute/34',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q199 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/37/edit',
+    '/borrows/37/edit',
+    '/inspections/37/edit',
+    '/inventory/scan/RFID-35',
+    '/safety-checklists/execute/35',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q200 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/38/edit',
+    '/borrows/38/edit',
+    '/inspections/38/edit',
+    '/inventory/scan/RFID-36',
+    '/safety-checklists/execute/36',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q201 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/39/edit',
+    '/borrows/39/edit',
+    '/inspections/39/edit',
+    '/inventory/scan/RFID-37',
+    '/safety-checklists/execute/37',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q202 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/40/edit',
+    '/borrows/40/edit',
+    '/inspections/40/edit',
+    '/inventory/scan/RFID-38',
+    '/safety-checklists/execute/38',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q203 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/41/edit',
+    '/borrows/41/edit',
+    '/inspections/41/edit',
+    '/inventory/scan/RFID-39',
+    '/safety-checklists/execute/39',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q204 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/42/edit',
+    '/borrows/42/edit',
+    '/inspections/42/edit',
+    '/inventory/scan/RFID-40',
+    '/safety-checklists/execute/40',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q205 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/43/edit',
+    '/borrows/43/edit',
+    '/inspections/43/edit',
+    '/inventory/scan/RFID-41',
+    '/safety-checklists/execute/41',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q206 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/44/edit',
+    '/borrows/44/edit',
+    '/inspections/44/edit',
+    '/inventory/scan/RFID-42',
+    '/safety-checklists/execute/42',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q207 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/45/edit',
+    '/borrows/45/edit',
+    '/inspections/45/edit',
+    '/inventory/scan/RFID-43',
+    '/safety-checklists/execute/43',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q208 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/46/edit',
+    '/borrows/46/edit',
+    '/inspections/46/edit',
+    '/inventory/scan/RFID-44',
+    '/safety-checklists/execute/44',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q209 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/47/edit',
+    '/borrows/47/edit',
+    '/inspections/47/edit',
+    '/inventory/scan/RFID-45',
+    '/safety-checklists/execute/45',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q210 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/48/edit',
+    '/borrows/48/edit',
+    '/inspections/48/edit',
+    '/inventory/scan/RFID-46',
+    '/safety-checklists/execute/46',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q211 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/49/edit',
+    '/borrows/49/edit',
+    '/inspections/49/edit',
+    '/inventory/scan/RFID-47',
+    '/safety-checklists/execute/47',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q212 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/50/edit',
+    '/borrows/50/edit',
+    '/inspections/50/edit',
+    '/inventory/scan/RFID-48',
+    '/safety-checklists/execute/48',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q213 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/51/edit',
+    '/borrows/51/edit',
+    '/inspections/51/edit',
+    '/inventory/scan/RFID-49',
+    '/safety-checklists/execute/49',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q214 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/52/edit',
+    '/borrows/52/edit',
+    '/inspections/52/edit',
+    '/inventory/scan/RFID-50',
+    '/safety-checklists/execute/50',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q215 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/53/edit',
+    '/borrows/53/edit',
+    '/inspections/53/edit',
+    '/inventory/scan/RFID-51',
+    '/safety-checklists/execute/51',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q216 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/54/edit',
+    '/borrows/54/edit',
+    '/inspections/54/edit',
+    '/inventory/scan/RFID-52',
+    '/safety-checklists/execute/52',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q217 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/55/edit',
+    '/borrows/55/edit',
+    '/inspections/55/edit',
+    '/inventory/scan/RFID-53',
+    '/safety-checklists/execute/53',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q218 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/56/edit',
+    '/borrows/56/edit',
+    '/inspections/56/edit',
+    '/inventory/scan/RFID-54',
+    '/safety-checklists/execute/54',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q219 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/57/edit',
+    '/borrows/57/edit',
+    '/inspections/57/edit',
+    '/inventory/scan/RFID-55',
+    '/safety-checklists/execute/55',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q220 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/58/edit',
+    '/borrows/58/edit',
+    '/inspections/58/edit',
+    '/inventory/scan/RFID-56',
+    '/safety-checklists/execute/56',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q221 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/59/edit',
+    '/borrows/59/edit',
+    '/inspections/59/edit',
+    '/inventory/scan/RFID-57',
+    '/safety-checklists/execute/57',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q222 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/60/edit',
+    '/borrows/60/edit',
+    '/inspections/60/edit',
+    '/inventory/scan/RFID-58',
+    '/safety-checklists/execute/58',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q223 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/61/edit',
+    '/borrows/61/edit',
+    '/inspections/61/edit',
+    '/inventory/scan/RFID-59',
+    '/safety-checklists/execute/59',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q224 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/62/edit',
+    '/borrows/62/edit',
+    '/inspections/62/edit',
+    '/inventory/scan/RFID-60',
+    '/safety-checklists/execute/60',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q225 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/63/edit',
+    '/borrows/63/edit',
+    '/inspections/63/edit',
+    '/inventory/scan/RFID-61',
+    '/safety-checklists/execute/61',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q226 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/64/edit',
+    '/borrows/64/edit',
+    '/inspections/64/edit',
+    '/inventory/scan/RFID-62',
+    '/safety-checklists/execute/62',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q227 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/65/edit',
+    '/borrows/65/edit',
+    '/inspections/65/edit',
+    '/inventory/scan/RFID-63',
+    '/safety-checklists/execute/63',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q228 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/66/edit',
+    '/borrows/66/edit',
+    '/inspections/66/edit',
+    '/inventory/scan/RFID-64',
+    '/safety-checklists/execute/64',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q229 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/67/edit',
+    '/borrows/67/edit',
+    '/inspections/67/edit',
+    '/inventory/scan/RFID-65',
+    '/safety-checklists/execute/65',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q230 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/68/edit',
+    '/borrows/68/edit',
+    '/inspections/68/edit',
+    '/inventory/scan/RFID-66',
+    '/safety-checklists/execute/66',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q231 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/69/edit',
+    '/borrows/69/edit',
+    '/inspections/69/edit',
+    '/inventory/scan/RFID-67',
+    '/safety-checklists/execute/67',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q232 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/70/edit',
+    '/borrows/70/edit',
+    '/inspections/70/edit',
+    '/inventory/scan/RFID-68',
+    '/safety-checklists/execute/68',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q233 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/71/edit',
+    '/borrows/71/edit',
+    '/inspections/71/edit',
+    '/inventory/scan/RFID-69',
+    '/safety-checklists/execute/69',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q234 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/72/edit',
+    '/borrows/72/edit',
+    '/inspections/72/edit',
+    '/inventory/scan/RFID-70',
+    '/safety-checklists/execute/70',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q235 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/73/edit',
+    '/borrows/73/edit',
+    '/inspections/73/edit',
+    '/inventory/scan/RFID-71',
+    '/safety-checklists/execute/71',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q236 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/74/edit',
+    '/borrows/74/edit',
+    '/inspections/74/edit',
+    '/inventory/scan/RFID-72',
+    '/safety-checklists/execute/72',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q237 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/75/edit',
+    '/borrows/75/edit',
+    '/inspections/75/edit',
+    '/inventory/scan/RFID-73',
+    '/safety-checklists/execute/73',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q238 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/76/edit',
+    '/borrows/76/edit',
+    '/inspections/76/edit',
+    '/inventory/scan/RFID-74',
+    '/safety-checklists/execute/74',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q239 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/77/edit',
+    '/borrows/77/edit',
+    '/inspections/77/edit',
+    '/inventory/scan/RFID-75',
+    '/safety-checklists/execute/75',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q240 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/78/edit',
+    '/borrows/78/edit',
+    '/inspections/78/edit',
+    '/inventory/scan/RFID-76',
+    '/safety-checklists/execute/76',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q241 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/79/edit',
+    '/borrows/79/edit',
+    '/inspections/79/edit',
+    '/inventory/scan/RFID-77',
+    '/safety-checklists/execute/77',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q242 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/80/edit',
+    '/borrows/80/edit',
+    '/inspections/80/edit',
+    '/inventory/scan/RFID-78',
+    '/safety-checklists/execute/78',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q243 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/81/edit',
+    '/borrows/81/edit',
+    '/inspections/81/edit',
+    '/inventory/scan/RFID-79',
+    '/safety-checklists/execute/79',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q244 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/82/edit',
+    '/borrows/82/edit',
+    '/inspections/82/edit',
+    '/inventory/scan/RFID-80',
+    '/safety-checklists/execute/80',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q245 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/83/edit',
+    '/borrows/83/edit',
+    '/inspections/83/edit',
+    '/inventory/scan/RFID-81',
+    '/safety-checklists/execute/81',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q246 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/84/edit',
+    '/borrows/84/edit',
+    '/inspections/84/edit',
+    '/inventory/scan/RFID-82',
+    '/safety-checklists/execute/82',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q247 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/85/edit',
+    '/borrows/85/edit',
+    '/inspections/85/edit',
+    '/inventory/scan/RFID-83',
+    '/safety-checklists/execute/83',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q248 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/86/edit',
+    '/borrows/86/edit',
+    '/inspections/86/edit',
+    '/inventory/scan/RFID-84',
+    '/safety-checklists/execute/84',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q249 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/87/edit',
+    '/borrows/87/edit',
+    '/inspections/87/edit',
+    '/inventory/scan/RFID-85',
+    '/safety-checklists/execute/85',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q250 USER 403 独立', () => {
+  for (const path of [
+    '/assignments/88/edit',
+    '/borrows/88/edit',
+    '/inspections/88/edit',
+    '/inventory/scan/RFID-86',
+    '/safety-checklists/execute/86',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+});
+
 function collectBrowserErrors(page: Page) {
   const errors: string[] = [];
   const ignored = [
