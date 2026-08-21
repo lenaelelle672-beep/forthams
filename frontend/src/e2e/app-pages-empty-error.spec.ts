@@ -8766,6 +8766,37 @@ test.describe('Q1763 桌面合同空态', () => {
   });
 });
 
+test.describe('Q1764 桌面合同空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/contracts 点新增合同「金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).first().click();
+    await expect(page.getByText('金额', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/contracts 点新增合同「货币」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).first().click();
+    await expect(page.getByText('货币').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/contracts 点新增合同「请输入备注信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).first().click();
+    await expect(page.getByPlaceholder('请输入备注信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

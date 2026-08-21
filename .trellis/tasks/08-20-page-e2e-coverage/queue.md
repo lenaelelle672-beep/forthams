@@ -951,4 +951,5 @@
 | Q1761 | done | 桌面空态 **3 passed**（/vendors 联系人姓名确认与标题）。禁 /m。 |
 | Q1762 | done | 桌面空态 **3 passed**（/vendors 取消、/contracts 合同名称）。禁 /m。 |
 | Q1763 | done | 桌面空态 **3 passed**（/contracts 点新增编号与类型）。禁 /m。 |
-| Q1764 | in_progress | 桌面空态：/contracts 点新增「金额」「货币」「请输入备注信息」。禁 /m。 |
+| Q1764 | done | 桌面空态 **3 passed**（/contracts 点新增金额货币备注）。禁 /m。 |
+| Q1765 | in_progress | 桌面空态：/contracts 点新增「开始日期」「到期日期」「备注」。禁 /m。 |
