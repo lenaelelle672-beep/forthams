@@ -985,4 +985,5 @@
 | Q1795 | done | 桌面空态 **3 passed**（/spare-parts/new 备件编码名称）。禁 /m。 |
 | Q1796 | done | 桌面空态 **3 passed**（/spare-parts/new 名称规格）。禁 /m。 |
 | Q1797 | done | 桌面空态 **3 passed**（/spare-parts/new 计量单位库存）。禁 /m。 |
-| Q1798 | in_progress | 桌面空态：/spare-parts/new「安全库存」「单价」。禁 /m。 |
+| Q1798 | done | 桌面空态 **3 passed**（/spare-parts/new 安全库存单价申请信息）。禁 /m。 |
+| Q1799 | in_progress | 桌面空态：/spare-parts/new「建议补足缺口」「待确认」「预计到货时间」。禁 /m。 |
