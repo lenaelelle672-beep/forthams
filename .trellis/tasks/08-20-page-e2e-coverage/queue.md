@@ -958,4 +958,5 @@
 | Q1768 | done | 桌面空态 **3 passed**（/contracts 点新增展开合同类型）。禁 /m。 |
 | Q1769 | done | 桌面空态 **3 passed**（/contracts 点新增服务合同与状态）。禁 /m。 |
 | Q1770 | done | 桌面空态 **3 passed**（/contracts 点新增到期取消与USD）。禁 /m。 |
-| Q1771 | in_progress | 桌面空态：/contracts「请选择」、点新增「新增合同」。禁 /m。 |
+| Q1771 | done | 桌面空态 **3 passed**（/contracts 合同编号名称类型列）。禁 /m。 |
+| Q1772 | in_progress | 桌面空态：/contracts「金额」「操作」、点新增空提交「请输入合同名称」。禁 /m。 |
