@@ -3659,6 +3659,37 @@ test.describe('Q1583 桌面处置空态', () => {
   });
 });
 
+test.describe('Q1584 桌面处置空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals 点资产调拨「调拨涉及资产归属变更，请核实转入方信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '资产调拨', exact: true }).click();
+    await expect(page.getByText('调拨涉及资产归属变更，请核实转入方信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals 点报废转让「报废操作不可逆，资产将被永久处置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '报废转让', exact: true }).click();
+    await expect(page.getByText('报废操作不可逆，资产将被永久处置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals 点资产赔偿「赔偿涉及财务责任认定，请核实损失金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '资产赔偿', exact: true }).click();
+    await expect(page.getByText('赔偿涉及财务责任认定，请核实损失金额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
