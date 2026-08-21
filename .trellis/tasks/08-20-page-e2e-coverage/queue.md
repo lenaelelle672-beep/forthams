@@ -938,4 +938,5 @@
 | Q1748 | done | 桌面空态 **3 passed**（/manufacturers 点新增说明名称）。禁 /m。 |
 | Q1749 | done | 桌面空态 **3 passed**（/manufacturers 点新增编码联系人）。禁 /m。 |
 | Q1750 | done | 桌面空态 **3 passed**（/manufacturers 点新增电话邮箱）。禁 /m。 |
-| Q1751 | in_progress | 桌面空态：/manufacturers 点新增「官网」。禁 /m。 |
+| Q1751 | done | 桌面空态 **3 passed**（/manufacturers 点新增官网国家）。禁 /m。 |
+| Q1752 | in_progress | 桌面空态：/manufacturers 点新增「地址」。禁 /m。 |

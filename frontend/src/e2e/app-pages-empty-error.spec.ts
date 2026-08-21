@@ -8372,6 +8372,37 @@ test.describe('Q1750 桌面制造商空态', () => {
   });
 });
 
+test.describe('Q1751 桌面制造商空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/manufacturers 点新增制造商「官网」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByText('官网').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商「请输入官网」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByPlaceholder('请输入官网').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商「国家」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByText('国家').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
