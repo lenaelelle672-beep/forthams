@@ -852,4 +852,5 @@
 | Q1662 | done | 桌面空态 **3 passed**（/system/menus 点新增组件路径与状态）。禁 /m。 |
 | Q1663 | done | 桌面空态 **3 passed**（/system/depts「组织架构」、点新增部门名称编码）。禁 /m。 |
 | Q1664 | done | 桌面空态 **3 passed**（/system/depts 点新增上级类型与领导）。禁 /m。 |
-| Q1665 | in_progress | 桌面空态：/system/depts 点新增「秘书」「联系电话」。禁 /m。 |
+| Q1665 | done | 桌面空态 **3 passed**（/system/depts 点新增秘书电话邮箱）。禁 /m。 |
+| Q1666 | in_progress | 桌面空态：/system/depts「新增」按钮与「支持搜索过滤」。禁 /m。 |

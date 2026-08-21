@@ -6018,6 +6018,37 @@ test.describe('Q1664 桌面部门空态', () => {
   });
 });
 
+test.describe('Q1665 桌面部门空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/depts 点新增部门「秘书」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('秘书').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 点新增部门「联系电话」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('联系电话').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 点新增部门「邮箱」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('邮箱').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
