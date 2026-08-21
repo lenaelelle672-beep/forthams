@@ -2081,6 +2081,35 @@ test.describe('Q1527 桌面列表搜索空态', () => {
   });
 });
 
+test.describe('Q1528 桌面弹窗搜索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/menus 点新增菜单「搜索图标...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await page.getByRole('button', { name: '新增菜单' }).click();
+    await expect(page.getByPlaceholder('搜索图标...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 空态「请选择一个部门查看详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await expect(page.getByText('请选择一个部门查看详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/new 空态「请输入资产编号或名称搜索」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('请输入资产编号或名称搜索').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
