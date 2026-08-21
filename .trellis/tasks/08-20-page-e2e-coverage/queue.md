@@ -721,4 +721,5 @@
 | Q1531 | done | 桌面空态 **3 passed**（/workflows「已停用」「全部业务流程」「可用于发起」）。禁 /m。 |
 | Q1532 | done | 桌面空态 **3 passed**（/workflows「待完善发布」「暂停发起」「流程定义」）。禁 /m。 |
 | Q1533 | done | 桌面空态 **3 passed**（/locations「资产存放位置的层级管理」「总位置数」「全部折叠」）。禁 /m。 |
-| Q1534 | in_progress | 桌面空态：/locations「全部展开」「顶级位置」、/system/custom-fields heading。禁 /m。 |
+| Q1534 | done | 桌面空态 **3 passed**（/locations「全部展开」「顶级位置」、/system/custom-fields「自定义字段管理」）。禁 /m。 |
+| Q1535 | in_progress | 桌面空态：/system/custom-fields 副标题、/system/custom-fieldsets heading、/system/posts 副标题或空态补充。禁 /m。 |
