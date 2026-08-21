@@ -2052,6 +2052,35 @@ test.describe('Q1526 桌面列表搜索空态', () => {
   });
 });
 
+test.describe('Q1527 桌面列表搜索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/compensation 空态「搜索资产编号/名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByPlaceholder('搜索资产编号/名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「搜索资产编号或名称...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByPlaceholder('搜索资产编号或名称...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/clearance/new 点添加资产「搜索资产编号、名称、分类...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await page.getByRole('button', { name: '添加资产' }).click();
+    await expect(page.getByPlaceholder('搜索资产编号、名称、分类...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
