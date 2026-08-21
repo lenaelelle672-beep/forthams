@@ -878,4 +878,5 @@
 | Q1688 | done | 桌面空态 **3 passed**（字段 V3 提示、菜单名称、岗位备注）。禁 /m。 |
 | Q1689 | done | 桌面空态 **3 passed**（/system/roles 点新增名称编码描述）。禁 /m。 |
 | Q1690 | done | 桌面空态 **3 passed**（/system/roles 点新增保存取消与空表）。禁 /m。 |
-| Q1691 | in_progress | 桌面空态：/system/roles 点新增「自定义部门」。禁 /m。 |
+| Q1691 | done | 桌面空态 **3 passed**（/system/roles 点新增展开数据权限选项）。禁 /m。 |
+| Q1692 | in_progress | 桌面空态：/system/roles 点新增展开「仅本人」。禁 /m。 |

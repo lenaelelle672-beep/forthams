@@ -6781,6 +6781,40 @@ test.describe('Q1690 桌面角色空态', () => {
   });
 });
 
+test.describe('Q1691 桌面角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/roles 点新增角色「自定义部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '新增角色' }).click();
+    await page.getByText('全部数据').first().click();
+    await expect(page.getByText('自定义部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/roles 点新增角色「本部门数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '新增角色' }).click();
+    await page.getByText('全部数据').first().click();
+    await expect(page.getByText('本部门数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/roles 点新增角色「本部门及以下」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '新增角色' }).click();
+    await page.getByText('全部数据').first().click();
+    await expect(page.getByText('本部门及以下').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
