@@ -743,4 +743,5 @@
 | Q1553 | done | 桌面空态 **3 passed**（/analytics/health「不健康资产 Top 20」、/analytics/reliability「平均故障间隔」「平均修复时间」）。禁 /m。 |
 | Q1554 | done | 桌面空态 **3 passed**（/analytics/reliability「设备可用率」「月均故障率」「总故障 0 次」）。禁 /m。 |
 | Q1555 | done | 桌面空态 **3 passed**（/analytics/reliability「MTBF/MTTR 趋势」「资产可靠性排名」「可用性」）。禁 /m。 |
-| Q1556 | in_progress | 桌面空态：/analytics 仪表盘未覆盖说明。禁 /m。 |
+| Q1556 | done | 桌面空态 **3 passed**（/analytics「多维资产趋势、分类结构与运营指标分析」「资产总数」「本月维保」）。禁 /m。 |
+| Q1557 | in_progress | 桌面空态：/analytics「资产总值」「待审批」「数据范围」。禁 /m。 |
