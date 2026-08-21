@@ -8248,6 +8248,37 @@ test.describe('Q1746 桌面位置空态', () => {
   });
 });
 
+test.describe('Q1747 桌面位置空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/locations 点新增顶级位置「位置编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await page.getByRole('button', { name: '新增顶级位置' }).first().click();
+    await expect(page.getByText('位置编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/locations 点新增顶级位置「如 RD-A-3F」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await page.getByRole('button', { name: '新增顶级位置' }).first().click();
+    await expect(page.getByPlaceholder('如 RD-A-3F').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/locations 点新增顶级位置「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await page.getByRole('button', { name: '新增顶级位置' }).first().click();
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

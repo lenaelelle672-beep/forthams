@@ -934,4 +934,5 @@
 | Q1744 | done | 桌面空态 **3 passed**（分类编码校验与标题）。禁 /m。 |
 | Q1745 | done | 桌面空态 **3 passed**（/locations 标题空表与新增位置）。禁 /m。 |
 | Q1746 | done | 桌面空态 **3 passed**（/locations 点新增名称占位确认）。禁 /m。 |
-| Q1747 | in_progress | 桌面空态：/locations 点新增「位置编码」。禁 /m。 |
+| Q1747 | done | 桌面空态 **3 passed**（/locations 点新增编码占位取消）。禁 /m。 |
+| Q1748 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
