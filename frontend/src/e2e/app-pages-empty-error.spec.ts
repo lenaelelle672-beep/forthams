@@ -589,6 +589,35 @@ test.describe('Q1475 桌面描述空态', () => {
   });
 });
 
+test.describe('Q1476 桌面描述空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis 空态「没有已定位的资产可在地图上显示」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByText('没有已定位的资产可在地图上显示').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 点系统空态「当前筛选条件下没有通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await page.getByRole('button', { name: '系统通知', exact: true }).click();
+    await expect(page.getByText('当前筛选条件下没有通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/energy 空态「尚未采集到能耗数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/energy');
+    await expect(page.getByText('尚未采集到能耗数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

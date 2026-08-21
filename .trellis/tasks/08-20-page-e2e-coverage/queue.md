@@ -663,4 +663,5 @@
 | Q1473 | done | 桌面空态 **3 passed**（/compensation/new「暂无可选部门」、/sam 点查看详情「暂无详情」、/system/roles 点菜单权限「暂无菜单数据」）。DialogTitle console 忽略。禁 /m。 |
 | Q1474 | done | 桌面空态 **3 passed**（/system/roles 点数据权限「暂无部门数据」、/assets/1/timeline「该资产暂无任何履历事件」、/floorplans「请新建平面图」）。领用/借用 option hidden。禁 /m。 |
 | Q1475 | done | 桌面空态 **3 passed**（/assets「未找到符合条件的资产记录…」、/approvals「当前没有待处理的审批事项」、/notifications「所有通知都会显示在这里」）。禁 /m。 |
-| Q1476 | in_progress | 桌面空态：/gis「没有已定位的资产可在地图上显示」、/notifications 点系统「当前筛选条件下没有通知」、/energy「尚未采集到能耗数据」。禁 /m。 |
+| Q1476 | done | 桌面空态 **3 passed**（/gis「没有已定位的资产可在地图上显示」、/notifications 点系统通知「当前筛选条件下没有通知」、/energy「尚未采集到能耗数据」）。禁 /m。 |
+| Q1477 | in_progress | 桌面空态：/sam 图表描述「执行合规扫描后显示许可类型分布」「执行合规扫描后显示席位使用率」「所有许可合规运行」。禁 /m。 |
