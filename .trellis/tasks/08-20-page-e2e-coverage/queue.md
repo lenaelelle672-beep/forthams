@@ -726,4 +726,5 @@
 | Q1536 | done | 桌面空态 **3 passed**（/system/posts「岗位总量」「正常」「停用」）。禁 /m。 |
 | Q1537 | done | 桌面空态 **3 passed**（/fault-codes「故障树」「三级故障编码体系」「现象 → 原因 → 措施」）。禁 /m。 |
 | Q1538 | done | 桌面空态 **3 passed**（/fault-codes「节点总数」「故障现象」「故障原因」）。禁 /m。 |
-| Q1539 | in_progress | 桌面空态：/fault-codes「解决措施」、/notifications 未覆盖说明。禁 /m。 |
+| Q1539 | done | 桌面空态 **3 passed**（/fault-codes「解决措施」、/notifications「审批通知」「预警通知」）。禁 /m。 |
+| Q1540 | in_progress | 桌面空态：/notifications「共 0 条通知」「系统通知」、/reports 未覆盖说明。禁 /m。 |

@@ -2390,6 +2390,34 @@ test.describe('Q1538 桌面故障码空态', () => {
   });
 });
 
+test.describe('Q1539 桌面故障码/通知空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fault-codes 空态「解决措施」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByText('解决措施').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「审批通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('审批通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「预警通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('预警通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
