@@ -947,4 +947,5 @@
 | Q1757 | done | 桌面空态 **3 passed**（制造商管理、供应商名称）。禁 /m。 |
 | Q1758 | done | 桌面空态 **3 passed**（/vendors 点新增编码联系人）。禁 /m。 |
 | Q1759 | done | 桌面空态 **3 passed**（/vendors 点新增电话邮箱）。禁 /m。 |
-| Q1760 | in_progress | 桌面空态：/vendors 点新增「地址」。禁 /m。 |
+| Q1760 | done | 桌面空态 **3 passed**（/vendors 点新增地址邮箱占位）。禁 /m。 |
+| Q1761 | in_progress | 桌面空态：/vendors 点新增「请输入联系人姓名」。禁 /m。 |
