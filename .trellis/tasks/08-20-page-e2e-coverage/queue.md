@@ -795,4 +795,5 @@
 | Q1605 | done | 桌面空态 **3 passed**（/audit「今日操作」「活跃用户」「风险事件」）。禁 /m。 |
 | Q1606 | done | 桌面空态 **3 passed**（/audit「操作趋势（近7天）」「操作类型分布」「最近操作」）。禁 /m。 |
 | Q1607 | done | 桌面空态 **3 passed**（/approvals「待我审批」「我发起的」「已驳回」）。禁 /m。 |
-| Q1608 | in_progress | 桌面空态：/approvals「审批」badge 与发起申请后空态。禁 /m。 |
+| Q1608 | done | 桌面空态 **3 passed**（/approvals「审批」「待审批」「已通过」）。禁 /m。 |
+| Q1609 | in_progress | 桌面空态：/borrow 未覆盖说明。禁 /m。 |
