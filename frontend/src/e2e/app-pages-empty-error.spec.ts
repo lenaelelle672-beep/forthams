@@ -8040,6 +8040,29 @@ test.describe('Q1739 桌面登录分析空态', () => {
   });
 });
 
+test.describe('Q1740 桌面SSO空态', () => {
+  test('/sso-callback 空态「Token 缺失，SSO 登录失败」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('Token 缺失，SSO 登录失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sso-callback 空态「返回登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('返回登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「欢迎回来」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('欢迎回来').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
