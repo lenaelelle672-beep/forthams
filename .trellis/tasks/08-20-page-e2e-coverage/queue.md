@@ -873,4 +873,5 @@
 | Q1683 | done | 桌面空态 **3 passed**（/403 角色缺失说明、/forbidden）。禁 /m。 |
 | Q1684 | done | 桌面空态 **3 passed**（/forbidden 权限说明与返回按钮）。禁 /m。 |
 | Q1685 | done | 桌面空态 **3 passed**（/forbidden 联系管理员与角色缺失）。禁 /m。 |
-| Q1686 | in_progress | 桌面空态：/forbidden?reason=roles_missing 剩余说明。禁 /m。 |
+| Q1686 | done | 桌面空态 **3 passed**（forbidden 角色缺失、/analytics「数据分析」）。禁 /m。 |
+| Q1687 | in_progress | 桌面空态：/analytics「暂无部门排行数据」。禁 /m。 |
