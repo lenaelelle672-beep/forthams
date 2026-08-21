@@ -695,4 +695,5 @@
 | Q1505 | done | 桌面空态 **3 passed**（ABC「B 类资产」「C 类资产」、确认框正文）。禁 /m。 |
 | Q1506 | done | 桌面空态 **3 passed**（ABC 确认时长提示、「总价值」、/idle「闲置天数」）。禁 /m。 |
 | Q1507 | done | 桌面空态 **3 passed**（/bigscreen「资产运营分析平台」「值班领导」「值班经理」）。WebGL console 忽略。禁 /m。 |
-| Q1508 | in_progress | 桌面空态：/bigscreen 更多 KPI/面板标题。禁 /m、禁 workbenchv3。 |
+| Q1508 | done | 桌面空态 **3 passed**（/bigscreen「资产运行分析」「今日资产信息」「资产异常分析」）。禁 /m。 |
+| Q1509 | in_progress | 桌面空态：/bigscreen「今日不正常情况明细」「收入运力信息」「人员信息」。禁 /m。 |
