@@ -892,4 +892,5 @@
 | Q1702 | done | 桌面空态 **3 passed**（/reports 待处理工单与财务描述）。禁 /m。 |
 | Q1703 | done | 桌面空态 **3 passed**（/reports 财务运维工单描述）。禁 /m。 |
 | Q1704 | done | 桌面空态 **3 passed**（/reports 退役工单描述与导出 CSV）。禁 /m。 |
-| Q1705 | in_progress | 桌面空态：/reports「导出 PDF」。禁 /m。 |
+| Q1705 | done | 桌面空态 **3 passed**（/reports 导出PDF、报表中心、副标题）。禁 /m。 |
+| Q1706 | in_progress | 桌面空态：/reports「近 6 个月」。禁 /m。 |
