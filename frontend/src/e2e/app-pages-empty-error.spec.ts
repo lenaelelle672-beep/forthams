@@ -8188,6 +8188,35 @@ test.describe('Q1744 桌面分类空态', () => {
   });
 });
 
+test.describe('Q1745 桌面位置空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/locations 空态「位置管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await expect(page.getByText('位置管理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/locations 空态「暂无位置数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await expect(page.getByText('暂无位置数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/locations 点新增顶级位置「新增位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await page.getByRole('button', { name: '新增顶级位置' }).first().click();
+    await expect(page.getByText('新增位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
