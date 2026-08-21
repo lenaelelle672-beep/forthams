@@ -945,4 +945,5 @@
 | Q1755 | done | 桌面空态 **3 passed**（/manufacturers 编码联系人电话列）。禁 /m。 |
 | Q1756 | done | 桌面空态 **3 passed**（/manufacturers 国家状态操作列）。禁 /m。 |
 | Q1757 | done | 桌面空态 **3 passed**（制造商管理、供应商名称）。禁 /m。 |
-| Q1758 | in_progress | 桌面空态：/vendors 点新增剩余字段。禁 /m。 |
+| Q1758 | done | 桌面空态 **3 passed**（/vendors 点新增编码联系人）。禁 /m。 |
+| Q1759 | in_progress | 桌面空态：/vendors 点新增「联系电话」。禁 /m。 |
