@@ -6606,6 +6606,34 @@ test.describe('Q1684 桌面forbidden空态', () => {
   });
 });
 
+test.describe('Q1685 桌面forbidden空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/forbidden 空态「请联系管理员获取相应角色权限后再尝试访问」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden');
+    await expect(page.getByText('请联系管理员获取相应角色权限后再尝试访问').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden?reason=roles_missing 空态「用户信息不完整」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByText('用户信息不完整').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden?reason=roles_missing 空态「重新登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByText('重新登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
