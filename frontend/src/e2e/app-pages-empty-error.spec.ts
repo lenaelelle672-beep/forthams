@@ -902,6 +902,34 @@ test.describe('Q1486 桌面 CTA 空态', () => {
   });
 });
 
+test.describe('Q1487 桌面 CTA 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/maintenance/plans 空态「新建计划」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance/plans');
+    await expect(page.getByText('新建计划').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendors 空态「新增供应商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await expect(page.getByText('新增供应商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/purchase-orders 空态「新增采购单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByText('新增采购单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

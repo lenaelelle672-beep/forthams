@@ -674,4 +674,5 @@
 | Q1484 | done | 桌面空态 CTA **3 passed**（/assignments「新建领用单」、/intake「新建验收单」、/assets「新建资产」）。禁 /m。 |
 | Q1485 | done | 桌面空态 CTA **3 passed**（/budgets「新增预算」、/revaluations「新增减值/重估」、/retirement「新建退役申请」）。禁 /m。 |
 | Q1486 | done | 桌面空态 CTA **3 passed**（/inspections「新增检验」、/maintenance「新增维保」、/stocktaking-cycles「新建周期」）。禁 /m。 |
-| Q1487 | in_progress | 桌面空态 CTA：/maintenance/plans、/vendors、/purchase-orders 列表新建按钮。禁 /m。 |
+| Q1487 | done | 桌面空态 CTA **3 passed**（/maintenance/plans「新建计划」、/vendors「新增供应商」、/purchase-orders「新增采购单」）。禁 /m。 |
+| Q1488 | in_progress | 桌面空态 CTA：/manufacturers「新增制造商」、/contracts、/asset-models 列表新建按钮。禁 /m。 |
