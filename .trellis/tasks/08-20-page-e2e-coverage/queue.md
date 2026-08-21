@@ -889,4 +889,5 @@
 | Q1699 | done | 桌面空态 **3 passed**（权限标识、通知中心、全部已读）。禁 /m。 |
 | Q1700 | done | 桌面空态 **3 passed**（/reports 点财务报表折旧分类价值趋势）。禁 /m。 |
 | Q1701 | done | 桌面空态 **3 passed**（/reports 点运维维保退役、工单完成率）。禁 /m。 |
-| Q1702 | in_progress | 桌面空态：/reports 点工单「待处理工单」。禁 /m。 |
+| Q1702 | done | 桌面空态 **3 passed**（/reports 待处理工单与财务描述）。禁 /m。 |
+| Q1703 | in_progress | 桌面空态：/reports 点财务/运维/工单剩余描述。禁 /m。 |
