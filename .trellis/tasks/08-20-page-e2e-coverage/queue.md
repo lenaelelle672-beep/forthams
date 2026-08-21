@@ -622,5 +622,16 @@
 | Q1436 | done | workbenchv3 失败：webhook/todo-fields/approval-rules/switches/security-policy 5 passed |
 | Q1437 | done | workbenchv3 失败：external-systems/base-params/notif-templates/fieldsets 4 passed |
 | Q1438 | done | 桌面 /energy ranking 非数组 1 passed |
-| Q1439 | in_progress | 桌面 /test-results modules 非数组无 pageerror |
+| Q1439 | done | 桌面 /test-results modules 非数组 1 passed（Vite 需重启才吃到 Array.isArray） |
+| Q1440 | done | 桌面 /bigscreen stats 非对象字段 1 passed |
+| Q1441 | done | 桌面 /bigscreen-3d stats 非对象字段 1 passed |
+| Q1442 | done | 桌面 /dashboard trends 非数组 1 passed |
+| Q1443 | in_progress | 桌面 /sam dashboard 非对象无 pageerror |
 | Q1440 | done | 桌面 src/pages records 非数组：energy/tco/compensation/import-export/workflow-designer/spare-parts/1/inspections/1 **7 passed**。修 EnergyDashboardPage assetRanking、SparePartDetailPage usages、InspectionDetailPage history Array.isArray。禁 /m。 |
+| Q1441 | done | 桌面 upload photos / energy assetRanking / safety items / spare usages / WORK_ORDER 失败 **5 passed**。修 InspectionUploadPage photoList、SafetyChecklistExecutionPage items Array.isArray。不抢 Q1439。 |
+| Q1442 | done | 桌面 /inspections/1 photos 非 JSON 数组 1 passed。修 InspectionDetailPage photos 解析。 |
+| Q1443 | done | 桌面 /inspections/1/edit photos 非数组 1 passed。修 InspectionFormPage parsePhotoValue。不抢 bigscreen-3d。 |
+| Q1445 | done | 桌面 /system/users depts/roles/posts 非数组 **3 passed**。修 flattenDepts + roles/posts Array.isArray。不抢 bigscreen-3d。 |
+| Q1446 | done | 桌面 SafetyChecklistTemplate items + History results Array.isArray；config items 非数组 1 passed |
+| Q1447 | in_progress | 桌面 src/pages 未测失败态：/profile 当前用户失败无 pageerror |
+| Q1444 | done | 桌面详情非数组：/gis/assets、scan surplusItems、/audit/1 changes、/workorders/1 attachments、/disposals/1、/budgets/1、/asset-models fieldsets/all、/insurances/1 **8 passed**。修 RFIDScanPage surplus/deficit、useGisAssets Array.isArray。禁 /m、禁 id 空转。 |

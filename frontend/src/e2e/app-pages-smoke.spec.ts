@@ -727,6 +727,39 @@ test.describe('非数组 mock 不崩溃', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/system/users depts tree 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/system/users');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '用户管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users roles 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/roles/all*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/system/users');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '用户管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users posts 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/posts/all*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/system/users');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '用户管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
   test('/safety-checklists/history records 非数组无 pageerror', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.route('**/api/**/safety-checklists/executions*', async (apiRoute) => {
@@ -740,6 +773,17 @@ test.describe('非数组 mock 不崩溃', () => {
     await page.goto('/safety-checklists/history');
     await page.waitForLoadState('domcontentloaded');
     await expect(page.getByRole('heading', { name: '安全检查历史' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/config items 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/safety-checklists/templates/*/items*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/safety-checklists/config');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '安全检查表模板' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -1911,6 +1955,127 @@ test.describe('非数组 mock 不崩溃', () => {
     expect(errors).toEqual([]);
   });
 
+  test('/gis/assets 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/gis/assets*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/gis');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: 'GIS 资产地图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/scan/RFID-1 surplusItems 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/inventory/tasks/*/summary*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        surplusCount: 1,
+        deficitCount: 1,
+        surplusItems: { unexpected: true },
+        deficitItems: { unexpected: true },
+      });
+    });
+    await page.goto('/inventory/scan/RFID-1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: 'RFID扫描任务' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/1 changes 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route(/\/audit-logs\/1(\?|$)/, async (apiRoute) => {
+      await fulfill(apiRoute, {
+        id: 1,
+        operatorName: 'E2E',
+        operationType: 'UPDATE',
+        createdAt: '2026-08-21T00:00:00',
+        changes: { unexpected: true },
+      });
+    });
+    await page.goto('/audit/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '审计日志详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 attachments 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/workorders*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workorders/1') {
+        await fulfill(apiRoute, {
+          title: '工单详情',
+          attachments: { unexpected: true },
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/workorders/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '工单详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/1 records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route(/\/retirement\/1(\?|$)/, async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/disposals/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产处置详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/budgets*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/budgets/1') {
+        await fulfill(apiRoute, { records: { unexpected: true }, budgetYear: 2026 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/budgets/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '预算详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-models custom-fieldsets/all 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/system/custom-fieldsets/all*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/asset-models');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产模型管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route(/\/insurance\/1(\?|$)/, async (apiRoute) => {
+      await fulfill(apiRoute, {
+        id: 1,
+        policyNo: 'POL-001',
+        insuranceName: '财产险',
+        insuranceType: 'PROPERTY',
+        status: 'ACTIVE',
+        premium: 100,
+        coverage: 10000,
+        records: { unexpected: true },
+      });
+    });
+    await page.goto('/insurances/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('保险详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
   test('/test-results modules 非数组无 pageerror', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.route('**/test-reports/data.json', async (route) => {
@@ -1933,6 +2098,39 @@ test.describe('非数组 mock 不崩溃', () => {
     await page.goto('/test-results');
     await page.waitForLoadState('domcontentloaded');
     await expect(page.getByText('测试结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen stats 非对象字段无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/bigscreen/stats*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/bigscreen');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('资产运营分析平台').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen-3d stats 非对象字段无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/bigscreen/stats*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/bigscreen-3d');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('固定资产智慧运营大屏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/dashboard trends 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/dashboard/trends*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/dashboard');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '运营首页' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -1987,21 +2185,52 @@ test.describe('非数组 mock 不崩溃', () => {
 
   test('/workflow-form/WORK_ORDER 失败显示获取数据失败', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.route('**/workflows*', async (apiRoute) => {
-      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
-      if (path === '/workflows' || path.startsWith('/workflows/')) {
-        await apiRoute.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
-        });
-        return;
-      }
-      await mockApi(apiRoute);
+    await page.route(/\/workflows(\/|$|\?)/, async (apiRoute) => {
+      await apiRoute.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: 500, message: '获取数据失败', data: null }),
+      });
     });
     await page.goto('/workflow-form/WORK_ORDER');
     await expect(page.getByText('获取数据失败').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('获取数据失败'))).toEqual([]);
+  });
+
+  test('/inspections/1 photos 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route(/\/api(?:\/v1)?\/inspections\/1(\?|$)/, async (apiRoute) => {
+      await fulfill(apiRoute, {
+        id: 1,
+        inspectionNo: 'INSP-001',
+        assetId: 1,
+        inspectionType: 'ANNUAL',
+        result: 'PASS',
+        photos: { unexpected: true },
+      });
+    });
+    await page.goto('/inspections/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('检验详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/edit photos 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route(/\/api(?:\/v1)?\/inspections\/1(\?|$)/, async (apiRoute) => {
+      await fulfill(apiRoute, {
+        id: 1,
+        inspectionNo: 'INSP-001',
+        assetId: 1,
+        inspectionType: 'ANNUAL',
+        result: 'PASS',
+        photos: { unexpected: true },
+      });
+    });
+    await page.goto('/inspections/1/edit');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('编辑检验记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
   });
 
   test('/energy records 非数组无 pageerror', async ({ page }) => {

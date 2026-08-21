@@ -161,6 +161,7 @@ export default function WorkOrderDetailPage() {
   });
 
   const { workOrder, approvalRecords } = resolveWorkOrderDetail(res as unknown as WorkOrderDetailPayload | undefined);
+  const attachments = Array.isArray(workOrder?.attachments) ? workOrder.attachments : [];
 
   const approveMutation = useMutation({
     mutationFn: (data: { version?: number }) => approveWorkOrder(orderId, data),
@@ -340,14 +341,14 @@ export default function WorkOrderDetailPage() {
                 </div>
               ))}
               {/* 附件展示 */}
-              {workOrder?.attachments && workOrder.attachments.length > 0 && (
+              {attachments.length > 0 && (
                 <div className="pt-3 border-t border-[#e5e7eb] dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-3">
                     <Paperclip className="w-4 h-4 text-[#94a3b8] dark:text-gray-500" />
-                    <span className="text-sm font-medium text-[#374151] dark:text-gray-300">附件 ({workOrder.attachments.length})</span>
+                    <span className="text-sm font-medium text-[#374151] dark:text-gray-300">附件 ({attachments.length})</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {workOrder.attachments.map((url: string, index: number) => {
+                    {attachments.map((url: string, index: number) => {
                       const fileName = url.substring(url.lastIndexOf('/') + 1);
                       const isImage = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(fileName);
                       return (
@@ -412,7 +413,7 @@ export default function WorkOrderDetailPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-4">
             <TimeLogForm workOrderId={orderId} />
-            <PhotoUpload workOrderId={orderId} existingPhotos={workOrder?.attachments || []} />
+            <PhotoUpload workOrderId={orderId} existingPhotos={attachments} />
           </div>
           <div className="space-y-4">
             <StepChecklist workOrderId={orderId} />

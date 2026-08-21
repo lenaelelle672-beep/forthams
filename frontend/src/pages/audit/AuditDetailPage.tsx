@@ -79,7 +79,7 @@ export default function AuditDetailPage() {
       return log.timeline as TimelineEntry[];
     }
 
-    const changes = log.changes || [];
+    const changes = Array.isArray(log.changes) ? log.changes : [];
     const entries: TimelineEntry[] = [];
 
     // Build an entry for each field change
@@ -116,7 +116,7 @@ export default function AuditDetailPage() {
     tenantId: log.tenantId ?? '—',
   };
 
-  const relatedChanges = (log.changes || []).map((c: any) => ({
+  const relatedChanges = (Array.isArray(log.changes) ? log.changes : []).map((c: any) => ({
     assetCode: log.resourceId || '—',
     assetName: log.description?.split('(')[0] || '—',
     field: c.fieldLabel || c.field,

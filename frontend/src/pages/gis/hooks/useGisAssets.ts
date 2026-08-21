@@ -26,7 +26,8 @@ export function useGisAssets(params: UseGisAssetsParams = {}) {
     queryKey: ['gis', 'assets', params],
     queryFn: async () => {
       try {
-        return await gisService.getAssets(params);
+        const data = await gisService.getAssets(params);
+        return Array.isArray(data) ? data : [];
       } catch (error) {
         const status = getHttpStatus(error);
         if (status === 403 || status === 404) {

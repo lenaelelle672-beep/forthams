@@ -66,11 +66,11 @@ export default function AssetModelPage() {
     }),
   });
 
-  const records: AssetModel[] = (data as any)?.records ?? [];
+  const records: AssetModel[] = Array.isArray((data as any)?.records) ? (data as any).records : [];
   const total = (data as any)?.total ?? 0;
   const categories = (categoriesQuery.data as any) ?? [];
   const manufacturers = (manufacturersQuery.data as any) ?? [];
-  const fieldsets = (fieldsetsQuery.data as any) ?? [];
+  const fieldsets = Array.isArray(fieldsetsQuery.data) ? fieldsetsQuery.data : [];
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['assetModels'] });
 

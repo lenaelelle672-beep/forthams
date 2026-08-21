@@ -232,7 +232,7 @@ export default function RFIDScanPage() {
   });
 
   // ── 派生数据 ────────────────────────────────────────────────────────────────
-  const assets = assetsResponse?.records ?? [];
+  const assets = Array.isArray(assetsResponse?.records) ? assetsResponse.records : [];
   const summary = summaryResponse;
   const unconfirmedAssets = assets.filter((a: InventoryAsset) => !a.confirmed);
 
@@ -276,15 +276,17 @@ export default function RFIDScanPage() {
         }))
       : [];
 
+  const surplusItems = Array.isArray(summary?.surplusItems) ? summary.surplusItems : [];
+  const deficitItems = Array.isArray(summary?.deficitItems) ? summary.deficitItems : [];
   const discrepancies = [
-    ...(summary?.surplusItems ?? []).map((item: any, i: number) => ({
+    ...surplusItems.map((item: any, i: number) => ({
       id: `surplus-${i}`,
       assetNo: item.assetCode,
       name: item.assetName,
       type: '盘盈' as const,
       detail: item.reason ?? '盘盈资产',
     })),
-    ...(summary?.deficitItems ?? []).map((item: any, i: number) => ({
+    ...deficitItems.map((item: any, i: number) => ({
       id: `deficit-${i}`,
       assetNo: item.assetCode,
       name: item.assetName,
