@@ -123,6 +123,7 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/inspection-templates', empty: '暂无检验模板' },
   { path: '/inventory/cycle-count', empty: '暂无循环盘点规则' },
   { path: '/inventory/abc-classification', empty: '暂无资产分类数据' },
+  { path: '/safety-checklists/config', empty: '暂无数据' },
 ];
 
 test.describe('列表空态', () => {
