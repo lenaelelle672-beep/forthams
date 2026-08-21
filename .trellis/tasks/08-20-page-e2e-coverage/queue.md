@@ -856,4 +856,7 @@
 | Q1666 | done | 桌面空态 **3 passed**（/system/depts「支持搜索过滤」「支持展开/收起子级」「新增」）。禁 /m。 |
 | Q1667 | done | 桌面空态 **3 passed**（/system/users 点新增用户名密码姓名）。禁 /m。 |
 | Q1668 | done | 桌面空态 **3 passed**（/system/users 点新增邮箱手机号部门）。禁 /m。 |
-| Q1669 | in_progress | 桌面空态：/system/users 点新增「备注」「分配角色」「分配岗位」。禁 /m。 |
+| Q1669 | done | 桌面空态 **3 passed**（/system/users 点新增备注与分配角色岗位）。禁 /m。 |
+| Q1670 | done | 桌面空态 **3 passed**（/system/users 点新增暂无角色岗位与确认新增）。禁 /m。 |
+| Q1671 | done | 桌面空态 **3 passed**（/system/users 副标题搜索与取消）。禁 /m。 |
+| Q1672 | in_progress | 桌面空态：/system/custom-fieldsets 未覆盖文案。禁 /m。 |
