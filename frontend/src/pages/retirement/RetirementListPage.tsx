@@ -292,7 +292,7 @@ export default function RetirementListPage() {
       },
     },
     {
-      key: 'id',
+      key: 'actions',
       title: '操作',
       width: 90,
       align: 'center',

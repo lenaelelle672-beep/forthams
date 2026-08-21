@@ -20,14 +20,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Select, SelectItem } from '@/components/ui/Select';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/Tooltip';
 import { maintenancePlanApi } from '@/api/maintenancePlan';
-import type { MaintenancePlan } from '@/types/maintenancePlan';
+import type { MaintenancePlan, PageResponse, CreateMaintenancePlanRequest } from '@/types/maintenancePlan';
 import { getAssetList } from '@/api/asset';
 import type { AssetListItem } from '@/types/asset';
 import {
   TRIGGER_TYPE_LABELS, PRIORITY_LABELS, PRIORITY_COLORS,
   STATUS_LABELS, STATUS_COLORS,
 } from '@/types/maintenancePlan';
-import type { MaintenancePlan, PageResponse, CreateMaintenancePlanRequest } from '@/types/maintenancePlan';
 
 const PAGE_SIZE = 10;
 

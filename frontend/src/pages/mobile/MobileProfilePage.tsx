@@ -9,7 +9,7 @@
  */
 
 import { useNavigate } from 'react-router';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { PageTransition } from '@/components/ui';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {

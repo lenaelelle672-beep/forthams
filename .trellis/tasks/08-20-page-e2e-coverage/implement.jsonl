@@ -1,0 +1,4 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python3 .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/ecc/testing.md", "reason": "Playwright 选择器与 mock 形状"}
+{"file": ".trellis/spec/dwk/dev-runtime.md", "reason": "自主拉起与禁止 skip"}
+{"file": ".trellis/spec/dwk/ui-replica.md", "reason": "本任务无设计稿，禁止换皮"}

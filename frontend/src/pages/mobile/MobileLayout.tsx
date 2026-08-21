@@ -9,7 +9,7 @@
  */
 
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import {
   LayoutDashboard,
   Package,

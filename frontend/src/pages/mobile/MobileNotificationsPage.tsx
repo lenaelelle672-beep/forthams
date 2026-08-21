@@ -40,7 +40,12 @@ export default function MobileNotificationsPage() {
   const { data, isLoading, isFetching, isError, error, refetch } = useQuery({
     queryKey: ['mobile', 'notifications'],
     queryFn: async () => {
-      return http.get<NotificationItem[]>('/mobile/notifications');
+      const res: unknown = await http.get('/mobile/notifications');
+      if (Array.isArray(res)) return res as NotificationItem[];
+      if (res && typeof res === 'object' && Array.isArray((res as { records?: unknown }).records)) {
+        return (res as { records: NotificationItem[] }).records;
+      }
+      return [];
     },
     staleTime: 1000 * 30,
   });

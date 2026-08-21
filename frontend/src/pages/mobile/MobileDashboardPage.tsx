@@ -5,7 +5,7 @@
 
 import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '@/app/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
 import { PageTransition, ErrorState, SkeletonCard } from '@/components/ui';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import http from '@/utils/http';
@@ -86,7 +86,12 @@ function MobileDashboardContent() {
   const { data: notifications, isLoading: notifLoading, isError: _notifError } = useQuery({
     queryKey: ['mobile', 'notifications'],
     queryFn: async () => {
-      return http.get<NotificationItem[]>('/mobile/notifications');
+      const res: unknown = await http.get('/mobile/notifications');
+      if (Array.isArray(res)) return res as NotificationItem[];
+      if (res && typeof res === 'object' && Array.isArray((res as { records?: unknown }).records)) {
+        return (res as { records: NotificationItem[] }).records;
+      }
+      return [];
     },
     staleTime: 1000 * 60 * 1,
   });

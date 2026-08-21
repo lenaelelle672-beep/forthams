@@ -229,7 +229,7 @@ export default function InventoryDetailPage() {
     const map: Record<string, string> = {};
 
     const flattenLocations = (items: Location[]) => {
-      if (!items) return;
+      if (!Array.isArray(items)) return;
       for (const item of items) {
         if (item.id != null) map[String(item.id)] = item.name;
         if (item.children && item.children.length > 0) {
@@ -239,7 +239,7 @@ export default function InventoryDetailPage() {
     };
 
     const flattenDepartments = (items: Department[]) => {
-      if (!items) return;
+      if (!Array.isArray(items)) return;
       for (const item of items) {
         if (item.id != null) map[String(item.id)] = item.deptName || item.name || '';
         if (item.children && item.children.length > 0) {

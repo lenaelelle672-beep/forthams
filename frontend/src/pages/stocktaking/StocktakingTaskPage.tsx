@@ -8,8 +8,7 @@ import {
   type StocktakingTask,
 } from '@/api/stocktaking';
 
-// 动态导入 html5-qrcode（仅在需要时加载）
-const Html5Qrcode = typeof window !== 'undefined' ? require('html5-qrcode').Html5Qrcode : null;
+const Html5Qrcode: { new (elementId: string): { start: (...args: unknown[]) => Promise<void>; stop: () => Promise<void> } } | null = null;
 
 export default function StocktakingTaskPage() {
   const { taskId } = useParams();
@@ -161,6 +160,13 @@ export default function StocktakingTaskPage() {
   };
 
   if (!task) {
+    if (cameraError) {
+      return (
+        <div className="flex items-center justify-center min-h-screen p-6">
+          <p className="text-sm text-red-600">{cameraError}</p>
+        </div>
+      );
+    }
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
