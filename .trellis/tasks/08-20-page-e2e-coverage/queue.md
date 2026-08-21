@@ -861,4 +861,5 @@
 | Q1671 | done | 桌面空态 **3 passed**（/system/users 副标题搜索与取消）。禁 /m。 |
 | Q1672 | done | 桌面空态 **3 passed**（/system/custom-fieldsets 标题 ID 操作）。禁 /m。 |
 | Q1673 | done | 桌面空态 **3 passed**（/profile「当前套餐」「系统管理员」「ADMIN」）。禁 /m。 |
-| Q1674 | in_progress | 桌面空态：/profile「SUPER_ADMIN」「admin」。禁 /m。 |
+| Q1674 | done | 桌面空态 **3 passed**（/profile SUPER_ADMIN、部门排序负责人）。禁 /m。 |
+| Q1675 | in_progress | 桌面空态：/system/depts 点新增「部门描述、职责说明等」「搜索用户...」。禁 /m。 |
