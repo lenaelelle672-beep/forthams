@@ -785,4 +785,5 @@
 | Q1595 | done | 桌面空态 **3 passed**（/inventory「进度趋势」「筛选」、点筛选「重置」）。禁 /m。 |
 | Q1596 | done | 桌面空态 **3 passed**（/spare-parts「备件总数」「备件列表」「备件库存管理」）。禁 /m。 |
 | Q1597 | done | 桌面空态 **3 passed**（/spare-parts「库存告警」「已启用」「库存总价值」）。禁 /m。 |
-| Q1598 | in_progress | 桌面空态：/contracts 未覆盖说明。禁 /m。 |
+| Q1598 | done | 桌面空态 **3 passed**（/contracts「合同信息维护与到期预警」「全部合同」「生效中」）。禁 /m。 |
+| Q1599 | in_progress | 桌面空态：/contracts「即将到期」「30天内到期」。禁 /m。 |
