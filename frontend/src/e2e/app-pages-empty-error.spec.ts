@@ -8012,6 +8012,34 @@ test.describe('Q1738 桌面登录空态', () => {
   });
 });
 
+test.describe('Q1739 桌面登录分析空态', () => {
+  test('/login5 点登录「请输入密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await page.getByText('登录并进入工作台').click();
+    await expect(page.getByText('请输入密码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics 点数据范围「近 6 个月」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/analytics');
+    await page.getByText('近 12 个月').first().click();
+    await expect(page.getByText('近 6 个月').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login4 点登录「请输入密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login4');
+    await page.getByText('登录并进入工作台').click();
+    await expect(page.getByText('请输入密码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
