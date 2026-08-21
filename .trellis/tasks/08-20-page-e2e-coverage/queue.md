@@ -699,4 +699,5 @@
 | Q1509 | done | 桌面空态 **3 passed**（/bigscreen「今日不正常情况明细」「收入运力信息」「人员信息」）。禁 /m。 |
 | Q1510 | done | 桌面空态 **3 passed**（/bigscreen「承运情况分析」「油量信息」「重点关注航班信息」）。禁 /m。 |
 | Q1511 | done | 桌面空态 **3 passed**（/bigscreen-3d「资产规模指标」「资产分类结构」「价值趋势预测」）。禁 /m。 |
-| Q1512 | in_progress | 桌面空态：/bigscreen-3d「设备在线总览」「城市资产TOP5」「风险异常队列」。禁 /m。 |
+| Q1512 | done | 桌面空态 **3 passed**（/bigscreen-3d「设备在线总览」「城市资产TOP5」「风险异常队列」）。禁 /m。 |
+| Q1513 | in_progress | 桌面空态：/categories「选择分类」详情空态、/floorplans「请选择平面图」。禁 /m。 |
