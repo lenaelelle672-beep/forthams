@@ -55,7 +55,12 @@ const STAT_BG: Record<string, string> = {
 
 function parseOptions(raw?: string | null): string[] {
   if (!raw) return [];
-  try { return JSON.parse(raw); } catch { return []; }
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.map(String) : [];
+  } catch {
+    return [];
+  }
 }
 
 /* ── Page Component ────────────────────────────────────────────────────── */
@@ -71,7 +76,7 @@ export default function CustomFieldsPage() {
     queryFn: () => getCustomFieldList(1, pageSize, keyword.trim() || undefined),
   });
 
-  const fields = data?.records ?? [];
+  const fields = Array.isArray(data?.records) ? data.records : [];
 
   /* filtered data */
   const filtered = useMemo(() => {

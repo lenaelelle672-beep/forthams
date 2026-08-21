@@ -219,11 +219,19 @@ const RiskMatrixPage: React.FC = () => {
   // ── 数据提取 ──────────────────────────────────────────────────────────────
 
   const riskAssessments = useMemo(() => {
-    return (listData as any)?.records || (listData as any)?.list || [];
+    return Array.isArray((listData as any)?.records)
+      ? (listData as any).records
+      : Array.isArray((listData as any)?.list)
+        ? (listData as any).list
+        : [];
   }, [listData]);
 
   const cellAssessments = useMemo(() => {
-    return (cellData as any)?.records || (cellData as any)?.list || [];
+    return Array.isArray((cellData as any)?.records)
+      ? (cellData as any).records
+      : Array.isArray((cellData as any)?.list)
+        ? (cellData as any).list
+        : [];
   }, [cellData]);
 
   // ── 统计 ──────────────────────────────────────────────────────────────────
@@ -247,9 +255,8 @@ const RiskMatrixPage: React.FC = () => {
         grid[`${p}-${i}`] = { probability: p, impact: i, count: 0, riskLevel: level };
       }
     }
-    if (heatmapData) {
-      const data = heatmapData as any[];
-      data.forEach((item: any) => {
+    if (Array.isArray(heatmapData)) {
+      heatmapData.forEach((item: any) => {
         const key = `${item.probability}-${item.impact}`;
         if (grid[key]) {
           grid[key].count = Number(item.cnt || 0);

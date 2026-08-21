@@ -35,6 +35,13 @@ import { cn } from '@/utils/cn';
 
 type DimensionMode = 'device' | 'area';
 
+function asMetricMap(value: unknown): Record<string, number | string> {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    return value as Record<string, number | string>;
+  }
+  return {};
+}
+
 const METER_TYPE_LABELS: Record<string, string> = {
   ELECTRICITY: '用电', WATER: '用水', GAS: '用气',
 };
@@ -106,11 +113,15 @@ const EnergyDashboardPage: React.FC = () => {
 
   const effectiveData = useMemo<EnergyDashboardData | undefined>(() => {
     if (!data) return undefined;
-    const hasByType = Object.keys(data.byType || {}).length > 0;
-    const hasTrend = Object.keys(data.trend || {}).length > 0;
-    const hasRanking = Array.isArray(data.assetRanking) && data.assetRanking.length > 0;
+    const byType = asMetricMap(data.byType);
+    const trend = asMetricMap(data.trend);
+    const assetRanking = Array.isArray(data.assetRanking) ? data.assetRanking : [];
+    const hasByType = Object.keys(byType).length > 0;
+    const hasTrend = Object.keys(trend).length > 0;
+    const hasRanking = assetRanking.length > 0;
     const hasTotal = Number(data.total || 0) > 0;
-    return hasByType || hasTrend || hasRanking || hasTotal ? data : undefined;
+    if (!hasByType && !hasTrend && !hasRanking && !hasTotal) return undefined;
+    return { ...data, byType, trend, assetRanking };
   }, [data]);
 
   // 同环比 — 前端 useMemo 兜底（B5 后端权威化推迟到下一轮）

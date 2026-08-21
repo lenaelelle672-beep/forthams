@@ -110,13 +110,14 @@ function flattenTree<T extends { children?: T[]; id: number; [key: string]: unkn
   depth = 0,
 ): Array<{ id: number; label: string; depth: number }> {
   const result: Array<{ id: number; label: string; depth: number }> = [];
+  if (!Array.isArray(nodes)) return result;
   for (const node of nodes) {
     const id = Number((node as Record<string, unknown>).id);
     const label = (node as Record<string, unknown>)[labelKey] as string;
     if (Number.isFinite(id)) {
       result.push({ id, label, depth });
     }
-    if (node.children?.length) {
+    if (Array.isArray(node.children) && node.children.length) {
       result.push(...flattenTree(node.children, labelKey, depth + 1));
     }
   }
@@ -142,7 +143,9 @@ export default function AssetTransferFormPage() {
     queryFn: () => getAssetList({ pageSize: 200 }),
   });
 
-  const availableAssets: AssetListItem[] = (assetListData as PageData<AssetListItem> | undefined)?.records ?? [];
+  const availableAssets: AssetListItem[] = Array.isArray((assetListData as PageData<AssetListItem> | undefined)?.records)
+    ? (assetListData as PageData<AssetListItem>).records
+    : [];
 
   useEffect(() => {
     if (!preselectKey || appliedPreselectKey === preselectKey || availableAssets.length === 0) {

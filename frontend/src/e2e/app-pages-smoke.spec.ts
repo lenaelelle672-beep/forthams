@@ -2646,6 +2646,90 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '自定义报表构建器' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/risk-assessments matrix 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/risk-assessments/matrix*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/risk-assessments');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '风险矩阵' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/energy byType 为数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/energy/dashboard*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        byType: [{ unexpected: true }],
+        trend: { '2026-01': 100, '2026-02': 110 },
+        assetRanking: [],
+        total: 1320,
+      });
+    });
+    await page.goto('/energy');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '能耗管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/energy trend 为数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/energy/dashboard*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        byType: { ELECTRICITY: 1200, WATER: 80, GAS: 40 },
+        trend: [{ unexpected: true }],
+        assetRanking: [],
+        total: 1320,
+      });
+    });
+    await page.goto('/energy');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '能耗管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fields fieldOptions 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/system/custom-fields*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/custom-fields') {
+        await fulfill(apiRoute, {
+          records: [{
+            id: 1,
+            fieldName: 'color',
+            fieldLabel: '颜色',
+            fieldType: 'DROPDOWN',
+            fieldOptions: '{"a":1}',
+            required: 0,
+            fieldOrder: 1,
+            status: 1,
+          }],
+          total: 1,
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/system/custom-fields');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '自定义字段管理' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByTitle('预览').click();
+    await expect(page.getByRole('heading', { name: /字段预览/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new depts tree 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/disposals/transfer/new');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产转移申请' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {
