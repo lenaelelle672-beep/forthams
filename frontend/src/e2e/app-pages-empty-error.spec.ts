@@ -126,6 +126,7 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/safety-checklists/config', empty: '暂无数据' },
   { path: '/disposals/scrap/new', empty: '暂无已选资产' },
   { path: '/disposals/transfer/new', empty: '暂无已选资产' },
+  { path: '/sam', empty: '暂无扫描历史' },
 ];
 
 test.describe('列表空态', () => {
@@ -176,6 +177,29 @@ test.describe('列表空态', () => {
       expect(errors).toEqual([]);
     });
   }
+});
+
+test.describe('Q1465 桌面 tab 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/contracts 点即将到期空态「暂无即将到期合同」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('tab', { name: /即将到期/ }).click();
+    await expect(page.getByText('暂无即将到期合同').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets 点超支告警空态「暂无超支告警」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await page.getByRole('button', { name: '超支告警' }).click();
+    await expect(page.getByText('暂无超支告警').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
