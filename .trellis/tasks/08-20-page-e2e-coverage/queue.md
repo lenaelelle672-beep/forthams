@@ -962,4 +962,5 @@
 | Q1772 | done | 桌面空态 **3 passed**（/contracts 金额操作列与名称校验）。禁 /m。 |
 | Q1773 | done | 桌面空态 **3 passed**（/purchase-orders 点新增供应商日期到货）。禁 /m。 |
 | Q1774 | done | 桌面空态 **3 passed**（/purchase-orders 点新增备注与明细占位）。禁 /m。 |
-| Q1775 | in_progress | 桌面空态：/purchase-orders 点新增「资产名称 *」「数量」「添加行」。禁 /m。 |
+| Q1775 | done | 桌面空态 **3 passed**（/purchase-orders 点新增明细列与添加行）。禁 /m。 |
+| Q1776 | in_progress | 桌面空态：/purchase-orders 点新增「单价」「确认新增」「取消」。禁 /m。 |
