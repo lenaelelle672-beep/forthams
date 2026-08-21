@@ -3746,6 +3746,37 @@ test.describe('Q1586 桌面维保空态', () => {
   });
 });
 
+test.describe('Q1587 桌面维保空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/maintenance 点新增维保「新增维保记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await page.getByRole('button', { name: '新增维保' }).click();
+    await expect(page.getByText('新增维保记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/maintenance 点新增维保「填写以下信息创建新的维保记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await page.getByRole('button', { name: '新增维保' }).click();
+    await expect(page.getByText('填写以下信息创建新的维保记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/maintenance 点新增维保「请描述维保内容...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await page.getByRole('button', { name: '新增维保' }).click();
+    await expect(page.getByPlaceholder('请描述维保内容...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
