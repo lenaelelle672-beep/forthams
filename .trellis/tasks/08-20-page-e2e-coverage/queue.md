@@ -796,4 +796,5 @@
 | Q1606 | done | 桌面空态 **3 passed**（/audit「操作趋势（近7天）」「操作类型分布」「最近操作」）。禁 /m。 |
 | Q1607 | done | 桌面空态 **3 passed**（/approvals「待我审批」「我发起的」「已驳回」）。禁 /m。 |
 | Q1608 | done | 桌面空态 **3 passed**（/approvals「审批」「待审批」「已通过」）。禁 /m。 |
-| Q1609 | in_progress | 桌面空态：/borrow 未覆盖说明。禁 /m。 |
+| Q1609 | done | 桌面空态 **3 passed**（/borrows「借用总数」「借用列表」「借用记录管理」）。禁 /m。 |
+| Q1610 | in_progress | 桌面空态：/borrows 其余 KPI。禁 /m。 |
