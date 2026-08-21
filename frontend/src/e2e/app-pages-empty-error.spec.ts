@@ -5097,6 +5097,37 @@ test.describe('Q1633 桌面平面图空态', () => {
   });
 });
 
+test.describe('Q1634 桌面平面图空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/floorplans 点新建「新建平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await page.getByRole('button', { name: '新建' }).click();
+    await expect(page.getByText('新建平面图').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/floorplans 点新建「填写平面图名称、楼栋、楼层和图片地址后创建新的空间视图。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await page.getByRole('button', { name: '新建' }).click();
+    await expect(page.getByText('填写平面图名称、楼栋、楼层和图片地址后创建新的空间视图。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/floorplans 点新建「平面图名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await page.getByRole('button', { name: '新建' }).click();
+    await expect(page.getByPlaceholder('平面图名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
