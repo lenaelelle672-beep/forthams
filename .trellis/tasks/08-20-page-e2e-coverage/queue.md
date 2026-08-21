@@ -972,4 +972,5 @@
 | Q1782 | done | 桌面空态 **3 passed**（/licenses 点新增价格采购单号）。禁 /m。 |
 | Q1783 | done | 桌面空态 **3 passed**（/licenses 点新增备注确认取消）。禁 /m。 |
 | Q1784 | done | 桌面空态 **3 passed**（软件许可证管理、备注请选择）。禁 /m。 |
-| Q1785 | in_progress | 桌面空态：/insurances 点新增未覆盖字段。禁 /m。 |
+| Q1785 | done | 桌面空态 **3 passed**（/insurances/new 保单号保险名称）。禁 /m。 |
+| Q1786 | in_progress | 桌面空态：/insurances/new「请输入保险名称」「保险类型」「保险公司」。禁 /m。 |
