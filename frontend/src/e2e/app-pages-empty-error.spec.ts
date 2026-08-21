@@ -6578,6 +6578,34 @@ test.describe('Q1683 桌面403空态', () => {
   });
 });
 
+test.describe('Q1684 桌面forbidden空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/forbidden 空态「您没有访问此页面的权限」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden');
+    await expect(page.getByText('您没有访问此页面的权限').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden 空态「返回上一页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden');
+    await expect(page.getByText('返回上一页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden 空态「返回首页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden');
+    await expect(page.getByText('返回首页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
