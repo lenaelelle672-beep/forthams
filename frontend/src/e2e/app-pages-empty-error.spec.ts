@@ -561,6 +561,34 @@ test.describe('Q1474 桌面表单/弹窗空态', () => {
   });
 });
 
+test.describe('Q1475 桌面描述空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets 空态「未找到符合条件的资产记录，请调整筛选条件或新建资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByText('未找到符合条件的资产记录，请调整筛选条件或新建资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态「当前没有待处理的审批事项」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByText('当前没有待处理的审批事项').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「所有通知都会显示在这里」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('所有通知都会显示在这里').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

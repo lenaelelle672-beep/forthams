@@ -662,4 +662,5 @@
 | Q1472 | done | 桌面空态 **3 passed**（/maintenance/plans 点日历「暂无维保计划数据」、/disposals 点调拨「暂无资产调拨记录」、点报废「暂无报废转让记录」）。vendor-portal 非 AppLayout、audit 趋势 7 天补零不可达。禁 /m。 |
 | Q1473 | done | 桌面空态 **3 passed**（/compensation/new「暂无可选部门」、/sam 点查看详情「暂无详情」、/system/roles 点菜单权限「暂无菜单数据」）。DialogTitle console 忽略。禁 /m。 |
 | Q1474 | done | 桌面空态 **3 passed**（/system/roles 点数据权限「暂无部门数据」、/assets/1/timeline「该资产暂无任何履历事件」、/floorplans「请新建平面图」）。领用/借用 option hidden。禁 /m。 |
-| Q1475 | in_progress | 桌面空态：/assets「未找到符合条件的资产记录」、/approvals「当前没有待处理的审批事项」、/notifications「所有通知都会显示在这里」。禁 /m。 |
+| Q1475 | done | 桌面空态 **3 passed**（/assets「未找到符合条件的资产记录…」、/approvals「当前没有待处理的审批事项」、/notifications「所有通知都会显示在这里」）。禁 /m。 |
+| Q1476 | in_progress | 桌面空态：/gis「没有已定位的资产可在地图上显示」、/notifications 点系统「当前筛选条件下没有通知」、/energy「尚未采集到能耗数据」。禁 /m。 |
