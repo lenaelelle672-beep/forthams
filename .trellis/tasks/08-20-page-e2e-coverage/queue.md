@@ -121,4 +121,51 @@
 | Q117 | done | empty-error 全量 **691 passed** |
 | Q118 | done | 10:00 硬停；R5 绿；未 commit |
 | Q119 | done | empty-error 全量 **679 passed**；随后增量至 **759 tests** 抽测绿；10:00 硬停 |
-| Q120 | in_progress | 截止改 18:00。扩 API 失败态：vendor-portal/audit/workflows/asset-health/dashboard |
+| Q120 | done | 独立 describe：workflows/asset-health/audit/dashboard/vendor-portal 失败态 5 passed。修合同非数组、健康/审计 isError |
+| Q121 | done | 独立失败态 bigscreen/3d/health/reliability/tco 5 passed；Array.isArray 防崩溃 |
+| Q122 | done | ADMIN 新建表单失败无 pageerror 5 passed（assets/borrows/assignments/inspections/intake） |
+| Q123 | done | 新建表单失败 5 passed（budgets/insurances/retirement/spare-parts/compensation） |
+| Q124 | done | 处置/工单/重估新建失败 5 passed |
+| Q125 | in_progress | 他票：USER 403 / 未登录补测（不抢） |
+| Q126 | done | 盘点周期新建/导入导出/风险新建/领用编辑/借用编辑失败 5 passed |
+| Q127 | done | 编辑资产/检验、workflow-form 获取数据失败、安全检查、cycle-count 5 passed |
+| Q128 | done | workflow-form 清退/报废/赔偿 + abc + report-builder 失败 5 passed |
+| Q129 | done | RETIREMENT 表单/检验模板/风险/安全配置/流程设计器失败 5 passed |
+| Q130 | done | profile/notifications/fault-codes/idle/depreciation 失败 5 passed |
+| Q131 | done | licenses/sam/manufacturers/locations/asset-models 失败 5 passed |
+| Q132 | done | system users/roles/depts/posts/menus 失败 5 passed |
+| Q133 | done | custom-fields/fieldsets/purchase-orders/maintenance/plans 失败 5 passed |
+| Q134 | in_progress | 独立：equipment/vendors/categories/floorplans/gis 失败无 pageerror（他票，不抢） |
+| Q135 | done | 独立失败态 energy/contracts/reports/inventory/assets 5 passed |
+| Q136 | done | 独立失败态 disposals/approvals/retirement/inspections/borrows 5 passed |
+| Q137 | done | 独立失败态 assignments/intake/budgets/insurances/revaluations 5 passed |
+| Q138 | done | 独立失败态 stocktaking-cycles/spare-parts/inspection-records/safety-history/risk-matrix 5 passed |
+| Q139 | done | 独立失败态 scheduled/compensation/m-index/m-assets/m-work-orders 5 passed |
+| Q140 | done | 独立失败态 m-notifications/m-scan/m-profile/test-results + USER 403 INV-002 5 passed |
+| Q141 | done | USER 403 inspections/2 edit+upload、workorders/2/acceptance、risk edit、scan/RFID-3 5 passed |
+| Q142 | done | USER 403 assignments/3/edit、borrows/3/edit、inspections/3/edit、acceptance/3、execute/4 5 passed |
+| Q143 | done | USER 403 assignments/4/edit、borrows/4/edit、inspections/4/edit、upload/3、scan/RFID-4 5 passed |
+| Q144 | done | 独立失败态 smart-report 空/非数组、upload、workorders/1、m/tasks/2 5 passed；修 SmartReportPage Array.isArray |
+| Q145 | done | USER 403 assignments/5/edit、borrows/5/edit、inspections/5/edit、upload/4、acceptance/4 5 passed |
+| Q146 | done | USER 403 risk-assessments/3/edit、execute/5、scan/RFID-5、upload/5、acceptance/5 5 passed |
+| Q147 | done | 独立失败态 scan/RFID-1、tasks/1、disposals/1、workflows-v2、workbenchv3 5 passed |
+| Q148 | done | USER 403 assignments/6/edit、borrows/6/edit、inspections/6/edit、risk/4/edit、execute/6 5 passed |
+| Q149 | done | 独立失败态 approvals/1、audit/1、spare-parts/1、insurances/1、budgets/1 5 passed |
+| Q150 | done | USER 403 scan/RFID-6、assignments/7/edit、borrows/7/edit、inspections/7/edit、upload/6 5 passed |
+| Q151 | done | 独立失败态 retirement/1、intake/1、borrows/1、assignments/1、inspections/1 5 passed |
+| Q152 | done | USER 403 acceptance/6、risk/5/edit、execute/7、scan/RFID-7、upload/7 5 passed |
+| Q153 | done | 独立失败态 assets/1、m/assets/1、acceptance/1、cycles/1、compensation/1 5 passed |
+| Q154 | done | USER 403 assignments/8/edit、borrows/8/edit、inspections/8/edit、acceptance/7、risk/6/edit 5 passed |
+| Q155 | done | 独立失败态 timeline + m/tasks/3；USER 403 INV-003、assignments/9/edit、borrows/9/edit 5 passed |
+| Q156 | done | USER 403 inspections/9/edit、upload/8、acceptance/8、execute/8、scan/RFID-8 5 passed |
+| Q157 | done | USER 403 assignments/10/edit、borrows/10/edit、inspections/10/edit、risk/7/edit、INV-004 5 passed |
+| Q158 | done | 独立失败态 workflow-form INTAKE/BORROW/ASSIGNMENT、timeline/2、m/tasks/4 5 passed |
+| Q159 | done | 独立失败态 spare-parts/2、insurances/2、budgets/2、audit/2、retirement/2 5 passed |
+| Q160 | done | USER 403 assignments/11/edit、borrows/11/edit、inspections/11/edit、acceptance/10、execute/10 5 passed |
+| Q161 | done | 独立失败态 approvals/2、disposals/2、intake/2、borrows/2、assignments/2 5 passed |
+| Q162 | done | USER 403 scan/RFID-10、inspections/12/edit、upload/10、acceptance/11、risk/8/edit 5 passed |
+| Q163 | done | 独立失败态 inspections/2、spare-parts/3、acceptance/2、assets/3、m/assets/3 5 passed |
+| Q164 | done | USER 403 assignments/12/edit、borrows/12/edit、inspections/13/edit、scan/RFID-11、execute/11 5 passed |
+| Q165 | done | 独立失败态 budgets/3、insurances/3、audit/3、retirement/3、approvals/3 5 passed |
+| Q166 | done | USER 403 assignments/13/edit、borrows/13/edit、upload/11、acceptance/12、INV-005 5 passed |
+| Q167 | in_progress | 独立失败态：disposals/3、intake/3、borrows/3、assignments/3、inspections/3 |
