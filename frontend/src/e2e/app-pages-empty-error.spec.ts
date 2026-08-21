@@ -5631,6 +5631,36 @@ test.describe('Q1651 桌面岗位空态', () => {
   });
 });
 
+test.describe('Q1652 桌面岗位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/posts 空态「备注」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByText('备注', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/posts 点新增岗位「岗位编码 *」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await page.getByRole('button', { name: '新增岗位' }).click();
+    await expect(page.getByText('岗位编码 *').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/posts 点新增岗位「如：CEO、CTO」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await page.getByRole('button', { name: '新增岗位' }).click();
+    await expect(page.getByPlaceholder('如：CEO、CTO').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

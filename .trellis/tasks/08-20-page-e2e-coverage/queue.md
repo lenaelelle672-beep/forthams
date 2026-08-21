@@ -839,4 +839,5 @@
 | Q1649 | done | 桌面空态 **3 passed**（/system/custom-fields「选项」「必填」「排序」）。禁 /m。 |
 | Q1650 | done | 桌面空态 **3 passed**（/system/custom-fields「共 0 条」「操作」「ID」）。禁 /m。 |
 | Q1651 | done | 桌面空态 **3 passed**（/system/posts「岗位编码」「岗位名称」「创建时间」）。禁 /m。 |
-| Q1652 | in_progress | 桌面空态：/system/posts「备注」、点新增岗位表单。禁 /m。 |
+| Q1652 | done | 桌面空态 **3 passed**（/system/posts「备注」、点新增岗位编码）。禁 /m。 |
+| Q1653 | in_progress | 桌面空态：/system/posts 点新增「岗位名称 *」与名称 placeholder。禁 /m。 |
