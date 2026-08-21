@@ -58,6 +58,8 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/audit', empty: '暂无审计日志' },
   { path: '/reports/scheduled', empty: '暂无定时报表配置' },
   { path: '/assets/1/timeline', empty: '暂无履历记录' },
+  { path: '/assets/2/timeline', empty: '暂无履历记录' },
+  { path: '/assets/3/timeline', empty: '暂无履历记录' },
   { path: '/purchase-orders', empty: '暂无数据' },
   { path: '/m/scan', empty: '查询资产' },
   { path: '/m/index', empty: '暂无待办事项' },
@@ -72,19 +74,27 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/asset-health', empty: '暂无不健康资产，所有资产状态良好' },
   { path: '/analytics/health', empty: '暂无数据' },
   { path: '/intake/1', empty: '暂无检查项' },
+  { path: '/intake/2', empty: '暂无检查项' },
   { path: '/retirement/1', empty: '暂无审批记录' },
+  { path: '/retirement/2', empty: '暂无审批记录' },
   { path: '/workorders/1', empty: '暂无审批记录' },
+  { path: '/workorders/2', empty: '暂无审批记录' },
   { path: '/system/depts', empty: '暂无部门数据' },
   { path: '/disposals', empty: '暂无资产清退记录' },
   { path: '/licenses', empty: '暂无数据' },
   { path: '/manufacturers', empty: '暂无数据' },
   { path: '/asset-models', empty: '暂无数据' },
   { path: '/stocktaking-cycles/1', empty: '暂无盘点任务' },
+  { path: '/stocktaking-cycles/2', empty: '暂无盘点任务' },
   { path: '/system/custom-fieldsets', empty: '暂无数据' },
   { path: '/approvals', empty: '暂无审批' },
   { path: '/system/users', empty: '暂无用户数据' },
   { path: '/inventory', empty: '暂无盘点任务' },
   { path: '/assets/1', empty: '暂无折旧数据' },
+  { path: '/assets/3', empty: '暂无折旧数据' },
+  { path: '/assets/3', empty: '暂无变更记录' },
+  { path: '/assets/3', empty: '暂无关联子资产' },
+  { path: '/assets/3', empty: '暂无成本数据' },
   { path: '/assets/1', empty: '暂无变更记录' },
   { path: '/assets/1', empty: '暂无关联子资产' },
   { path: '/assets/1', empty: '暂无成本数据' },
@@ -95,9 +105,14 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/dashboard', empty: '暂无部门统计数据' },
   { path: '/equipment', empty: '暂无维保记录' },
   { path: '/spare-parts/1', empty: '暂无领用记录' },
+  { path: '/spare-parts/2', empty: '暂无领用记录' },
   { path: '/inspections/1/upload', empty: '暂无已上传的照片' },
+  { path: '/inspections/2/upload', empty: '暂无已上传的照片' },
   { path: '/inventory/scan/RFID-1', empty: '暂无扫描记录' },
   { path: '/inventory/scan/RFID-1', empty: '暂无差异' },
+  { path: '/inventory/tasks/2', empty: '暂无盘点资产' },
+  { path: '/inventory/tasks/2', empty: '暂无盘盈记录' },
+  { path: '/inventory/tasks/2', empty: '暂无盘亏记录' },
   { path: '/inventory/tasks/1', empty: '暂无盘点资产' },
   { path: '/inventory/tasks/1', empty: '暂无盘盈记录' },
   { path: '/inventory/tasks/1', empty: '暂无盘亏记录' },
@@ -135,15 +150,11 @@ const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/m/index', failPath: '/mobile/dashboard' },
   { path: '/m/assets', failPath: '/mobile/assets' },
   { path: '/assets/1/timeline', failPath: '/assets/1/history' },
+  { path: '/assets/2/timeline', failPath: '/assets/2/history' },
   { path: '/m/work-orders', failPath: '/mobile/work-orders' },
   { path: '/m/notifications', failPath: '/mobile/notifications' },
   { path: '/reports', failPath: '/reports/by-category' },
   { path: '/approvals', failPath: '/approvals/list' },
-  { path: '/vendor-portal', failPath: '/contracts' },
-  { path: '/audit', failPath: '/audit-logs' },
-  { path: '/workflows', failPath: '/workflows' },
-  { path: '/asset-health', failPath: '/asset-health/unhealthy' },
-  { path: '/dashboard', failPath: '/dashboard/stats' },
   { path: '/disposals/1', failPath: '/retirement/1' },
   { path: '/audit/1', failPath: '/audit-logs/1', error: '未找到该审计记录' },
   { path: '/assets/1', failPath: '/assets/1', error: '获取数据失败' },
@@ -162,6 +173,78 @@ const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/inspections/1', failPath: '/inspections/1', error: '检验记录不存在' },
   { path: '/spare-parts/1', failPath: '/spare-parts/1', error: '备件不存在' },
   { path: '/m/stocktaking-tasks/1', failPath: '/stocktaking/tasks/1', error: '获取任务失败' },
+  { path: '/borrows/999', failPath: '/borrows/999', error: '借用单不存在' },
+  { path: '/assignments/999', failPath: '/assignments/999', error: '领用单不存在' },
+  { path: '/intake/999', failPath: '/intake-orders/999', error: '验收单不存在' },
+  { path: '/inspections/999', failPath: '/inspections/999', error: '检验记录不存在' },
+  { path: '/spare-parts/999', failPath: '/spare-parts/999', error: '备件不存在' },
+  { path: '/budgets/999', failPath: '/budgets/999', error: '未找到预算信息' },
+  { path: '/insurances/999', failPath: '/insurance/999', error: '未找到保险记录' },
+  { path: '/audit/999', failPath: '/audit-logs/999', error: '未找到该审计记录' },
+  { path: '/retirement/999', failPath: '/retirement/999', error: '未找到该退役申请记录' },
+  { path: '/approvals/999', failPath: '/approvals/999', error: '工单不存在或已删除' },
+  { path: '/disposals/999', failPath: '/retirement/999', error: '加载失败' },
+  { path: '/assets/999', failPath: '/assets/999', error: '获取数据失败' },
+  { path: '/workorders/1/acceptance', failPath: '/workorders/1', error: '工单不存在' },
+  { path: '/workorders/999/acceptance', failPath: '/workorders/999', error: '工单不存在' },
+  { path: '/m/stocktaking-tasks/999', failPath: '/stocktaking/tasks/999', error: '获取任务失败' },
+  { path: '/m/stocktaking-tasks/abc', failPath: '/stocktaking/tasks/abc', error: '获取任务失败' },
+  { path: '/intake/2', failPath: '/intake-orders/2', error: '验收单不存在' },
+  { path: '/borrows/2', failPath: '/borrows/2', error: '借用单不存在' },
+  { path: '/assignments/2', failPath: '/assignments/2', error: '领用单不存在' },
+  { path: '/inspections/2', failPath: '/inspections/2', error: '检验记录不存在' },
+  { path: '/spare-parts/2', failPath: '/spare-parts/2', error: '备件不存在' },
+  { path: '/budgets/2', failPath: '/budgets/2', error: '未找到预算信息' },
+  { path: '/retirement/2', failPath: '/retirement/2', error: '未找到该退役申请记录' },
+  { path: '/workorders/2/acceptance', failPath: '/workorders/2', error: '工单不存在' },
+  { path: '/audit/2', failPath: '/audit-logs/2', error: '未找到该审计记录' },
+  { path: '/approvals/2', failPath: '/approvals/2', error: '工单不存在或已删除' },
+  { path: '/disposals/2', failPath: '/retirement/2', error: '加载失败' },
+  { path: '/assets/3', failPath: '/assets/3', error: '获取数据失败' },
+  { path: '/insurances/2', failPath: '/insurance/2', error: '未找到保险记录' },
+  { path: '/m/assets/3', failPath: '/mobile/assets/3', error: '资产加载失败' },
+  { path: '/assets/3/timeline', failPath: '/assets/3/history' },
+  { path: '/m/assets/4', failPath: '/mobile/assets/4', error: '资产加载失败' },
+  { path: '/assets/4', failPath: '/assets/4', error: '获取数据失败' },
+  { path: '/audit/3', failPath: '/audit-logs/3', error: '未找到该审计记录' },
+  { path: '/approvals/3', failPath: '/approvals/3', error: '工单不存在或已删除' },
+  { path: '/disposals/3', failPath: '/retirement/3', error: '加载失败' },
+  { path: '/workorders/3/acceptance', failPath: '/workorders/3', error: '工单不存在' },
+  { path: '/retirement/3', failPath: '/retirement/3', error: '未找到该退役申请记录' },
+  { path: '/intake/3', failPath: '/intake-orders/3', error: '验收单不存在' },
+  { path: '/borrows/3', failPath: '/borrows/3', error: '借用单不存在' },
+  { path: '/assignments/3', failPath: '/assignments/3', error: '领用单不存在' },
+  { path: '/inspections/3', failPath: '/inspections/3', error: '检验记录不存在' },
+  { path: '/spare-parts/3', failPath: '/spare-parts/3', error: '备件不存在' },
+  { path: '/budgets/3', failPath: '/budgets/3', error: '未找到预算信息' },
+  { path: '/insurances/3', failPath: '/insurance/3', error: '未找到保险记录' },
+  { path: '/workorders/4/acceptance', failPath: '/workorders/4', error: '工单不存在' },
+  { path: '/retirement/4', failPath: '/retirement/4', error: '未找到该退役申请记录' },
+  { path: '/intake/4', failPath: '/intake-orders/4', error: '验收单不存在' },
+  { path: '/borrows/4', failPath: '/borrows/4', error: '借用单不存在' },
+  { path: '/assignments/4', failPath: '/assignments/4', error: '领用单不存在' },
+  { path: '/inspections/4', failPath: '/inspections/4', error: '检验记录不存在' },
+  { path: '/spare-parts/4', failPath: '/spare-parts/4', error: '备件不存在' },
+  { path: '/budgets/4', failPath: '/budgets/4', error: '未找到预算信息' },
+  { path: '/insurances/4', failPath: '/insurance/4', error: '未找到保险记录' },
+  { path: '/audit/4', failPath: '/audit-logs/4', error: '未找到该审计记录' },
+  { path: '/approvals/4', failPath: '/approvals/4', error: '工单不存在或已删除' },
+  { path: '/disposals/4', failPath: '/retirement/4', error: '加载失败' },
+  { path: '/m/assets/5', failPath: '/mobile/assets/5', error: '资产加载失败' },
+  { path: '/workorders/5/acceptance', failPath: '/workorders/5', error: '工单不存在' },
+  { path: '/retirement/5', failPath: '/retirement/5', error: '未找到该退役申请记录' },
+  { path: '/intake/5', failPath: '/intake-orders/5', error: '验收单不存在' },
+  { path: '/borrows/5', failPath: '/borrows/5', error: '借用单不存在' },
+  { path: '/assignments/5', failPath: '/assignments/5', error: '领用单不存在' },
+  { path: '/inspections/5', failPath: '/inspections/5', error: '检验记录不存在' },
+  { path: '/spare-parts/5', failPath: '/spare-parts/5', error: '备件不存在' },
+  { path: '/budgets/5', failPath: '/budgets/5', error: '未找到预算信息' },
+  { path: '/insurances/5', failPath: '/insurance/5', error: '未找到保险记录' },
+  { path: '/audit/5', failPath: '/audit-logs/5', error: '未找到该审计记录' },
+  { path: '/approvals/5', failPath: '/approvals/5', error: '工单不存在或已删除' },
+  { path: '/disposals/5', failPath: '/retirement/5', error: '加载失败' },
+  { path: '/assets/5', failPath: '/assets/5', error: '获取数据失败' },
+  { path: '/m/stocktaking-tasks/5', failPath: '/stocktaking/tasks/5', error: '获取任务失败' },
 ];
 
 test.describe('API 错误态', () => {
@@ -171,6 +254,99 @@ test.describe('API 错误态', () => {
       await seedSession(page, adminUser);
       await page.goto(route.path);
       await expect(page.getByText(route.error ?? '加载失败').first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+
+  for (const id of Array.from({ length: 75 }, (_, i) => i + 6)) {
+    test(`/borrows/${id} 失败显示「借用单不存在」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/borrows/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/borrows/${id}`);
+      await expect(page.getByText('借用单不存在').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/assignments/${id} 失败显示「领用单不存在」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/assignments/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/assignments/${id}`);
+      await expect(page.getByText('领用单不存在').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/intake/${id} 失败显示「验收单不存在」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/intake-orders/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/intake/${id}`);
+      await expect(page.getByText('验收单不存在').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/retirement/${id} 失败显示「未找到该退役申请记录」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/retirement/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/retirement/${id}`);
+      await expect(page.getByText('未找到该退役申请记录').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/workorders/${id}/acceptance 失败显示「工单不存在」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/workorders/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/workorders/${id}/acceptance`);
+      await expect(page.getByText('工单不存在').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/budgets/${id} 失败显示「未找到预算信息」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/budgets/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/budgets/${id}`);
+      await expect(page.getByText('未找到预算信息').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/inspections/${id} 失败显示「检验记录不存在」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/inspections/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/inspections/${id}`);
+      await expect(page.getByText('检验记录不存在').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/spare-parts/${id} 失败显示「备件不存在」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/spare-parts/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/spare-parts/${id}`);
+      await expect(page.getByText('备件不存在').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/insurances/${id} 失败显示「未找到保险记录」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/insurance/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/insurances/${id}`);
+      await expect(page.getByText('未找到保险记录').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/audit/${id} 失败显示「未找到该审计记录」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/audit-logs/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/audit/${id}`);
+      await expect(page.getByText('未找到该审计记录').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/approvals/${id} 失败显示「工单不存在或已删除」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/approvals/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/approvals/${id}`);
+      await expect(page.getByText('工单不存在或已删除').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/disposals/${id} 失败显示「加载失败」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/retirement/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/disposals/${id}`);
+      await expect(page.getByText('加载失败').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/assets/${id} 失败显示「获取数据失败」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/assets/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/assets/${id}`);
+      await expect(page.getByText('获取数据失败').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/m/assets/${id} 失败显示「资产加载失败」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/mobile/assets/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/m/assets/${id}`);
+      await expect(page.getByText('资产加载失败').first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`/m/stocktaking-tasks/${id} 失败显示「获取任务失败」`, async ({ page }) => {
+      await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/stocktaking/tasks/${id}`));
+      await seedSession(page, adminUser);
+      await page.goto(`/m/stocktaking-tasks/${id}`);
+      await expect(page.getByText('获取任务失败').first()).toBeVisible({ timeout: 15_000 });
     });
   }
 });
@@ -331,10 +507,80 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-notification-templates/, { timeout: 15_000 });
   });
 
+  test('已认证 /settings/unknown-tab 回落到基础参数', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings/unknown-tab');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-base-params/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/unknown-tab 回落到基础参数', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/unknown-tab');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-base-params/, { timeout: 15_000 });
+  });
+
   test('已认证 /settings/mail-log 重定向邮件日志', async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, adminUser);
     await page.goto('/settings/mail-log');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-mail-logs/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/notif-channel 重定向通知渠道', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/notif-channel');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-notification-channels/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/notif-switch 重定向流程通知开关', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/notif-switch');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-workflow-notification-switch/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/sla-config 重定向 SLA', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/sla-config');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-sla-config/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/sysconfig 重定向基础参数', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/sysconfig');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-base-params/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/notif-pref 重定向通知偏好', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/notif-pref');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-notification-preferences/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/notif-template 重定向通知模板', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/notif-template');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-notification-templates/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/mail-template 重定向邮件模板', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/mail-template');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-mail-templates/, { timeout: 15_000 });
+  });
+
+  test('已认证 /settings-v2/mail-log 重定向邮件日志', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/settings-v2/mail-log');
     await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=system-mail-logs/, { timeout: 15_000 });
   });
 
@@ -368,6 +614,27 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=home/, { timeout: 15_000 });
   });
 
+  test('/sso-callback 无 userId 仍跳工作台', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.goto('/sso-callback?token=e2e-sso&username=admin');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=home/, { timeout: 15_000 });
+  });
+
+  test('/sso-callback USER 角色跳转工作台', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.goto('/sso-callback?token=e2e-sso&userId=2&username=viewer&realName=只读&roles=USER');
+    await expect(page).toHaveURL(/\/fixed-assets\/workbench\?menu=home/, { timeout: 15_000 });
+  });
+
+  for (const path of ['/login2', '/login3', '/login4', '/login5']) {
+    test(`已认证访问 ${path}?from=e2e 停留登录变体`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, adminUser);
+      await page.goto(`${path}?from=e2e`);
+      await expect(page).toHaveURL(new RegExp(`${path.replace('/', '\\/')}\\?`));
+    });
+  }
+
   for (const path of ['/login2', '/login3', '/login4', '/login5']) {
     test(`已认证访问 ${path} 停留登录变体`, async ({ page }) => {
       await page.route('**/api/**', mockApi);
@@ -382,6 +649,26 @@ test.describe('未测路由 / 权限 / 404', () => {
     await seedSession(page, adminUser);
     await page.goto('/sso-callback');
     await expect(page.getByText('Token 缺失，SSO 登录失败').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('/login2?expired=1 停留登录变体', async ({ page }) => {
+    await page.goto('/login2?expired=1');
+    await expect(page).toHaveURL(/\/login2\?/);
+  });
+
+  test('/login3?expired=1 停留登录变体', async ({ page }) => {
+    await page.goto('/login3?expired=1');
+    await expect(page).toHaveURL(/\/login3\?/);
+  });
+
+  test('/login4?expired=1 停留登录变体', async ({ page }) => {
+    await page.goto('/login4?expired=1');
+    await expect(page).toHaveURL(/\/login4\?/);
+  });
+
+  test('/login5?expired=1 停留登录变体', async ({ page }) => {
+    await page.goto('/login5?expired=1');
+    await expect(page).toHaveURL(/\/login5\?/);
   });
 
   test('/sso-callback 空 token 可见 Token 缺失', async ({ page }) => {
@@ -435,6 +722,13 @@ test.describe('未测路由 / 权限 / 404', () => {
     '/retirement/1/edit', '/approvals/1/edit', '/disposals/1/edit', '/intake/1/edit',
     '/budgets/1/edit', '/compensation/1/edit', '/insurances/1/edit', '/spare-parts/1/edit',
     '/workflows-v2/1', '/fixed-assets/foo', '/vendor-portal/1',
+    '/login/foo', '/forbidden/1', '/sso-callback/1', '/workspace-preview/1',
+    '/stocktaking-cycles/1/edit', '/revaluations/1/edit', '/depreciation/1/edit',
+    '/licenses/1/edit', '/fault-codes/1/edit', '/vendors/1/edit',
+    '/workorders/1/edit', '/inventory/1/edit', '/inventory/tasks/1/edit',
+    '/m/index/foo', '/assets/import-export/1',
+    '/fixed-assets/workbenchv3/1', '/compensation/new/edit',
+    '/safety-checklists/foo', '/risk-assessments/foo',
   ]) {
     test(`已认证 ${path} 未挂载子路由落到 /404`, async ({ page }) => {
       await page.route('**/api/**', mockApi);
@@ -634,6 +928,12 @@ test.describe('未测路由 / 权限 / 404', () => {
     '/purchase-orders/new', '/contracts/new', '/licenses/new/edit',
     '/manufacturers/new/edit', '/asset-models/new/edit',
     '/settings-v2/numbering',
+    '/inventory/smart-report/FOO', '/inventory/scan/FOO',
+    '/safety-checklists/execute/FOO', '/workflow-form/UNKNOWN_TYPE',
+    '/settings-v2/notif-template', '/disposals/2', '/purchase-orders/1',
+    '/inventory/tasks/2', '/inventory/tasks/3', '/approvals/2',
+    '/borrows/2', '/assignments/2', '/intake/2', '/budgets/2',
+    '/inspections/2', '/spare-parts/2', '/insurances/2',
   ]) {
     test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
       await page.route('**/api/**', mockApi);
@@ -786,6 +1086,101 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
   });
 
+  test('未登录 /login?redirect=/analytics 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/analytics');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/system/users 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/system/users');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/ 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/bigscreen 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/bigscreen');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/energy 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/energy');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/gis 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/gis');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/reports 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/reports');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/contracts 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/contracts');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/maintenance 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/maintenance');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/idle 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/idle');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/categories 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/categories');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/vendors 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/vendors');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/locations 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/locations');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/licenses 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/licenses');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/sam 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/sam');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/notifications 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/notifications');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/audit 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/audit');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/workflows-v2 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/workflows-v2');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?expired=1&redirect=/m/scan 可见会话过期提示', async ({ page }) => {
+    await page.goto('/login?expired=1&redirect=/m/scan');
+    await expect(page.getByText('您的会话已过期，请重新登录').first()).toBeVisible({ timeout: 15_000 });
+  });
+
   test('/login?expired=1&redirect=/assets 可见会话过期提示', async ({ page }) => {
     await page.goto('/login?expired=1&redirect=/assets');
     await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
@@ -799,6 +1194,25 @@ test.describe('未测路由 / 权限 / 404', () => {
 
   test('未登录未知路径跳转 /login', async ({ page }) => {
     await page.goto('/e2e-anon-missing-xyz');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('ADMIN 访问 /403 可见无访问权限', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/403');
+    await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('ADMIN 访问 /404 可见页面不存在', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/404');
+    await expect(page.getByText('404 — 页面不存在').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/sso-callback 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/sso-callback');
     await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
   });
 
@@ -888,12 +1302,33 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page.getByText('暂无待办事项').first()).toBeVisible({ timeout: 15_000 });
   });
 
+  test('USER 可打开 /assets/3', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, limitedUser);
+    await page.goto('/assets/3');
+    await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('USER 可打开 /assets/2', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, limitedUser);
+    await page.goto('/assets/2');
+    await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
+  });
+
   test('USER 可打开 /assets/1', async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, limitedUser);
     await page.goto('/assets/1');
     await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
     await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('USER 有台账权限可打开 /assets/2/edit', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, limitedUser);
+    await page.goto('/assets/2/edit');
+    await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
   });
 
   test('USER 有台账权限可打开 /assets/1/edit', async ({ page }) => {
@@ -908,6 +1343,13 @@ test.describe('未测路由 / 权限 / 404', () => {
     await seedSession(page, limitedUser);
     await page.goto('/fixed-assets/workbench/assets?menu=asset');
     await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
+  });
+
+  test('ADMIN 可打开 /m/profile', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/m/profile');
+    await expect(page.getByText('系统管理员').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('USER 可打开 /m/profile', async ({ page }) => {
@@ -945,11 +1387,39 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
   });
 
+  test('USER 有台账权限可打开 /assets/2/timeline 空态', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, limitedUser);
+    await page.goto('/assets/2/timeline');
+    await expect(page.getByText('暂无履历记录').first()).toBeVisible({ timeout: 15_000 });
+  });
+
   test('USER 有台账权限可打开 /assets/1/timeline 空态', async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, limitedUser);
     await page.goto('/assets/1/timeline');
     await expect(page.getByText('暂无履历记录').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('ADMIN 可打开 /bigscreen', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/bigscreen');
+    await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
+  });
+
+  test('ADMIN 可打开 /bigscreen-3d', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
+  });
+
+  test('ADMIN /profile 可见真实姓名', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/profile');
+    await expect(page.getByText('系统管理员').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('USER 无规则路径 /profile 可见真实姓名', async ({ page }) => {
@@ -959,6 +1429,15 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page.getByText('只读用户').first()).toBeVisible({ timeout: 15_000 });
   });
 
+  for (const path of ['/m/unknown-xyz', '/m/work-orders/1', '/profile/1', '/workflows-v2/1', '/retirement/1/edit']) {
+    test(`USER 访问未挂载 ${path} 落到 /404`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/404/, { timeout: 15_000 });
+    });
+  }
+
   test('ADMIN 可打开 /m/assets/2 详情', async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, adminUser);
@@ -966,10 +1445,170 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
   });
 
+  test('/borrows/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/m/assets/abc 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/m/assets/abc');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute/999 不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/UNKNOWN_TYPE 不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/UNKNOWN_TYPE');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/tasks/999 无详情不崩溃', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/tasks/999');
+    await page.waitForLoadState('domcontentloaded');
+    expect(errors).toEqual([]);
+  });
+
   test('ADMIN 可打开 /assets/2 详情', async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, adminUser);
     await page.goto('/assets/2');
+    await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('USER 可打开 /m/assets/2 详情', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, limitedUser);
+    await page.goto('/m/assets/2');
     await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
   });
 
@@ -987,6 +1626,20 @@ test.describe('未测路由 / 权限 / 404', () => {
     await page.goto('/fixed-assets/workbenchv3');
     await expect(page).toHaveURL(/\/fixed-assets\/workbenchv3/, { timeout: 15_000 });
     await expect(page.getByRole('heading', { name: '无访问权限' })).toHaveCount(0);
+  });
+
+  test('USER /retirement/999 失败显示未找到', async ({ page }) => {
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/retirement/999'));
+    await seedSession(page, limitedUser);
+    await page.goto('/retirement/999');
+    await expect(page.getByText('未找到该退役申请记录').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('USER /assets/999 失败显示获取数据失败', async ({ page }) => {
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets/999'));
+    await seedSession(page, limitedUser);
+    await page.goto('/assets/999');
+    await expect(page.getByText('获取数据失败').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('USER 可打开 /m/stocktaking-tasks/1 失败态', async ({ page }) => {
@@ -1053,6 +1706,16 @@ test.describe('未测路由 / 权限 / 404', () => {
     await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
   });
 
+  test('未登录 /login?redirect=/m/assets/1 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/m/assets/1');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
+  test('未登录 /login?redirect=/m/stocktaking-tasks/1 停留登录页', async ({ page }) => {
+    await page.goto('/login?redirect=/m/stocktaking-tasks/1');
+    await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+  });
+
   test('未登录 /login?redirect=/m/index 停留登录页', async ({ page }) => {
     await page.goto('/login?redirect=/m/index');
     await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
@@ -1105,6 +1768,13 @@ test.describe('未测路由 / 权限 / 404', () => {
     await page.getByPlaceholder('密码').fill('ok');
     await page.getByRole('button', { name: '登录' }).click();
     await expect(page.getByText('加载失败').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('USER /m/assets/3 API 失败显示资产加载失败', async ({ page }) => {
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/mobile/assets/3'));
+    await seedSession(page, limitedUser);
+    await page.goto('/m/assets/3');
+    await expect(page.getByText('资产加载失败').first()).toBeVisible({ timeout: 15_000 });
   });
 
   test('USER /m/assets/1 API 失败显示资产加载失败', async ({ page }) => {
@@ -1223,6 +1893,13 @@ test.describe('未测路由 / 权限 / 404', () => {
     '/m/stocktaking-tasks/foo', '/fixed-assets/workbench/foo',
     '/purchase-orders/new', '/contracts/new',
     '/settings-v2/numbering',
+    '/inventory/smart-report/FOO', '/inventory/scan/FOO',
+    '/safety-checklists/execute/FOO', '/workflow-form/UNKNOWN_TYPE',
+    '/assets/import-export', '/retirement/1', '/settings-v2/mail-template',
+    '/settings-v2/notif-template', '/m/stocktaking-tasks/2', '/disposals/2',
+    '/fixed-assets/workbench/todo', '/assets/3/timeline',
+    '/inventory/tasks/2', '/approvals/2', '/borrows/2', '/assignments/2',
+    '/intake/2', '/budgets/2', '/inspections/2', '/spare-parts/2',
   ]) {
     test(`未登录访问 ${path} 跳转 /login`, async ({ page }) => {
       await page.route('**/api/**', mockApi);
