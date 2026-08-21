@@ -8612,6 +8612,37 @@ test.describe('Q1758 桌面供应商空态', () => {
   });
 });
 
+test.describe('Q1759 桌面供应商空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/vendors 点新增供应商「联系电话」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).first().click();
+    await expect(page.getByText('联系电话').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/vendors 点新增供应商「请输入联系电话」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).first().click();
+    await expect(page.getByPlaceholder('请输入联系电话').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/vendors 点新增供应商「邮箱」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).first().click();
+    await expect(page.getByText('邮箱').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
