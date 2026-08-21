@@ -906,4 +906,5 @@
 | Q1716 | done | 桌面空态 **3 passed**（/login 工作台文案与演示账户）。禁 /m。 |
 | Q1717 | done | 桌面空态 **3 passed**（/login 演示账户角色）。禁 /m。 |
 | Q1718 | done | 桌面空态 **3 passed**（/login 演示账户描述）。禁 /m。 |
-| Q1719 | in_progress | 桌面空态：/login2 未覆盖文案。禁 /m。 |
+| Q1719 | done | 桌面空态 **3 passed**（/login5 登录系统与演示体验）。禁 /m。 |
+| Q1720 | in_progress | 桌面空态：/login5 剩余可见文案。禁 /m。 |
