@@ -378,6 +378,49 @@ test.describe('Q1470 桌面趋势/图表空态', () => {
   });
 });
 
+test.describe('Q1471 桌面入库/字段集/审计空态', () => {
+  test('/intake/1 空态「暂无入库资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/intake/1');
+    await expect(page.getByText('暂无入库资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fieldsets 点查看字段空态「该字段集暂无字段」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api/, '');
+      if (path === '/system/custom-fieldsets') {
+        return fulfill(apiRoute, {
+          records: [{ id: 1, name: 'E2E字段集', description: '', status: 1 }],
+          total: 1,
+          size: 20,
+          current: 1,
+          pages: 1,
+        });
+      }
+      return mockApi(apiRoute);
+    });
+    await seedSession(page, adminUser);
+    await page.goto('/system/custom-fieldsets');
+    await page.getByTitle('查看字段').first().click();
+    await expect(page.getByText('该字段集暂无字段').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit 点筛选空态「暂无筛选项」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/audit');
+    await page.getByRole('button', { name: '筛选' }).click();
+    await expect(page.getByText('暂无筛选项').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
