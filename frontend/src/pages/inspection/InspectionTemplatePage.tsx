@@ -260,9 +260,10 @@ const InspectionTemplatePage: React.FC = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={data?.records || data?.list || []}
+          dataSource={Array.isArray(data?.records) ? data.records : Array.isArray(data?.list) ? data.list : []}
           loading={isLoading}
           rowKey="id"
+          locale={{ emptyText: '暂无检验模板' }}
           pagination={{
             current: params.pageNum,
             pageSize: params.pageSize,

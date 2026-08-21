@@ -648,3 +648,4 @@
 | Q1458 | done | 桌面非数组 **3 passed**（/disposals/transfer/new assignees/preview nodes、/assets/1 audit log.changes、/equipment upcoming）。修 AssetTransferFormPage nodes/missingFields、AssetDetailPage log.changes、EquipmentPage upcoming Array.isArray。preview 须 mock start-availability canStart。禁 /m、禁 workbenchv3、禁 id 空转。 |
 | Q1459 | done | 桌面非数组 **2 passed**（/risk-matrix 编辑 dimension、/assets/import-export category/location children）。修 RiskMatrixConfigPage asList、AssetImportExportPage guardTree/guardCascade、CategoryTreeSelect children Array.isArray。禁 /m、禁 workbenchv3、禁 id 空转。 |
 | Q1460 | done | 桌面非数组 **2 passed**（/profile roles/permissions、/floorplans assets）。修 UserProfilePage roles/permissions Array.isArray。平面图 getAssets 已有防护。禁 /m、禁 workbenchv3。不抢 Q1447 失败态。 |
+| Q1461 | done | 桌面空态 **3 passed**（/inspection-templates、/inventory/cycle-count、/inventory/abc-classification）。antd Table locale.emptyText。禁 /m、禁 id 空转。 |

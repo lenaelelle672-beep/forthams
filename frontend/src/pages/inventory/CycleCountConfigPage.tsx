@@ -179,6 +179,7 @@ const CycleCountConfigPage: React.FC = () => {
           loading={isLoading}
           rowKey="id"
           pagination={false}
+          locale={{ emptyText: '暂无循环盘点规则' }}
         />
       </Card>
 

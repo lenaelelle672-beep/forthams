@@ -37,7 +37,10 @@ const ABCClassificationPage: React.FC = () => {
   // 查询资产列表
   const { data: assets, isLoading: assetsLoading } = useQuery({
     queryKey: ['assets'],
-    queryFn: () => getAssetList({ page: 1, pageSize: 1000 }).then(res => (res as any).records || (res as any).list || []),
+    queryFn: () => getAssetList({ page: 1, pageSize: 1000 }).then((res) => {
+      const rows = (res as { records?: unknown; list?: unknown })?.records ?? (res as { list?: unknown })?.list;
+      return Array.isArray(rows) ? rows : [];
+    }),
   });
 
   // 批量重新分类 mutation
@@ -243,9 +246,10 @@ const ABCClassificationPage: React.FC = () => {
         <CardContent>
           <Table
             columns={columns}
-            dataSource={assets || []}
+            dataSource={Array.isArray(assets) ? assets : []}
             rowKey="id"
             pagination={{ pageSize: 20 }}
+            locale={{ emptyText: '暂无资产分类数据' }}
           />
         </CardContent>
       </Card>
