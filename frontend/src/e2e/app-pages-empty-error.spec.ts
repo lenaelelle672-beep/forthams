@@ -7148,6 +7148,37 @@ test.describe('Q1702 桌面报表空态', () => {
   });
 });
 
+test.describe('Q1703 桌面报表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports 点财务报表「资产总价值与净值的月度变化趋势」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: '财务报表' }).click();
+    await expect(page.getByText('资产总价值与净值的月度变化趋势').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 点运维报表「月度维保次数与维保费用统计」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: '运维报表' }).click();
+    await expect(page.getByText('月度维保次数与维保费用统计').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 点工单报表「工单完成率、按时完成率、平均处理时长」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: '工单报表' }).click();
+    await expect(page.getByText('工单完成率、按时完成率、平均处理时长').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

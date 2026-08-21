@@ -890,4 +890,5 @@
 | Q1700 | done | 桌面空态 **3 passed**（/reports 点财务报表折旧分类价值趋势）。禁 /m。 |
 | Q1701 | done | 桌面空态 **3 passed**（/reports 点运维维保退役、工单完成率）。禁 /m。 |
 | Q1702 | done | 桌面空态 **3 passed**（/reports 待处理工单与财务描述）。禁 /m。 |
-| Q1703 | in_progress | 桌面空态：/reports 点财务/运维/工单剩余描述。禁 /m。 |
+| Q1703 | done | 桌面空态 **3 passed**（/reports 财务运维工单描述）。禁 /m。 |
+| Q1704 | in_progress | 桌面空态：/reports 剩余描述。禁 /m。 |
