@@ -963,4 +963,5 @@
 | Q1773 | done | 桌面空态 **3 passed**（/purchase-orders 点新增供应商日期到货）。禁 /m。 |
 | Q1774 | done | 桌面空态 **3 passed**（/purchase-orders 点新增备注与明细占位）。禁 /m。 |
 | Q1775 | done | 桌面空态 **3 passed**（/purchase-orders 点新增明细列与添加行）。禁 /m。 |
-| Q1776 | in_progress | 桌面空态：/purchase-orders 点新增「单价」「确认新增」「取消」。禁 /m。 |
+| Q1776 | done | 桌面空态 **3 passed**（/purchase-orders 点新增单价确认取消）。禁 /m。 |
+| Q1777 | in_progress | 桌面空态：/purchase-orders「采购订单管理」、点新增「金额」「备注」。禁 /m。 |
