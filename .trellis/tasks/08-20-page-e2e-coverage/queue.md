@@ -883,4 +883,5 @@
 | Q1693 | done | 桌面空态 **3 passed**（/system/posts 点新增确认取消标题）。禁 /m。 |
 | Q1694 | done | 桌面空态 **3 passed**（/energy「暂无能耗数据」、/system/users「停用」「全部」）。禁 /m。 |
 | Q1695 | done | 桌面空态 **3 passed**（/system/users「正常」「重置」「用户」）。禁 /m。 |
-| Q1696 | in_progress | 桌面空态：/system/users「状态」。禁 /m。 |
+| Q1696 | done | 桌面空态 **3 passed**（/system/users「状态」「操作」「用户管理」）。禁 /m。 |
+| Q1697 | in_progress | 桌面空态：/system/users 点新增「状态」。禁 /m。 |
