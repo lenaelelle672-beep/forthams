@@ -734,6 +734,34 @@ test.describe('Q1480 桌面导出/部门空态', () => {
   });
 });
 
+test.describe('Q1481 桌面导入/岗位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/import-export 空态「将 .xlsx 文件拖到此处，或点击选择文件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('将 .xlsx 文件拖到此处，或点击选择文件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export 空态「支持 .xlsx 格式，文件大小不超过 10MB」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('支持 .xlsx 格式，文件大小不超过 10MB').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/posts 空态「新增岗位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByText('新增岗位').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
