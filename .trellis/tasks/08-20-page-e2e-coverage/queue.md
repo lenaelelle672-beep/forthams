@@ -686,4 +686,5 @@
 | Q1496 | done | 桌面空态 **3 passed**（/gis 点资产定位管理「新建资产定位」「关联已有资产」、/notifications「全部已读」）。禁 /m。 |
 | Q1497 | done | 桌面空态 **3 passed**（GIS 关联提示、搜索 placeholder、新建定位临时数据提示）。禁 /m。 |
 | Q1498 | done | 桌面空态 **3 passed**（GIS 新建定位名称/编号/纬度 placeholder）。禁 /m。 |
-| Q1499 | in_progress | 桌面空态：/gis 点新建资产定位 placeholder「如：116.4074」「如：北京总部A栋1层」、「确认创建」。禁 /m。 |
+| Q1499 | done | 桌面空态 **3 passed**（GIS 新建定位经度/位置 placeholder、「确认创建」）。禁 /m。 |
+| Q1500 | in_progress | 桌面空态：/gis 关联模式「标注坐标」「取消」、点新建资产定位 label「资产名称」。禁 /m。 |
