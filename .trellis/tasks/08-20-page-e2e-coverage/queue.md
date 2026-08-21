@@ -976,4 +976,5 @@
 | Q1786 | done | 桌面空态 **3 passed**（/insurances/new 保险名称类型公司）。禁 /m。 |
 | Q1787 | done | 桌面空态 **3 passed**（/insurances/new 保险公司保费）。禁 /m。 |
 | Q1788 | done | 桌面空态 **3 passed**（/insurances/new 保额免赔额）。禁 /m。 |
-| Q1789 | in_progress | 桌面空态：/insurances/new「请输入免赔额」「开始日期」「结束日期」。禁 /m。 |
+| Q1789 | done | 桌面空态 **3 passed**（/insurances/new 免赔额起止日期）。禁 /m。 |
+| Q1790 | in_progress | 桌面空态：/insurances/new「状态」「备注」「返回」。禁 /m。 |
