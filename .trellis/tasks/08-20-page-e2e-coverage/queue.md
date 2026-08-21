@@ -896,4 +896,5 @@
 | Q1706 | done | 桌面空态 **3 passed**（/reports 近6/12/24个月）。禁 /m。 |
 | Q1707 | done | 桌面空态 **3 passed**（/reports 卡片日期）。禁 /m。 |
 | Q1708 | done | 桌面空态 **3 passed**（/login 品牌标语）。禁 /m。 |
-| Q1709 | in_progress | 桌面空态：/login 剩余品牌文案。禁 /m。 |
+| Q1709 | done | 桌面空态 **3 passed**（/login 智能运维入口与副标语）。禁 /m。 |
+| Q1710 | in_progress | 桌面空态：/login「运行稳定」。禁 /m。 |
