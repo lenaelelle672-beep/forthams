@@ -810,4 +810,5 @@
 | Q1620 | done | 桌面空态 **3 passed**（/manufacturers 点新增说明与名称 placeholder）。禁 /m。 |
 | Q1621 | done | 桌面空态 **3 passed**（/asset-models 规格说明、「全部模型」「全部分类」）。禁 /m。 |
 | Q1622 | done | 桌面空态 **3 passed**（/asset-models 点新增模型标题、说明与名称 placeholder）。禁 /m。 |
-| Q1623 | in_progress | 桌面空态：/asset-models 点新增「产品型号」「模型名称 *」。禁 /m。 |
+| Q1623 | done | 桌面空态 **3 passed**（/asset-models 点新增「产品型号」「模型名称 *」「分类 *」）。禁 /m。 |
+| Q1624 | in_progress | 桌面空态：/depreciation 未覆盖说明。禁 /m。 |

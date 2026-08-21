@@ -4779,6 +4779,37 @@ test.describe('Q1622 桌面资产模型空态', () => {
   });
 });
 
+test.describe('Q1623 桌面资产模型空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/asset-models 点新增模型「产品型号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).click();
+    await expect(page.getByPlaceholder('产品型号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/asset-models 点新增模型「模型名称 *」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).click();
+    await expect(page.getByText('模型名称 *').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/asset-models 点新增模型「分类 *」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).click();
+    await expect(page.getByText('分类 *').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
