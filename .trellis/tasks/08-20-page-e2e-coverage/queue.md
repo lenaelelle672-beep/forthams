@@ -900,4 +900,5 @@
 | Q1710 | done | 桌面空态 **3 passed**（/login 运行稳定与宇视品牌）。禁 /m。 |
 | Q1711 | done | 桌面空态 **3 passed**（/login 全息版流星版与版权）。禁 /m。 |
 | Q1712 | done | 桌面空态 **3 passed**（/login 账号密码与记住用户名）。禁 /m。 |
-| Q1713 | in_progress | 桌面空态：/login「忘记密码?」。禁 /m。 |
+| Q1713 | done | 桌面空态 **3 passed**（/login 忘记密码登录系统SSO）。禁 /m。 |
+| Q1714 | in_progress | 桌面空态：/login「使用组织统一身份认证登录」。禁 /m。 |
