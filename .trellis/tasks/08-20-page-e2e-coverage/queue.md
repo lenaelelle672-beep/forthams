@@ -935,4 +935,5 @@
 | Q1745 | done | 桌面空态 **3 passed**（/locations 标题空表与新增位置）。禁 /m。 |
 | Q1746 | done | 桌面空态 **3 passed**（/locations 点新增名称占位确认）。禁 /m。 |
 | Q1747 | done | 桌面空态 **3 passed**（/locations 点新增编码占位取消）。禁 /m。 |
-| Q1748 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
+| Q1748 | done | 桌面空态 **3 passed**（/manufacturers 点新增说明名称）。禁 /m。 |
+| Q1749 | in_progress | 桌面空态：/manufacturers 点新增剩余字段。禁 /m。 |
