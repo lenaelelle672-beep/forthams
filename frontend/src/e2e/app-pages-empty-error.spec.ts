@@ -262,6 +262,62 @@ test.describe('Q1467 桌面详情/弹窗空态', () => {
   });
 });
 
+test.describe('Q1468 桌面明细/弹窗空态', () => {
+  test('/disposals/clearance/new 点添加资产空态「暂无匹配资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/disposals/clearance/new');
+    await page.getByRole('button', { name: '添加资产' }).click();
+    await expect(page.getByText('暂无匹配资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/purchase-orders 点行空态「暂无明细」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api/, '');
+      if (path === '/purchase-orders/1') {
+        return fulfill(apiRoute, { order: { id: 1, orderNo: 'PO-1', orderName: 'E2E采购' }, items: [] });
+      }
+      if (path === '/purchase-orders') {
+        return fulfill(apiRoute, { records: [{ id: 1, orderNo: 'PO-1', orderName: 'E2E采购' }], total: 1, size: 10, current: 1, pages: 1 });
+      }
+      return mockApi(apiRoute);
+    });
+    await seedSession(page, adminUser);
+    await page.goto('/purchase-orders');
+    await page.getByText('E2E采购').first().click();
+    await expect(page.getByText('暂无明细').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-records 点历史空态「暂无历史记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api/, '');
+      if (path === '/inspections/list') {
+        return fulfill(apiRoute, {
+          records: [{ id: 1, assetId: 1, inspectionNo: 'INSP-E2E', result: 'PASS' }],
+          total: 1,
+          size: 10,
+          current: 1,
+          pages: 1,
+        });
+      }
+      if (path === '/inspections/history/1') {
+        return fulfill(apiRoute, { records: [], total: 0, size: 20, current: 1, pages: 1 });
+      }
+      return mockApi(apiRoute);
+    });
+    await seedSession(page, adminUser);
+    await page.goto('/inspection-records');
+    await page.getByRole('button', { name: '历史' }).first().click();
+    await expect(page.getByText('暂无历史记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

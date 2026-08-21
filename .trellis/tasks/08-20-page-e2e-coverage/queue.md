@@ -655,4 +655,5 @@
 | Q1465 | done | 桌面空态 **3 passed**（/sam「暂无扫描历史」、/contracts 点即将到期「暂无即将到期合同」、/budgets 点超支告警「暂无超支告警」）。禁 /m。 |
 | Q1466 | done | 桌面空态 **3 passed**（/contracts 点时间轴「暂无时间线数据」、/budgets 点执行率「暂无执行率数据」、/inventory/smart-report/INV-001「暂无差异资产，盘点结果正常」）。summary mock 须对象。禁 /m。 |
 | Q1467 | done | 桌面空态 **3 passed**（/assets/1「暂无 TCO 数据」、/approvals 点发起申请「暂无可发起的流程」、/audit/1「暂无变更记录」）。TCO mock `null`。禁 /m。 |
-| Q1468 | in_progress | 桌面空态（/purchase-orders/1「暂无明细」、/inspections 点历史「暂无历史记录」、/disposals/clearance/new「暂无匹配资产」）。禁 /m、禁 workbenchv3、禁 id 空转。不抢 Q1443/Q1447。 |
+| Q1468 | done | 桌面空态 **3 passed**（/disposals/clearance/new 点添加资产「暂无匹配资产」、/purchase-orders 点行「暂无明细」、/inspection-records 点历史「暂无历史记录」）。禁 /m。 |
+| Q1469 | in_progress | 桌面空态（/disposals/clearance/new「暂未选择资产」、/sam 图表「暂无数据」、/gis 点关联已有「暂无可关联的资产」）。禁 /m、禁 workbenchv3、禁 id 空转。不抢 Q1443/Q1447。 |
