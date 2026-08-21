@@ -916,4 +916,5 @@
 | Q1726 | done | 桌面空态 **3 passed**（/login4 演示账户与版本导航）。禁 /m。 |
 | Q1727 | done | 桌面空态 **3 passed**（/login4 标准全息流星版）。禁 /m。 |
 | Q1728 | done | 桌面空态 **3 passed**（/login4 账号密码占位与校验）。禁 /m。 |
-| Q1729 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
+| Q1729 | done | 桌面空态 **3 passed**（/vendor-portal 标题编码登录）。禁 /m。 |
+| Q1730 | in_progress | 桌面空态：/vendor-portal 点登录空表。禁 /m。 |
