@@ -952,4 +952,5 @@
 | Q1762 | done | 桌面空态 **3 passed**（/vendors 取消、/contracts 合同名称）。禁 /m。 |
 | Q1763 | done | 桌面空态 **3 passed**（/contracts 点新增编号与类型）。禁 /m。 |
 | Q1764 | done | 桌面空态 **3 passed**（/contracts 点新增金额货币备注）。禁 /m。 |
-| Q1765 | in_progress | 桌面空态：/contracts 点新增「开始日期」「到期日期」「备注」。禁 /m。 |
+| Q1765 | done | 桌面空态 **3 passed**（/contracts 点新增起止日期备注）。禁 /m。 |
+| Q1766 | in_progress | 桌面空态：/contracts 点新增「0.00」「确认新增」「取消」。禁 /m。 |
