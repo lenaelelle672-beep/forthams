@@ -895,4 +895,5 @@
 | Q1705 | done | 桌面空态 **3 passed**（/reports 导出PDF、报表中心、副标题）。禁 /m。 |
 | Q1706 | done | 桌面空态 **3 passed**（/reports 近6/12/24个月）。禁 /m。 |
 | Q1707 | done | 桌面空态 **3 passed**（/reports 卡片日期）。禁 /m。 |
-| Q1708 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
+| Q1708 | done | 桌面空态 **3 passed**（/login 品牌标语）。禁 /m。 |
+| Q1709 | in_progress | 桌面空态：/login 剩余品牌文案。禁 /m。 |
