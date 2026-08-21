@@ -733,4 +733,5 @@
 | Q1543 | done | 桌面空态 **3 passed**（/reports「部门资产排行」「资产增长趋势」、点财务报表「资产价值趋势」）。禁 /m。 |
 | Q1544 | done | 桌面空态 **3 passed**（/reports 点财务报表「折旧统计」「分类价值分布」、点运维报表「维保统计」）。禁 /m。 |
 | Q1545 | done | 桌面空态 **3 passed**（/reports 点运维报表「退役处置统计」、点工单报表「工单完成率」「待处理工单」）。禁 /m。 |
-| Q1546 | in_progress | 桌面空态：/reports/scheduled 或 /sam 未覆盖说明。禁 /m。 |
+| Q1546 | done | 桌面空态 **3 passed**（/reports/scheduled 调度说明与新建提示、/sam 副标题）。禁 /m。 |
+| Q1547 | in_progress | 桌面空态：/sam「触发合规扫描」与图表空态说明。禁 /m。 |

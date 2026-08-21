@@ -2593,6 +2593,34 @@ test.describe('Q1545 桌面报表空态', () => {
   });
 });
 
+test.describe('Q1546 桌面定时报表/SAM空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports/scheduled 空态「管理定时报表调度和邮件推送」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByText('管理定时报表调度和邮件推送').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports/scheduled 空态「点击"新建定时报表"开始创建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByText('点击"新建定时报表"开始创建').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam 空态「软件许可合规扫描与审计仪表盘」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByText('软件许可合规扫描与审计仪表盘').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
