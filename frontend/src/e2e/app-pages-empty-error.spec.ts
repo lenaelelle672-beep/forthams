@@ -6662,6 +6662,34 @@ test.describe('Q1686 桌面forbidden与分析空态', () => {
   });
 });
 
+test.describe('Q1687 桌面分析空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics 空态「暂无部门排行数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByText('暂无部门排行数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics 空态「暂无趋势数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByText('暂无趋势数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics 空态「暂无分类数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByText('暂无分类数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
