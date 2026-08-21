@@ -868,4 +868,5 @@
 | Q1678 | done | 桌面空态 **3 passed**（/dashboard「查看全部」「总价值」、/test-results 加载失败）。禁 /m。 |
 | Q1679 | done | 桌面空态 **3 passed**（/system/posts 点新增排序与状态）。禁 /m。 |
 | Q1680 | done | 桌面空态 **3 passed**（字段只读副标题共 0 条、菜单取消）。禁 /m。 |
-| Q1681 | in_progress | 桌面空态：/403 未覆盖文案。禁 /m。 |
+| Q1681 | done | 桌面空态 **3 passed**（/403 权限说明与返回按钮）。禁 /m。 |
+| Q1682 | in_progress | 桌面空态：/403 联系管理员、/403?reason=roles_missing。禁 /m。 |
