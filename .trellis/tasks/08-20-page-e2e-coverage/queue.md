@@ -954,4 +954,5 @@
 | Q1764 | done | 桌面空态 **3 passed**（/contracts 点新增金额货币备注）。禁 /m。 |
 | Q1765 | done | 桌面空态 **3 passed**（/contracts 点新增起止日期备注）。禁 /m。 |
 | Q1766 | done | 桌面空态 **3 passed**（/contracts 点新增金额占位确认取消）。禁 /m。 |
-| Q1767 | in_progress | 桌面空态：/contracts「合同管理」、点新增「CNY」「状态」。禁 /m。 |
+| Q1767 | done | 桌面空态 **3 passed**（/contracts 合同管理、CNY、状态）。禁 /m。 |
+| Q1768 | in_progress | 桌面空态：/contracts 点新增展开「维保合同」「采购合同」「租赁合同」。禁 /m。 |
