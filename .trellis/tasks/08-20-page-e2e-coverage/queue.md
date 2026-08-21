@@ -704,4 +704,5 @@
 | Q1514 | done | 桌面空态 **3 passed**（/intake/new 验收说明、/spare-parts/new 备件保障说明、/workflows 搜索 placeholder）。禁 /m。 |
 | Q1515 | done | 桌面空态 **3 passed**（/budgets/new「创建新的预算记录」、/revaluations/new「资产价值调整申请」、/analytics/reliability 副标题）。禁 /m。 |
 | Q1516 | done | 桌面空态 **3 passed**（/analytics/tco 副标题、/disposals/scrap/new 报废说明、/disposals/transfer/new 转移说明）。禁 /m。 |
-| Q1517 | in_progress | 桌面空态：/analytics/tco placeholder「输入资产ID」「输入部门ID」「输入分类ID」。禁 /m。 |
+| Q1517 | done | 桌面空态 **3 passed**（/analytics/tco placeholder「输入资产ID」「输入部门ID」「输入分类ID」）。禁 /m。 |
+| Q1518 | in_progress | 桌面空态：/manufacturers「搜索名称/编码」、/contracts「搜索合同名称/编号」、/insurances 搜索 placeholder。禁 /m。 |
