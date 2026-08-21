@@ -834,4 +834,5 @@
 | Q1644 | done | 桌面空态 **3 passed**（/vendors「合作供应商信息维护」「全部供应商」「合作中」）。禁 /m。 |
 | Q1645 | done | 桌面空态 **3 passed**（/vendors「已停用」、点新增说明与名称 placeholder）。禁 /m。 |
 | Q1646 | done | 桌面空态 **3 passed**（/vendors 点新增名称编码与弹窗标题）。禁 /m。 |
-| Q1647 | in_progress | 桌面空态：/system/custom-fieldsets 未覆盖说明。禁 /m。 |
+| Q1647 | done | 桌面空态 **3 passed**（/system/custom-fieldsets「字段集名称」「描述」「状态」）。禁 /m。 |
+| Q1648 | in_progress | 桌面空态：/system/custom-fields 列标题。禁 /m。 |
