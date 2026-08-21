@@ -1576,6 +1576,34 @@ test.describe('Q1509 桌面大屏面板空态', () => {
   });
 });
 
+test.describe('Q1510 桌面大屏面板空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen 空态「承运情况分析」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('承运情况分析').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('webgl'))).toEqual([]);
+  });
+
+  test('/bigscreen 空态「油量信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('油量信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('webgl'))).toEqual([]);
+  });
+
+  test('/bigscreen 空态「重点关注航班信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('重点关注航班信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('webgl'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

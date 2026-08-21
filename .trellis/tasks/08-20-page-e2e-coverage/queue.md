@@ -697,4 +697,5 @@
 | Q1507 | done | 桌面空态 **3 passed**（/bigscreen「资产运营分析平台」「值班领导」「值班经理」）。WebGL console 忽略。禁 /m。 |
 | Q1508 | done | 桌面空态 **3 passed**（/bigscreen「资产运行分析」「今日资产信息」「资产异常分析」）。禁 /m。 |
 | Q1509 | done | 桌面空态 **3 passed**（/bigscreen「今日不正常情况明细」「收入运力信息」「人员信息」）。禁 /m。 |
-| Q1510 | in_progress | 桌面空态：/bigscreen「承运情况分析」「油量信息」「重点关注航班信息」。禁 /m。 |
+| Q1510 | done | 桌面空态 **3 passed**（/bigscreen「承运情况分析」「油量信息」「重点关注航班信息」）。禁 /m。 |
+| Q1511 | in_progress | 桌面空态：/bigscreen-3d「资产规模指标」「资产分类结构」「价值趋势预测」。禁 /m。 |
