@@ -759,4 +759,5 @@
 | Q1569 | done | 桌面空态 **3 passed**（/categories「子分类数」、/system/users「用户总量」「新增用户」）。禁 /m。 |
 | Q1570 | done | 桌面空态 **3 passed**（/system/users「角色数」「岗位数」「总页数」）。禁 /m。 |
 | Q1571 | done | 桌面空态 **3 passed**（/system/users「用户列表」、/system/roles「角色列表」「角色与权限管理」）。禁 /m。 |
-| Q1572 | in_progress | 桌面空态：/system/roles「角色总数」「当前页」「RBAC」。禁 /m。 |
+| Q1572 | done | 桌面空态 **3 passed**（/system/roles「角色总数」「当前页」「RBAC」）。禁 /m。 |
+| Q1573 | in_progress | 桌面空态：/system/menus 未覆盖说明。禁 /m。 |
