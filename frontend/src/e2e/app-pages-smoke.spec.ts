@@ -3052,6 +3052,73 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '数据分析' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/reports by-category 纯对象点击分类统计无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reports/by-category*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/reports');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('heading', { name: '资产分类统计' }).click();
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer definition.nodes 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/workflows*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (/^\/workflows\/[A-Z][A-Z0-9_]*$/.test(path)) {
+        await fulfill(apiRoute, {
+          businessType: path.split('/').pop(),
+          name: '资产转移流程',
+          description: '',
+          definition: { nodes: { unexpected: true }, edges: { unexpected: true } },
+          status: 'DRAFT',
+          version: 1,
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/workflow-designer');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产转移流程' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer assignees/preview nodes 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/assignees/preview*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        calculable: true,
+        nodes: { unexpected: true },
+        missingFields: { unexpected: true },
+      });
+    });
+    await page.goto('/workflow-designer');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产转移流程' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications items 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/notifications*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/notifications') {
+        await fulfill(apiRoute, { items: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/notifications');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '通知中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

@@ -42,6 +42,8 @@ export function ChartPreview({
   valueKey = 'value',
   loading,
 }: ChartPreviewProps) {
+  const chartRows = Array.isArray(data) ? data : [];
+
   if (loading) {
     return (
       <Card>
@@ -55,7 +57,7 @@ export function ChartPreview({
     );
   }
 
-  if (!data || data.length === 0) {
+  if (chartRows.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -77,7 +79,7 @@ export function ChartPreview({
       case 'bar':
         return (
           <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={data} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
+            <BarChart data={chartRows} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis
                 dataKey={dataKey}
@@ -102,7 +104,7 @@ export function ChartPreview({
           <ResponsiveContainer width="100%" height={280}>
             <PieChart>
               <Pie
-                data={data}
+                data={chartRows}
                 cx="50%"
                 cy="45%"
                 innerRadius={50}
@@ -112,7 +114,7 @@ export function ChartPreview({
                 paddingAngle={2}
                 label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
               >
-                {data.map((_, i) => (
+                {chartRows.map((_, i) => (
                   <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                 ))}
               </Pie>
@@ -125,7 +127,7 @@ export function ChartPreview({
       case 'area':
         return (
           <ResponsiveContainer width="100%" height={280}>
-            <AreaChart data={data} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
+            <AreaChart data={chartRows} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
               <defs>
                 <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15} />
@@ -161,7 +163,7 @@ export function ChartPreview({
       case 'line':
         return (
           <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={data} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
+            <LineChart data={chartRows} margin={{ top: 5, right: 16, left: -16, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
               <XAxis
                 dataKey={dataKey}

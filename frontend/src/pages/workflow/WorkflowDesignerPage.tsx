@@ -46,7 +46,7 @@ function syncLegacyFormSource(definition: Pick<FlowDefinition, 'nodes' | 'edges'
   if (!legacyFormSource.trim()) return definition;
   return {
     ...definition,
-    nodes: definition.nodes.map((node) => {
+    nodes: (Array.isArray(definition.nodes) ? definition.nodes : []).map((node) => {
       if (node.type !== 'start' || (typeof node.data.formSource === 'string' && node.data.formSource.trim())) return node;
       return { ...node, data: { ...node.data, formSource: legacyFormSource, formSectionName: node.data.formSectionName || '申请信息' } };
     }),
@@ -163,8 +163,8 @@ function AssigneePreviewPanel({
   onBusinessDataChange: (value: string) => void;
   onPreview: () => void;
 }) {
-  const missingFields = preview?.missingFields ?? [];
-  const nodes = preview?.nodes ?? [];
+  const missingFields = Array.isArray(preview?.missingFields) ? preview.missingFields : [];
+  const nodes = Array.isArray(preview?.nodes) ? preview.nodes : [];
   const unresolvedNodes = nodes.filter((node) => !node.resolved || node.reason);
   const sourceText = source === 'auto'
     ? (preview?.calculable ? '已自动计算处理人' : '自动计算已运行')
