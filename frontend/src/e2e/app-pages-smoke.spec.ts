@@ -2981,6 +2981,77 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: 'SAM 合规管理' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/reports depreciation-stats 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reports/depreciation-stats*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/reports');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '财务报表' }).click();
+    await page.getByRole('heading', { name: '折旧统计' }).click();
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports maintenance-stats 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reports/maintenance-stats*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/reports');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '运维报表' }).click();
+    await page.getByRole('heading', { name: '维保统计' }).click();
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports retirement-stats 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reports/retirement-stats*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/reports');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '运维报表' }).click();
+    await page.getByRole('heading', { name: '退役处置统计' }).click();
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports workorders 统计非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/workorders/status-distribution*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.route('**/workorders/dept-pending*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/reports');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '工单报表' }).click();
+    await page.getByRole('heading', { name: '工单完成率' }).click();
+    await page.getByRole('heading', { name: '待处理工单' }).click();
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics maintenance-stats 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/dashboard/maintenance-stats*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ unexpected: true }]);
+    });
+    await page.goto('/analytics');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '数据分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

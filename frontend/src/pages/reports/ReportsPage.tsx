@@ -168,8 +168,8 @@ export default function ReportsPage() {
       toast.error('数据加载失败，请重试');
     }
   }, [categoryError, summaryError, trendError]);
-  const categoryData = categoryRes as unknown as CategoryReport[] | undefined ?? [];
-  const trendData = trendRes as unknown as TrendReport[] | undefined ?? [];
+  const categoryData = Array.isArray(categoryRes) ? categoryRes as CategoryReport[] : [];
+  const trendData = Array.isArray(trendRes) ? trendRes as TrendReport[] : [];
   const summary = summaryRes as unknown as ReportSummary | undefined;
 
   // ── 当前分类下的报表 ────────────────────────────────────────────────────────
@@ -232,40 +232,50 @@ export default function ReportsPage() {
         return [];
       case 'fin-depreciation': {
         // AC-2: 从后端获取真实折旧统计数据，替代原有 mock
-        const depreciationData = depreciationRes as unknown as { month: string; value: number }[] | undefined;
-        if (depreciationData && depreciationData.length > 0) {
+        const depreciationData = Array.isArray(depreciationRes)
+          ? depreciationRes as { month: string; value: number }[]
+          : [];
+        if (depreciationData.length > 0) {
           return depreciationData.map((d) => ({ month: d.month, value: d.value }));
         }
         return [];
       }
       case 'ops-maintenance': {
         // AC-2: 从后端获取真实维保统计数据，替代原有 mock
-        const maintenanceData = maintenanceRes as unknown as { month: string; value: number }[] | undefined;
-        if (maintenanceData && maintenanceData.length > 0) {
+        const maintenanceData = Array.isArray(maintenanceRes)
+          ? maintenanceRes as { month: string; value: number }[]
+          : [];
+        if (maintenanceData.length > 0) {
           return maintenanceData.map((d) => ({ month: d.month, value: d.value }));
         }
         return [];
       }
       case 'ops-retirement': {
         // AC-2: 从后端获取真实退役处置统计数据，替代原有 mock
-        const retirementData = retirementRes as unknown as { month: string; value: number }[] | undefined;
-        if (retirementData && retirementData.length > 0) {
+        const retirementData = Array.isArray(retirementRes)
+          ? retirementRes as { month: string; value: number }[]
+          : [];
+        if (retirementData.length > 0) {
           return retirementData.map((d) => ({ month: d.month, value: d.value }));
         }
         return [];
       }
       case 'wo-summary': {
         // AC-2: 从后端获取真实工单状态分布数据
-        const statusData = workOrderStatusRes as unknown as NameValueItem[] | undefined;
-        if (statusData && statusData.length > 0) {
+        const statusData = Array.isArray(workOrderStatusRes)
+          ? workOrderStatusRes as NameValueItem[]
+          : [];
+        if (statusData.length > 0) {
           return statusData;
         }
         return [];
       }
       case 'wo-pending': {
         // AC-2: 从后端获取真实部门待处理工单数据
-        const deptData = workOrderDeptPendingRes as unknown as NameValueItem[] | undefined;
-        if (deptData && deptData.length > 0) {
+        const deptData = Array.isArray(workOrderDeptPendingRes)
+          ? workOrderDeptPendingRes as NameValueItem[]
+          : [];
+        if (deptData.length > 0) {
           return deptData;
         }
         return [];

@@ -191,10 +191,13 @@ export default function AnalyticsPage() {
 
   const stats = statsRes as unknown as DashboardStats | undefined;
   const summary = summaryRes as unknown as ReportSummary | undefined;
-  const trends = (trendsRes as unknown as AssetValueTrend[] | undefined) ?? [];
-  const deptData = (deptRes as unknown as DeptAssetDistribution[] | undefined) ?? [];
-  const categoryData = (categoryRes as unknown as CategoryReport[] | undefined) ?? [];
-  const maintenanceData = maintenanceRes as unknown as Record<string, unknown> | undefined;
+  const trends = Array.isArray(trendsRes) ? trendsRes as AssetValueTrend[] : [];
+  const deptData = Array.isArray(deptRes) ? deptRes as DeptAssetDistribution[] : [];
+  const categoryData = Array.isArray(categoryRes) ? categoryRes as CategoryReport[] : [];
+  const maintenanceData =
+    maintenanceRes && typeof maintenanceRes === 'object' && !Array.isArray(maintenanceRes)
+      ? maintenanceRes as unknown as Record<string, unknown>
+      : undefined;
 
   /** 趋势图数据：将 API 响应映射为图表格式 */
   const trendChartData =

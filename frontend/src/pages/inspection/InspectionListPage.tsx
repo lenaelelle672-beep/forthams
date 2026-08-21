@@ -132,9 +132,9 @@ const InspectionListPage: React.FC = () => {
       return;
     }
 
-    const selectedRecords = records.filter((record: Inspection) =>
-      selectedRowKeys.includes(record.id!),
-    );
+    const selectedRecords = Array.isArray(records)
+      ? records.filter((record: Inspection) => selectedRowKeys.includes(record.id!))
+      : [];
 
     // 准备导出数据
     const exportData = selectedRecords.map((record: Inspection) => ({
