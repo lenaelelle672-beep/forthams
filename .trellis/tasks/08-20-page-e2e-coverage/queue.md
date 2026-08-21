@@ -881,4 +881,5 @@
 | Q1691 | done | 桌面空态 **3 passed**（/system/roles 点新增展开数据权限选项）。禁 /m。 |
 | Q1692 | done | 桌面空态 **3 passed**（角色仅本人、部门确认新增取消）。禁 /m。 |
 | Q1693 | done | 桌面空态 **3 passed**（/system/posts 点新增确认取消标题）。禁 /m。 |
-| Q1694 | in_progress | 桌面空态：未覆盖桌面页继续。禁 /m。 |
+| Q1694 | done | 桌面空态 **3 passed**（/energy「暂无能耗数据」、/system/users「停用」「全部」）。禁 /m。 |
+| Q1695 | in_progress | 桌面空态：/system/users「正常」。禁 /m。 |
