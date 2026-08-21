@@ -7525,6 +7525,29 @@ test.describe('Q1717 桌面登录空态', () => {
   });
 });
 
+test.describe('Q1718 桌面登录空态', () => {
+  test('/login 空态「全生命周期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('全生命周期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「资源审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('资源审批').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「巡检维修」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('巡检维修').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
