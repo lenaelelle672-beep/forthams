@@ -103,8 +103,8 @@ export default function IntakeFormPage() {
       setOrderDate(detailRes.orderDate || new Date().toISOString().split('T')[0]);
       setTotalAmount(detailRes.totalAmount?.toString() || '');
       setVendorId(detailRes.vendorId?.toString() || '');
-      if (detailRes.checkItems?.length) setCheckItems(detailRes.checkItems);
-      if (detailRes.intakeAssets?.length) setIntakeAssets(detailRes.intakeAssets);
+      if (Array.isArray(detailRes.checkItems) && detailRes.checkItems.length) setCheckItems(detailRes.checkItems);
+      if (Array.isArray(detailRes.intakeAssets) && detailRes.intakeAssets.length) setIntakeAssets(detailRes.intakeAssets);
     }
   }, [detailRes]);
 

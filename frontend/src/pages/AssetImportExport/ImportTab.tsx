@@ -525,7 +525,7 @@ const ImportTab: React.FC = () => {
       } else {
         // 后端可能返回新的校验结果（如业务规则校验失败）
         const json = await res.json().catch(() => null);
-        if (json?.rows) {
+        if (Array.isArray(json?.rows)) {
           const refreshed: ImportPreviewRow[] = json.rows.map(
             (r: Record<string, unknown>, idx: number) => ({
               key: String(r.id ?? idx),

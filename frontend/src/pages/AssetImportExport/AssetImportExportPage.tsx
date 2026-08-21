@@ -292,8 +292,8 @@ const AssetImportExportPage: React.FC = () => {
         try {
           const result: ParseResult = JSON.parse(xhr.responseText);
           setParseId(result.parseId);
-          setRows(result.rows);
-          setOriginalErrors(result.errors || []);
+          setRows(Array.isArray(result.rows) ? result.rows : []);
+          setOriginalErrors(Array.isArray(result.errors) ? result.errors : []);
           setEditedFields(new Set());
           setCommitResult(null);
           setImportPhase('preview');

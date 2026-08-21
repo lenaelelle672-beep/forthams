@@ -241,6 +241,7 @@ export default function RetirementDetailPage() {
   const statusCfg = STATUS_CONFIG[record.status];
   const canWithdraw = record.status === 'PENDING' || record.status === 'DRAFT';
   const isTerminal = record.status === 'APPROVED' || record.status === 'REJECTED' || record.status === 'WITHDRAWN' || record.status === 'COMPLETED';
+  const approvalRecords = Array.isArray(record.approvalRecords) ? record.approvalRecords : [];
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto">
@@ -412,14 +413,14 @@ export default function RetirementDetailPage() {
           </SectionCard>
 
           {/* ③ 历史记录 — 终态时展示 */}
-          {isTerminal && record.approvalRecords && record.approvalRecords.length > 0 && (
+          {isTerminal && approvalRecords.length > 0 && (
             <SectionCard
               icon={<History className="w-3.5 h-3.5 text-gray-600" />}
               iconColor="bg-gray-100"
               title="历史记录"
             >
               <div className="space-y-3">
-                {record.approvalRecords.map((r) => {
+                {approvalRecords.map((r) => {
                   const actionLabel = r.action === 'APPROVE' ? '审批通过' : '审批驳回';
                   const actionColor = r.action === 'APPROVE'
                     ? 'text-green-700 bg-green-50 border-green-200'
@@ -483,9 +484,9 @@ export default function RetirementDetailPage() {
             )}
 
             {/* 时间线 */}
-            {record.approvalRecords && record.approvalRecords.length > 0 ? (
+            {approvalRecords.length > 0 ? (
               <div className="space-y-0">
-                {record.approvalRecords.map((r, i) => (
+                {approvalRecords.map((r, i) => (
                   <TimelineStep
                     key={r.id}
                     label={r.action === 'APPROVE' ? '审批通过' : r.action === 'REJECT' ? '审批驳回' : '审批操作'}
@@ -497,7 +498,7 @@ export default function RetirementDetailPage() {
                       r.action === 'PENDING' ? 'active' : 'pending'
                     }
                     comment={r.comment ?? r.rejectionReason}
-                    isLast={i === record.approvalRecords!.length - 1}
+                    isLast={i === approvalRecords.length - 1}
                   />
                 ))}
               </div>

@@ -112,8 +112,8 @@ export function useAssetImport() {
         };
 
         setParseId(id);
-        setRows(parsedRows);
-        setErrorMap(buildErrorMap(errors || []));
+        setRows(Array.isArray(parsedRows) ? parsedRows : []);
+        setErrorMap(buildErrorMap(Array.isArray(errors) ? errors : []));
         setUploadStatus('success');
       } catch (error: any) {
         // 请求被取消（AbortController）时静默退出

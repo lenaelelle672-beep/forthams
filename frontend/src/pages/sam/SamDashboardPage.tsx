@@ -231,7 +231,7 @@ const SamDashboardPage: React.FC = () => {
 
   /* ── 席位使用率条形图 ────────────────────────────────────────────────── */
   const usageBarOption = useMemo(() => {
-    const items = dashboard?.highRiskItems ?? [];
+    const items = Array.isArray(dashboard?.highRiskItems) ? dashboard.highRiskItems : [];
     if (items.length === 0) {
       return null;
     }
@@ -403,8 +403,8 @@ const SamDashboardPage: React.FC = () => {
 
   /* ── 渲染 ──────────────────────────────────────────────────────────────── */
   const d = dashboard;
-  const highRiskItems = d?.highRiskItems ?? [];
-  const upcomingExpiry = d?.upcomingExpiry ?? [];
+  const highRiskItems = Array.isArray(d?.highRiskItems) ? d.highRiskItems : [];
+  const upcomingExpiry = Array.isArray(d?.upcomingExpiry) ? d.upcomingExpiry : [];
 
   if (error) {
     return (
@@ -677,7 +677,7 @@ const SamDashboardPage: React.FC = () => {
           </CardHeader>
           <DataTable<ScanRecord>
             columns={historyColumns}
-            data={history?.records ?? []}
+            data={Array.isArray(history?.records) ? history.records : []}
             loading={loading}
             pagination={{
               page: history?.current ?? 1,

@@ -204,7 +204,9 @@ export default function InventoryDetailPage() {
       })()
     : undefined;
   const rawStatus = rawTask ? String(rawTask.status ?? '') : '';
-  const records = (assetsRes as PageData<InventoryAsset> | undefined)?.records ?? [];
+  const records = Array.isArray((assetsRes as PageData<InventoryAsset> | undefined)?.records)
+    ? (assetsRes as PageData<InventoryAsset>).records
+    : [];
   const total = (assetsRes as PageData<InventoryAsset> | undefined)?.total ?? 0;
   const summary = summaryRes as unknown as InventorySummary | undefined;
   const canSubmit = task?.status === 'completed' || task?.progress >= 100;
@@ -232,7 +234,7 @@ export default function InventoryDetailPage() {
       if (!Array.isArray(items)) return;
       for (const item of items) {
         if (item.id != null) map[String(item.id)] = item.name;
-        if (item.children && item.children.length > 0) {
+        if (Array.isArray(item.children) && item.children.length > 0) {
           flattenLocations(item.children);
         }
       }
@@ -242,7 +244,7 @@ export default function InventoryDetailPage() {
       if (!Array.isArray(items)) return;
       for (const item of items) {
         if (item.id != null) map[String(item.id)] = item.deptName || item.name || '';
-        if (item.children && item.children.length > 0) {
+        if (Array.isArray(item.children) && item.children.length > 0) {
           flattenDepartments(item.children);
         }
       }
@@ -602,8 +604,8 @@ export default function InventoryDetailPage() {
                     <span className="px-3 py-1.5 bg-gradient-to-r from-slate-50 to-slate-100 text-slate-500 text-[12px] font-medium rounded-full border border-slate-200/60">
                       全部门
                     </span>
-                  ) : (task.scopeIds ?? []).length > 0 ? (
-                    task.scopeIds.map((id) => (
+                  ) : (Array.isArray(task.scopeIds) ? task.scopeIds : []).length > 0 ? (
+                    (Array.isArray(task.scopeIds) ? task.scopeIds : []).map((id) => (
                       <span
                         key={id}
                         className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 text-[12px] font-medium rounded-full border border-blue-200/60 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-default"
@@ -625,7 +627,7 @@ export default function InventoryDetailPage() {
                   <MapPin className="w-3.5 h-3.5 text-slate-400" /> 关键点位
                 </p>
                 <ul className="space-y-3">
-                  {task?.scopeType === 'location' && task.scopeIds && task.scopeIds.length > 0
+                  {task?.scopeType === 'location' && Array.isArray(task.scopeIds) && task.scopeIds.length > 0
                     ? task.scopeIds.map((id, idx) => (
                         <li
                           key={id}
@@ -699,7 +701,7 @@ export default function InventoryDetailPage() {
                   <p className="text-2xl font-bold text-amber-700">{surplusCount}</p>
                 </div>
               </div>
-              {summary?.surplusItems && summary.surplusItems.length > 0 ? (
+              {Array.isArray(summary?.surplusItems) && summary.surplusItems.length > 0 ? (
                 <ul className="mt-1 space-y-1">
                   {summary.surplusItems.slice(0, 3).map((item: any) => (
                     <li key={item.assetCode} className="text-[11px] text-amber-600 flex items-center gap-1.5">
@@ -727,7 +729,7 @@ export default function InventoryDetailPage() {
                   <p className="text-2xl font-bold text-red-700">{deficitCount}</p>
                 </div>
               </div>
-              {summary?.deficitItems && summary.deficitItems.length > 0 ? (
+              {Array.isArray(summary?.deficitItems) && summary.deficitItems.length > 0 ? (
                 <ul className="mt-1 space-y-1">
                   {summary.deficitItems.slice(0, 3).map((item: any) => (
                     <li key={item.assetCode} className="text-[11px] text-red-600 flex items-center gap-1.5">

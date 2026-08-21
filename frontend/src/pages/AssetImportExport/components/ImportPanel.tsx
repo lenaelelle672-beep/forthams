@@ -161,8 +161,8 @@ const ImportPanel: React.FC = () => {
   /** 仍有未清除错误的行号集合 */
   const errorRowNumbers = useMemo(() => {
     const s = new Set<number>();
-    if (!parseResponse?.errors) return s;
-    for (const err of parseResponse.errors) {
+    const errors = Array.isArray(parseResponse?.errors) ? parseResponse.errors : [];
+    for (const err of errors) {
       const key = `${err.rowNumber}-${err.field}`;
       if (!clearedErrors.has(key)) {
         s.add(err.rowNumber);
@@ -174,8 +174,8 @@ const ImportPanel: React.FC = () => {
   /** 原始出现过错误的行号集合（用于判断"已修正"标记） */
   const originalErrorRows = useMemo(() => {
     const s = new Set<number>();
-    if (!parseResponse?.errors) return s;
-    for (const err of parseResponse.errors) {
+    const errors = Array.isArray(parseResponse?.errors) ? parseResponse.errors : [];
+    for (const err of errors) {
       s.add(err.rowNumber);
     }
     return s;
@@ -183,13 +183,13 @@ const ImportPanel: React.FC = () => {
 
   /** 至少存在一行有效数据 */
   const hasValidRows = useMemo(() => {
-    if (!parseResponse?.rows?.length) return false;
+    if (!Array.isArray(parseResponse?.rows) || !parseResponse.rows.length) return false;
     return parseResponse.rows.some(row => !errorRowNumbers.has(row.rowNumber));
   }, [parseResponse, errorRowNumbers]);
 
   /** 合并编辑后的展示行 */
   const displayRows = useMemo(() => {
-    if (!parseResponse?.rows) return [];
+    if (!Array.isArray(parseResponse?.rows)) return [];
     return parseResponse.rows.map(row => {
       const edited = editedRows.get(row.rowNumber);
       return edited ? { ...row, ...edited } : { ...row };
@@ -327,7 +327,7 @@ const ImportPanel: React.FC = () => {
     setCommitting(true);
     try {
       // 合并修正数据
-      const mergedRows = parseResponse.rows.map(row => {
+      const mergedRows = (Array.isArray(parseResponse.rows) ? parseResponse.rows : []).map(row => {
         const edited = editedRows.get(row.rowNumber);
         return edited ? { ...row, ...edited } : row;
       });

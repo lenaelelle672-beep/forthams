@@ -2913,6 +2913,74 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '新建资产' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/inventory/tasks/1 locations children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/locations/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, name: 'E2E位置', children: { unexpected: true } }]);
+    });
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, deptName: 'E2E部门', children: { unexpected: true } }]);
+    });
+    await page.goto('/inventory/tasks/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '办公室盘点' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/tasks/1 summary surplusItems 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/inventory/tasks/*/summary*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        surplusCount: 1,
+        deficitCount: 1,
+        surplusItems: { unexpected: true },
+        deficitItems: { unexpected: true },
+      });
+    });
+    await page.goto('/inventory/tasks/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '办公室盘点' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/1 approvalRecords 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/retirement*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/retirement/1') {
+        await fulfill(apiRoute, {
+          id: 1,
+          status: 'APPROVED',
+          approvalRecords: { unexpected: true },
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/retirement/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '退役申请 #1' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam dashboard highRiskItems 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/sam/dashboard*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        hasData: true,
+        complianceRate: 80,
+        totalLicenses: 1,
+        highRiskItems: { unexpected: true },
+        upcomingExpiry: { unexpected: true },
+        byLicenseType: { VOLUME: 1 },
+      });
+    });
+    await page.goto('/sam');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: 'SAM 合规管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {
