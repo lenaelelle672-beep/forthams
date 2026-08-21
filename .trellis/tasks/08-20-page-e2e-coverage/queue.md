@@ -735,4 +735,5 @@
 | Q1545 | done | 桌面空态 **3 passed**（/reports 点运维报表「退役处置统计」、点工单报表「工单完成率」「待处理工单」）。禁 /m。 |
 | Q1546 | done | 桌面空态 **3 passed**（/reports/scheduled 调度说明与新建提示、/sam 副标题）。禁 /m。 |
 | Q1547 | done | 桌面空态 **3 passed**（/risk-matrix 副标题、「创建矩阵」「矩阵名称」）。禁 /m。 |
-| Q1548 | in_progress | 桌面空态：/risk-matrix 点创建矩阵「创建矩阵配置」「输入矩阵名称」、/asset-health 未覆盖说明。禁 /m。 |
+| Q1548 | done | 桌面空态 **3 passed**（/risk-matrix 点创建矩阵「创建矩阵配置」「输入矩阵名称」、/asset-health 多维度评估说明）。禁 /m。 |
+| Q1549 | in_progress | 桌面空态：/asset-health「平均健康分」「健康」「批量计算」。禁 /m。 |
