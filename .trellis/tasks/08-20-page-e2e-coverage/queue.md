@@ -776,4 +776,5 @@
 | Q1586 | done | 桌面空态 **3 passed**（/maintenance「计划中」「执行中」「逾期」）。禁 /m。 |
 | Q1587 | done | 桌面空态 **3 passed**（/maintenance 点新增维保「新增维保记录」说明与内容 placeholder）。禁 /m。 |
 | Q1588 | done | 桌面空态 **3 passed**（/maintenance 点新增维保结果 placeholder 与类型内容标签）。禁 /m。 |
-| Q1589 | in_progress | 桌面空态：/maintenance/plans 未覆盖说明。禁 /m。 |
+| Q1589 | done | 桌面空态 **3 passed**（/maintenance/plans 副标题、表格/卡片视图）。禁 /m。 |
+| Q1590 | in_progress | 桌面空态：/maintenance/plans「日历视图」、点新建计划表单。禁 /m。 |
