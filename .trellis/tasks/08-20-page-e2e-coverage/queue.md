@@ -717,4 +717,5 @@
 | Q1527 | done | 桌面空态 **3 passed**（/compensation「搜索资产编号/名称」、/workorders/new「搜索资产编号或名称...」、/disposals/clearance/new 点添加资产后搜索）。禁 /m。 |
 | Q1528 | done | 桌面空态 **3 passed**（/system/menus 点新增菜单「搜索图标...」、/system/depts「请选择一个部门查看详情」、/retirement/new「请输入资产编号或名称搜索」）。禁 /m。 |
 | Q1529 | done | 桌面空态 **3 passed**（/system/depts「暂无部门数据」「点击下方按钮创建第一个部门」「点击左侧组织架构树中的节点即可查看」）。禁 /m。 |
-| Q1530 | in_progress | 桌面空态：/workflows「请选择一个流程查看详情」「没有匹配的流程」「调整关键词或状态筛选后重试。」。禁 /m。 |
+| Q1530 | done | 桌面空态 **3 passed**（/workflows「流程总数」「已发布」「草稿中」）。禁 /m。 |
+| Q1531 | in_progress | 桌面空态：/workflows「已停用」「全部业务流程」「可用于发起」。禁 /m。 |
