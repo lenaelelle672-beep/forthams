@@ -366,13 +366,17 @@ function MenuAssignDialog({
     queryFn: getMenuTree,
     enabled: open,
   });
+  const menuItems: MenuItem[] = useMemo(
+    () => (Array.isArray(menuTree) ? menuTree : []),
+    [menuTree],
+  );
 
   /** 弹窗打开时默认展开所有一级节点，不重置已勾选内容 */
   React.useEffect(() => {
-    if (open && menuTree) {
-      setExpandedIds(new Set(menuTree.map((m: MenuItem) => m.id)));
+    if (open) {
+      setExpandedIds(new Set(menuItems.map((m: MenuItem) => m.id)));
     }
-  }, [open, menuTree]);
+  }, [open, menuItems]);
 
   const assignMut = useMutation({
     mutationFn: (menuIds: number[]) => assignRoleMenus(roleId, menuIds),
@@ -405,7 +409,7 @@ function MenuAssignDialog({
   /** 统计选中节点数量 */
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const selectedCount = selectedIds.length;
-  const totalCount = menuTree ? collectAllIds(menuTree).length : 0;
+  const totalCount = collectAllIds(menuItems).length;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -428,8 +432,8 @@ function MenuAssignDialog({
                 <span className="animate-spin mr-2 h-4 w-4 border-2 border-blue-400 border-t-transparent rounded-full" />
                 加载中...
               </div>
-            ) : menuTree && menuTree.length > 0 ? (
-              menuTree.map((item: MenuItem) => (
+            ) : menuItems.length > 0 ? (
+              menuItems.map((item: MenuItem) => (
                 <TreeNode
                   key={item.id}
                   item={item}
@@ -654,7 +658,7 @@ export default function RoleManagement() {
     setDeptAssignOpen(true);
   };
 
-  const records = data?.records || [];
+  const records = Array.isArray(data?.records) ? data.records : [];
   const totalRoles = data?.total || 0;
 
   const columns: Column<RoleItem>[] = [

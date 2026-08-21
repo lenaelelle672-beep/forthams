@@ -39,24 +39,29 @@ export default function RevaluationFormPage() {
   const [isEditing, setIsEditing] = useState(mode === 'edit');
 
   // 如果是查看已有记录
-  const { data: existingRecord } = useQuery({
+  const { data: existingRecordRaw } = useQuery({
     queryKey: ['revaluation', viewId],
     queryFn: () => getRevaluationDetail(Number(viewId)),
     enabled: !!viewId,
   });
+  const existingRecord =
+    existingRecordRaw && typeof existingRecordRaw === 'object' && !Array.isArray(existingRecordRaw)
+      ? existingRecordRaw
+      : undefined;
 
   useEffect(() => {
-    if (existingRecord) {
-      setRevaluationType(existingRecord.revaluationType);
-      setNewValue(existingRecord.newValue);
-      setReason(existingRecord.reason || '');
-      setEvidence(existingRecord.evidence || '');
-      // 加载资产信息
-      getAssetById(existingRecord.assetId).then((asset) => {
-        setSelectedAsset(asset);
-        setAssetSearch(asset?.assetNo || '');
-      }).catch(() => {});
+    if (!existingRecord) {
+      return;
     }
+    setRevaluationType(existingRecord.revaluationType);
+    setNewValue(existingRecord.newValue);
+    setReason(existingRecord.reason || '');
+    setEvidence(existingRecord.evidence || '');
+    // 加载资产信息
+    getAssetById(existingRecord.assetId).then((asset) => {
+      setSelectedAsset(asset);
+      setAssetSearch(asset?.assetNo || '');
+    }).catch(() => {});
   }, [existingRecord]);
 
   const handleAssetLookup = async () => {

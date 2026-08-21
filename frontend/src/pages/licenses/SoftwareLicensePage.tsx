@@ -443,10 +443,10 @@ export default function SoftwareLicensePage() {
     if (deletingLicense?.id) deleteMutation.mutate(deletingLicense.id);
   };
 
-  const summaryData = summary as any;
+  const summaryData = summary && typeof summary === 'object' && !Array.isArray(summary) ? summary as any : undefined;
   const records: SoftwareLicense[] = Array.isArray((data as any)?.records) ? (data as any).records : [];
   const total = (data as any)?.total ?? 0;
-  const expiringCount = (expiring as any[])?.length ?? 0;
+  const expiringCount = Array.isArray(expiring) ? expiring.length : 0;
 
   const submitting = createMutation.isPending || updateMutation.isPending;
 

@@ -2540,6 +2540,112 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: 'GIS 资产地图' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/fault-codes tree 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/fault-codes/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/fault-codes');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '故障代码管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reliability/summary 非对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reliability/summary*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ unexpected: true }]);
+    });
+    await page.goto('/analytics/reliability');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '可靠性分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reliability/trend 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reliability/trend*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/analytics/reliability');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '可靠性分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reliability/ranking 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reliability/ranking*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/analytics/reliability');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '可靠性分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-health/unhealthy 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/asset-health/unhealthy*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/asset-health');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产健康评分' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/licenses summary 非对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/licenses/summary*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ unexpected: true }]);
+    });
+    await page.goto('/licenses');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '软件许可证管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/licenses expiring 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/licenses/expiring*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/licenses');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '软件许可证管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations/new 详情非对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/revaluations*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/revaluations/1') {
+        await fulfill(apiRoute, [{ unexpected: true }]);
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/revaluations/new?id=1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: /减值\/重估/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder depreciation-stats 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/reports/depreciation-stats*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/report-builder');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '自定义报表构建器' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.locator('select').first().selectOption('FINANCIAL');
+    await expect(page.getByRole('heading', { name: '自定义报表构建器' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

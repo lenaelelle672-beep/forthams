@@ -31,9 +31,12 @@ export default function ReliabilityPage() {
     queryFn: () => getReliabilityRanking({ sortBy, limit: 10 }),
   });
 
-  const summary: ReliabilitySummary | undefined = summaryRes;
-  const trends: ReliabilityTrend[] = trendRes ?? [];
-  const rankings: ReliabilityRanking[] = rankingRes ?? [];
+  const summary: ReliabilitySummary | undefined =
+    summaryRes && typeof summaryRes === 'object' && !Array.isArray(summaryRes)
+      ? summaryRes
+      : undefined;
+  const trends: ReliabilityTrend[] = Array.isArray(trendRes) ? trendRes : [];
+  const rankings: ReliabilityRanking[] = Array.isArray(rankingRes) ? rankingRes : [];
 
   const kpiCards = [
     {

@@ -75,16 +75,19 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
   switch (reportType) {
     case 'ASSET':
       return loadAssetPreviewRows(selectedFields);
-    case 'FINANCIAL':
-      return (await getDepreciationStats()).slice(0, 8).map((item: any) => projectPreviewRow({
+    case 'FINANCIAL': {
+      const stats = await getDepreciationStats();
+      return (Array.isArray(stats) ? stats : []).slice(0, 8).map((item: any) => projectPreviewRow({
         name: item.month,
         depreciationAmount: item.value,
         maintenanceCost: 0,
         energyCost: 0,
         totalCost: item.value,
       }, selectedFields));
-    case 'MAINTENANCE':
-      return (await getMaintenanceStats()).slice(0, 8).map((item: any) => projectPreviewRow({
+    }
+    case 'MAINTENANCE': {
+      const stats = await getMaintenanceStats();
+      return (Array.isArray(stats) ? stats : []).slice(0, 8).map((item: any) => projectPreviewRow({
         name: item.month,
         workOrderCount: 0,
         maintenanceCount: item.value,
@@ -92,13 +95,16 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
         mtbf: null,
         mttr: null,
       }, selectedFields));
-    case 'INVENTORY':
-      return (await getReportByCategory()).slice(0, 8).map((item: any) => projectPreviewRow({
+    }
+    case 'INVENTORY': {
+      const stats = await getReportByCategory();
+      return (Array.isArray(stats) ? stats : []).slice(0, 8).map((item: any) => projectPreviewRow({
         name: item.categoryName,
         categoryName: item.categoryName,
         assetCount: item.assetCount,
         totalValue: item.totalValue,
       }, selectedFields));
+    }
     default:
       return [];
   }
@@ -106,7 +112,7 @@ async function loadPreviewRows(reportType: string, selectedFields: ReportField[]
 
 async function loadAssetPreviewRows(selectedFields: ReportField[]): Promise<PreviewRow[]> {
   const page = await getAssetList({ page: 1, pageSize: 8 });
-  return (page.records ?? []).map((asset: AssetListItem) => projectPreviewRow(assetPreviewRow(asset), selectedFields));
+  return (Array.isArray(page.records) ? page.records : []).map((asset: AssetListItem) => projectPreviewRow(assetPreviewRow(asset), selectedFields));
 }
 
 function assetPreviewRow(asset: AssetListItem): PreviewRow {
