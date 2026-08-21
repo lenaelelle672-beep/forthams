@@ -2480,6 +2480,66 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '借用详情' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/locations tree 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/locations/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/locations');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '位置管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus tree 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/menus/admin/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/system/menus');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '菜单管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/depts tree 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/system/depts');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '部门管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking/cycles 纯对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/stocktaking/cycles*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/stocktaking/cycles') {
+        await fulfill(apiRoute, { unexpected: true });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/stocktaking-cycles');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '循环盘点周期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis/stats 非对象无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/gis/stats*', async (apiRoute) => {
+      await fulfill(apiRoute, []);
+    });
+    await page.goto('/gis');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: 'GIS 资产地图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {
