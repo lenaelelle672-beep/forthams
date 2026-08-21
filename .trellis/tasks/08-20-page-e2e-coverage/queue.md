@@ -987,4 +987,5 @@
 | Q1797 | done | 桌面空态 **3 passed**（/spare-parts/new 计量单位库存）。禁 /m。 |
 | Q1798 | done | 桌面空态 **3 passed**（/spare-parts/new 安全库存单价申请信息）。禁 /m。 |
 | Q1799 | done | 桌面空态 **3 passed**（/spare-parts/new 缺口待确认到货）。禁 /m。 |
-| Q1800 | in_progress | 桌面空态：/spare-parts/new 剩余未覆盖文案。禁 /m。 |
+| Q1800 | done | 桌面空态 **3 passed**（/spare-parts/new 备件申请提交返回）。禁 /m。 |
+| Q1801 | in_progress | 桌面空态：/spare-parts/new「按维保工单、库存下限和供应商交期创建备件保障记录」。禁 /m。 |
