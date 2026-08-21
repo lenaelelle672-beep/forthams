@@ -49,7 +49,7 @@ function transformTreeData(
     value: node.code,
     key: node.code,
     children:
-      node.children && node.children.length > 0
+      Array.isArray(node.children) && node.children.length > 0
         ? transformTreeData(node.children)
         : undefined,
   }));

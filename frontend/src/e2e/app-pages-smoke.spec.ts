@@ -3241,6 +3241,52 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '重要设备管理' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/risk-matrix 编辑 dimension 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/risk-matrix/list*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        records: [{
+          id: 1,
+          matrixName: 'E2E矩阵',
+          isActive: 1,
+          createTime: '2026-08-21T00:00:00',
+          probabilityDimension: { unexpected: true },
+          severityDimension: { unexpected: true },
+          levelMapping: { unexpected: true },
+        }],
+        total: 1,
+      });
+    });
+    await page.goto('/risk-matrix');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '风险矩阵配置' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '编辑' }).first().click();
+    await expect(page.getByText('编辑矩阵配置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export category tree children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/asset-categories/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{
+        value: 'cat-1',
+        title: '分类一',
+        children: { unexpected: true },
+      }]);
+    });
+    await page.route('**/asset-locations/cascade*', async (apiRoute) => {
+      await fulfill(apiRoute, [{
+        value: 'loc-1',
+        label: '位置一',
+        children: { unexpected: true },
+      }]);
+    });
+    await page.goto('/assets/import-export');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产批量导入导出' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

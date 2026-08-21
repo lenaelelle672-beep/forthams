@@ -27,6 +27,10 @@ import { riskApi } from '@/api/risk';
 import type { RiskMatrix, MatrixDimensionItem, MatrixLevelMapping } from '@/types/risk';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+function asList<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
 const RiskMatrixConfigPage: React.FC = () => {
   const [page, _setPage] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -129,9 +133,9 @@ const RiskMatrixConfigPage: React.FC = () => {
     setEditingMatrix(matrix);
     setFormData({
       matrixName: matrix.matrixName,
-      probabilityDimension: matrix.probabilityDimension,
-      severityDimension: matrix.severityDimension,
-      levelMapping: matrix.levelMapping,
+      probabilityDimension: Array.isArray(matrix.probabilityDimension) ? matrix.probabilityDimension : [],
+      severityDimension: Array.isArray(matrix.severityDimension) ? matrix.severityDimension : [],
+      levelMapping: Array.isArray(matrix.levelMapping) ? matrix.levelMapping : [],
       isActive: matrix.isActive
     });
     setIsDialogOpen(true);
@@ -166,7 +170,7 @@ const RiskMatrixConfigPage: React.FC = () => {
 
   // 添加概率维度项
   const addProbabilityDimension = () => {
-    const newDimension = [...(formData.probabilityDimension || [])];
+    const newDimension = [...asList<MatrixDimensionItem>(formData.probabilityDimension)];
     const maxValue = newDimension.length > 0
       ? Math.max(...newDimension.map(d => d.value))
       : 0;
@@ -176,21 +180,21 @@ const RiskMatrixConfigPage: React.FC = () => {
 
   // 移除概率维度项
   const removeProbabilityDimension = (index: number) => {
-    const newDimension = [...(formData.probabilityDimension || [])];
+    const newDimension = [...asList<MatrixDimensionItem>(formData.probabilityDimension)];
     newDimension.splice(index, 1);
     setFormData({ ...formData, probabilityDimension: newDimension });
   };
 
   // 更新概率维度项
   const updateProbabilityDimension = (index: number, field: keyof MatrixDimensionItem, value: any) => {
-    const newDimension = [...(formData.probabilityDimension || [])];
+    const newDimension = [...asList<MatrixDimensionItem>(formData.probabilityDimension)];
     newDimension[index] = { ...newDimension[index], [field]: value };
     setFormData({ ...formData, probabilityDimension: newDimension });
   };
 
   // 添加严重度维度项
   const addSeverityDimension = () => {
-    const newDimension = [...(formData.severityDimension || [])];
+    const newDimension = [...asList<MatrixDimensionItem>(formData.severityDimension)];
     const maxValue = newDimension.length > 0
       ? Math.max(...newDimension.map(d => d.value))
       : 0;
@@ -200,35 +204,35 @@ const RiskMatrixConfigPage: React.FC = () => {
 
   // 移除严重度维度项
   const removeSeverityDimension = (index: number) => {
-    const newDimension = [...(formData.severityDimension || [])];
+    const newDimension = [...asList<MatrixDimensionItem>(formData.severityDimension)];
     newDimension.splice(index, 1);
     setFormData({ ...formData, severityDimension: newDimension });
   };
 
   // 更新严重度维度项
   const updateSeverityDimension = (index: number, field: keyof MatrixDimensionItem, value: any) => {
-    const newDimension = [...(formData.severityDimension || [])];
+    const newDimension = [...asList<MatrixDimensionItem>(formData.severityDimension)];
     newDimension[index] = { ...newDimension[index], [field]: value };
     setFormData({ ...formData, severityDimension: newDimension });
   };
 
   // 添加等级映射
   const addLevelMapping = () => {
-    const newMapping = [...(formData.levelMapping || [])];
+    const newMapping = [...asList<MatrixLevelMapping>(formData.levelMapping)];
     newMapping.push({ minScore: 0, level: 'LOW' });
     setFormData({ ...formData, levelMapping: newMapping });
   };
 
   // 移除等级映射
   const removeLevelMapping = (index: number) => {
-    const newMapping = [...(formData.levelMapping || [])];
+    const newMapping = [...asList<MatrixLevelMapping>(formData.levelMapping)];
     newMapping.splice(index, 1);
     setFormData({ ...formData, levelMapping: newMapping });
   };
 
   // 更新等级映射
   const updateLevelMapping = (index: number, field: keyof MatrixLevelMapping, value: any) => {
-    const newMapping = [...(formData.levelMapping || [])];
+    const newMapping = [...asList<MatrixLevelMapping>(formData.levelMapping)];
     newMapping[index] = { ...newMapping[index], [field]: value };
     setFormData({ ...formData, levelMapping: newMapping });
   };
@@ -258,7 +262,7 @@ const RiskMatrixConfigPage: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {matrixList?.records?.map((matrix: RiskMatrix) => (
+                {(Array.isArray(matrixList?.records) ? matrixList.records : []).map((matrix: RiskMatrix) => (
                   <TableRow key={matrix.id}>
                     <TableCell className="font-medium">{matrix.matrixName}</TableCell>
                     <TableCell>
@@ -341,7 +345,7 @@ const RiskMatrixConfigPage: React.FC = () => {
                     添加维度
                   </Button>
                 </div>
-                {formData.probabilityDimension?.map((item, index) => (
+                {asList<MatrixDimensionItem>(formData.probabilityDimension).map((item, index) => (
                   <div key={index} className="flex gap-2 items-center">
                     <Input
                       type="number"
@@ -373,7 +377,7 @@ const RiskMatrixConfigPage: React.FC = () => {
                     添加维度
                   </Button>
                 </div>
-                {formData.severityDimension?.map((item, index) => (
+                {asList<MatrixDimensionItem>(formData.severityDimension).map((item, index) => (
                   <div key={index} className="flex gap-2 items-center">
                     <Input
                       type="number"
@@ -405,7 +409,7 @@ const RiskMatrixConfigPage: React.FC = () => {
                     添加规则
                   </Button>
                 </div>
-                {formData.levelMapping?.map((item, index) => (
+                {asList<MatrixLevelMapping>(formData.levelMapping).map((item, index) => (
                   <div key={index} className="flex gap-2 items-center">
                     <Input
                       type="number"

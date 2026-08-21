@@ -177,6 +177,37 @@ const rowStyles = `
   .import-row-valid:hover > td { background-color: #f0ffe6 !important; }
 `;
 
+type CategoryTreeNode = { value: string; title: string; children?: CategoryTreeNode[] };
+
+function guardTree(nodes: unknown): CategoryTreeNode[] {
+  if (!Array.isArray(nodes)) return [];
+  return nodes.map((node) => {
+    const item = node && typeof node === 'object'
+      ? node as { value?: string; title?: string; children?: unknown }
+      : {};
+    return {
+      value: String(item.value ?? ''),
+      title: String(item.title ?? ''),
+      children: Array.isArray(item.children) ? guardTree(item.children) : undefined,
+    };
+  });
+}
+
+function guardCascade(nodes: unknown): CascaderOption[] {
+  if (!Array.isArray(nodes)) return [];
+  return nodes.map((node) => {
+    const item = node && typeof node === 'object'
+      ? node as CascaderOption & { children?: unknown }
+      : { value: '', label: '' };
+    return {
+      ...item,
+      value: item.value ?? '',
+      label: item.label ?? '',
+      children: Array.isArray(item.children) ? guardCascade(item.children) : undefined,
+    };
+  });
+}
+
 // ==================== 主组件 ====================
 
 const AssetImportExportPage: React.FC = () => {
@@ -195,7 +226,7 @@ const AssetImportExportPage: React.FC = () => {
   const [currentFile, setCurrentFile] = useState<File | null>(null);
 
   // ---------- 导出状态 ----------
-  const [categoryTree, setCategoryTree] = useState<Array<{ value: string; title: string; children?: unknown[] }>>([]);
+  const [categoryTree, setCategoryTree] = useState<CategoryTreeNode[]>([]);
   const [locationCascade, setLocationCascade] = useState<CascaderOption[]>([]);
   const [exportCategoryCodes, setExportCategoryCodes] = useState<string[]>([]);
   const [exportStatusCodes, setExportStatusCodes] = useState<string[]>([]);
@@ -405,11 +436,11 @@ const AssetImportExportPage: React.FC = () => {
   useEffect(() => {
     apiClient
       .get('/asset-categories/tree')
-      .then((res) => setCategoryTree(res.data || []))
+      .then((res) => setCategoryTree(guardTree(res.data)))
       .catch(() => {});
     apiClient
       .get('/asset-locations/cascade')
-      .then((res) => setLocationCascade(res.data || []))
+      .then((res) => setLocationCascade(guardCascade(res.data)))
       .catch(() => {});
   }, []);
 
