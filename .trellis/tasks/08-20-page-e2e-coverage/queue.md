@@ -831,4 +831,5 @@
 | Q1641 | done | 桌面空态 **3 passed**（/risk-matrix 点创建「概率维度」「严重度维度」「等级映射」）。禁 /m。 |
 | Q1642 | done | 桌面空态 **3 passed**（/risk-matrix 点创建「添加维度」「维度名称」「概率维度配置」）。禁 /m。 |
 | Q1643 | done | 桌面空态 **3 passed**（/risk-matrix 点严重度/映射 tab 配置文案）。禁 /m。 |
-| Q1644 | in_progress | 桌面空态：/vendors 未覆盖说明。禁 /m。 |
+| Q1644 | done | 桌面空态 **3 passed**（/vendors「合作供应商信息维护」「全部供应商」「合作中」）。禁 /m。 |
+| Q1645 | in_progress | 桌面空态：/vendors「已停用」、点新增供应商表单。禁 /m。 |
