@@ -1660,6 +1660,34 @@ test.describe('Q1512 桌面 3D 大屏面板空态', () => {
   });
 });
 
+test.describe('Q1513 桌面分类/平面图空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/categories 空态「选择分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByText('选择分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories 空态「请在左侧树中选择一个分类查看详情，或点击上方按钮添加新分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByText('请在左侧树中选择一个分类查看详情，或点击上方按钮添加新分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans 空态「请选择平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByText('请选择平面图').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
