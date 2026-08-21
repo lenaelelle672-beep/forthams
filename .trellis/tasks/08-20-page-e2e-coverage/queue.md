@@ -885,4 +885,5 @@
 | Q1695 | done | 桌面空态 **3 passed**（/system/users「正常」「重置」「用户」）。禁 /m。 |
 | Q1696 | done | 桌面空态 **3 passed**（/system/users「状态」「操作」「用户管理」）。禁 /m。 |
 | Q1697 | done | 桌面空态 **3 passed**（用户状态空表、部门备注）。禁 /m。 |
-| Q1698 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
+| Q1698 | done | 桌面空态 **3 passed**（无匹配图标、按钮权限标识、部门状态）。禁 /m。 |
+| Q1699 | in_progress | 桌面空态：/system/menus 点新增选按钮「权限标识」。禁 /m。 |

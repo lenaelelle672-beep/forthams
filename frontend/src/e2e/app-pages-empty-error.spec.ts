@@ -6992,6 +6992,39 @@ test.describe('Q1697 桌面用户空态', () => {
   });
 });
 
+test.describe('Q1698 桌面菜单部门空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/menus 点新增菜单「无匹配图标」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await page.getByRole('button', { name: '新增菜单' }).click();
+    await page.getByPlaceholder('搜索图标...').fill('zzzzz');
+    await expect(page.getByText('无匹配图标').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/menus 点新增菜单选按钮「如：system:user:add」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await page.getByRole('button', { name: '新增菜单' }).click();
+    await page.locator('select').first().selectOption('F');
+    await expect(page.getByPlaceholder('如：system:user:add').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 点新增部门「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByText('状态', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
