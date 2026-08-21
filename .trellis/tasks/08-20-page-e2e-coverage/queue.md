@@ -709,4 +709,5 @@
 | Q1519 | done | 桌面空态 **3 passed**（/asset-models「搜索名称 / 型号」、/assignments「搜索编号、名称...」、/borrows「搜索用途/备注...」）。禁 /m。 |
 | Q1520 | done | 桌面空态 **3 passed**（/approvals「搜索编号、标题或发起人」、/maintenance「按资产ID搜索...」、/maintenance/plans「搜索计划名称...」）。禁 /m。 |
 | Q1521 | done | 桌面空态 **3 passed**（/licenses「搜索软件名称/厂商」、/spare-parts「搜索备件编码/名称...」、/audit「搜索操作记录...」）。禁 /m。 |
-| Q1522 | in_progress | 桌面空态：/equipment「搜索设备名称或编号...」、/system/posts 搜索岗位、/system/custom-fields 搜索字段。禁 /m。 |
+| Q1522 | done | 桌面空态 **3 passed**（/equipment「搜索设备名称或编号...」、/system/posts 搜索岗位、/system/custom-fields 搜索字段）。禁 /m。 |
+| Q1523 | in_progress | 桌面空态：/system/depts 搜索部门、/system/custom-fieldsets 搜索字段集、/vendors 搜索供应商。禁 /m。 |
