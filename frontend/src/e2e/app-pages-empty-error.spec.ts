@@ -202,6 +202,36 @@ test.describe('Q1465 桌面 tab 空态', () => {
   });
 });
 
+test.describe('Q1466 桌面 tab/报告空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/contracts 点时间轴空态「暂无时间线数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('tab', { name: '时间轴视图' }).click();
+    await expect(page.getByText('暂无时间线数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets 点执行率空态「暂无执行率数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await page.getByRole('button', { name: '执行率' }).click();
+    await expect(page.getByText('暂无执行率数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/smart-report/INV-001 空态「暂无差异资产，盘点结果正常」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/smart-report/INV-001');
+    await expect(page.getByText('暂无差异资产，盘点结果正常').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
@@ -6158,6 +6188,14 @@ async function mockApi(route: Route) {
   }
   if (/\/inspections\/\d+$/.test(path)) {
     return fulfill(route, { id: 1, inspectionNo: 'INSP-001', status: 'PENDING' });
+  }
+  if (/\/inventory\/tasks\/[^/]+\/summary$/.test(path)) {
+    return fulfill(route, {
+      surplusCount: 0,
+      deficitCount: 0,
+      surplusItems: [],
+      deficitItems: [],
+    });
   }
   if (path.endsWith('/inventory/tasks/INV-001') || path.endsWith('/inventory/tasks/1') || path.endsWith('/inventory/tasks/RFID-1')) {
     return fulfill(route, {

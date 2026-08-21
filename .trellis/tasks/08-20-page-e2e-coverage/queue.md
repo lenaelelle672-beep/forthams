@@ -653,4 +653,5 @@
 | Q1463 | cancelled | /test-results 空态：静态 /test-reports/data.json 有模块数据，route 拦不住；report-builder 无空表文案。禁 /m。 |
 | Q1464 | done | 桌面空态 **2 passed**（/disposals/scrap/new、/disposals/transfer/new「暂无已选资产」）。禁 /m。 |
 | Q1465 | done | 桌面空态 **3 passed**（/sam「暂无扫描历史」、/contracts 点即将到期「暂无即将到期合同」、/budgets 点超支告警「暂无超支告警」）。禁 /m。 |
-| Q1466 | in_progress | 桌面空态（/contracts 点「时间轴视图」→「暂无时间线数据」、/budgets 点「执行率」→「暂无执行率数据」、/assets/1「暂无 TCO 数据」）。禁 /m、禁 workbenchv3、禁 id 空转。不抢 Q1443/Q1447。 |
+| Q1466 | done | 桌面空态 **3 passed**（/contracts 点时间轴「暂无时间线数据」、/budgets 点执行率「暂无执行率数据」、/inventory/smart-report/INV-001「暂无差异资产，盘点结果正常」）。summary mock 须对象。禁 /m。 |
+| Q1467 | in_progress | 桌面空态（/assets/1「暂无 TCO 数据」、/approvals 点「发起申请」→「暂无可发起的流程」、/audit/1「暂无变更记录」）。禁 /m、禁 workbenchv3、禁 id 空转。不抢 Q1443/Q1447。 |
