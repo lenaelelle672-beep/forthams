@@ -766,4 +766,5 @@
 | Q1576 | done | 桌面空态 **3 passed**（/assets「导出全部」「导出 PDF」「搜索编号、名称...」）。禁 /m。 |
 | Q1577 | done | 桌面空态 **3 passed**（/assets「共 0 条资产」「导入」「资产管理」）。禁 /m。 |
 | Q1578 | done | 桌面空态 **3 passed**（/dashboard「总资产数」「导出数据」「刷新视图」）。禁 /m。 |
-| Q1579 | in_progress | 桌面空态：/dashboard「在用资产」「闲置资产」「资产价值趋势 (近12个月)」。禁 /m。 |
+| Q1579 | done | 桌面空态 **3 passed**（/dashboard「在用资产」「闲置资产」「资产价值趋势 (近12个月)」）。禁 /m。 |
+| Q1580 | in_progress | 桌面空态：/dashboard「总价值」「净值」及部门统计标题。禁 /m。 |
