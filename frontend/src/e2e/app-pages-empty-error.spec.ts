@@ -8093,6 +8093,37 @@ test.describe('Q1741 桌面分类空态', () => {
   });
 });
 
+test.describe('Q1742 桌面分类空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/categories 点添加根分类「分类编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await page.getByRole('button', { name: '添加根分类' }).click();
+    await expect(page.getByText('分类编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/categories 点添加根分类「请输入分类编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await page.getByRole('button', { name: '添加根分类' }).click();
+    await expect(page.getByPlaceholder('请输入分类编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/categories 点添加根分类「创建一个新的根分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await page.getByRole('button', { name: '添加根分类' }).click();
+    await expect(page.getByText('创建一个新的根分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
