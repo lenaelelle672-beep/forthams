@@ -6906,6 +6906,34 @@ test.describe('Q1694 桌面能耗用户空态', () => {
   });
 });
 
+test.describe('Q1695 桌面用户空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/users 空态「正常」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByText('正常').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users 空态「重置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByText('重置', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users 空态「用户」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByText('用户', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
