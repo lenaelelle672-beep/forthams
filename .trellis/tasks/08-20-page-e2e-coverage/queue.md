@@ -801,4 +801,5 @@
 | Q1611 | done | 桌面空态 **3 passed**（/assignments「领用列表」「领用归还管理」「长期领用」）。禁 /m。 |
 | Q1612 | done | 桌面空态 **3 passed**（/assignments「短期借用」「归还入库」「调拨转移」）。禁 /m。 |
 | Q1613 | done | 桌面空态 **3 passed**（/assignments「总记录」「已签收」「已归还」）。禁 /m。 |
-| Q1614 | in_progress | 桌面空态：/intake 列表未覆盖说明。禁 /m。 |
+| Q1614 | done | 桌面空态 **3 passed**（/intake「管理资产入库验收全流程」「待质检」「部分验收」）。禁 /m。 |
+| Q1615 | in_progress | 桌面空态：/intake「质检中」「已验收」「搜索」。禁 /m。 |
