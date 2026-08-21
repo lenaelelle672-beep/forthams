@@ -762,4 +762,5 @@
 | Q1572 | done | 桌面空态 **3 passed**（/system/roles「角色总数」「当前页」「RBAC」）。禁 /m。 |
 | Q1573 | done | 桌面空态 **3 passed**（/system/menus「树形」「目录」「总计」）。禁 /m。 |
 | Q1574 | done | 桌面空态 **3 passed**（/assets「资产台账管理」「资产列表」「资产总净值」）。禁 /m。 |
-| Q1575 | in_progress | 桌面空态：/assets「待处理维修」「闲置率」「累计折旧」。禁 /m。 |
+| Q1575 | done | 桌面空态 **3 passed**（/assets「待处理维修」「闲置率」「累计折旧」）。禁 /m。 |
+| Q1576 | in_progress | 桌面空态：/assets「导出全部」「导出 PDF」、搜索 placeholder。禁 /m。 |
