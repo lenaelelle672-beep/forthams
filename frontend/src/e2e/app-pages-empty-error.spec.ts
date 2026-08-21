@@ -127,6 +127,8 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/disposals/scrap/new', empty: '暂无已选资产' },
   { path: '/disposals/transfer/new', empty: '暂无已选资产' },
   { path: '/sam', empty: '暂无扫描历史' },
+  { path: '/assets/1', empty: '暂无趋势数据' },
+  { path: '/audit', empty: '暂无趋势数据' },
 ];
 
 test.describe('列表空态', () => {
@@ -343,6 +345,35 @@ test.describe('Q1469 桌面弹窗空态', () => {
     await page.goto('/gis');
     await page.getByRole('button', { name: '资产定位管理' }).click();
     await expect(page.getByText('暂无可关联的资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q1470 桌面趋势/图表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/1 空态「暂无趋势数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/1');
+    await expect(page.getByText('暂无趋势数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「暂无发布快照」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('暂无发布快照').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 点资产分类统计空态「暂无图表数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: /资产分类统计/ }).click();
+    await expect(page.getByText('暂无图表数据').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 });
