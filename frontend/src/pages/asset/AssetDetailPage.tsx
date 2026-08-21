@@ -76,7 +76,8 @@ export default function AssetDetailPage() {
     queryFn: () => getDepreciationSchedule(Number(id!)),
     enabled: !!id,
     select: (res: unknown) =>
-      ((res ?? []) as DepreciationScheduleItem[]).map((d) => ({ date: d.periodDate, value: d.endValue })),  });
+      (Array.isArray(res) ? res as DepreciationScheduleItem[] : []).map((d) => ({ date: d.periodDate, value: d.endValue })),
+  });
 
   const depreciationData = depRes ?? [];
 
@@ -103,7 +104,7 @@ export default function AssetDetailPage() {
     enabled: !!id,
   });
 
-  const auditLogs: AuditLog[] = auditRes?.records ?? [];
+  const auditLogs: AuditLog[] = Array.isArray(auditRes?.records) ? auditRes.records : [];
 
   // TCO 数据
   const { data: tcoResult } = useQuery({
@@ -123,6 +124,7 @@ export default function AssetDetailPage() {
     queryFn: () => getTcoCompare(Number(asset?.categoryId ?? 0)),
     enabled: !!id && !!asset?.categoryId,
   });
+  const tcoCompareRows = Array.isArray(tcoCompare) ? tcoCompare : [];
 
   const TCO_COLORS = ['#004ac6', '#16a34a', '#d97706', '#9333ea', '#dc2626'];
   const TCO_LABELS: Record<string, string> = {
@@ -441,11 +443,11 @@ export default function AssetDetailPage() {
                       </LineChart>
                     </ResponsiveContainer>
                   ) : <p className="text-gray-400 text-sm text-center py-8">暂无趋势数据</p>}
-                  {tcoCompare && tcoCompare.length > 0 && (
+                  {tcoCompareRows.length > 0 && (
                     <div className="mt-2">
                       <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">同类对比 (前5)</p>
                       <div className="text-xs space-y-1">
-                        {tcoCompare.slice(0, 5).map((c: any) => (
+                        {tcoCompareRows.slice(0, 5).map((c: any) => (
                           <div key={c.assetId} className="flex justify-between">
                             <span className="text-gray-600 truncate">{c.assetName}</span>
                             <span className="font-mono">{formatCurrency(c.totalCost)}</span>

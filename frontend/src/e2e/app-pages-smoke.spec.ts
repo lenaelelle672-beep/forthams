@@ -3119,6 +3119,70 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '通知中心' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/workorders/new attachments 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/workorders*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/workorders' || /^\/workorders\/\d+$/.test(path)) {
+        await fulfill(apiRoute, {
+          title: '新建工单',
+          attachments: { unexpected: true },
+        });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/workorders/new');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '新建工单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/1 tcoCompare 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/assets/1') {
+        await fulfill(apiRoute, {
+          id: 1,
+          assetNo: 'E2E-ASSET',
+          assetName: 'E2E资产',
+          status: 'IN_USE',
+          categoryId: 1,
+        });
+        return;
+      }
+      if (path.startsWith('/tco/compare/')) {
+        await fulfill(apiRoute, { unexpected: true });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/assets/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/dashboard maintenance-stats alerts 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/dashboard/maintenance-stats*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        totalMaintenanceCount: 12,
+        avgMaintenanceCost: 460,
+        monthlyMaintenanceCount: 4,
+        upcomingCount: 2,
+        overdueCount: 0,
+        alerts: { unexpected: true },
+        upcomingList: { unexpected: true },
+      });
+    });
+    await page.goto('/dashboard');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '运营首页' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

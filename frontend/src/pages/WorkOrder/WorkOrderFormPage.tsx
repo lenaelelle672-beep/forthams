@@ -259,7 +259,9 @@ export default function WorkOrderFormPage() {
     (async () => {
       try {
         const res = await getUserList({ page: 1, pageSize: 100 });
-        const users = (res as PageData<UserItem> | undefined)?.records ?? [];
+        const users = Array.isArray((res as PageData<UserItem> | undefined)?.records)
+          ? (res as PageData<UserItem>).records
+          : [];
         if (cancelled) return;
         setAssigneeUsers(users);
         if (users.length > 0) {
@@ -296,7 +298,9 @@ export default function WorkOrderFormPage() {
     assetSearchTimer.current = setTimeout(async () => {
       try {
         const res = await getAssetList({ keyword, pageSize: 10 });
-        const records = (res as PageData<AssetListItem> | undefined)?.records ?? [];
+        const records = Array.isArray((res as PageData<AssetListItem> | undefined)?.records)
+          ? (res as PageData<AssetListItem>).records
+          : [];
         setAssetResults(records);
         setShowAssetDropdown(records.length > 0);
       } catch {
@@ -358,7 +362,7 @@ export default function WorkOrderFormPage() {
     reset(toFormDefaults(getWorkOrderFormDefaults(editingWorkOrder)));
     setSelectedAsset(getSelectedAssetFromWorkOrder(editingWorkOrder));
     setCollaboratorsList(editingWorkOrder.collaborators ?? []);
-    setAttachmentList(editingWorkOrder.attachments ?? []);
+    setAttachmentList(Array.isArray(editingWorkOrder.attachments) ? editingWorkOrder.attachments : []);
     setFaultCodeId(editingWorkOrder.faultCodeId);
   }, [editingWorkOrder, reset]);
 
