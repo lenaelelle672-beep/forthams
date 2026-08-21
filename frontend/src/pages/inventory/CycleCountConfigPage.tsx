@@ -171,7 +171,11 @@ const CycleCountConfigPage: React.FC = () => {
         </div>
         <Table
           columns={columns}
-          dataSource={data?.records || data?.list || []}
+          dataSource={Array.isArray(data?.records)
+            ? data.records
+            : Array.isArray(data?.list)
+              ? data.list
+              : []}
           loading={isLoading}
           rowKey="id"
           pagination={false}

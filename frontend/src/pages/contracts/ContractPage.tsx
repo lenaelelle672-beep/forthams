@@ -150,7 +150,7 @@ const DOT_COLORS: Record<string, string> = {
 };
 
 function ContractTimeline({ contracts }: { contracts: Contract[] }) {
-  const sorted = [...contracts]
+  const sorted = [...(Array.isArray(contracts) ? contracts : [])]
     .filter((c) => c.endDate)
     .sort((a, b) => new Date(a.endDate!).getTime() - new Date(b.endDate!).getTime());
 
@@ -456,9 +456,9 @@ export default function ContractPage() {
     queryFn: () => getExpiringContracts(30),
   });
 
-  const contracts: Contract[] = (data as any)?.records ?? [];
+  const contracts: Contract[] = Array.isArray((data as any)?.records) ? (data as any).records : [];
   const total = (data as any)?.total ?? 0;
-  const expiringList: Contract[] = (expiringData ?? []) as Contract[];
+  const expiringList: Contract[] = Array.isArray(expiringData) ? expiringData : [];
 
   // ── 统计 ──────────────────────────────────────────────────────────────────
 

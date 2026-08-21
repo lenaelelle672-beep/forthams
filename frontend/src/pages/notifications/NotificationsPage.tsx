@@ -251,7 +251,9 @@ export default function NotificationsPage() {
     },
   });
 
-  const notifications: Notification[] = (data as PageData<Notification> | undefined)?.records ?? [];
+  const notifications: Notification[] = Array.isArray((data as PageData<Notification> | undefined)?.records)
+    ? (data as PageData<Notification>).records
+    : [];
   const total: number = (data as PageData<Notification> | undefined)?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
