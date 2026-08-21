@@ -923,4 +923,5 @@
 | Q1733 | done | 桌面空态 **3 passed**（/login4 资源审批巡检、/login5 资产管理员）。禁 /m。 |
 | Q1734 | done | 桌面空态 **3 passed**（/login5 部门运维全域权限）。禁 /m。 |
 | Q1735 | done | 桌面空态 **3 passed**（/login5 演示描述）。禁 /m。 |
-| Q1736 | in_progress | 桌面空态：/login5 表单剩余。禁 /m。 |
+| Q1736 | done | 桌面空态 **3 passed**（/login5 记住忘记与进入工作台）。禁 /m。 |
+| Q1737 | in_progress | 桌面空态：/login5「UNIVIEW 统一身份认证」。禁 /m。 |
