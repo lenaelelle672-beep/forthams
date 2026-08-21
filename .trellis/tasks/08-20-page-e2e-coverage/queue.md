@@ -830,4 +830,5 @@
 | Q1640 | done | 桌面空态 **3 passed**（/reports 点工单/财务剩余卡片描述）。禁 /m。 |
 | Q1641 | done | 桌面空态 **3 passed**（/risk-matrix 点创建「概率维度」「严重度维度」「等级映射」）。禁 /m。 |
 | Q1642 | done | 桌面空态 **3 passed**（/risk-matrix 点创建「添加维度」「维度名称」「概率维度配置」）。禁 /m。 |
-| Q1643 | in_progress | 桌面空态：/risk-matrix 点严重度维度 tab。禁 /m。 |
+| Q1643 | done | 桌面空态 **3 passed**（/risk-matrix 点严重度/映射 tab 配置文案）。禁 /m。 |
+| Q1644 | in_progress | 桌面空态：/vendors 未覆盖说明。禁 /m。 |
