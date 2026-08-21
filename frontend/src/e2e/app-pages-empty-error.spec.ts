@@ -232,6 +232,36 @@ test.describe('Q1466 桌面 tab/报告空态', () => {
   });
 });
 
+test.describe('Q1467 桌面详情/弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/1 空态「暂无 TCO 数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/tco/asset/**', (apiRoute) => fulfill(apiRoute, null));
+    await page.goto('/assets/1');
+    await expect(page.getByText('暂无 TCO 数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 点发起申请空态「暂无可发起的流程」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await page.getByRole('button', { name: '发起申请' }).first().click();
+    await expect(page.getByText('暂无可发起的流程').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/1 空态「暂无变更记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('暂无变更记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
