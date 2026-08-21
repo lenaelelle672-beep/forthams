@@ -970,4 +970,5 @@
 | Q1780 | done | 桌面空态 **3 passed**（/licenses 点新增版本授权类型）。禁 /m。 |
 | Q1781 | done | 桌面空态 **3 passed**（/licenses 点新增席位购买价格）。禁 /m。 |
 | Q1782 | done | 桌面空态 **3 passed**（/licenses 点新增价格采购单号）。禁 /m。 |
-| Q1783 | in_progress | 桌面空态：/licenses 点新增「请输入备注信息」「确认新增」「取消」。禁 /m。 |
+| Q1783 | done | 桌面空态 **3 passed**（/licenses 点新增备注确认取消）。禁 /m。 |
+| Q1784 | in_progress | 桌面空态：/licenses「软件许可证管理」、点新增「备注」。禁 /m。 |
