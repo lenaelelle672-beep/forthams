@@ -2735,6 +2735,34 @@ test.describe('Q1550 桌面资产健康空态', () => {
   });
 });
 
+test.describe('Q1551 桌面分析健康空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/health 空态「多维度资产健康度评估」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByText('多维度资产健康度评估').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health 空态「健康资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByText('健康资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health 空态「警告资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByText('警告资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
