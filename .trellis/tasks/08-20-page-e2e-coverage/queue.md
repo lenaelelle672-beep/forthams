@@ -911,4 +911,5 @@
 | Q1721 | done | 桌面空态 **3 passed**（/login4 MES连接与信任条）。禁 /m。 |
 | Q1722 | done | 桌面空态 **3 passed**（/login4 闭环协同与演示体验）。禁 /m。 |
 | Q1723 | done | 桌面空态 **3 passed**（/login4 登录系统与平台名）。禁 /m。 |
-| Q1724 | in_progress | 桌面空态：/login4 表单剩余。禁 /m。 |
+| Q1724 | done | 桌面空态 **3 passed**（/login4 用户名密码记住）。禁 /m。 |
+| Q1725 | in_progress | 桌面空态：/login4 剩余表单。禁 /m。 |
