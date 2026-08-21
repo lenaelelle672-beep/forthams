@@ -827,4 +827,5 @@
 | Q1637 | done | 桌面空态 **3 passed**（/reports 资产汇总/分类/状态卡片描述）。禁 /m。 |
 | Q1638 | done | 桌面空态 **3 passed**（/reports 部门排行/增长趋势描述、点财务折旧描述）。禁 /m。 |
 | Q1639 | done | 桌面空态 **3 passed**（/reports 点财务分类价值、运维维保/退役描述）。禁 /m。 |
-| Q1640 | in_progress | 桌面空态：/reports 点工单报表卡片描述。禁 /m。 |
+| Q1640 | done | 桌面空态 **3 passed**（/reports 点工单/财务剩余卡片描述）。禁 /m。 |
+| Q1641 | in_progress | 桌面空态：/energy 未覆盖剩余文案。禁 /m。 |
