@@ -875,4 +875,5 @@
 | Q1685 | done | 桌面空态 **3 passed**（/forbidden 联系管理员与角色缺失）。禁 /m。 |
 | Q1686 | done | 桌面空态 **3 passed**（forbidden 角色缺失、/analytics「数据分析」）。禁 /m。 |
 | Q1687 | done | 桌面空态 **3 passed**（/analytics 部门排行趋势分类空数据）。禁 /m。 |
-| Q1688 | in_progress | 桌面空态：/analytics「净值（万元）」。禁 /m。 |
+| Q1688 | done | 桌面空态 **3 passed**（字段 V3 提示、菜单名称、岗位备注）。禁 /m。 |
+| Q1689 | in_progress | 桌面空态：/system/roles 点新增「角色名称」。禁 /m。 |
