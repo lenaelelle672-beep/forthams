@@ -888,4 +888,5 @@
 | Q1698 | done | 桌面空态 **3 passed**（无匹配图标、按钮权限标识、部门状态）。禁 /m。 |
 | Q1699 | done | 桌面空态 **3 passed**（权限标识、通知中心、全部已读）。禁 /m。 |
 | Q1700 | done | 桌面空态 **3 passed**（/reports 点财务报表折旧分类价值趋势）。禁 /m。 |
-| Q1701 | in_progress | 桌面空态：/reports 点运维报表「维保统计」。禁 /m。 |
+| Q1701 | done | 桌面空态 **3 passed**（/reports 点运维维保退役、工单完成率）。禁 /m。 |
+| Q1702 | in_progress | 桌面空态：/reports 点工单「待处理工单」。禁 /m。 |
