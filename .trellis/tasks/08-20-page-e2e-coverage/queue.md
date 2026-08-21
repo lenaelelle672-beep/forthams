@@ -979,4 +979,5 @@
 | Q1789 | done | 桌面空态 **3 passed**（/insurances/new 免赔额起止日期）。禁 /m。 |
 | Q1790 | done | 桌面空态 **3 passed**（/insurances/new 状态备注返回）。禁 /m。 |
 | Q1791 | done | 桌面空态 **3 passed**（/insurances/new 备注财产险标题）。禁 /m。 |
-| Q1792 | in_progress | 桌面空态：/insurances/new 点类型「责任险」「车险」、空态「生效中」。禁 /m。 |
+| Q1792 | done | 桌面空态 **3 passed**（/insurances/new 责任险车险生效中）。禁 /m。 |
+| Q1793 | in_progress | 桌面空态：/insurances/new「保存」「取消」、点状态「已过期」。禁 /m。 |
