@@ -740,4 +740,5 @@
 | Q1550 | done | 桌面空态 **3 passed**（/asset-health「警告」「危险」「TopN:」）。禁 /m。 |
 | Q1551 | done | 桌面空态 **3 passed**（/analytics/health「多维度资产健康度评估」「健康资产」「警告资产」）。禁 /m。 |
 | Q1552 | done | 桌面空态 **3 passed**（/analytics/health「危险资产」「评分分布」「评分区间分布」）。禁 /m。 |
-| Q1553 | in_progress | 桌面空态：/analytics/health「不健康资产 Top 20」、/analytics/reliability 未覆盖说明。禁 /m。 |
+| Q1553 | done | 桌面空态 **3 passed**（/analytics/health「不健康资产 Top 20」、/analytics/reliability「平均故障间隔」「平均修复时间」）。禁 /m。 |
+| Q1554 | in_progress | 桌面空态：/analytics/reliability「设备可用率」「月均故障率」「总故障 0 次」。禁 /m。 |
