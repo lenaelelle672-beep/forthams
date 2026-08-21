@@ -908,4 +908,5 @@
 | Q1718 | done | 桌面空态 **3 passed**（/login 演示账户描述）。禁 /m。 |
 | Q1719 | done | 桌面空态 **3 passed**（/login5 登录系统与演示体验）。禁 /m。 |
 | Q1720 | done | 桌面空态 **3 passed**（/login 校验文案与系统管理员）。禁 /m。 |
-| Q1721 | in_progress | 桌面空态：/login4 可见文案。禁 /m。 |
+| Q1721 | done | 桌面空态 **3 passed**（/login4 MES连接与信任条）。禁 /m。 |
+| Q1722 | in_progress | 桌面空态：/login4「运维闭环协同」。禁 /m。 |
