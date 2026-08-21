@@ -925,4 +925,5 @@
 | Q1735 | done | 桌面空态 **3 passed**（/login5 演示描述）。禁 /m。 |
 | Q1736 | done | 桌面空态 **3 passed**（/login5 记住忘记与进入工作台）。禁 /m。 |
 | Q1737 | done | 桌面空态 **3 passed**（/login5 SSO与用户名密码）。禁 /m。 |
-| Q1738 | in_progress | 桌面空态：/login5 占位符。禁 /m。 |
+| Q1738 | done | 桌面空态 **3 passed**（/login5 占位与校验）。禁 /m。 |
+| Q1739 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
