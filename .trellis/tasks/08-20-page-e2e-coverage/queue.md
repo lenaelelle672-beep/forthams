@@ -744,4 +744,5 @@
 | Q1554 | done | 桌面空态 **3 passed**（/analytics/reliability「设备可用率」「月均故障率」「总故障 0 次」）。禁 /m。 |
 | Q1555 | done | 桌面空态 **3 passed**（/analytics/reliability「MTBF/MTTR 趋势」「资产可靠性排名」「可用性」）。禁 /m。 |
 | Q1556 | done | 桌面空态 **3 passed**（/analytics「多维资产趋势、分类结构与运营指标分析」「资产总数」「本月维保」）。禁 /m。 |
-| Q1557 | in_progress | 桌面空态：/analytics「资产总值」「待审批」「数据范围」。禁 /m。 |
+| Q1557 | done | 桌面空态 **3 passed**（/analytics「资产总值」「待审批」「数据范围」）。禁 /m。 |
+| Q1558 | in_progress | 桌面空态：/analytics「近 12 个月」「资产价值趋势」「资产分类分布」。禁 /m。 |
