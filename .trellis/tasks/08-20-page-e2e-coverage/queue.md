@@ -981,4 +981,5 @@
 | Q1791 | done | 桌面空态 **3 passed**（/insurances/new 备注财产险标题）。禁 /m。 |
 | Q1792 | done | 桌面空态 **3 passed**（/insurances/new 责任险车险生效中）。禁 /m。 |
 | Q1793 | done | 桌面空态 **3 passed**（/insurances/new 保存与状态选项）。禁 /m。 |
-| Q1794 | in_progress | 桌面空态：/insurances/new 点保存校验「请输入保单号」。禁 /m。 |
+| Q1794 | done | 桌面空态 **3 passed**（/insurances/new 点保存校验）。禁 /m。 |
+| Q1795 | in_progress | 桌面空态：/insurances/new 点保存「请选择保险类型」「请选择状态」。禁 /m。 |
