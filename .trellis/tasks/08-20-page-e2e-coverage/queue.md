@@ -941,4 +941,5 @@
 | Q1751 | done | 桌面空态 **3 passed**（/manufacturers 点新增官网国家）。禁 /m。 |
 | Q1752 | done | 桌面空态 **3 passed**（/manufacturers 点新增地址确认）。禁 /m。 |
 | Q1753 | done | 桌面空态 **3 passed**（/manufacturers 点新增剩余占位）。禁 /m。 |
-| Q1754 | in_progress | 桌面空态：/manufacturers 点新增「请输入国家」。禁 /m。 |
+| Q1754 | done | 桌面空态 **3 passed**（/manufacturers 国家取消与名称列）。禁 /m。 |
+| Q1755 | in_progress | 桌面空态：/manufacturers 列表列。禁 /m。 |
