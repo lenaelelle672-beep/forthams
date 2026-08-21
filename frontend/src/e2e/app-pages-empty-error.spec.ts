@@ -1744,6 +1744,34 @@ test.describe('Q1515 桌面表单说明空态', () => {
   });
 });
 
+test.describe('Q1516 桌面 TCO/处置说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/tco 空态「全生命周期成本总览与分析」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByText('全生命周期成本总览与分析').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/scrap/new 空态「发起资产报废处置流程，提交后将进入审批环节。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByText('发起资产报废处置流程，提交后将进入审批环节。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 空态「发起部门或位置之间的正式资产转移申请。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('发起部门或位置之间的正式资产转移申请。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
