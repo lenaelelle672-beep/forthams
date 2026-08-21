@@ -519,6 +519,48 @@ test.describe('Q1473 桌面表单/弹窗空态', () => {
   });
 });
 
+test.describe('Q1474 桌面表单/弹窗空态', () => {
+  test('/system/roles 点数据权限空态「暂无部门数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api/, '');
+      if (path === '/roles/list') {
+        return fulfill(apiRoute, {
+          records: [{ id: 1, roleName: 'E2E角色', roleCode: 'E2E', dataScope: 1, description: '' }],
+          total: 1,
+          size: 10,
+          current: 1,
+          pages: 1,
+        });
+      }
+      return mockApi(apiRoute);
+    });
+    await seedSession(page, adminUser);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '数据权限' }).first().click();
+    await expect(page.getByText('暂无部门数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/assets/1/timeline 空态「该资产暂无任何履历事件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/assets/1/timeline');
+    await expect(page.getByText('该资产暂无任何履历事件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans 空态「请新建平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    await page.goto('/floorplans');
+    await expect(page.getByText('请新建平面图').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
