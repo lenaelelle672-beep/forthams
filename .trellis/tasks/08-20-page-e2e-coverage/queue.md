@@ -752,4 +752,5 @@
 | Q1562 | done | 桌面空态 **3 passed**（/budgets「资产预算」「总预算」「已使用」）。禁 /m。 |
 | Q1563 | done | 桌面空态 **3 passed**（/budgets「已承诺」「合同锁定」「0 项预算」）。禁 /m。 |
 | Q1564 | done | 桌面空态 **3 passed**（/budgets「预算列表」「超支告警」「执行率」）。禁 /m。 |
-| Q1565 | in_progress | 桌面空态：/revaluations 列表未覆盖说明。禁 /m。 |
+| Q1565 | done | 桌面空态 **3 passed**（/revaluations「总记录」「减值/重估合计」「需及时处理」）。禁 /m。 |
+| Q1566 | in_progress | 桌面空态：/revaluations「已通过」「本期已审批」「本期驳回」。禁 /m。 |
