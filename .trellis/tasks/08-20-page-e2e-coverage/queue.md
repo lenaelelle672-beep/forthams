@@ -719,4 +719,5 @@
 | Q1529 | done | 桌面空态 **3 passed**（/system/depts「暂无部门数据」「点击下方按钮创建第一个部门」「点击左侧组织架构树中的节点即可查看」）。禁 /m。 |
 | Q1530 | done | 桌面空态 **3 passed**（/workflows「流程总数」「已发布」「草稿中」）。禁 /m。 |
 | Q1531 | done | 桌面空态 **3 passed**（/workflows「已停用」「全部业务流程」「可用于发起」）。禁 /m。 |
-| Q1532 | in_progress | 桌面空态：/workflows「待完善发布」「暂停发起」「流程定义」。禁 /m。 |
+| Q1532 | done | 桌面空态 **3 passed**（/workflows「待完善发布」「暂停发起」「流程定义」）。禁 /m。 |
+| Q1533 | in_progress | 桌面空态：待拆 /system/users /locations /system/roles 未覆盖说明。禁 /m。 |
