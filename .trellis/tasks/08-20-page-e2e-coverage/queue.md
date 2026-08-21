@@ -651,3 +651,4 @@
 | Q1461 | done | 桌面空态 **3 passed**（/inspection-templates、/inventory/cycle-count、/inventory/abc-classification）。antd Table locale.emptyText。禁 /m、禁 id 空转。 |
 | Q1462 | done | 桌面空态 **1 passed**（/safety-checklists/config「暂无数据」）。DataTable 默认 emptyText。禁 /m。 |
 | Q1463 | cancelled | /test-results 空态：静态 /test-reports/data.json 有模块数据，route 拦不住；report-builder 无空表文案。禁 /m。 |
+| Q1464 | done | 桌面空态 **2 passed**（/disposals/scrap/new、/disposals/transfer/new「暂无已选资产」）。禁 /m。 |

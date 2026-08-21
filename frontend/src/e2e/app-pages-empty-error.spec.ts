@@ -124,6 +124,8 @@ const emptyPages: Array<{ path: string; empty: string }> = [
   { path: '/inventory/cycle-count', empty: '暂无循环盘点规则' },
   { path: '/inventory/abc-classification', empty: '暂无资产分类数据' },
   { path: '/safety-checklists/config', empty: '暂无数据' },
+  { path: '/disposals/scrap/new', empty: '暂无已选资产' },
+  { path: '/disposals/transfer/new', empty: '暂无已选资产' },
 ];
 
 test.describe('列表空态', () => {
