@@ -804,4 +804,5 @@
 | Q1614 | done | 桌面空态 **3 passed**（/intake「管理资产入库验收全流程」「待质检」「部分验收」）。禁 /m。 |
 | Q1615 | done | 桌面空态 **3 passed**（/intake「质检中」「已验收」「搜索」）。禁 /m。 |
 | Q1616 | done | 桌面空态 **3 passed**（/equipment 副标题、「总设备数」「设备列表」）。禁 /m。 |
-| Q1617 | in_progress | 桌面空态：/equipment「设备状态:」及其余 KPI。禁 /m。 |
+| Q1617 | done | 桌面空态 **3 passed**（/equipment「维保中」「正常运行」「设备状态:」）。禁 /m。 |
+| Q1618 | in_progress | 桌面空态：/equipment「维修中」「已过期」「找到 0 台设备」。禁 /m。 |
