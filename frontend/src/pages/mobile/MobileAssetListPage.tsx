@@ -107,7 +107,7 @@ export default function MobileAssetListPage() {
     );
   }
 
-  const records = data?.records || [];
+  const records = Array.isArray(data?.records) ? data.records : [];
   const hasMore = data ? records.length < data.total : false;
 
   return (

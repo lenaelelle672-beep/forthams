@@ -521,6 +521,65 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '软件许可证管理' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/budgets records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/budgets*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/budgets') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/budgets');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '预算管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/revaluations*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/revaluations') {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/revaluations');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产减值/重估' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/m/assets records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/assets*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/assets' || path.startsWith('/assets?')) {
+        await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/m/assets');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('暂无资产数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals records 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/retirement/list*', async (apiRoute) => {
+      await fulfill(apiRoute, { records: { unexpected: true }, total: 0 });
+    });
+    await page.goto('/disposals');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产处置管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 async function seedAuthenticatedSession(page: Page) {

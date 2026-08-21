@@ -95,7 +95,7 @@ export default function BudgetListPage() {
       if (yearFilter) params.budgetYear = parseInt(yearFilter);
       if (typeFilter) params.budgetType = typeFilter;
       const res = await getBudgets(params);
-      return { data: res?.records ?? [], total: res?.total ?? 0 };
+      return { data: Array.isArray(res?.records) ? res.records : [], total: res?.total ?? 0 };
     },
     enabled: activeTab === 'list',
   });
