@@ -957,4 +957,5 @@
 | Q1767 | done | 桌面空态 **3 passed**（/contracts 合同管理、CNY、状态）。禁 /m。 |
 | Q1768 | done | 桌面空态 **3 passed**（/contracts 点新增展开合同类型）。禁 /m。 |
 | Q1769 | done | 桌面空态 **3 passed**（/contracts 点新增服务合同与状态）。禁 /m。 |
-| Q1770 | in_progress | 桌面空态：/contracts 点新增状态「已到期」「已取消」、点货币「USD」。禁 /m。 |
+| Q1770 | done | 桌面空态 **3 passed**（/contracts 点新增到期取消与USD）。禁 /m。 |
+| Q1771 | in_progress | 桌面空态：/contracts「请选择」、点新增「新增合同」。禁 /m。 |
