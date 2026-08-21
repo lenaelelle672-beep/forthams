@@ -943,4 +943,5 @@
 | Q1753 | done | 桌面空态 **3 passed**（/manufacturers 点新增剩余占位）。禁 /m。 |
 | Q1754 | done | 桌面空态 **3 passed**（/manufacturers 国家取消与名称列）。禁 /m。 |
 | Q1755 | done | 桌面空态 **3 passed**（/manufacturers 编码联系人电话列）。禁 /m。 |
-| Q1756 | in_progress | 桌面空态：/manufacturers「国家」「状态」「操作」。禁 /m。 |
+| Q1756 | done | 桌面空态 **3 passed**（/manufacturers 国家状态操作列）。禁 /m。 |
+| Q1757 | in_progress | 桌面空态：/manufacturers「制造商管理」。禁 /m。 |
