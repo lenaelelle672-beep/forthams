@@ -7179,6 +7179,36 @@ test.describe('Q1703 桌面报表空态', () => {
   });
 });
 
+test.describe('Q1704 桌面报表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports 点运维报表「月度退役资产数量及处置方式分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: '运维报表' }).click();
+    await expect(page.getByText('月度退役资产数量及处置方式分布').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 点工单报表「各部门待处理工单数量与超时工单统计」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: '工单报表' }).click();
+    await expect(page.getByText('各部门待处理工单数量与超时工单统计').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 空态「导出 CSV」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByText('导出 CSV').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
