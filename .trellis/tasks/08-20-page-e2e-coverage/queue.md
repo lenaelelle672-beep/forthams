@@ -928,4 +928,5 @@
 | Q1738 | done | 桌面空态 **3 passed**（/login5 占位与校验）。禁 /m。 |
 | Q1739 | done | 桌面空态 **3 passed**（login5/4 校验、analytics 近6个月）。禁 /m。 |
 | Q1740 | done | 桌面空态 **3 passed**（SSO 失败返回登录、欢迎回来）。禁 /m。 |
-| Q1741 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
+| Q1741 | done | 桌面空态 **3 passed**（/categories 暂无分类与添加名称）。禁 /m。 |
+| Q1742 | in_progress | 桌面空态：/categories 点添加根分类「分类编码」。禁 /m。 |
