@@ -867,4 +867,5 @@
 | Q1677 | done | 桌面空态 **3 passed**（/dashboard「运营首页」「待审批」「欢迎回来，系统管理员」）。禁 /m。 |
 | Q1678 | done | 桌面空态 **3 passed**（/dashboard「查看全部」「总价值」、/test-results 加载失败）。禁 /m。 |
 | Q1679 | done | 桌面空态 **3 passed**（/system/posts 点新增排序与状态）。禁 /m。 |
-| Q1680 | in_progress | 桌面空态：/system/custom-fields 点新增未覆盖字段。禁 /m。 |
+| Q1680 | done | 桌面空态 **3 passed**（字段只读副标题共 0 条、菜单取消）。禁 /m。 |
+| Q1681 | in_progress | 桌面空态：/403 未覆盖文案。禁 /m。 |

@@ -6465,6 +6465,35 @@ test.describe('Q1679 桌面岗位空态', () => {
   });
 });
 
+test.describe('Q1680 桌面字段与菜单空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/custom-fields 空态「管理系统扩展字段定义」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('管理系统扩展字段定义').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fields 空态「共 0 条」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('共 0 条').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus 点新增菜单「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await page.getByRole('button', { name: '新增菜单' }).click();
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
