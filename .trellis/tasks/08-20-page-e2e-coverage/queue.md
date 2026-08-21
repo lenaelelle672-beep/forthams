@@ -711,4 +711,5 @@
 | Q1521 | done | 桌面空态 **3 passed**（/licenses「搜索软件名称/厂商」、/spare-parts「搜索备件编码/名称...」、/audit「搜索操作记录...」）。禁 /m。 |
 | Q1522 | done | 桌面空态 **3 passed**（/equipment「搜索设备名称或编号...」、/system/posts 搜索岗位、/system/custom-fields 搜索字段）。禁 /m。 |
 | Q1523 | done | 桌面空态 **3 passed**（/system/depts「搜索部门名称、编码、负责人...」、/system/custom-fieldsets「搜索字段集名称」、/vendors「搜索供应商名称、编码、联系人...」）。禁 /m。 |
-| Q1524 | in_progress | 桌面空态：/intake 搜索验收单号、/depreciation 搜索资产编号、/purchase-orders 搜索采购单号。禁 /m。 |
+| Q1524 | done | 桌面空态 **3 passed**（/intake「搜索验收单号...」、/depreciation「搜索资产编号...」、/purchase-orders「搜索采购单号、名称...」）。禁 /m。 |
+| Q1525 | in_progress | 桌面空态：/retirement 搜索编号或资产、/insurances 保单号搜索、/inspections 检验编号搜索。禁 /m。 |
