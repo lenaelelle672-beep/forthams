@@ -811,4 +811,5 @@
 | Q1621 | done | 桌面空态 **3 passed**（/asset-models 规格说明、「全部模型」「全部分类」）。禁 /m。 |
 | Q1622 | done | 桌面空态 **3 passed**（/asset-models 点新增模型标题、说明与名称 placeholder）。禁 /m。 |
 | Q1623 | done | 桌面空态 **3 passed**（/asset-models 点新增「产品型号」「模型名称 *」「分类 *」）。禁 /m。 |
-| Q1624 | in_progress | 桌面空态：/depreciation 未覆盖说明。禁 /m。 |
+| Q1624 | done | 桌面空态 **3 passed**（/depreciation「本月折旧总额」「折旧计划」「资产折旧计划管理」）。禁 /m。 |
+| Q1625 | in_progress | 桌面空态：/depreciation 其余 KPI。禁 /m。 |
