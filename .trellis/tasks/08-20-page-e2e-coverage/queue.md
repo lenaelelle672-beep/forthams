@@ -931,4 +931,5 @@
 | Q1741 | done | 桌面空态 **3 passed**（/categories 暂无分类与添加名称）。禁 /m。 |
 | Q1742 | done | 桌面空态 **3 passed**（/categories 点添加编码与说明）。禁 /m。 |
 | Q1743 | done | 桌面空态 **3 passed**（/categories 创建取消与名称校验）。禁 /m。 |
-| Q1744 | in_progress | 桌面空态：/categories 点添加根分类编码校验。禁 /m。 |
+| Q1744 | done | 桌面空态 **3 passed**（分类编码校验与标题）。禁 /m。 |
+| Q1745 | in_progress | 桌面空态：继续未覆盖桌面文案。禁 /m。 |
