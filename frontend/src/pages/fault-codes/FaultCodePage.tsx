@@ -43,10 +43,11 @@ const LEVEL_CONFIG: Record<number, {
 };
 
 function countByLevel(nodes: FaultCode[], level: number): number {
+  if (!Array.isArray(nodes)) return 0;
   let count = 0;
   for (const n of nodes) {
     if (n.level === level) count++;
-    if (n.children) count += countByLevel(n.children, level);
+    if (Array.isArray(n.children)) count += countByLevel(n.children, level);
   }
   return count;
 }
@@ -67,7 +68,7 @@ export default function FaultCodePage() {
     queryFn: () => getFaultCodeTree(),
   });
 
-  const tree: FaultCode[] = res ?? [];
+  const tree: FaultCode[] = Array.isArray(res) ? res : [];
 
   /* ── Mutations (unchanged) ────────────────────────────────────────────── */
 
@@ -163,9 +164,10 @@ export default function FaultCodePage() {
   const totalCount = useMemo(() => {
     let count = 0;
     const walk = (nodes: FaultCode[]) => {
+      if (!Array.isArray(nodes)) return;
       for (const n of nodes) {
         count++;
-        if (n.children) walk(n.children);
+        if (Array.isArray(n.children)) walk(n.children);
       }
     };
     walk(tree);
@@ -182,7 +184,8 @@ export default function FaultCodePage() {
   /* ── Tree node renderer ───────────────────────────────────────────────── */
 
   function renderNode(node: FaultCode, depth: number = 0) {
-    const hasChildren = node.children && node.children.length > 0;
+    const childNodes = Array.isArray(node.children) ? node.children : [];
+    const hasChildren = childNodes.length > 0;
     const isExpanded = expandedIds.has(node.id);
     const cfg = LEVEL_CONFIG[node.level ?? 0];
     const levelLabel = cfg?.label ?? '';
@@ -239,7 +242,7 @@ export default function FaultCodePage() {
           </div>
         </div>
         {hasChildren && isExpanded && (
-          node.children!.map(child => renderNode(child, depth + 1))
+          childNodes.map(child => renderNode(child, depth + 1))
         )}
       </div>
     );

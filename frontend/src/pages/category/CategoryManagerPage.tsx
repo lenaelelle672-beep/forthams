@@ -64,7 +64,8 @@ function TreeNode({
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(true);
-  const hasChildren = node.children && node.children.length > 0;
+  const childNodes = Array.isArray(node.children) ? node.children : [];
+  const hasChildren = childNodes.length > 0;
   const isSelected = selectedId === node.id;
 
   return (
@@ -145,7 +146,7 @@ function TreeNode({
       {/* 子节点 */}
       {hasChildren && expanded && (
         <div>
-          {node.children!.map((child) => (
+          {childNodes.map((child) => (
             <TreeNode
               key={child.id}
               node={child}
@@ -165,10 +166,11 @@ function TreeNode({
 
 // ── 辅助：统计分类总数 ─────────────────────────────────────────────────────
 function countAll(nodes: AssetCategory[]): number {
+  if (!Array.isArray(nodes)) return 0;
   let count = 0;
   for (const n of nodes) {
     count += 1;
-    if (n.children) count += countAll(n.children);
+    if (Array.isArray(n.children)) count += countAll(n.children);
   }
   return count;
 }
@@ -202,7 +204,7 @@ export default function CategoryManagerPage() {
     staleTime: 1000 * 60,
   });
 
-  const treeData = treeRes as unknown as AssetCategory[] | undefined ?? [];
+  const treeData = Array.isArray(treeRes) ? treeRes as AssetCategory[] : [];
 
   // ── Stats ─────────────────────────────────────────────────────────────────
   const totalCategories = useMemo(() => countAll(treeData), [treeData]);
@@ -210,9 +212,10 @@ export default function CategoryManagerPage() {
 
   // ── 找到当前选中的节点 ────────────────────────────────────────────────────
   function findNode(nodes: AssetCategory[], id: number): AssetCategory | null {
+    if (!Array.isArray(nodes)) return null;
     for (const n of nodes) {
       if (n.id === id) return n;
-      if (n.children) {
+      if (Array.isArray(n.children)) {
         const found = findNode(n.children, id);
         if (found) return found;
       }

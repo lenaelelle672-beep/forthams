@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAssetList, useCategoryTree } from '@/hooks/asset/useAssets';
+import { useAuth } from '@/context/AuthContext';
+import { canAccessRoute } from '@/utils/routePermissions';
 import { usePdfExport } from '@/hooks/usePdfExport';
 import { AssetStatus } from '@/types/asset';
 import type { AssetListQuery, AssetListItem, DashboardStats } from '@/types/asset';
@@ -19,6 +21,8 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { DataTable, type Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/Badge';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ErrorState } from '@/components/ui/ErrorState';
 import http from '@/utils/http';
 
 
@@ -37,7 +41,7 @@ function flattenCategoryTree(tree: { id: number; categoryName: string; children?
   const walk = (nodes: typeof tree[]) => {
     for (const node of nodes) {
       result.push({ id: node.id, name: node.categoryName });
-      if (node.children) walk(node.children as typeof tree[]);
+      if (Array.isArray(node.children)) walk(node.children as typeof tree[]);
     }
   };
   walk([tree]);
@@ -52,9 +56,11 @@ interface StatCardDef {
   gradient: string;
 }
 
-export default function AssetListPage() {
+export default function AssetListPage({ embeddedInWorkbench = false }: { embeddedInWorkbench?: boolean }) {
   const { t } = useTranslation(['asset', 'common']);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const canCreateAsset = canAccessRoute('/assets/new', user);
 
   const STATUS_OPTIONS = useMemo(() => STATUS_OPTIONS_DEF.map(opt => ({
     ...opt,
@@ -103,7 +109,7 @@ export default function AssetListPage() {
     const walk = (nodes: Department[]) => {
       for (const node of nodes) {
         flat.push({ id: node.id, name: node.deptName });
-        if (node.children) walk(node.children);
+        if (Array.isArray(node.children)) walk(node.children);
       }
     };
     walk(list);
@@ -125,10 +131,10 @@ export default function AssetListPage() {
     isImportant: importantOnly ? 1 : undefined,
   }), [page, pageSize, keyword, categoryId, deptId, selectedStatuses, importantOnly]);
 
-  const { data: res, isLoading, isFetching } = useAssetList(apiQuery);
+  const { data: res, isLoading, isFetching, isError, error, refetch } = useAssetList(apiQuery);
 
   const pageData = res as unknown as PageData<AssetListItem> | undefined;
-  const records = pageData?.records ?? [];
+  const records = Array.isArray(pageData?.records) ? pageData.records : [];
   const total = pageData?.total ?? 0;
 
   const toggleStatus = useCallback((status: string) => {
@@ -288,7 +294,7 @@ export default function AssetListPage() {
     try {
       const allQuery: AssetListQuery = { page: 1, pageSize: 99999, keyword: keyword || undefined, categoryId: categoryId || undefined, deptId: deptId || undefined, status: selectedStatuses.length > 0 ? selectedStatuses.join(',') : undefined, isImportant: importantOnly ? 1 : undefined };
       const allRes = await http.get('/assets', { params: allQuery });
-      const allRecords = (allRes as any)?.records ?? [];
+      const allRecords = Array.isArray((allRes as any)?.records) ? (allRes as any).records : [];
       if (allRecords.length === 0) { toast.info('暂无数据可导出'); return; }
       const csv = [
         ['资产编号', '资产名称', '分类', '状态', '原值', '存放位置'].join(','),
@@ -308,7 +314,7 @@ export default function AssetListPage() {
   };
 
   return (
-    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8">
+    <div className="min-h-full bg-[var(--app-background)] px-4 py-5 sm:px-6 lg:px-8" data-embedded={embeddedInWorkbench || undefined}>
       <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-6">
         {/* ① 紧凑头部 — 标题 + 指标条 */}
         <section className="rounded-2xl border border-[var(--surface-border)] bg-white shadow-sm">
@@ -333,10 +339,12 @@ export default function AssetListPage() {
                 {pdfExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                 {pdfExporting ? t('asset:messages.exporting') : t('asset:list.exportPDF')}
               </Button>
+              {canCreateAsset ? (
               <Button variant="primary" size="md" onClick={() => navigate('/assets/new')}>
                 <Plus className="w-4 h-4" />
-                {t('asset:actions.create')}
-              </Button>
+                 {t('asset:actions.create')}
+               </Button>
+              ) : null}
             </div>
           </div>
 
@@ -523,10 +531,22 @@ export default function AssetListPage() {
 
           {/* 表格 */}
           <div className="p-4 sm:p-5">
+            {isError && !isLoading ? (
+              <ErrorState
+                title={(error as { status?: number } | undefined)?.status === 403 ? '没有权限' : undefined}
+                description={error instanceof Error ? error.message : undefined}
+                onRetry={() => { void refetch(); }}
+              />
+            ) : !isLoading && records.length === 0 ? (
+              <EmptyState
+                variant="asset"
+                action={canCreateAsset ? { label: '新建资产', onClick: () => navigate('/assets/new') } : undefined}
+              />
+            ) : (
             <DataTable
               columns={columns}
               data={records}
-              loading={isLoading}
+              loading={isLoading || isFetching}
               rowKey="id"
               onRowClick={(row) => navigate(`/assets/${row.id}`)}
               pagination={{
@@ -537,6 +557,7 @@ export default function AssetListPage() {
               }}
               emptyText="暂无资产数据，点击「新建资产」开始录入"
             />
+            )}
           </div>
         </Card>
       </div>

@@ -75,8 +75,9 @@ function getDeptName(dept?: Department) {
 
 /** Count total descendants of a department node */
 function countDescendants(node: Department): number {
-  if (!node.children || node.children.length === 0) return 0;
-  return node.children.reduce((sum, c) => sum + 1 + countDescendants(c), 0);
+  const children = Array.isArray(node.children) ? node.children : [];
+  if (children.length === 0) return 0;
+  return children.reduce((sum, c) => sum + 1 + countDescendants(c), 0);
 }
 
 // ── Tree node component ────────────────────────────────────────────────────────
@@ -96,7 +97,8 @@ function DeptTreeNode({
   onSelect: (dept: Department) => void;
   onToggle: (id: number) => void;
 }) {
-  const hasChildren = node.children && node.children.length > 0;
+  const childNodes = Array.isArray(node.children) ? node.children : [];
+  const hasChildren = childNodes.length > 0;
   const isSelected = selectedId === node.id;
   const isExpanded = expandedIds.has(node.id);
   const isDisabled = node.status === 0;
@@ -148,7 +150,7 @@ function DeptTreeNode({
             text-[10px] rounded-full px-1.5 py-px shrink-0 font-medium tabular-nums
             ${isSelected ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'}
           `}>
-            {node.children!.length}
+            {childNodes.length}
           </span>
         )}
 
@@ -163,7 +165,7 @@ function DeptTreeNode({
       {/* children */}
       {hasChildren && isExpanded && (
         <div className="flex flex-col">
-          {node.children!.map((child) => (
+          {childNodes.map((child) => (
             <DeptTreeNode
               key={child.id}
               node={child}
@@ -238,8 +240,9 @@ export default function DeptManagement() {
   const allNodeIds = useMemo(() => {
     const ids = new Set<number>();
     function collect(nodes: Department[]) {
+      if (!Array.isArray(nodes)) return;
       for (const n of nodes) {
-        if (n.children && n.children.length > 0) {
+        if (Array.isArray(n.children) && n.children.length > 0) {
           ids.add(n.id);
           collect(n.children);
         }
@@ -271,9 +274,10 @@ export default function DeptManagement() {
     }
 
     function filterNodes(nodes: Department[]): Department[] {
+      if (!Array.isArray(nodes)) return [];
       const result: Department[] = [];
       for (const node of nodes) {
-        const childMatch = node.children ? filterNodes(node.children) : [];
+        const childMatch = Array.isArray(node.children) ? filterNodes(node.children) : [];
         if (matchNode(node) || childMatch.length > 0) {
           result.push({ ...node, children: childMatch.length > 0 ? childMatch : node.children });
         }
@@ -371,12 +375,13 @@ export default function DeptManagement() {
   // Flat dept options for parent selector
   const flatDeptOptions = useMemo(() => {
     function flatten(nodes: Department[], depth: number): Array<{ id: number; name: string; level: number }> {
+      if (!Array.isArray(nodes)) return [];
       const result: Array<{ id: number; name: string; level: number }> = [];
       for (const node of nodes) {
         if (!editingDept || node.id !== editingDept.id) {
           result.push({ id: node.id, name: getDeptName(node), level: depth });
         }
-        if (node.children) {
+        if (Array.isArray(node.children)) {
           result.push(...flatten(node.children, depth + 1));
         }
       }
@@ -388,7 +393,8 @@ export default function DeptManagement() {
   // Count all depts for summary
   const totalDeptCount = useMemo(() => {
     function count(nodes: Department[]): number {
-      return nodes.reduce((sum, n) => sum + 1 + (n.children ? count(n.children) : 0), 0);
+      if (!Array.isArray(nodes)) return 0;
+      return nodes.reduce((sum, n) => sum + 1 + (Array.isArray(n.children) ? count(n.children) : 0), 0);
     }
     return count(deptTree);
   }, [deptTree]);
@@ -399,9 +405,10 @@ export default function DeptManagement() {
     const parentId = selectedDept.parentId;
     if (!parentId || parentId === 0) return null;
     function findName(nodes: Department[]): string | null {
+      if (!Array.isArray(nodes)) return null;
       for (const n of nodes) {
         if (n.id === parentId) return getDeptName(n);
-        if (n.children) {
+        if (Array.isArray(n.children)) {
           const found = findName(n.children);
           if (found) return found;
         }
@@ -414,7 +421,8 @@ export default function DeptManagement() {
   // Count active/dept stats
   const activeDeptCount = useMemo(() => {
     function count(nodes: Department[]): number {
-      return nodes.reduce((sum, n) => sum + (n.status !== 0 ? 1 : 0) + (n.children ? count(n.children) : 0), 0);
+      if (!Array.isArray(nodes)) return 0;
+      return nodes.reduce((sum, n) => sum + (n.status !== 0 ? 1 : 0) + (Array.isArray(n.children) ? count(n.children) : 0), 0);
     }
     return count(deptTree);
   }, [deptTree]);
@@ -891,9 +899,10 @@ function DetailField({ label, value, icon }: { label: string; value?: string; ic
 
 /** Find the depth of a department node in the tree */
 function findDepth(nodes: Department[], targetId: number, currentDepth = 0): number {
+  if (!Array.isArray(nodes)) return -1;
   for (const node of nodes) {
     if (node.id === targetId) return currentDepth;
-    if (node.children) {
+    if (Array.isArray(node.children)) {
       const d = findDepth(node.children, targetId, currentDepth + 1);
       if (d >= 0) return d;
     }

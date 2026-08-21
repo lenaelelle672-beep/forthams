@@ -2730,6 +2730,90 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '资产转移申请' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/locations children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/locations/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, name: 'E2E位置', children: { unexpected: true } }]);
+    });
+    await page.goto('/locations');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '位置管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/categories/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, categoryName: 'E2E分类', children: { unexpected: true } }]);
+    });
+    await page.goto('/categories');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产分类管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/fault-codes/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, code: 'F-001', level: 1, children: { unexpected: true } }]);
+    });
+    await page.goto('/fault-codes');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '故障代码管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/depts children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, deptName: 'E2E部门', children: { unexpected: true } }]);
+    });
+    await page.goto('/system/depts');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '部门管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets categories/depts children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/categories/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, categoryName: 'E2E分类', children: { unexpected: true } }]);
+    });
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, deptName: 'E2E部门', children: { unexpected: true } }]);
+    });
+    await page.goto('/assets');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产台账' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets alerts 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/budgets/over-budget-alerts*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/budgets');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '预算管理' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '超支告警' }).click();
+    await expect(page.getByRole('heading', { name: '预算管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets execution-rate 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/budgets/execution-rate*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/budgets');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '预算管理' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByRole('button', { name: '执行率' }).click();
+    await expect(page.getByRole('heading', { name: '预算管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

@@ -41,10 +41,11 @@ interface LocationFormData {
 // ─── Stats helpers ───────────────────────────────────────────────────────────
 
 function countAll(nodes: LocationNode[]): number {
+  if (!Array.isArray(nodes)) return 0;
   let count = 0;
   for (const n of nodes) {
     count += 1;
-    if (n.children) count += countAll(n.children);
+    if (Array.isArray(n.children)) count += countAll(n.children);
   }
   return count;
 }
@@ -170,7 +171,8 @@ interface TreeNodeRowProps {
 }
 
 function TreeNodeRow({ node, depth, expanded, onToggle, onAddChild, onEdit, onDelete }: TreeNodeRowProps) {
-  const hasChildren = (node.children?.length ?? 0) > 0;
+  const childNodes = Array.isArray(node.children) ? node.children : [];
+  const hasChildren = childNodes.length > 0;
   const isExpanded = expanded.has(node.id);
 
   return (
@@ -223,7 +225,7 @@ function TreeNodeRow({ node, depth, expanded, onToggle, onAddChild, onEdit, onDe
       </div>
 
       {/* 子节点（展开时渲染） */}
-      {hasChildren && isExpanded && node.children!.map(child => (
+      {hasChildren && isExpanded && childNodes.map(child => (
         <TreeNodeRow
           key={child.id}
           node={child}
@@ -285,7 +287,10 @@ export default function LocationsPage() {
 
   const expandAll = () => {
     const ids = new Set<number>();
-    const collect = (nodes: LocationNode[]) => nodes.forEach(n => { ids.add(n.id); if (n.children) collect(n.children); });
+    const collect = (nodes: LocationNode[]) => {
+      if (!Array.isArray(nodes)) return;
+      nodes.forEach(n => { ids.add(n.id); if (Array.isArray(n.children)) collect(n.children); });
+    };
     collect(tree);
     setExpanded(ids);
   };

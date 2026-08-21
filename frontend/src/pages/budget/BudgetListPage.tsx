@@ -100,17 +100,19 @@ export default function BudgetListPage() {
     enabled: activeTab === 'list',
   });
 
-  const { data: execRates = [] } = useQuery({
+  const { data: execRatesRes } = useQuery({
     queryKey: ['budget-exec-rate', yearFilter],
     queryFn: () => getExecutionRate({ budgetYear: parseInt(yearFilter) || undefined }),
     enabled: activeTab === 'rate',
   });
+  const execRates = Array.isArray(execRatesRes) ? execRatesRes : [];
 
-  const { data: alerts = [] } = useQuery({
+  const { data: alertsRes } = useQuery({
     queryKey: ['budget-alerts'],
     queryFn: () => getOverBudgetAlerts(),
     enabled: activeTab === 'alerts',
   });
+  const alerts = Array.isArray(alertsRes) ? alertsRes : [];
 
   const dataSource = queryResult?.data ?? [];
   const total = queryResult?.total ?? 0;
@@ -120,7 +122,7 @@ export default function BudgetListPage() {
   const totalCommitted = dataSource.reduce((s: number, r: Budget) => s + (r.committedAmount || 0), 0);
   const execRate = totalBudget > 0 ? ((totalUsed / totalBudget) * 100).toFixed(1) : '0.0';
 
-  const alertCount = (alerts as OverBudgetAlert[]).length;
+  const alertCount = alerts.length;
 
   // ── 统计卡片数据 ────────────────────────────────────────────────────────────────
   const statCards = useMemo(() => [
