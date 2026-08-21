@@ -855,4 +855,5 @@
 | Q1665 | done | 桌面空态 **3 passed**（/system/depts 点新增秘书电话邮箱）。禁 /m。 |
 | Q1666 | done | 桌面空态 **3 passed**（/system/depts「支持搜索过滤」「支持展开/收起子级」「新增」）。禁 /m。 |
 | Q1667 | done | 桌面空态 **3 passed**（/system/users 点新增用户名密码姓名）。禁 /m。 |
-| Q1668 | in_progress | 桌面空态：/system/users 点新增「邮箱」「手机号」「所属部门」。禁 /m。 |
+| Q1668 | done | 桌面空态 **3 passed**（/system/users 点新增邮箱手机号部门）。禁 /m。 |
+| Q1669 | in_progress | 桌面空态：/system/users 点新增「备注」「分配角色」「分配岗位」。禁 /m。 |
