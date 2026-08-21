@@ -690,4 +690,5 @@
 | Q1500 | done | 桌面空态 **3 passed**（GIS 关联「标注坐标」「取消」、新建定位「资产名称」）。禁 /m。 |
 | Q1501 | done | 桌面空态 **3 passed**（/depreciation「批量计算折旧」、/inventory/abc-classification「批量重新分类」、/idle 副标题）。禁 /m。 |
 | Q1502 | done | 桌面空态 **3 passed**（ABC 规则说明、/depreciation「待计算资产」「刷新」）。禁 /m。 |
-| Q1503 | in_progress | 桌面空态：/inventory/abc-classification「未分类资产」、点批量重新分类确认、/depreciation 点批量计算确认。禁 /m。 |
+| Q1503 | done | 桌面空态 **3 passed**（ABC「未分类资产」「导出报告」规则未匹配说明）。折旧批量确认空表不可达。禁 /m。 |
+| Q1504 | in_progress | 桌面空态：/inventory/abc-classification「A 类资产」、点批量重新分类确认文案、/idle「闲置总量」。禁 /m。 |
