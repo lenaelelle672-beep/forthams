@@ -63,7 +63,7 @@ export default function AssignmentListPage() {
   const { data: pageRes, isLoading } = useAssignments(query);
 
   const pageData = pageRes as unknown as { records?: AssetAssignment[]; total?: number } | undefined;
-  const records = pageData?.records ?? [];
+  const records = Array.isArray(pageData?.records) ? pageData.records : [];
   const total = pageData?.total ?? 0;
 
   const handleSearch = () => {

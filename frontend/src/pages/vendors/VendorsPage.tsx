@@ -399,7 +399,7 @@ export default function VendorsPage() {
     },
   });
 
-  const vendors: Vendor[] = listData?.records ?? [];
+  const vendors: Vendor[] = Array.isArray(listData?.records) ? listData.records : [];
   const total = listData?.total ?? 0;
   const totalPages = listData?.pages ?? Math.ceil(total / PAGE_SIZE);
 

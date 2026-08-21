@@ -206,7 +206,7 @@ export default function EquipmentPage() {
 
   // ── 维保记录按 assetId 建立索引，以便快速查找 last/next maintenance ────────
   const maintenanceByAsset: Record<string, { lastDate: string; nextDate: string | null }> = {};
-  const rawRecords = recordsData?.records ?? [];
+  const rawRecords = Array.isArray(recordsData?.records) ? recordsData.records : [];
   for (const r of rawRecords) {
     const key = String(r.assetId);
     const existing = maintenanceByAsset[key];
@@ -225,7 +225,7 @@ export default function EquipmentPage() {
   }
 
   // ── 将 API 资产列表映射为设备展示列表 ─────────────────────────────────────────
-  const assetItems: AssetListItem[] = assetListData?.records ?? [];
+  const assetItems: AssetListItem[] = Array.isArray(assetListData?.records) ? assetListData.records : [];
   const equipment: EquipmentItem[] = assetItems.map((a) => {
     const mInfo = maintenanceByAsset[String(a.id)];
     const nextDate = mInfo?.nextDate ?? null;

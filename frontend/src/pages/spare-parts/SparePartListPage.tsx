@@ -51,7 +51,7 @@ export default function SparePartListPage() {
   });
 
   const pageData: PageData<SparePart> | undefined = res;
-  const records = pageData?.records ?? [];
+  const records = Array.isArray(pageData?.records) ? pageData.records : [];
   const total = pageData?.total ?? 0;
 
   /* ── Derived stats ── */

@@ -56,7 +56,7 @@ export default function BorrowListPage() {
 
   const { data: pageRes, isLoading, isFetching } = useBorrows(query);
   const pageData = pageRes as unknown as { records?: AssetBorrow[]; total?: number } | undefined;
-  const records = pageData?.records ?? [];
+  const records = Array.isArray(pageData?.records) ? pageData.records : [];
   const total = pageData?.total ?? 0;
 
   const handleSearch = () => setQuery((prev) => ({ ...prev, keyword, page: 1 }));

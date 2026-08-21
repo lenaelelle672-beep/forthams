@@ -214,7 +214,7 @@ export default function ManufacturerPage() {
     queryFn: () => getManufacturers({ keyword, status: statusFilter, page, pageSize }),
   });
 
-  const records: Manufacturer[] = (data as any)?.records ?? [];
+  const records: Manufacturer[] = Array.isArray((data as any)?.records) ? (data as any).records : [];
   const total = (data as any)?.total ?? 0;
 
   // ── Stats ─────────────────────────────────────────────────────────────────

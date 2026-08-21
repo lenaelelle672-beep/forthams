@@ -78,7 +78,11 @@ const InspectionListPage: React.FC = () => {
     queryFn: () => inspectionApi.list(params as any),
   });
 
-  const records: Inspection[] = data?.records || data?.list || [];
+  const records: Inspection[] = Array.isArray(data?.records)
+    ? data.records
+    : Array.isArray(data?.list)
+      ? data.list
+      : [];
 
   const stats = useMemo(() => {
     const s = { total: records.length, pass: 0, fail: 0, conditional: 0, overdue: 0 };

@@ -444,7 +444,7 @@ export default function SoftwareLicensePage() {
   };
 
   const summaryData = summary as any;
-  const records: SoftwareLicense[] = (data as any)?.records ?? [];
+  const records: SoftwareLicense[] = Array.isArray((data as any)?.records) ? (data as any).records : [];
   const total = (data as any)?.total ?? 0;
   const expiringCount = (expiring as any[])?.length ?? 0;
 

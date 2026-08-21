@@ -468,9 +468,9 @@ export default function PurchaseOrderPage() {
     },
   });
 
-  const orders: PurchaseOrder[] = listData?.records ?? [];
+  const orders: PurchaseOrder[] = Array.isArray(listData?.records) ? listData.records : [];
   const total = listData?.total ?? 0;
-  const vendors: Vendor[] = vendorsData?.records ?? [];
+  const vendors: Vendor[] = Array.isArray(vendorsData?.records) ? vendorsData.records : [];
   const stats = statsData ?? { totalOrders: 0, pendingApproval: 0, approved: 0 };
 
   // ── Mutations ──
