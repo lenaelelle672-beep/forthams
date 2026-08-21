@@ -863,4 +863,5 @@
 | Q1673 | done | 桌面空态 **3 passed**（/profile「当前套餐」「系统管理员」「ADMIN」）。禁 /m。 |
 | Q1674 | done | 桌面空态 **3 passed**（/profile SUPER_ADMIN、部门排序负责人）。禁 /m。 |
 | Q1675 | done | 桌面空态 **3 passed**（部门描述搜索用户、菜单排序号）。禁 /m。 |
-| Q1676 | in_progress | 桌面空态：/system/menus 点新增「路由路径」「组件路径」。禁 /m。 |
+| Q1676 | done | 桌面空态 **3 passed**（/system/menus 点新增路径与保存）。禁 /m。 |
+| Q1677 | in_progress | 桌面空态：/dashboard 未覆盖文案。禁 /m。 |
