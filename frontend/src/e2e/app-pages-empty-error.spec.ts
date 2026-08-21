@@ -7873,6 +7873,29 @@ test.describe('Q1732 桌面登录空态', () => {
   });
 });
 
+test.describe('Q1733 桌面登录空态', () => {
+  test('/login4 空态「资源审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login4');
+    await expect(page.getByText('资源审批').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login4 空态「巡检维修」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login4');
+    await expect(page.getByText('巡检维修').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态「资产管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByText('资产管理员').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
