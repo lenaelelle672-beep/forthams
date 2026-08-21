@@ -701,4 +701,5 @@
 | Q1511 | done | 桌面空态 **3 passed**（/bigscreen-3d「资产规模指标」「资产分类结构」「价值趋势预测」）。禁 /m。 |
 | Q1512 | done | 桌面空态 **3 passed**（/bigscreen-3d「设备在线总览」「城市资产TOP5」「风险异常队列」）。禁 /m。 |
 | Q1513 | done | 桌面空态 **3 passed**（/categories「选择分类」详情空态、/floorplans「请选择平面图」）。禁 /m。 |
-| Q1514 | in_progress | 桌面空态：/intake/new 验收说明、/spare-parts/new 备件保障说明、/workflows 搜索 placeholder。禁 /m。 |
+| Q1514 | done | 桌面空态 **3 passed**（/intake/new 验收说明、/spare-parts/new 备件保障说明、/workflows 搜索 placeholder）。禁 /m。 |
+| Q1515 | in_progress | 桌面空态：/budgets/new「创建新的预算记录」、/revaluations/new「资产价值调整申请」、/analytics/reliability 副标题。禁 /m。 |

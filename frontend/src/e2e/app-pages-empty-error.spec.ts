@@ -1688,6 +1688,34 @@ test.describe('Q1513 桌面分类/平面图空态', () => {
   });
 });
 
+test.describe('Q1514 桌面表单说明/搜索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/new 空态「填写验收信息和入库资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/new');
+    await expect(page.getByText('填写验收信息和入库资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/new 空态「按维保工单、库存下限和供应商交期创建备件保障记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('按维保工单、库存下限和供应商交期创建备件保障记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态搜索「搜索流程名称、编码、说明或业务对象」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByPlaceholder('搜索流程名称、编码、说明或业务对象').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
