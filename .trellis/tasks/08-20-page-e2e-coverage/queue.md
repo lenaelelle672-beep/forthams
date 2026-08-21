@@ -725,4 +725,5 @@
 | Q1535 | done | 桌面空态 **3 passed**（/system/custom-fields「管理系统扩展字段定义」、/system/posts「岗位信息维护」「岗位列表」）。禁 /m。 |
 | Q1536 | done | 桌面空态 **3 passed**（/system/posts「岗位总量」「正常」「停用」）。禁 /m。 |
 | Q1537 | done | 桌面空态 **3 passed**（/fault-codes「故障树」「三级故障编码体系」「现象 → 原因 → 措施」）。禁 /m。 |
-| Q1538 | in_progress | 桌面空态：/fault-codes「节点总数」「故障现象」「故障原因」。禁 /m。 |
+| Q1538 | done | 桌面空态 **3 passed**（/fault-codes「节点总数」「故障现象」「故障原因」）。禁 /m。 |
+| Q1539 | in_progress | 桌面空态：/fault-codes「解决措施」、/notifications 未覆盖说明。禁 /m。 |
