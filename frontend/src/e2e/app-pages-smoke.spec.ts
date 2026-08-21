@@ -3287,6 +3287,48 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '资产批量导入导出' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/profile roles/permissions 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/user-management/*/detail*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        id: 1,
+        username: 'admin',
+        realName: 'E2E管理员',
+        roles: { unexpected: true },
+        permissions: { unexpected: true },
+        status: 0,
+      });
+    });
+    await page.goto('/profile');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: 'E2E管理员' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans assets 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/floor-plans*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/floor-plans') {
+        await fulfill(apiRoute, {
+          records: [{ id: 1, name: 'E2E平面图' }],
+          total: 1,
+        });
+        return;
+      }
+      if (/^\/floor-plans\/\d+\/assets$/.test(path)) {
+        await fulfill(apiRoute, { unexpected: true });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/floorplans');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '2D/3D 平面图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

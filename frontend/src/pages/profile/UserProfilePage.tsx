@@ -74,7 +74,7 @@ export default function UserProfilePage() {
     id: user?.userId ?? 0,
     username: user?.username ?? '',
     realName: user?.realName ?? '',
-    roles: user?.roles?.map((r) => ({ id: 0, roleCode: r, roleName: getRoleLabel(r) })) ?? [],
+    roles: (Array.isArray(user?.roles) ? user.roles : []).map((r) => ({ id: 0, roleCode: r, roleName: getRoleLabel(r) })),
     email: undefined,
     phone: undefined,
     deptName: undefined,
@@ -87,10 +87,14 @@ export default function UserProfilePage() {
 
   const displayName = profile.realName || profile.username || t('profile.systemAdmin');
   const initial = displayName[0].toUpperCase();
-  const roleNames =
-    profile.roles?.map((r: any) => getRoleLabel(r.roleCode)) ??
-    user?.roles?.map((r: string) => getRoleLabel(r)) ??
-    [];
+  const profileRoles = Array.isArray(profile.roles) ? profile.roles : [];
+  const authRoles = Array.isArray(user?.roles) ? user.roles : [];
+  const permissionList = Array.isArray((profile as { permissions?: unknown }).permissions)
+    ? (profile as { permissions: string[] }).permissions
+    : [];
+  const roleNames = profileRoles.length > 0
+    ? profileRoles.map((r: any) => getRoleLabel(r.roleCode))
+    : authRoles.map((r: string) => getRoleLabel(r));
   const statusCfg = getStatusLabel(profile.status ?? 0);
 
   return (
@@ -198,8 +202,8 @@ export default function UserProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {(profile.roles ?? []).length > 0
-                  ? profile.roles!.map((r: any) => (
+                {profileRoles.length > 0
+                  ? profileRoles.map((r: any) => (
                       <span
                         key={r.roleCode}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"
@@ -208,7 +212,7 @@ export default function UserProfilePage() {
                         {getRoleLabel(r.roleCode)}
                       </span>
                     ))
-                  : user?.roles?.map((r) => (
+                  : authRoles.map((r) => (
                       <span
                         key={r}
                         className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-sm font-semibold text-violet-700"
@@ -217,18 +221,17 @@ export default function UserProfilePage() {
                         {getRoleLabel(r)}
                       </span>
                     ))}
-                {(!profile.roles || profile.roles.length === 0) &&
-                  (!user?.roles || user.roles.length === 0) && (
+                {profileRoles.length === 0 && authRoles.length === 0 && (
                     <span className="text-sm text-slate-400">{t('profile.noRole')}</span>
                   )}
               </div>
-              {(profile as any).permissions && (profile as any).permissions.length > 0 && (
+              {permissionList.length > 0 && (
                 <div className="mt-4 border-t border-slate-100 pt-4">
                   <p className="text-xs font-semibold text-slate-500 mb-2">
-                    {t('profile.permissionCount', { count: (profile as any).permissions.length })}
+                    {t('profile.permissionCount', { count: permissionList.length })}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
-                    {(profile as any).permissions.slice(0, 20).map((p: string) => (
+                    {permissionList.slice(0, 20).map((p: string) => (
                       <span
                         key={p}
                         className="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-600"
@@ -236,9 +239,9 @@ export default function UserProfilePage() {
                         {p}
                       </span>
                     ))}
-                    {(profile as any).permissions.length > 20 && (
+                    {permissionList.length > 20 && (
                       <span className="rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-400">
-                        +{(profile as any).permissions.length - 20} {t('profile.more')}
+                        +{permissionList.length - 20} {t('profile.more')}
                       </span>
                     )}
                   </div>
