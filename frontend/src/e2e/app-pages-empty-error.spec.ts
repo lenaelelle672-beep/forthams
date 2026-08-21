@@ -5575,6 +5575,34 @@ test.describe('Q1649 桌面自定义字段空态', () => {
   });
 });
 
+test.describe('Q1650 桌面自定义字段空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/custom-fields 空态「共 0 条」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('共 0 条').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fields 空态「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('操作', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fields 空态「ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('ID', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
