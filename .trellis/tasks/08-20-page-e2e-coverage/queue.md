@@ -921,4 +921,5 @@
 | Q1731 | done | 桌面空态 **3 passed**（/login4 资产运维、/login5 管理员）。禁 /m。 |
 | Q1732 | done | 桌面空态 **3 passed**（/login4 部门负责人全域权限）。禁 /m。 |
 | Q1733 | done | 桌面空态 **3 passed**（/login4 资源审批巡检、/login5 资产管理员）。禁 /m。 |
-| Q1734 | in_progress | 桌面空态：/login5 剩余演示账户。禁 /m。 |
+| Q1734 | done | 桌面空态 **3 passed**（/login5 部门运维全域权限）。禁 /m。 |
+| Q1735 | in_progress | 桌面空态：/login5 剩余演示描述。禁 /m。 |
