@@ -646,6 +646,35 @@ test.describe('Q1477 桌面 SAM 描述空态', () => {
   });
 });
 
+test.describe('Q1478 桌面描述/图表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fault-codes 空态「点击「新增根节点」创建第一级故障现象」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByText('点击「新增根节点」创建第一级故障现象').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories 空态「点击上方按钮添加根分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByText('点击上方按钮添加根分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 点资产分类统计空态「当前报表暂无可用数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await page.getByRole('button', { name: /资产分类统计/ }).click();
+    await expect(page.getByText('当前报表暂无可用数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
