@@ -68,8 +68,8 @@ export default function AssetModelPage() {
 
   const records: AssetModel[] = Array.isArray((data as any)?.records) ? (data as any).records : [];
   const total = (data as any)?.total ?? 0;
-  const categories = (categoriesQuery.data as any) ?? [];
-  const manufacturers = (manufacturersQuery.data as any) ?? [];
+  const categories = Array.isArray(categoriesQuery.data) ? categoriesQuery.data : [];
+  const manufacturers = Array.isArray(manufacturersQuery.data) ? manufacturersQuery.data : [];
   const fieldsets = Array.isArray(fieldsetsQuery.data) ? fieldsetsQuery.data : [];
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['assetModels'] });

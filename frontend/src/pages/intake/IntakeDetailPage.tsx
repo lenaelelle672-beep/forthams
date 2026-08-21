@@ -29,7 +29,7 @@ export default function IntakeDetailPage() {
   const [editingItems, setEditingItems] = useState<Record<number, { actualValue: string; result: string; remark: string }>>({});
 
   React.useEffect(() => {
-    if (order?.checkItems) {
+    if (Array.isArray(order?.checkItems)) {
       const edits: Record<number, any> = {};
       order.checkItems.forEach((item) => {
         if (item.id != null) {
@@ -60,7 +60,7 @@ export default function IntakeDetailPage() {
   };
 
   const handleSaveInspect = () => {
-    if (!order?.checkItems) return;
+    if (!Array.isArray(order?.checkItems)) return;
     const updatedItems: IntakeCheckItem[] = order.checkItems
       .filter((item) => item.id != null && editingItems[item.id])
       .map((item) => ({
@@ -195,7 +195,7 @@ export default function IntakeDetailPage() {
       <Card>
         <CardContent className="p-6">
           <h2 className="text-lg font-bold mb-4 text-[#0f172a]">检查项</h2>
-          {order.checkItems && order.checkItems.length > 0 ? (
+          {Array.isArray(order.checkItems) && order.checkItems.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -276,7 +276,7 @@ export default function IntakeDetailPage() {
       <Card>
         <CardContent className="p-6">
           <h2 className="text-lg font-bold mb-4 text-[#0f172a]">入库资产列表</h2>
-          {order.intakeAssets && order.intakeAssets.length > 0 ? (
+          {Array.isArray(order.intakeAssets) && order.intakeAssets.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

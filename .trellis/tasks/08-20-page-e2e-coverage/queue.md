@@ -635,3 +635,5 @@
 | Q1446 | done | 桌面 SafetyChecklistTemplate items + History results Array.isArray；config items 非数组 1 passed |
 | Q1447 | in_progress | 桌面 src/pages 未测失败态：/profile 当前用户失败无 pageerror |
 | Q1444 | done | 桌面详情非数组：/gis/assets、scan surplusItems、/audit/1 changes、/workorders/1 attachments、/disposals/1、/budgets/1、/asset-models fieldsets/all、/insurances/1 **8 passed**。修 RFIDScanPage surplus/deficit、useGisAssets Array.isArray。禁 /m、禁 id 空转。 |
+| Q1448 | done | 桌面非数组：manufacturers/options、categories/all、intake/1 checkItems、maintenance upcoming、categories tree 对象、purchase-orders/1 items、assignments/1、borrows/1 **8 passed**。修 AssetModelPage options、IntakeDetailPage checkItems/intakeAssets、PurchaseOrderPage items Array.isArray。禁 /m、禁 workbenchv3、禁 id 空转。 |
+| Q1449 | pending | 桌面 src/pages 未测非数组：/locations tree 纯对象、/system/menus tree 纯对象、/system/depts tree 纯对象、/stocktaking/cycles 纯对象、/gis/stats 非对象。禁 /m、禁 workbenchv3、禁 id 空转。 |

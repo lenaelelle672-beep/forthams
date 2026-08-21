@@ -285,7 +285,7 @@ function OrderDetailSheet({ open, orderId, onClose }: OrderDetailSheetProps) {
   if (!open) return null;
 
   const order = result?.order;
-  const items = result?.items ?? [];
+  const items = Array.isArray(result?.items) ? result.items : [];
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
