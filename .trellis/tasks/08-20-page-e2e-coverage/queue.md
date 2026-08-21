@@ -847,4 +847,5 @@
 | Q1657 | done | 桌面空态 **3 passed**（/system/roles 点新增数据权限范围与描述）。禁 /m。 |
 | Q1658 | done | 桌面空态 **3 passed**（/system/menus「菜单列表」「系统菜单目录与按钮权限」「菜单名称」）。禁 /m。 |
 | Q1659 | done | 桌面空态 **3 passed**（/system/menus「权限标识」「路由」「按钮」）。禁 /m。 |
-| Q1660 | in_progress | 桌面空态：/system/menus「菜单」stat。禁 /m。 |
+| Q1660 | done | 桌面空态 **3 passed**（/system/menus「菜单」、点新增显示名称与类型）。禁 /m。 |
+| Q1661 | in_progress | 桌面空态：/system/menus 点新增「菜单图标」。禁 /m。 |

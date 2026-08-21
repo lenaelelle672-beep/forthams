@@ -5865,6 +5865,36 @@ test.describe('Q1659 桌面菜单空态', () => {
   });
 });
 
+test.describe('Q1660 桌面菜单空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/menus 空态「菜单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByText('菜单', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus 点新增菜单「菜单显示名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await page.getByRole('button', { name: '新增菜单' }).click();
+    await expect(page.getByPlaceholder('菜单显示名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/menus 点新增菜单「菜单类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await page.getByRole('button', { name: '新增菜单' }).click();
+    await expect(page.getByText('菜单类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
