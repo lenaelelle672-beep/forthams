@@ -818,4 +818,5 @@
 | Q1628 | done | 桌面空态 **3 passed**（/purchase-orders 点新增「采购明细」「采购单号 *」「采购名称 *」）。禁 /m。 |
 | Q1629 | done | 桌面空态 **3 passed**（/insurances「保险台账管理」「保单列表」「保单总数」）。禁 /m。 |
 | Q1630 | done | 桌面空态 **3 passed**（/insurances「总保费」「保单」「重置筛选」）。禁 /m。 |
-| Q1631 | in_progress | 桌面空态：/notifications 未覆盖剩余文案。禁 /m。 |
+| Q1631 | done | 桌面空态 **3 passed**（/notifications 点系统通知空态、「全部」「暂无通知」）。禁 /m。 |
+| Q1632 | in_progress | 桌面空态：/floorplans 未覆盖说明。禁 /m。 |

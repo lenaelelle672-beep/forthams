@@ -5012,6 +5012,35 @@ test.describe('Q1630 桌面保险空态', () => {
   });
 });
 
+test.describe('Q1631 桌面通知空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/notifications 点系统通知「当前筛选条件下没有通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await page.getByRole('button', { name: '系统通知', exact: true }).click();
+    await expect(page.getByText('当前筛选条件下没有通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('全部', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「暂无通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('暂无通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
