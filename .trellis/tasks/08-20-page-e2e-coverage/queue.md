@@ -814,4 +814,5 @@
 | Q1624 | done | 桌面空态 **3 passed**（/depreciation「本月折旧总额」「折旧计划」「资产折旧计划管理」）。禁 /m。 |
 | Q1625 | done | 桌面空态 **3 passed**（/depreciation「已完成」「直线0 / 双倍0」「折旧」）。禁 /m。 |
 | Q1626 | done | 桌面空态 **3 passed**（/purchase-orders 副标题、「总采购单」「已审批」）。禁 /m。 |
-| Q1627 | in_progress | 桌面空态：/purchase-orders 点新增采购单表单。禁 /m。 |
+| Q1627 | done | 桌面空态 **3 passed**（/purchase-orders 点新增采购订单标题与 placeholder）。禁 /m。 |
+| Q1628 | in_progress | 桌面空态：/purchase-orders 点新增「采购明细」「采购单号 *」。禁 /m。 |
