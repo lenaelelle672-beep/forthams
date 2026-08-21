@@ -53,12 +53,12 @@ function toDiscrepancyType(status: string): DiscrepancyType | null {
 
 /** 数字千分位格式化 */
 function fmtNum(n: number): string {
-  return n.toLocaleString('zh-CN');
+  return (Number.isFinite(n) ? n : 0).toLocaleString('zh-CN');
 }
 
 /** 百分比格式化，保留一位小数 */
 function fmtPct(n: number): string {
-  return n.toFixed(1) + '%';
+  return (Number.isFinite(n) ? n : 0).toFixed(1) + '%';
 }
 
 // ─── 子组件 ─────────────────────────────────────────────────────────────────
@@ -232,7 +232,7 @@ export default function SmartReportPage() {
       }
     : undefined;
   const summary: InventorySummary | undefined = summaryResponse;
-  const assets: InventoryAsset[] = assetsResponse?.records ?? [];
+  const assets: InventoryAsset[] = Array.isArray(assetsResponse?.records) ? assetsResponse.records : [];
 
   // ── 衍生数据 ────────────────────────────────────────────────────────────────
 
@@ -247,7 +247,9 @@ export default function SmartReportPage() {
 
     // 从 summary 的盘亏/盘盈明细构建
     if (summary) {
-      summary.deficitItems.forEach((d: any) => {
+      const deficitItems = Array.isArray(summary.deficitItems) ? summary.deficitItems : [];
+      const surplusItems = Array.isArray(summary.surplusItems) ? summary.surplusItems : [];
+      deficitItems.forEach((d: any) => {
         items.push({
           id: d.assetCode,
           name: d.assetName,
@@ -256,7 +258,7 @@ export default function SmartReportPage() {
           type: '盘亏',
         });
       });
-      summary.surplusItems.forEach((d: any) => {
+      surplusItems.forEach((d: any) => {
         items.push({
           id: d.assetCode,
           name: d.assetName,
@@ -290,10 +292,10 @@ export default function SmartReportPage() {
 
   const totalDiscrepancyCount = useMemo(() => {
     if (summary) {
-      return summary.surplusCount + summary.deficitCount;
+      return (Number(summary.surplusCount) || 0) + (Number(summary.deficitCount) || 0);
     }
     if (task) {
-      return task.surplusAssets + task.deficitAssets;
+      return (Number(task.surplusAssets) || 0) + (Number(task.deficitAssets) || 0);
     }
     return 0;
   }, [summary, task]);
@@ -460,10 +462,10 @@ export default function SmartReportPage() {
           <div className="lg:col-span-5 bg-white border border-[#e2e8f0] rounded-xl p-5 sm:p-6 flex flex-col transition-shadow duration-200 hover:shadow-sm" style={{ minHeight: 280 }}>
             <h3 className="text-base font-semibold text-[#0f172a] mb-4 pb-3 border-b border-[#f1f5f9]">差异分布</h3>
             <DonutChart
-              normalCount={task.countedAssets - totalDiscrepancyCount}
-              deficitCount={task.deficitAssets}
-              surplusCount={task.surplusAssets}
-              totalCount={task.countedAssets}
+              normalCount={(Number(task.countedAssets) || 0) - totalDiscrepancyCount}
+              deficitCount={Number(task.deficitAssets) || 0}
+              surplusCount={Number(task.surplusAssets) || 0}
+              totalCount={Number(task.countedAssets) || 0}
               totalDiscrepancy={totalDiscrepancyCount}
             />
           </div>
@@ -775,10 +777,10 @@ function DonutChart({
 function AssetStatusBars({ task }: { task: InventoryTask }) {
   const total = task.totalAssets || 1;
   const bars = [
-    { label: '已确认', count: task.countedAssets, from: '#34d399', to: '#10b981' },
-    { label: '未盘点', count: task.uncountedAssets, from: '#cbd5e1', to: '#94a3b8' },
-    { label: '盘盈', count: task.surplusAssets, from: '#fbbf24', to: '#f59e0b' },
-    { label: '盘亏', count: task.deficitAssets, from: '#f87171', to: '#ef4444' },
+    { label: '已确认', count: Number(task.countedAssets) || 0, from: '#34d399', to: '#10b981' },
+    { label: '未盘点', count: Number(task.uncountedAssets) || 0, from: '#cbd5e1', to: '#94a3b8' },
+    { label: '盘盈', count: Number(task.surplusAssets) || 0, from: '#fbbf24', to: '#f59e0b' },
+    { label: '盘亏', count: Number(task.deficitAssets) || 0, from: '#f87171', to: '#ef4444' },
   ];
 
   return (

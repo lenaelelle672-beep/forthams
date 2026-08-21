@@ -318,6 +318,35 @@ test.describe('Q1468 桌面明细/弹窗空态', () => {
   });
 });
 
+test.describe('Q1469 桌面弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/clearance/new 空态「暂未选择资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('暂未选择资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam 空态「暂无数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByText('暂无数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点资产定位管理空态「暂无可关联的资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await expect(page.getByText('暂无可关联的资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
