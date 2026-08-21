@@ -5041,6 +5041,34 @@ test.describe('Q1631 桌面通知空态', () => {
   });
 });
 
+test.describe('Q1632 桌面平面图空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/floorplans 空态「2D/3D 平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByText('2D/3D 平面图').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans 空态「平面图列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByText('平面图列表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans 空态「请从左侧选择一个平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByText('请从左侧选择一个平面图').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

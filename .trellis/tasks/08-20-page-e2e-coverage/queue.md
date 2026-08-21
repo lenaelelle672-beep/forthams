@@ -819,4 +819,5 @@
 | Q1629 | done | 桌面空态 **3 passed**（/insurances「保险台账管理」「保单列表」「保单总数」）。禁 /m。 |
 | Q1630 | done | 桌面空态 **3 passed**（/insurances「总保费」「保单」「重置筛选」）。禁 /m。 |
 | Q1631 | done | 桌面空态 **3 passed**（/notifications 点系统通知空态、「全部」「暂无通知」）。禁 /m。 |
-| Q1632 | in_progress | 桌面空态：/floorplans 未覆盖说明。禁 /m。 |
+| Q1632 | done | 桌面空态 **3 passed**（/floorplans「2D/3D 平面图」「平面图列表」「请从左侧选择一个平面图」）。禁 /m。 |
+| Q1633 | in_progress | 桌面空态：/floorplans「请新建平面图」。禁 /m。 |
