@@ -81,7 +81,7 @@ export default function CustomFieldsetsPage() {
       <Card>
         <DataTable
           columns={columns}
-          data={data?.records ?? []}
+          data={Array.isArray(data?.records) ? data.records : []}
           loading={isLoading}
           pagination={{
             page,
@@ -99,10 +99,10 @@ export default function CustomFieldsetsPage() {
           </DialogHeader>
           <div className="space-y-3">
             <div className="max-h-80 overflow-y-auto space-y-2">
-              {(fieldsetFields ?? []).length === 0 ? (
+              {(!Array.isArray(fieldsetFields) || fieldsetFields.length === 0) ? (
                 <p className="py-6 text-center text-sm text-slate-400">该字段集暂无字段</p>
               ) : (
-                fieldsetFields?.map((field: CustomFieldItem) => (
+                fieldsetFields.map((field: CustomFieldItem) => (
                   <div key={field.id} className="flex items-center gap-2 p-2 rounded hover:bg-slate-50">
                     <span className="text-sm">{field.fieldLabel}</span>
                     <span className="text-xs text-slate-400">({field.fieldName})</span>

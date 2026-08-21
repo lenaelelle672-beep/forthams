@@ -197,7 +197,8 @@ function MenuRow({ item, depth, onEdit, onDelete }: {
   item: MenuItem; depth: number; onEdit: (item: MenuItem) => void; onDelete: (id: number) => void;
 }) {
   const [expanded, setExpanded] = useState(true);
-  const hasChildren = item.children && item.children.length > 0;
+  const childNodes = Array.isArray(item.children) ? item.children : [];
+  const hasChildren = childNodes.length > 0;
   const typeStyle = TYPE_STYLE[item.menuType] || TYPE_STYLE['F'];
 
   return (
@@ -269,7 +270,7 @@ function MenuRow({ item, depth, onEdit, onDelete }: {
           </div>
         </td>
       </tr>
-      {hasChildren && expanded && item.children!.map((child) => <MenuRow key={child.id} item={child} depth={depth + 1} onEdit={onEdit} onDelete={onDelete} />)}
+      {hasChildren && expanded && childNodes.map((child) => <MenuRow key={child.id} item={child} depth={depth + 1} onEdit={onEdit} onDelete={onDelete} />)}
     </>
   );
 }
@@ -297,7 +298,7 @@ export default function MenuManagement() {
     if (!Array.isArray(items)) return [];
     return items.flatMap((item) => {
       const r: (MenuItem & { _depth: number })[] = [{ ...item, _depth: depth }];
-      if (item.children) r.push(...flattenTree(item.children, depth + 1));
+      if (Array.isArray(item.children)) r.push(...flattenTree(item.children, depth + 1));
       return r;
     });
   };

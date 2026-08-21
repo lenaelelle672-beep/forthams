@@ -47,7 +47,7 @@ export default function IntakeFormPage() {
     queryKey: ['vendors', 'select'],
     queryFn: async () => {
       const res = await getVendorList({ page: 1, pageSize: 999 });
-      return res.records ?? [];
+      return Array.isArray(res.records) ? res.records : [];
     },
     staleTime: 60_000,
   });
@@ -77,20 +77,22 @@ export default function IntakeFormPage() {
 
   /** 递归展平分类树得到所有叶子/中间节点 */
   const flattenCategories = (nodes: AssetCategory[]): AssetCategory[] => {
+    if (!Array.isArray(nodes)) return [];
     const result: AssetCategory[] = [];
     for (const node of nodes) {
       result.push(node);
-      if (node.children?.length) result.push(...flattenCategories(node.children));
+      if (Array.isArray(node.children) && node.children.length) result.push(...flattenCategories(node.children));
     }
     return result;
   };
 
   /** 递归展平地点树 */
   const flattenLocations = (nodes: Location[]): Location[] => {
+    if (!Array.isArray(nodes)) return [];
     const result: Location[] = [];
     for (const node of nodes) {
       result.push(node);
-      if (node.children?.length) result.push(...flattenLocations(node.children));
+      if (Array.isArray(node.children) && node.children.length) result.push(...flattenLocations(node.children));
     }
     return result;
   };

@@ -2814,6 +2814,105 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '预算管理' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/system/menus children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/menus/admin/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, menuName: 'E2E菜单', menuType: 'M', sortOrder: 1, status: 1, children: { unexpected: true } }]);
+    });
+    await page.goto('/system/menus');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '菜单管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles menus children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/roles/list*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        records: [{ id: 1, roleName: 'E2E角色', roleCode: 'e2e', status: 1 }],
+        total: 1,
+      });
+    });
+    await page.route('**/api/**/menus/admin/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, menuName: 'E2E菜单', menuType: 'M', children: { unexpected: true } }]);
+    });
+    await page.goto('/system/roles');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '角色管理' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByTitle('分配菜单权限').click();
+    await expect(page.getByText(/已选/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/custom-fieldsets fields 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**/system/custom-fieldsets*', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api(?:\/v1)?/, '');
+      if (path === '/system/custom-fieldsets') {
+        await fulfill(apiRoute, { records: [{ id: 1, name: 'E2E字段集', status: 1 }], total: 1 });
+        return;
+      }
+      if (path === '/system/custom-fieldsets/1/fields') {
+        await fulfill(apiRoute, { unexpected: true });
+        return;
+      }
+      await mockApi(apiRoute);
+    });
+    await page.goto('/system/custom-fieldsets');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '自定义字段集管理' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.getByTitle('查看字段').click();
+    await expect(page.getByText(/字段集字段/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/new categories children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/categories/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, categoryName: 'E2E分类', children: { unexpected: true } }]);
+    });
+    await page.goto('/intake/new');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '新建验收单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-models manufacturers/options children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/manufacturers/options*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, name: 'E2E厂商', children: { unexpected: true } }]);
+    });
+    await page.goto('/asset-models');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产模型管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement depts children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/depts/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, deptName: 'E2E部门', children: { unexpected: true } }]);
+    });
+    await page.route('**/depts/list*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, deptName: 'E2E部门', children: { unexpected: true } }]);
+    });
+    await page.goto('/retirement');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产退役管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new categories children 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/categories/tree*', async (apiRoute) => {
+      await fulfill(apiRoute, [{ id: 1, categoryName: 'E2E分类', children: { unexpected: true } }]);
+    });
+    await page.goto('/assets/new');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '新建资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

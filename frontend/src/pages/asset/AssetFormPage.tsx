@@ -125,12 +125,12 @@ export default function AssetFormPage() {
     queryKey: ['departments'],
     queryFn: () => getDeptList(),
   });
-  const departments: Department[] = deptRes as unknown as Department[] | undefined ?? [];
+  const departments: Department[] = Array.isArray(deptRes) ? deptRes as Department[] : [];
   const createMutation = useCreateAsset();
   const updateMutation = useUpdateAsset();
 
   const asset = assetRes as unknown as Asset | undefined;
-  const categories = catRes as unknown as AssetCategory[] | undefined ?? [];
+  const categories = Array.isArray(catRes) ? catRes as AssetCategory[] : [];
   const {
     register, handleSubmit, control, reset, watch,
     formState: { errors, isSubmitting },
@@ -236,7 +236,10 @@ export default function AssetFormPage() {
     }
   };
 
-  const flatCategories = (cats: any[]): any[] => cats.flatMap((c) => [c, ...flatCategories(c.children ?? [])]);
+  const flatCategories = (cats: any[]): any[] => {
+    if (!Array.isArray(cats)) return [];
+    return cats.flatMap((c) => [c, ...flatCategories(Array.isArray(c.children) ? c.children : [])]);
+  };
 
   if (isLoadingDetail) {
     return (

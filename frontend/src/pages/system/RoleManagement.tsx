@@ -62,13 +62,19 @@ const DATA_SCOPE_STYLES: Record<number, { bg: string; border: string; text: stri
 
 // ─── 工具函数：权限树级联 ──────────────────────────────────────────────────
 
+function menuChildren(item: MenuItem): MenuItem[] {
+  return Array.isArray(item.children) ? item.children : [];
+}
+
 /** 收集节点及其所有后代 id */
 function collectAllIds(items: MenuItem[]): number[] {
+  if (!Array.isArray(items)) return [];
   const ids: number[] = [];
   for (const item of items) {
     ids.push(item.id);
-    if (item.children?.length) {
-      ids.push(...collectAllIds(item.children));
+    const children = menuChildren(item);
+    if (children.length) {
+      ids.push(...collectAllIds(children));
     }
   }
   return ids;
@@ -82,7 +88,7 @@ function isChecked(item: MenuItem, selectedIds: Set<number>): TreeCheckState {
     return true;
   }
 
-  const hasSelectedChild = item.children?.some((child) => {
+  const hasSelectedChild = menuChildren(item).some((child) => {
     const childState = isChecked(child, selectedIds);
     return childState === true || childState === 'indeterminate';
   });
@@ -247,7 +253,8 @@ function TreeNode({
   depth: number;
   disabled?: boolean;
 }) {
-  const hasChildren = !!(item.children && item.children.length > 0);
+  const childNodes = menuChildren(item);
+  const hasChildren = childNodes.length > 0;
   const isExpanded = expandedIds.has(item.id);
   const checkState = isChecked(item, selectedIds);
 
@@ -327,7 +334,7 @@ function TreeNode({
       {/* 子节点 */}
       {hasChildren && isExpanded && (
         <div className="relative">
-          {item.children!.map((child) => (
+          {childNodes.map((child) => (
             <TreeNode
               key={child.id}
               item={child}

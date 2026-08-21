@@ -106,13 +106,14 @@ const QUICK_FILTERS: { key: RetirementStatus | ''; label: string; dotColor: stri
 type FlatDepartment = { id: number; name: string; level: number };
 
 function flattenDepartments(tree: Department[] = [], level = 0): FlatDepartment[] {
+  if (!Array.isArray(tree)) return [];
   return tree.flatMap((dept) => [
     {
       id: dept.id,
       name: dept.deptName || dept.name || `部门#${dept.id}`,
       level,
     },
-    ...flattenDepartments(dept.children ?? [], level + 1),
+    ...flattenDepartments(Array.isArray(dept.children) ? dept.children : [], level + 1),
   ]);
 }
 
@@ -162,7 +163,9 @@ export default function RetirementListPage() {
     placeholderData: (p) => p,
   });
 
-  const records = (res as PageData<RetirementApplication> | undefined)?.records ?? [];
+  const records = Array.isArray((res as PageData<RetirementApplication> | undefined)?.records)
+    ? (res as PageData<RetirementApplication>).records
+    : [];
   const total = (res as PageData<RetirementApplication> | undefined)?.total ?? 0;
 
   const { data: deptRes = [] } = useQuery({
