@@ -669,4 +669,5 @@
 | Q1479 | done | 桌面空态 **3 passed**（/report-builder 拖拽字段、/assets/import-export 点导出「请选择资产分类」、/locations「新增顶级位置」）。修 TreeSelect `treeCheckable`。禁 /m。 |
 | Q1480 | done | 桌面空态 **3 passed**（导出「请选择资产状态（可多选）」「请选择存放位置」、/system/depts「新增部门」）。DragUploadArea 范围文案不在当前页。禁 /m。 |
 | Q1481 | done | 桌面空态 **3 passed**（导入拖拽文案两句、/system/posts「新增岗位」）。禁 /m。 |
-| Q1482 | in_progress | 桌面空态：/assets/import-export「下载导入模板」、/system/menus「新增菜单」、/system/users 点新增「暂无角色」或可见新增用户。禁 /m。 |
+| Q1482 | done | 桌面空态 **3 passed**（下载导入模板、/system/menus「新增菜单」、/system/depts「请选择一个部门查看详情」）。禁 /m。 |
+| Q1483 | in_progress | 桌面空态 CTA：/spare-parts「新增备件」、/insurances「新增保险」、/borrows「新建借用单」。禁 /m。 |

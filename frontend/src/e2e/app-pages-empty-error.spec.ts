@@ -762,6 +762,34 @@ test.describe('Q1481 桌面导入/岗位空态', () => {
   });
 });
 
+test.describe('Q1482 桌面导入/菜单/部门空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/import-export 空态「下载导入模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('下载导入模板').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus 空态「新增菜单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByText('新增菜单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/depts 空态「请选择一个部门查看详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await expect(page.getByText('请选择一个部门查看详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
