@@ -723,4 +723,5 @@
 | Q1533 | done | 桌面空态 **3 passed**（/locations「资产存放位置的层级管理」「总位置数」「全部折叠」）。禁 /m。 |
 | Q1534 | done | 桌面空态 **3 passed**（/locations「全部展开」「顶级位置」、/system/custom-fields「自定义字段管理」）。禁 /m。 |
 | Q1535 | done | 桌面空态 **3 passed**（/system/custom-fields「管理系统扩展字段定义」、/system/posts「岗位信息维护」「岗位列表」）。禁 /m。 |
-| Q1536 | in_progress | 桌面空态：/system/posts 统计卡片文案。禁 /m。 |
+| Q1536 | done | 桌面空态 **3 passed**（/system/posts「岗位总量」「正常」「停用」）。禁 /m。 |
+| Q1537 | in_progress | 桌面空态：/energy 仪表盘未覆盖说明文案。禁 /m。 |
