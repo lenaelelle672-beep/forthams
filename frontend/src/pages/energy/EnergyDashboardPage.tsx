@@ -108,7 +108,7 @@ const EnergyDashboardPage: React.FC = () => {
     if (!data) return undefined;
     const hasByType = Object.keys(data.byType || {}).length > 0;
     const hasTrend = Object.keys(data.trend || {}).length > 0;
-    const hasRanking = (data.assetRanking || []).length > 0;
+    const hasRanking = Array.isArray(data.assetRanking) && data.assetRanking.length > 0;
     const hasTotal = Number(data.total || 0) > 0;
     return hasByType || hasTrend || hasRanking || hasTotal ? data : undefined;
   }, [data]);
@@ -207,7 +207,7 @@ const EnergyDashboardPage: React.FC = () => {
   }), [effectiveData]);
 
   const rankOption = useMemo(() => {
-    const rankingData = effectiveData?.assetRanking ?? [];
+    const rankingData = Array.isArray(effectiveData?.assetRanking) ? effectiveData.assetRanking : [];
     return {
       tooltip: { trigger: 'axis' as const },
       grid: { left: 80, right: 40, top: 16, bottom: 28 },

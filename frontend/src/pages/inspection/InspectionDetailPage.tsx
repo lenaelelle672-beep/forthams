@@ -24,7 +24,11 @@ const InspectionDetailPage: React.FC = () => {
   });
 
   const inspection = data as any;
-  const historyList = historyData as any[] || [];
+  const historyList = Array.isArray(historyData)
+    ? historyData
+    : Array.isArray((historyData as { records?: unknown[] } | undefined)?.records)
+      ? (historyData as { records: unknown[] }).records
+      : [];
 
   if (isLoading) {
     return <div className="p-6 text-center"><Spin size="large" /></div>;

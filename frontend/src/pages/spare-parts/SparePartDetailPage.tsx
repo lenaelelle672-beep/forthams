@@ -125,7 +125,11 @@ export default function SparePartDetailPage() {
   });
 
   const sparePart: SparePart | undefined = detailRes;
-  const usages: SparePartUsage[] = usageRes ?? [];
+  const usages: SparePartUsage[] = Array.isArray(usageRes)
+    ? usageRes
+    : Array.isArray((usageRes as { records?: SparePartUsage[] } | undefined)?.records)
+      ? (usageRes as { records: SparePartUsage[] }).records
+      : [];
 
   const updateForm = <K extends keyof CreateSparePartRequest>(key: K, value: CreateSparePartRequest[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));

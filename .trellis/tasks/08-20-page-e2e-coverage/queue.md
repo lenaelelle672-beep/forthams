@@ -251,7 +251,7 @@
 | Q247 | done | USER 403 assignments/85/edit、borrows/85/edit、inspections/85/edit、scan/RFID-83、execute/83 5 passed |
 | Q248 | done | USER 403 assignments/86/edit、borrows/86/edit、inspections/86/edit、scan/RFID-84、execute/84 5 passed |
 | Q249 | done | USER 403 assignments/87/edit、borrows/87/edit、inspections/87/edit、scan/RFID-85、execute/85 5 passed |
-| Q250 | in_progress | USER 403：assignments/88/edit、borrows/88/edit、inspections/88/edit、scan/RFID-86、execute/86 |
+| Q250 | cancelled | 禁止再复制只改数字 id 的 USER 403（assignments/88 空转） |
 | Q800 | done | 独立失败态 compensation/4、cycles/4、workorders/6、upload/5、timeline/6 5 passed |
 | Q802 | done | 独立失败态 compensation/6、cycles/6、workorders/8、upload/7、timeline/8 5 passed |
 | Q804 | done | 独立失败态 compensation/8、cycles/8、workorders/10、upload/9、timeline/10 5 passed |
@@ -523,4 +523,104 @@
 | Q1336 | done | 独立失败态 compensation/542、cycles/542、workorders/542、upload/551、timeline/542 5 passed |
 | Q1338 | done | 独立失败态 compensation/544、cycles/544、workorders/544、upload/553、timeline/544 5 passed |
 | Q1340 | done | 独立失败态 compensation/546、cycles/546、workorders/546、upload/555、timeline/546 5 passed |
-| Q1342 | in_progress | 独立失败态：compensation/548、cycles/548、workorders/548、upload/557、timeline/548 |
+| Q1342 | cancelled | 禁止再复制只改数字 id 的失败态（compensation/548 空转） |
+| Q1343 | done | router 真路径 workbench section 5 passed：overview/manufacturing/data/asset/safety |
+| Q1344 | done | Array.isArray：ContractPage expiring/records 非数组 1 passed |
+| Q1345 | done | R5 browser/core/publish + approval/retirement **20 passed** |
+| Q1346 | done | workbench 合同 `--workers=1` **35 passed** |
+| Q1347 | done | 真路径 my-assets + workspace-preview tab analytics/assets/security 4 passed |
+| Q1348 | done | Array.isArray：AssetDetail 折旧非数组 1 passed |
+| Q1349 | done | Array.isArray：InventoryTasksPage records 非数组 1 passed |
+| Q1350 | done | `/workflow-form/WORK_ORDER` heading「工单申请」1 passed |
+| Q1351 | done | `/workflow-form/{ASSET_INTAKE,ASSET_BORROW,ASSET_ASSIGNMENT}` 3 passed |
+| Q1352 | done | Array.isArray：ABCClassificationPage assets 非数组 1 passed |
+| Q1353 | done | Array.isArray：RFIDScanPage assets 非数组 1 passed |
+| Q1354 | done | Array.isArray：MaintenancePage list records 非数组 1 passed |
+| Q1355 | done | Array.isArray：MaintenancePlanPage records 非数组 1 passed |
+| Q1356 | done | Array.isArray：ApprovalListPage records 非数组 1 passed |
+| Q1357 | done | Array.isArray：AssetListPage records 非数组 1 passed |
+| Q1358 | done | Array.isArray：NotificationsPage records 非数组 1 passed |
+| Q1359 | done | Array.isArray：RetirementListPage records 非数组 1 passed |
+| Q1360 | done | Array.isArray：InspectionListPage records 非数组 1 passed |
+| Q1361 | done | Array.isArray：EquipmentPage records 非数组 1 passed |
+| Q1362 | done | Array.isArray：SparePartListPage records 非数组 1 passed |
+| Q1363 | done | Array.isArray：VendorsPage records 非数组 1 passed |
+| Q1364 | done | Array.isArray：BorrowListPage records 非数组 1 passed |
+| Q1365 | done | Array.isArray：AssignmentListPage records 非数组 1 passed |
+| Q1366 | done | Array.isArray：IntakeListPage records 非数组 1 passed |
+| Q1367 | done | Array.isArray：PurchaseOrderPage records 非数组 1 passed |
+| Q1368 | done | Array.isArray：ManufacturerPage records 非数组 1 passed |
+| Q1369 | done | Array.isArray：SoftwareLicensePage records 非数组 1 passed |
+| Q1370 | done | Array.isArray：DisposalListPage records 非数组 1 passed |
+| Q1371 | done | Array.isArray：BudgetListPage records 非数组 1 passed |
+| Q1372 | done | Array.isArray：RevaluationListPage records 非数组 1 passed |
+| Q1373 | done | Array.isArray：AssetModelPage records 非数组 1 passed |
+| Q1374 | done | Array.isArray：PostManagement records 非数组 1 passed |
+| Q1375 | done | Array.isArray：RoleManagement records 非数组 1 passed |
+| Q1376 | done | Array.isArray：InspectionTemplatePage records 非数组 1 passed |
+| Q1377 | done | Array.isArray：CycleCountConfigPage records 非数组 1 passed |
+| Q1378 | done | Array.isArray：InsuranceListPage records 非数组 1 passed |
+| Q1379 | done | Array.isArray：SamDashboardPage history.records 非数组 1 passed |
+| Q1380 | done | Array.isArray：InventoryDetailPage assets records 非数组 1 passed |
+| Q1381 | done | Array.isArray：InsuranceDetailPage claims records 非数组 1 passed |
+| Q1382 | done | Array.isArray：AssetCompensationFormPage records 非数组 1 passed |
+| Q1383 | done | Array.isArray：InspectionRecordPage records 非数组 1 passed |
+| Q1384 | done | Array.isArray：CustomFieldsPage records 非数组 1 passed |
+| Q1385 | done | Array.isArray：CustomFieldsetsPage records 非数组 1 passed |
+| Q1386 | done | Array.isArray：ScheduledReportConfigPage records 非数组 1 passed |
+| Q1387 | done | Array.isArray：UserManagement records 非数组 1 passed |
+| Q1388 | done | Array.isArray：SafetyChecklistHistoryPage records 非数组 1 passed |
+| Q1389 | done | Array.isArray：SafetyChecklistTemplatePage records 非数组 1 passed |
+| Q1390 | done | Array.isArray：FloorPlanPage records 非数组 1 passed |
+| Q1391 | done | Array.isArray：MobileWorkOrdersPage records 非数组 1 passed |
+| Q1392 | done | Array.isArray：RiskMatrixPage records 非数组 1 passed |
+| Q1393 | done | Array.isArray：analytics AssetHealthPage records 非数组 1 passed |
+| Q1394 | done | Array.isArray：DashboardPage workorders records 非数组 1 passed |
+| Q1395 | done | Array.isArray：ReportBuilderPage records 非数组 1 passed |
+| Q1396 | done | Array.isArray：SmartReportPage assets records 非数组 1 passed |
+| Q1397 | done | Array.isArray：GisMapPage records 非数组 1 passed |
+| Q1398 | done | Array.isArray：AssignmentFormPage assets records 非数组 1 passed |
+| Q1399 | done | Array.isArray：BorrowFormPage assets records 非数组 1 passed |
+| Q1400 | done | Array.isArray：AssetTransferFormPage records 非数组 1 passed |
+| Q1401 | done | Array.isArray：RiskMatrixConfigPage records 非数组 1 passed |
+| Q1402 | done | Array.isArray：InspectionRecordPage templates records 非数组不崩溃 |
+| Q1402 | done | Array.isArray：IntakeFormPage vendors records 非数组 1 passed |
+| Q1403 | done | Array.isArray：WorkOrderFormPage users records 非数组 1 passed |
+| Q1404 | done | Array.isArray：AssetDetailPage + getAuditLogs records 非数组 2 passed |
+| Q1405 | done | Array.isArray：asset AssetHealthPage batch records 已防护 |
+| Q1406 | done | Array.isArray：FaultCodePage tree 非数组 1 passed |
+| Q1407 | done | Array.isArray：DepreciationListPage data 非数组 1 passed |
+| Q1408 | done | Array.isArray：StocktakingCycleListPage 非数组 1 passed |
+| Q1409 | done | Array.isArray：SystemMailTemplatesWorkbenchPage records 已有测试 |
+| Q1409 | done | Array.isArray：SystemBaseParamsWorkbenchPage records 非数组 1 passed |
+| Q1410 | done | Array.isArray：useCatalogPage records（MEDIUM 7 callers） |
+| Q1411 | done | Array.isArray：AssetPickerModal/CommentSection/SparePartUsageForm records |
+| Q1412 | done | Array.isArray：useWorkOrderList records |
+| Q1413 | done | Array.isArray：app WorkOrderListPage / CategoryManagerPage records |
+| Q1414 | done | Array.isArray：app AssetListPage setAssets records |
+| Q1415 | done | Array.isArray：app WorkOrderManagementPage records |
+| Q1416 | cancelled | 禁止 src/app/pages |
+| Q1417 | done | Array.isArray：SystemMailLogs/Gateway/NotifTemplates records 3 passed |
+| Q1418 | done | Array.isArray：workbench posts/audit/fieldsets/category records 4 passed |
+| Q1419 | done | Array.isArray：SystemFormStorageWorkbenchPage records 非数组 1 passed |
+| Q1420 | done | Array.isArray：AssetScrapFormPage records 已有测试 |
+| Q1421 | done | Array.isArray：app Compensation/Disposals/Approval/Settings/RFID records |
+| Q1422 | done | Array.isArray：AssetWorkOrdersTab/DepreciationSchedule/useAssetDetail/workOrderApi |
+| Q1423 | done | Array.isArray：auditLogService/assetDetailApi/AssetDisposal/useAssets/Picker |
+| Q1424 | done | Array.isArray：/idle + workbenchv3 handover/doc/tech-support/workflow-mail 5 passed |
+| Q1425 | done | Array.isArray：workbenchv3 import-export/tenants/runtime/data-permissions/channel-configs 5 passed |
+| Q1426 | done | Array.isArray：workbenchv3 dept-org/file-storage/sla/notif-pref/custom-fields 5 passed |
+| Q1427 | done | Array.isArray：workbenchv3 flow-def/form-config/switches/role-permissions/command-center 5 passed |
+| Q1428 | done | Array.isArray：workbenchv3 menu-permissions/flow-designer 2 passed |
+| Q1429 | done | workbenchv3 catalog API 失败脱敏：handover/doc/tech-support/workflow-mail/import-export 5 passed |
+| Q1430 | done | workbenchv3 catalog 失败：tenants/dept-org/sla/file-storage/notif-pref 5 passed |
+| Q1431 | done | workbenchv3 失败：runtime/flow-def/form-config/role-permissions/custom-fields 5 passed |
+| Q1432 | done | workbenchv3 失败：menu-permissions/flow-designer/channel-configs/mail-templates/command-center 5 passed |
+| Q1433 | done | workbenchv3 失败：mail-logs/mail-gateway/interfaces/cache/vendors 5 passed |
+| Q1434 | done | workbenchv3 失败：locations/field-mapping/sync-rules/numbering-rules/posts 5 passed |
+| Q1435 | done | workbenchv3 失败：users/audit-log/asset-category/form-storage/data-permissions 5 passed |
+| Q1436 | done | workbenchv3 失败：webhook/todo-fields/approval-rules/switches/security-policy 5 passed |
+| Q1437 | done | workbenchv3 失败：external-systems/base-params/notif-templates/fieldsets 4 passed |
+| Q1438 | done | 桌面 /energy ranking 非数组 1 passed |
+| Q1439 | in_progress | 桌面 /test-results modules 非数组无 pageerror |
+| Q1440 | done | 桌面 src/pages records 非数组：energy/tco/compensation/import-export/workflow-designer/spare-parts/1/inspections/1 **7 passed**。修 EnergyDashboardPage assetRanking、SparePartDetailPage usages、InspectionDetailPage history Array.isArray。禁 /m。 |

@@ -48,7 +48,7 @@ See `.trellis/spec/dwk/dev-runtime.md`. Probe health, start missing frontend/bac
 - Post-login land is `/fixed-assets/workbench?menu=home`, not `/dashboard`. Approval list is `/approvals` with h1 `审批中心`. Asset list h1 is `资产台账`.
 - Workbench 真页 heading 合同（`workbench-platform-entry.browser-regression-smoke.spec.ts`）：home `运营首页`、todo `审批中心`、asset `/资产/`、device `重要设备管理`、orders `资产处置管理`、inspection `检验/年检管理`、spares `备品备件管理`、energy `能耗管理`、report `报表中心`、alarm `通知中心`、policy `风险矩阵`、settings `资产分类管理`。禁止再断言 mock 列表/抽屉文案。
 - 该 spec 用 `--workers=1`。多 worker 会触发 Vite `Failed to fetch dynamically imported module`（尤其 `EnergyDashboardPage`）。
-- `mockApi` 默认 `paged([])` 不能喂给：`/energy/dashboard`（对象 `{byType,trend,assetRanking,total}`）、`/risk-assessments/matrix`（数组）、`/categories/tree`（数组）。否则真页无 heading 或 `forEach` 崩溃。
+- `mockApi` 默认 `paged([])` 不能喂给：`/energy/dashboard`（对象 `{byType,trend,assetRanking,total}`）、`/risk-assessments/matrix`（数组）、`/categories/tree`（数组）。否则真页无 heading 或 `forEach` 崩溃。`assetRanking`、备件详情 `usages`、检验详情 `history` 必须 `Array.isArray` 再 `.map`。TCO mock 用 `**/api/**/tco/**`，勿拦 Vite `TcoPage` chunk。
 - AppLayout 列表补测 `src/e2e/app-pages-smoke.spec.ts`：下列路径必须是 **数组** 不是 paged：`/contracts/expiring`、`/stocktaking/cycles`、`/menus/admin/tree`、`/fault-codes/tree`、`/reliability/trend|ranking`、`/asset-health/unhealthy`、`/gis/assets`、`/manufacturers/options`、`/system/custom-fieldsets/all`、`/maintenance/upcoming`。`/reliability/summary`、`/gis/stats` 必须是对象。
 - 空态/403/失败态：`src/e2e/app-pages-empty-error.spec.ts`。失败态只测页面会渲染「加载失败」的路径；Dashboard KPI 失败不显示该文案，不要硬断言。
 - 登录变体：`src/e2e/login-variants-smoke.spec.ts`。`/login5` 走 `Login4Page` 且 h1 可能不是 role=heading，用 `region` landmark「UNIVIEW 固定资产平台登录」。
