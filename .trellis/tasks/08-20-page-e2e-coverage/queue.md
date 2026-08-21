@@ -667,4 +667,5 @@
 | Q1477 | done | 桌面空态 **3 passed**（/sam「执行合规扫描后显示许可类型分布」「执行合规扫描后显示席位使用率」「所有许可合规运行」）。禁 /m。 |
 | Q1478 | done | 桌面空态 **3 passed**（/fault-codes「点击「新增根节点」…」、/categories「点击上方按钮添加根分类」、/reports 点资产分类统计「当前报表暂无可用数据」）。资产状态分布有图点。禁 /m。 |
 | Q1479 | done | 桌面空态 **3 passed**（/report-builder 拖拽字段、/assets/import-export 点导出「请选择资产分类」、/locations「新增顶级位置」）。修 TreeSelect `treeCheckable`。禁 /m。 |
-| Q1480 | in_progress | 桌面空态：/assets/import-export 点导出「请选择资产状态（可多选）」「选择需要导出的资产范围，不选则导出全部数据」、/system/depts「新增部门」。禁 /m。 |
+| Q1480 | done | 桌面空态 **3 passed**（导出「请选择资产状态（可多选）」「请选择存放位置」、/system/depts「新增部门」）。DragUploadArea 范围文案不在当前页。禁 /m。 |
+| Q1481 | in_progress | 桌面空态：/assets/import-export「将 .xlsx 文件拖到此处，或点击选择文件」「支持 .xlsx 格式，文件大小不超过 10MB」、/system/posts「新增岗位」。禁 /m。 |

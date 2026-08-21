@@ -704,6 +704,36 @@ test.describe('Q1479 桌面构建器/导出空态', () => {
   });
 });
 
+test.describe('Q1480 桌面导出/部门空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/import-export 点导出空态「请选择资产状态（可多选）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await page.getByRole('tab', { name: '导出' }).click();
+    await expect(page.getByText('请选择资产状态（可多选）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export 点导出空态「请选择存放位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await page.getByRole('tab', { name: '导出' }).click();
+    await expect(page.getByText('请选择存放位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/depts 空态「新增部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await expect(page.getByText('新增部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
