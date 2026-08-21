@@ -7571,6 +7571,31 @@ test.describe('Q1719 桌面登录空态', () => {
   });
 });
 
+test.describe('Q1720 桌面登录空态', () => {
+  test('/login 点登录系统「请输入用户名」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await page.getByRole('button', { name: '登录系统' }).click();
+    await expect(page.getByText('请输入用户名').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 点登录系统「请输入密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await page.getByRole('button', { name: '登录系统' }).click();
+    await expect(page.getByText('请输入密码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「系统管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('系统管理员').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
