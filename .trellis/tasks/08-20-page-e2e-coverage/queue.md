@@ -729,4 +729,5 @@
 | Q1539 | done | 桌面空态 **3 passed**（/fault-codes「解决措施」、/notifications「审批通知」「预警通知」）。禁 /m。 |
 | Q1540 | done | 桌面空态 **3 passed**（/notifications「共 0 条通知」「系统通知」、/reports「资产报表」）。禁 /m。 |
 | Q1541 | done | 桌面空态 **3 passed**（/reports「财务报表」「运维报表」「工单报表」）。禁 /m。 |
-| Q1542 | in_progress | 桌面空态：/reports「资产汇总表」「资产分类统计」「资产状态分布」。禁 /m。 |
+| Q1542 | done | 桌面空态 **3 passed**（/reports「资产汇总表」「资产分类统计」「资产状态分布」）。禁 /m。 |
+| Q1543 | in_progress | 桌面空态：/reports「部门资产排行」「资产增长趋势」、点财务报表「资产价值趋势」。禁 /m。 |
