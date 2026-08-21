@@ -1189,6 +1189,38 @@ test.describe('Q1496 桌面 GIS/通知空态', () => {
   });
 });
 
+test.describe('Q1497 桌面 GIS 弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis 点资产定位管理「从资产台账中选择已有资产，为其标注 GIS 地理坐标。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await expect(page.getByText('从资产台账中选择已有资产，为其标注 GIS 地理坐标。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点资产定位管理 placeholder「搜索资产名称或编号...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await expect(page.getByPlaceholder('搜索资产名称或编号...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点新建资产定位「创建一条仅含位置信息的资产记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await page.getByRole('button', { name: '新建资产定位' }).click();
+    await expect(page.getByText('创建一条仅含位置信息的资产记录（临时数据，需后续在资产台账中完善）。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
