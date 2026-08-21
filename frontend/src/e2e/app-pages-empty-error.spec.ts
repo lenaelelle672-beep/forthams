@@ -3099,6 +3099,34 @@ test.describe('Q1563 桌面预算空态', () => {
   });
 });
 
+test.describe('Q1564 桌面预算空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets 空态「预算列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByText('预算列表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets 空态「超支告警」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByText('超支告警').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets 空态「执行率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByText('执行率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -751,4 +751,5 @@
 | Q1561 | done | 桌面空态 **3 passed**（/idle「发布公告」「公告中」「已认领」）。禁 /m。 |
 | Q1562 | done | 桌面空态 **3 passed**（/budgets「资产预算」「总预算」「已使用」）。禁 /m。 |
 | Q1563 | done | 桌面空态 **3 passed**（/budgets「已承诺」「合同锁定」「0 项预算」）。禁 /m。 |
-| Q1564 | in_progress | 桌面空态：/budgets「预算列表」「暂无数据」「预算使用效率」或执行率 tab。禁 /m。 |
+| Q1564 | done | 桌面空态 **3 passed**（/budgets「预算列表」「超支告警」「执行率」）。禁 /m。 |
+| Q1565 | in_progress | 桌面空态：/revaluations 列表未覆盖说明。禁 /m。 |
