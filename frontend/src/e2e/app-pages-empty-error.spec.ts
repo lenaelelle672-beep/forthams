@@ -421,6 +421,37 @@ test.describe('Q1471 桌面入库/字段集/审计空态', () => {
   });
 });
 
+test.describe('Q1472 桌面日历/处置tab空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/maintenance/plans 点日历空态「暂无维保计划数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance/plans');
+    await page.getByTitle('日历视图').click();
+    await expect(page.getByText('暂无维保计划数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals 点资产调拨空态「暂无资产调拨记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '资产调拨' }).click();
+    await expect(page.getByText('暂无资产调拨记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals 点报废转让空态「暂无报废转让记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await page.getByRole('button', { name: '报废转让' }).click();
+    await expect(page.getByText('暂无报废转让记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

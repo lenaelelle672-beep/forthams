@@ -659,4 +659,4 @@
 | Q1469 | done | 桌面空态 **3 passed**（清退「暂未选择资产」、/sam「暂无数据」、/gis 点资产定位管理「暂无可关联的资产」）。禁 /m。 |
 | Q1470 | done | 桌面空态 **3 passed**（/assets/1「暂无趋势数据」、/workflows「暂无发布快照」、/reports 点资产分类统计「暂无图表数据」）。禁 /m。 |
 | Q1471 | done | 桌面空态 **3 passed**（/intake/1「暂无入库资产」、/system/custom-fieldsets 点查看字段「该字段集暂无字段」、/audit 点筛选「暂无筛选项」）。禁 /m。 |
-| Q1472 | in_progress | 桌面空态（/vendor-portal「暂无合同数据」、/maintenance/plans「暂无维保计划数据」、/inspection-records 列表已有「暂无检验记录」则改 /audit 仪表趋势「暂无趋势数据」）。禁 /m、禁 workbenchv3、禁 id 空转。不抢 Q1443/Q1447。 |
+| Q1472 | done | 桌面空态 **3 passed**（/maintenance/plans 点日历「暂无维保计划数据」、/disposals 点调拨「暂无资产调拨记录」、点报废「暂无报废转让记录」）。vendor-portal 非 AppLayout、audit 趋势 7 天补零不可达。禁 /m。 |
