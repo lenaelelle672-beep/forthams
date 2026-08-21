@@ -577,7 +577,7 @@ export default function AssetDetailPage() {
                         {log.description && (
                           <p className="text-sm text-[#334155] dark:text-gray-300 mb-3 leading-relaxed">{log.description}</p>
                         )}
-                        {log.changes && log.changes.length > 0 && (
+                        {Array.isArray(log.changes) && log.changes.length > 0 && (
                           <div className="space-y-2 mt-4 pt-4 border-t border-[#e5e7eb] dark:border-gray-700">
                             <span className="text-xs font-bold text-[#64748b] dark:text-gray-400 uppercase tracking-wide">字段变更</span>
                             <div className="grid grid-cols-1 gap-2">

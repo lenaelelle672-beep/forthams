@@ -240,7 +240,7 @@ export default function EquipmentPage() {
     };
   });
 
-  const upcomingList = (upcomingData && upcomingData.length > 0) ? upcomingData : [];
+  const upcomingList = Array.isArray(upcomingData) && upcomingData.length > 0 ? upcomingData : [];
 
   // ── 统计 ─────────────────────────────────────────────────────────────────────
   const total = equipment.length;

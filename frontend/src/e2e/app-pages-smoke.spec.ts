@@ -3183,6 +3183,64 @@ test.describe('非数组 mock 不崩溃', () => {
     await expect(page.getByRole('heading', { name: '运营首页' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
+
+  test('/disposals/transfer/new assignees/preview nodes 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/start-availability*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        businessType: 'ASSET_TRANSFER',
+        canStart: true,
+        status: 'PUBLISHED',
+        version: 1,
+        definitionId: 1,
+        entryUrl: '/disposals/transfer/new',
+        blockReason: '',
+      });
+    });
+    await page.route('**/assignees/preview*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        calculable: true,
+        nodes: { unexpected: true },
+        missingFields: { unexpected: true },
+      });
+    });
+    await page.goto('/disposals/transfer/new');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '资产转移申请' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/1 audit log.changes 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/audit-logs*', async (apiRoute) => {
+      await fulfill(apiRoute, {
+        records: [{
+          id: 1,
+          operatorName: 'E2E',
+          operationType: 'UPDATE',
+          createdAt: '2026-08-21T00:00:00',
+          description: '变更',
+          changes: { unexpected: true },
+        }],
+        total: 1,
+      });
+    });
+    await page.goto('/assets/1');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByText('E2E-ASSET').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment upcoming 非数组无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/maintenance/upcoming*', async (apiRoute) => {
+      await fulfill(apiRoute, { unexpected: true });
+    });
+    await page.goto('/equipment');
+    await page.waitForLoadState('domcontentloaded');
+    await expect(page.getByRole('heading', { name: '重要设备管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe('Workbench V3 catalog 失败态', () => {

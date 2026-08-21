@@ -662,7 +662,7 @@ export default function AssetTransferFormPage() {
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-emerald-700">已解析处理人</p>
                   <div className="space-y-2">
-                    {assigneePreview.nodes.map((node: any) => {
+                    {(Array.isArray(assigneePreview.nodes) ? assigneePreview.nodes : []).map((node: any) => {
                       const assigneeCount = node.assigneeCount ?? (Array.isArray(node.assignees) ? node.assignees.length : 0);
                       return (
                         <div
@@ -685,7 +685,7 @@ export default function AssetTransferFormPage() {
               ) : (
                 <div className="rounded-md border border-amber-100 bg-white px-3 py-2 text-xs text-amber-800 space-y-1">
                   <p>{assigneePreviewReason || '处理人暂不可计算'}</p>
-                  {assigneePreview?.missingFields?.length ? (
+                  {Array.isArray(assigneePreview?.missingFields) && assigneePreview.missingFields.length ? (
                     <p>缺少字段：{assigneePreview.missingFields.join('、')}</p>
                   ) : null}
                   {shouldHideAssigneeList ? <p>处理人名单已隐藏</p> : null}
