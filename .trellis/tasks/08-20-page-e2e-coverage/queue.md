@@ -816,4 +816,5 @@
 | Q1626 | done | 桌面空态 **3 passed**（/purchase-orders 副标题、「总采购单」「已审批」）。禁 /m。 |
 | Q1627 | done | 桌面空态 **3 passed**（/purchase-orders 点新增采购订单标题与 placeholder）。禁 /m。 |
 | Q1628 | done | 桌面空态 **3 passed**（/purchase-orders 点新增「采购明细」「采购单号 *」「采购名称 *」）。禁 /m。 |
-| Q1629 | in_progress | 桌面空态：/insurance 列表未覆盖说明。禁 /m。 |
+| Q1629 | done | 桌面空态 **3 passed**（/insurances「保险台账管理」「保单列表」「保单总数」）。禁 /m。 |
+| Q1630 | in_progress | 桌面空态：/insurances「总保费」「保单」「重置筛选」。禁 /m。 |
