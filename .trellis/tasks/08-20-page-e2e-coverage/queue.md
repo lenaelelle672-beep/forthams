@@ -787,4 +787,5 @@
 | Q1597 | done | 桌面空态 **3 passed**（/spare-parts「库存告警」「已启用」「库存总价值」）。禁 /m。 |
 | Q1598 | done | 桌面空态 **3 passed**（/contracts「合同信息维护与到期预警」「全部合同」「生效中」）。禁 /m。 |
 | Q1599 | done | 桌面空态 **3 passed**（/contracts「30天内到期」「时间轴视图」「即将到期」）。禁 /m。 |
-| Q1600 | in_progress | 桌面空态：/contracts 点新增合同表单。禁 /m。 |
+| Q1600 | done | 桌面空态 **3 passed**（/contracts 点新增合同说明与名称 placeholder）。禁 /m。 |
+| Q1601 | in_progress | 桌面空态：/contracts 点新增合同类型标签。禁 /m。 |
