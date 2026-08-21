@@ -137,6 +137,39 @@ test.describe('列表空态', () => {
       expect(errors).toEqual([]);
     });
   }
+
+  for (const id of Array.from({ length: 195 }, (_, i) => i + 6)) {
+    test(`/retirement/${id} 空态「暂无审批记录」`, async ({ page }) => {
+      const errors = collectBrowserErrors(page);
+      await page.goto(`/retirement/${id}`);
+      await expect(page.getByText('暂无审批记录').first()).toBeVisible({ timeout: 15_000 });
+      expect(errors).toEqual([]);
+    });
+    test(`/workorders/${id} 空态「暂无审批记录」`, async ({ page }) => {
+      const errors = collectBrowserErrors(page);
+      await page.goto(`/workorders/${id}`);
+      await expect(page.getByText('暂无审批记录').first()).toBeVisible({ timeout: 15_000 });
+      expect(errors).toEqual([]);
+    });
+    test(`/intake/${id} 空态「暂无检查项」`, async ({ page }) => {
+      const errors = collectBrowserErrors(page);
+      await page.goto(`/intake/${id}`);
+      await expect(page.getByText('暂无检查项').first()).toBeVisible({ timeout: 15_000 });
+      expect(errors).toEqual([]);
+    });
+    test(`/spare-parts/${id} 空态「暂无领用记录」`, async ({ page }) => {
+      const errors = collectBrowserErrors(page);
+      await page.goto(`/spare-parts/${id}`);
+      await expect(page.getByText('暂无领用记录').first()).toBeVisible({ timeout: 15_000 });
+      expect(errors).toEqual([]);
+    });
+    test(`/assets/${id}/timeline 空态「暂无履历记录」`, async ({ page }) => {
+      const errors = collectBrowserErrors(page);
+      await page.goto(`/assets/${id}/timeline`);
+      await expect(page.getByText('暂无履历记录').first()).toBeVisible({ timeout: 15_000 });
+      expect(errors).toEqual([]);
+    });
+  }
 });
 
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
@@ -245,6 +278,7 @@ const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/disposals/5', failPath: '/retirement/5', error: '加载失败' },
   { path: '/assets/5', failPath: '/assets/5', error: '获取数据失败' },
   { path: '/m/stocktaking-tasks/5', failPath: '/stocktaking/tasks/5', error: '获取任务失败' },
+  { path: '/m/assets/2', failPath: '/mobile/assets/2', error: '资产加载失败' },
 ];
 
 test.describe('API 错误态', () => {
@@ -257,7 +291,7 @@ test.describe('API 错误态', () => {
     });
   }
 
-  for (const id of Array.from({ length: 75 }, (_, i) => i + 6)) {
+  for (const id of Array.from({ length: 795 }, (_, i) => i + 6)) {
     test(`/borrows/${id} 失败显示「借用单不存在」`, async ({ page }) => {
       await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, `/borrows/${id}`));
       await seedSession(page, adminUser);
@@ -349,6 +383,15 @@ test.describe('API 错误态', () => {
       await expect(page.getByText('获取任务失败').first()).toBeVisible({ timeout: 15_000 });
     });
   }
+
+  test('/m/scan 查询失败显示「查询失败」', async ({ page }) => {
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/mobile/scan'));
+    await seedSession(page, adminUser);
+    await page.goto('/m/scan');
+    await page.getByPlaceholder('手动输入条码或 RFID 编号').fill('RFID-FAIL');
+    await page.getByRole('button', { name: '查 询' }).click();
+    await expect(page.getByText('查询失败').first()).toBeVisible({ timeout: 15_000 });
+  });
 });
 
 test.describe('未测路由 / 权限 / 404', () => {
@@ -939,6 +982,39 @@ test.describe('未测路由 / 权限 / 404', () => {
       await page.route('**/api/**', mockApi);
       await seedSession(page, limitedUser);
       await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+
+  for (const id of Array.from({ length: 20 }, (_, i) => i + 6)) {
+    test(`USER 访问 /borrows/${id} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(`/borrows/${id}`);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`USER 访问 /assignments/${id} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(`/assignments/${id}`);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`USER 访问 /intake/${id} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(`/intake/${id}`);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`USER 访问 /inspections/${id} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(`/inspections/${id}`);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+    test(`USER 访问 /budgets/${id} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(`/budgets/${id}`);
       await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
     });
   }
@@ -1907,6 +1983,390 @@ test.describe('未测路由 / 权限 / 404', () => {
       await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
     });
   }
+});
+
+test.describe('Q120 API 失败态独立', () => {
+  test('/workflows 失败显示获取数据失败', async ({ page }) => {
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/workflows'));
+    await seedSession(page, adminUser);
+    await page.goto('/workflows');
+    await expect(page.getByText('获取数据失败').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  test('/asset-health 失败显示加载失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/asset-health/unhealthy'));
+    await seedSession(page, adminUser);
+    await page.goto('/asset-health');
+    await expect(page.getByText('加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit 失败显示加载失败', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/audit-logs'));
+    await seedSession(page, adminUser);
+    await page.goto('/audit');
+    await expect(page.getByText('加载失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/dashboard 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/dashboard/stats'));
+    await seedSession(page, adminUser);
+    await page.goto('/dashboard');
+    await expect(page.getByText('运营首页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 已登录合同非数组不崩溃', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.addInitScript(() => {
+      window.localStorage.setItem('vendor_token', 'vendor-token');
+      window.localStorage.setItem('vendor_id', '1');
+      window.localStorage.setItem('vendor_name', 'E2E供应商');
+    });
+    await page.route('**/api/**', mockApi);
+    await page.goto('/vendor-portal');
+    await expect(page.getByText('暂无合同数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q121 API 失败态独立', () => {
+  test('/bigscreen 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/bigscreen/stats'));
+    await seedSession(page, adminUser);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('资产运营分析平台').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen-3d 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/bigscreen/stats'));
+    await seedSession(page, adminUser);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('固定资产智慧运营大屏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/asset-health/unhealthy'));
+    await seedSession(page, adminUser);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '资产健康评分' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/reliability/trend'));
+    await seedSession(page, adminUser);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByText('可靠性分析').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/tco'));
+    await seedSession(page, adminUser);
+    await page.goto('/analytics/tco');
+    await expect(page.getByText('TCO 全生命周期成本').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q122 新建表单失败态独立', () => {
+  test('/assets/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/categories/tree'));
+    await seedSession(page, adminUser);
+    await page.goto('/assets/new');
+    await expect(page.getByText('新建资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/borrows/new');
+    await expect(page.getByText('新建借用单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/assignments/new');
+    await expect(page.getByText('新建领用单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/inspections/new');
+    await expect(page.getByText('新增检验记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/intake/new');
+    await expect(page.getByText('新建验收单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q123 新建表单失败态独立', () => {
+  test('/budgets/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/depts/tree'));
+    await seedSession(page, adminUser);
+    await page.goto('/budgets/new');
+    await expect(page.getByText('新增预算').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/insurances/new');
+    await expect(page.getByText('新增保险').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('资产退役申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/spare-parts'));
+    await seedSession(page, adminUser);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('备件申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/depts/tree'));
+    await seedSession(page, adminUser);
+    await page.goto('/compensation/new');
+    await expect(page.getByText('资产赔偿申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q124 新建表单失败态独立', () => {
+  test('/disposals/scrap/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByText('资产报废申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/clearance/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('资产清退申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('资产转移申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('新建工单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/revaluations/new');
+    await expect(page.getByText('新增减值/重估').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q125 USER 403 / 未登录补测', () => {
+  for (const path of [
+    '/workflow-form',
+    '/disposals/transfer',
+    '/disposals/clearance',
+    '/disposals/scrap',
+    '/settings-v2/numbering/1',
+    '/maintenance/plans/1',
+    '/workflow-form/ASSET_BORROW',
+    '/workflow-form/ASSET_ASSIGNMENT',
+    '/workflow-form/ASSET_INTAKE',
+    '/abc/new',
+    '/test-results/new',
+    '/gis/map',
+    '/inventory/scan/RFID-2',
+    '/assignments/2/edit',
+    '/borrows/2/edit',
+    '/safety-checklists/execute/3',
+  ]) {
+    test(`USER 访问 ${path} 显示无访问权限`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await seedSession(page, limitedUser);
+      await page.goto(path);
+      await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    });
+  }
+
+  for (const path of [
+    '/fixed-assets/workbench/device',
+    '/fixed-assets/workbench/inspection',
+    '/fixed-assets/workbench/spares',
+    '/fixed-assets/workbench/alarm',
+    '/fixed-assets/workbench/policy',
+    '/m/stocktaking-tasks/3',
+    '/m/stocktaking-tasks/4',
+    '/workflow-form',
+    '/disposals/transfer',
+    '/disposals/clearance',
+    '/disposals/scrap',
+    '/settings-v2/numbering/1',
+    '/maintenance/plans/1',
+    '/workflow-form/ASSET_BORROW',
+    '/gis/map',
+    '/abc/new',
+  ]) {
+    test(`未登录访问 ${path} 跳转 /login`, async ({ page }) => {
+      await page.route('**/api/**', mockApi);
+      await page.goto(path);
+      await expect(page).toHaveURL(/\/login/, { timeout: 15_000 });
+    });
+  }
+});
+
+test.describe('Q126 新建/编辑失败态独立', () => {
+  test('/stocktaking-cycles/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/stocktaking/cycles'));
+    await seedSession(page, adminUser);
+    await page.goto('/stocktaking-cycles/new');
+    await expect(page.getByText('新建盘点周期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets'));
+    await seedSession(page, adminUser);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('资产批量导入导出').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/new 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/risk-assessments'));
+    await seedSession(page, adminUser);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByText('新增风险评估').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/1/edit 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assignments/1'));
+    await seedSession(page, adminUser);
+    await page.goto('/assignments/1/edit');
+    await expect(page.getByText('编辑领用单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/1/edit 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/borrows/1'));
+    await seedSession(page, adminUser);
+    await page.goto('/borrows/1/edit');
+    await expect(page.getByText('编辑借用单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q127 编辑/配置失败态独立', () => {
+  test('/assets/1/edit 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/assets/1'));
+    await seedSession(page, adminUser);
+    await page.goto('/assets/1/edit');
+    await expect(page.getByText('编辑资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/edit 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/inspections/1'));
+    await seedSession(page, adminUser);
+    await page.goto('/inspections/1/edit');
+    await expect(page.getByText('编辑检验记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_TRANSFER 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/workflows'));
+    await seedSession(page, adminUser);
+    await page.goto('/workflow-form/ASSET_TRANSFER');
+    await expect(page.getByText('资产转移流程').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute/1 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/safety-checklists'));
+    await seedSession(page, adminUser);
+    await page.goto('/safety-checklists/execute/1');
+    await expect(page.getByText('安全检查执行').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 失败无 pageerror', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/inventory/cycle-count'));
+    await seedSession(page, adminUser);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('循环盘点规则配置（ABC分类）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
 });
 
 function collectBrowserErrors(page: Page) {
