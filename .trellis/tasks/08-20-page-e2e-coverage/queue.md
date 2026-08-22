@@ -1599,4 +1599,5 @@
 | Q2409 | done | 桌面空态 **3 passed**（/spare-parts 库存总价值/搜索/空表）。禁 /m。 |
 | Q2410 | done | 桌面空态 **3 passed**（/spare-parts 启用/停用/全部）。禁 /m。 |
 | Q2411 | done | 桌面空态 **3 passed**（/contracts heading/副标题/新增合同）。禁 /m。 |
-| Q2412 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2412 | done | 桌面空态 **3 passed**（/contracts 全部合同/即将到期/30天内到期）。禁 /m。 |
+| Q2413 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

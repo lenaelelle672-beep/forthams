@@ -519,5 +519,6 @@
 - Q2408：/spare-parts 库存告警/已启用/搜索 **3 passed**。`82884b93b`
 - Q2409：/spare-parts 库存总价值/搜索/空表 **3 passed**。`36ee559fe`
 - Q2410：/spare-parts 启用/停用/全部 **3 passed**。`9a2d7f3a7`
-- Q2411：/contracts heading/副标题/新增合同 **3 passed**。
+- Q2411：/contracts heading/副标题/新增合同 **3 passed**。`f97604513`
+- Q2412：/contracts 全部合同/即将到期/30天内到期 **3 passed**。
 
