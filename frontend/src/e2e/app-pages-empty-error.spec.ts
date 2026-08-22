@@ -36517,6 +36517,34 @@ test.describe('Q2726 桌面数据分析来源标题空态', () => {
   });
 });
 
+test.describe('Q2727 桌面可靠性分析标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/reliability 空态 heading「可靠性分析」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '可靠性分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability 空态「暂无排名数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByText('暂无排名数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability 空态「暂无趋势数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByText('暂无趋势数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
