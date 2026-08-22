@@ -554,5 +554,6 @@
 - Q2443：/equipment heading/副标题/新建维保记录 **3 passed**。`323a6abcd`
 - Q2444：/equipment 总设备数/维保中/正常运行 **3 passed**。`0babe601c`
 - Q2445：/equipment 暂无设备/最近维保/暂无记录 **3 passed**。`80b032c3a`
-- Q2446：/equipment 维保状态/已过期/维修中 **3 passed**。
+- Q2446：/equipment 维保状态/已过期/维修中 **3 passed**。`ab468d449`
+- Q2447：/asset-models heading/副标题/新增模型 **3 passed**。
 

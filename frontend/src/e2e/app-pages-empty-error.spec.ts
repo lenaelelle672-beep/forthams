@@ -28675,6 +28675,34 @@ test.describe('Q2446 桌面重要设备筛选空态', () => {
   });
 });
 
+test.describe('Q2447 桌面资产模型标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/asset-models 空态 heading「资产模型管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await expect(page.getByRole('heading', { name: '资产模型管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-models 空态「管理资产品类的标准模板与规格定义」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await expect(page.getByText('管理资产品类的标准模板与规格定义').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-models 空态「新增模型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await expect(page.getByText('新增模型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

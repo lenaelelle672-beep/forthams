@@ -1634,4 +1634,5 @@
 | Q2444 | done | 桌面空态 **3 passed**（/equipment 总设备数/维保中/正常运行）。禁 /m。 |
 | Q2445 | done | 桌面空态 **3 passed**（/equipment 暂无设备/最近维保/暂无记录）。禁 /m。 |
 | Q2446 | done | 桌面空态 **3 passed**（/equipment 维保状态/已过期/维修中）。禁 /m。 |
-| Q2447 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2447 | done | 桌面空态 **3 passed**（/asset-models heading/副标题/新增模型）。禁 /m。 |
+| Q2448 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
