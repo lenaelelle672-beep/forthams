@@ -590,5 +590,6 @@
 - Q2479：/system/depts 搜索/个部门/新增 **3 passed**。`3d10f961e`
 - Q2480：/system/menus heading/树形/新增菜单 **3 passed**。`6f46003f2`
 - Q2481：/system/posts heading/岗位/新增岗位 **3 passed**。`9cd12b871`
-- Q2482：/system/posts 岗位列表/总量/空表 **3 passed**。
+- Q2482：/system/posts 岗位列表/总量/空表 **3 passed**。`08ec32333`
+- Q2483：/system/custom-fields heading/副标题/搜索 **3 passed**。
 
