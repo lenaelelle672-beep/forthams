@@ -1581,4 +1581,5 @@
 | Q2391 | done | 桌面空态 **3 passed**（/assignments heading/领用/新建领用单）。禁 /m。 |
 | Q2392 | done | 桌面空态 **3 passed**（/assignments 领用列表/归还管理/搜索）。禁 /m。 |
 | Q2393 | done | 桌面空态 **3 passed**（/assignments 搜索/总记录/已签收）。禁 /m。 |
-| Q2394 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2394 | done | 桌面空态 **3 passed**（/assignments 待归还/长期领用/空表）。禁 /m。 |
+| Q2395 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
