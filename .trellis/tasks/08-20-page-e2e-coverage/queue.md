@@ -1164,4 +1164,5 @@
 | Q1974 | done | 桌面空态 **3 passed**（/analytics/tco「资产 TCO 构成」「请输入资产ID查询」「资产ID」）。禁 /m。 |
 | Q1975 | done | 桌面空态 **3 passed**（/analytics/tco「TCO 趋势 (近12个月)」「部门 TCO 排行」「请先查询资产」）。禁 /m。 |
 | Q1976 | done | 桌面空态 **3 passed**（/analytics/tco「分类 TCO 排行」「请输入部门ID查询」「请输入分类ID查询」）。禁 /m。 |
-| Q1977 | in_progress | 桌面空态：/analytics/health「资产健康评分」及相关可见文案（读页确认）。禁 /m。 |
+| Q1977 | done | 桌面空态 **3 passed**（/analytics/health「平均健康分」「暂无数据」「资产健康评分」）。禁 /m。 |
+| Q1978 | in_progress | 桌面空态：/analytics/health 表头或剩余文案；不够则切下一桌面页。禁 /m。 |
