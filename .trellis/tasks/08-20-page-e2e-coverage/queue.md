@@ -1516,4 +1516,5 @@
 | Q2326 | done | 桌面空态 **3 passed**（/workspace-preview 侧栏资产总览/设备/工单）。禁 /m。 |
 | Q2327 | done | 桌面空态 **3 passed**（/workspace-preview 侧栏巡检/备件/数据监控）。禁 /m。 |
 | Q2328 | done | 桌面空态 **3 passed**（/workspace-preview 侧栏报表/告警/组织策略）。禁 /m。 |
-| Q2329 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2329 | done | 桌面空态 **3 passed**（preview 基础维护/设计稿/B端预览。设计稿仅 preview 渲染）。禁 /m。 |
+| Q2330 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

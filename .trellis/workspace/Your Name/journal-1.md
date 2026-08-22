@@ -436,5 +436,6 @@
 - Q2325：preview 侧栏运营首页/我的资产/流程待办 **3 passed**。`86c6ae7f9`
 - Q2326：preview 侧栏资产总览/设备/工单 **3 passed**。`54d1e266d`
 - Q2327：preview 侧栏巡检/备件/数据监控 **3 passed**。`0ad68b7b2`
-- Q2328：preview 侧栏报表/告警/组织策略 **3 passed**。
+- Q2328：preview 侧栏报表/告警/组织策略 **3 passed**。`69e93dc20`
+- Q2329：基础维护/设计稿/B端预览。设计稿仅 preview。
 
