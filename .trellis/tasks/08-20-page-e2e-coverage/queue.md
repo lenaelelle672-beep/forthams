@@ -1738,4 +1738,5 @@
 | Q2548 | done | 桌面空态 **3 passed**（/assets/new 纬度/经度/RFID）。禁 /m。 |
 | Q2549 | done | 桌面空态 **3 passed**（/assets/new 原值/净值/保修月）。禁 /m。 |
 | Q2550 | done | 桌面空态 **3 passed**（/assets/new 折旧率/用途/其他说明）。禁 /m。 |
-| Q2551 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2551 | done | 桌面空态 **3 passed**（/assets/new 品牌厂商/纬度范围/RFID标签）。禁 /m。 |
+| Q2552 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
