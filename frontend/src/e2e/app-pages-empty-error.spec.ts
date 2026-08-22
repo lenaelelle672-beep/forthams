@@ -13894,6 +13894,36 @@ test.describe('Q1925 桌面安全检查模板操作筛选空态', () => {
   });
 });
 
+test.describe('Q1926 桌面安全检查模板新增弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/config 空态「禁用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByText('禁用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/config 点新增模板「模板名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).click();
+    await expect(page.getByText('模板名称').nth(1)).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/safety-checklists/config 点新增模板 placeholder「如：消防安全检查表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).click();
+    await expect(page.getByPlaceholder('如：消防安全检查表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
