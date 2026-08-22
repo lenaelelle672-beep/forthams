@@ -1978,4 +1978,5 @@
 | Q2788 | done | 桌面空态 **3 passed**（/inspections/new 下次检验/机构/检验人）。禁 /m。 |
 | Q2789 | done | 桌面空态 **3 passed**（/inspections/new 检验结果/检查发现/检验照片）。禁 /m。 |
 | Q2790 | done | 桌面空态 **3 passed**（/inspections/new 证书编号/到期日/检验费用）。禁 /m。 |
-| Q2791 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2791 | done | 桌面空态 **3 passed**（/inspections/new 报告附件/编号placeholder/机构placeholder）。禁 /m。 |
+| Q2792 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
