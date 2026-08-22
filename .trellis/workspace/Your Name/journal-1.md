@@ -488,5 +488,6 @@
 - Q2377：/depreciation 直线法/双倍余额/年数总和 **3 passed**。`445c8285c`
 - Q2378：/depreciation 工作量法/本月总额/空表 **3 passed**。`c22d2ad0c`
 - Q2379：/depreciation 待计算资产/已完成/刷新 **3 passed**。`85658265e`
-- Q2380：/inventory heading/实时同步/新建任务 **3 passed**。
+- Q2380：/inventory heading/实时同步/新建任务 **3 passed**。`820371e37`
+- Q2381：/inventory 任务总数/盘点任务/资产盘点管理 **3 passed**。
 

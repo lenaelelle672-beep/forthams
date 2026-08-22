@@ -1568,4 +1568,5 @@
 | Q2378 | done | 桌面空态 **3 passed**（/depreciation 工作量法/本月总额/空表）。禁 /m。 |
 | Q2379 | done | 桌面空态 **3 passed**（/depreciation 待计算资产/已完成/刷新）。禁 /m。 |
 | Q2380 | done | 桌面空态 **3 passed**（/inventory heading/实时同步/新建任务）。禁 /m。 |
-| Q2381 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2381 | done | 桌面空态 **3 passed**（/inventory 任务总数/盘点任务/资产盘点管理）。禁 /m。 |
+| Q2382 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
