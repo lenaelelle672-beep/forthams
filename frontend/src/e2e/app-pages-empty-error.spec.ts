@@ -25819,6 +25819,34 @@ test.describe('Q2344 桌面仪表盘总价值欢迎空态', () => {
   });
 });
 
+test.describe('Q2345 桌面资产台账标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets 空态 heading「资产台账管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: '资产台账管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets 空态「新建资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByText('新建资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets 空态「导出全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByText('导出全部').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -452,5 +452,6 @@
 - Q2341：dashboard 闲置/待审批/导出 **3 passed**。`1b0c05ae0`
 - Q2342：dashboard 刷新/净值/最近工单 **3 passed**。`a9264722b`
 - Q2343：dashboard 维保/分类/查看全部 **3 passed**。`1ee44601f`
-- Q2344：dashboard 总价值/欢迎回来/系统管理员 **3 passed**。
+- Q2344：dashboard 总价值/欢迎回来/系统管理员 **3 passed**。`3dadf96e2`
+- Q2345：/assets heading 台账/新建/导出全部 **3 passed**。
 

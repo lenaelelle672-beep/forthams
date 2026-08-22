@@ -1532,4 +1532,5 @@
 | Q2342 | done | 桌面空态 **3 passed**（/dashboard 刷新视图/净值/最近工单）。禁 /m。 |
 | Q2343 | done | 桌面空态 **3 passed**（/dashboard 维保预警/分类分布/查看全部）。禁 /m。 |
 | Q2344 | done | 桌面空态 **3 passed**（/dashboard 总价值/欢迎回来/系统管理员）。禁 /m。 |
-| Q2345 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2345 | done | 桌面空态 **3 passed**（/assets heading 台账/新建/导出全部）。禁 /m。 |
+| Q2346 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
