@@ -11041,6 +11041,58 @@ test.describe('Q1835 桌面入库详情操作空态', () => {
   });
 });
 
+test.describe('Q1836 桌面入库检查项表头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/1 检查项「名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', checkItems: [{ id:1, itemName:'外观', expectedValue:'完好' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 检查项「预期值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', checkItems: [{ id:1, itemName:'外观', expectedValue:'完好' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('预期值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 检查项「实际值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', checkItems: [{ id:1, itemName:'外观', expectedValue:'完好' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('实际值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
