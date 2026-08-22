@@ -1896,4 +1896,5 @@
 | Q2706 | done | 桌面空态 **3 passed**（/depreciation 原值/净值/状态表头）。禁 /m。 |
 | Q2707 | done | 桌面空态 **3 passed**（/depreciation 折旧率/刷新/折旧计划）。禁 /m。 |
 | Q2708 | done | 桌面空态 **3 passed**（/revaluations 新增/标题/暂无记录）。禁 /m。 |
-| Q2709 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2709 | done | 桌面空态 **3 passed**（/revaluations 总记录/已拒绝/价值调整）。禁 /m。 |
+| Q2710 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

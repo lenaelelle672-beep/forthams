@@ -816,5 +816,6 @@
 - Q2705：/depreciation 折旧方法/当期/累计表头 **3 passed**。`07cb773ee`
 - Q2706：/depreciation 原值/净值/状态表头 **3 passed**。`9c901c217`
 - Q2707：/depreciation 折旧率/刷新/折旧计划 **3 passed**。`f249f867b`
-- Q2708：/revaluations 新增/标题/暂无记录 **3 passed**。
+- Q2708：/revaluations 新增/标题/暂无记录 **3 passed**。`fcaf82dd9`
+- Q2709：/revaluations 总记录/已拒绝/价值调整 **3 passed**。
 
