@@ -1402,4 +1402,5 @@
 | Q2212 | done | 桌面空态 **3 passed**（/inspections/new「检验机构」「检验人」「检验结果」）。禁 /m。 |
 | Q2213 | done | 桌面空态 **3 passed**（/inspections/new「检查发现」「检验照片」「证书编号」）。禁 /m。 |
 | Q2214 | done | 桌面空态 **3 passed**（/inspections/new「证书到期日」「检验费用」「报告附件」）。禁 /m。 |
-| Q2215 | in_progress | 桌面空态：/inspections/new「扫码」或占位。禁 /m。 |
+| Q2215 | done | 桌面空态 **3 passed**（/inspections/new「扫码」、编号/机构 placeholder）。禁 /m。 |
+| Q2216 | in_progress | 桌面空态：/inspections/new 检验人/发现/证书占位。禁 /m。 |
