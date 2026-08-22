@@ -30748,6 +30748,34 @@ test.describe('Q2520 桌面新建工单提交提示空态', () => {
   });
 });
 
+test.describe('Q2521 桌面新建工单搜索提示空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/new 空态 placeholder「搜索资产编号或名称...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByPlaceholder('搜索资产编号或名称...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「用于安排负责人、资产与截止时间的填写参考。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('用于安排负责人、资产与截止时间的填写参考。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -1708,4 +1708,5 @@
 | Q2518 | done | 桌面空态 **3 passed**（/workorders/new 截止日期/人员安排/负责人）。禁 /m。 |
 | Q2519 | done | 桌面空态 **3 passed**（/workorders/new 协作人/添加人员/附件）。禁 /m。 |
 | Q2520 | done | 桌面空态 **3 passed**（/workorders/new 上传文件/处理提示/提交工单）。禁 /m。 |
-| Q2521 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2521 | done | 桌面空态 **3 passed**（/workorders/new 搜索资产/填写参考/取消）。禁 /m。 |
+| Q2522 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

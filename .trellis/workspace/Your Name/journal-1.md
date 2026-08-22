@@ -628,5 +628,6 @@
 - Q2517：/workorders/new 描述/placeholder/预计费用 **3 passed**。`d9001ac66`
 - Q2518：/workorders/new 截止日期/人员安排/负责人 **3 passed**。`86ce86eef`
 - Q2519：/workorders/new 协作人/添加人员/附件 **3 passed**。`2cccd291c`
-- Q2520：/workorders/new 上传文件/处理提示/提交工单 **3 passed**。
+- Q2520：/workorders/new 上传文件/处理提示/提交工单 **3 passed**。`e30a13c93`
+- Q2521：/workorders/new 搜索资产/填写参考/取消 **3 passed**。
 
