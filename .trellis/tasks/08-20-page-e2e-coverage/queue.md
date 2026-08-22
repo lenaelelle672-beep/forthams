@@ -1653,4 +1653,5 @@
 | Q2463 | done | 桌面空态 **3 passed**（/analytics/health heading/副标题/平均健康分）。禁 /m。 |
 | Q2464 | done | 桌面空态 **3 passed**（/analytics/health 健康/警告/危险资产）。禁 /m。 |
 | Q2465 | done | 桌面空态 **3 passed**（/analytics/health 评分分布 + /analytics/tco 标题）。禁 /m。 |
-| Q2466 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2466 | done | 桌面空态 **3 passed**（/analytics/tco 副标题/构成/部门排行）。禁 /m。 |
+| Q2467 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
