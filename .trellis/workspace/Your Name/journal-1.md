@@ -293,5 +293,6 @@
 - Q2182：预估残值/紧急程度/确认提交 **3 passed**。`bd20d6489`
 - Q2183：先选资产提示/保存草稿/普通 **3 passed**。`a2ef22b6e`
 - Q2184：紧急 exact/审批流程/备注。无 exact 会撞 hidden option。`6765e1082`
-- Q2185：取消/风险正文/备注 placeholder **3 passed**。
+- Q2185：取消/风险正文/备注 placeholder **3 passed**。`81df98382`
+- Q2186：报废申请/填写信息/选择资产 **3 passed**。
 
