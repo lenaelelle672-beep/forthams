@@ -1930,4 +1930,5 @@
 | Q2740 | done | 桌面空态 **3 passed**（/audit 最近操作 heading/审计日志/导出）。禁 /m。 |
 | Q2741 | done | 桌面空态 **3 passed**（/disposals 新建清退/标题/暂无记录）。禁 /m。 |
 | Q2742 | done | 桌面空态 **3 passed**（/disposals 搜索/本月总量/回收价值）。禁 /m。 |
-| Q2743 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2743 | done | 桌面空态 **3 passed**（/disposals 处置单号/资产信息/申请人表头）。禁 /m。 |
+| Q2744 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
