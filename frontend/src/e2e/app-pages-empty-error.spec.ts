@@ -31812,6 +31812,34 @@ test.describe('Q2558 桌面新建资产名称创建空态', () => {
   });
 });
 
+test.describe('Q2559 桌面新建资产上传进度空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态「请先保存资产后再上传附件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('请先保存资产后再上传附件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「填写进度：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('填写进度：').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「资产台账」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('资产台账').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
