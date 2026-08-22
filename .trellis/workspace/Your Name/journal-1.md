@@ -856,5 +856,6 @@
 - Q2745：/disposals 资产清退/工单管理/全周期 **3 passed**。`47e40636d`
 - Q2746：/disposals 报废转让/资产赔偿/资产调拨 **3 passed**。`15438fa3b`
 - Q2747：/disposals 清退列表/提示/新建文案 **3 passed**。`e194df681`
-- Q2748：/inspections 新增检验/标题/暂无记录 **3 passed**。
+- Q2748：/inspections 新增检验/标题/暂无记录 **3 passed**。`03a661be1`
+- Q2749：/inspections 搜索/总检验数/已过期 **3 passed**。
 

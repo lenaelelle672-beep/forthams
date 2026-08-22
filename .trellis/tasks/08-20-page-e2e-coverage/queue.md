@@ -1936,4 +1936,5 @@
 | Q2746 | done | 桌面空态 **3 passed**（/disposals 报废转让/资产赔偿/资产调拨）。禁 /m。 |
 | Q2747 | done | 桌面空态 **3 passed**（/disposals 清退列表/提示/新建文案）。禁 /m。 |
 | Q2748 | done | 桌面空态 **3 passed**（/inspections 新增检验/标题/暂无记录）。禁 /m。 |
-| Q2749 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2749 | done | 桌面空态 **3 passed**（/inspections 搜索/总检验数/已过期）。禁 /m。 |
+| Q2750 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
