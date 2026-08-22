@@ -758,5 +758,6 @@
 - Q2647：/login5 忘记密码/记住用户名/SSO link **3 passed**。无 seedSession。`4737f55e7`
 - Q2648：/login5 登录表单/用户名/显示密码 **3 passed**。无 seedSession。`ce750e7f3`
 - Q2649：/login5 组织账号文案/密码/登录系统 **3 passed**。无 seedSession。/login5 默认皮肤非 /login4。`6b39cd2bb`
-- Q2650：/login5 工作台预览/演示账户/快速体验 **3 passed**。无 seedSession。
+- Q2650：/login5 工作台预览/演示账户/快速体验 **3 passed**。无 seedSession。`e32ebd71d`
+- Q2651：/login5 系统管理员/资产管理员/运维人员按钮 **3 passed**。无 seedSession。
 
