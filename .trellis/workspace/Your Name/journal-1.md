@@ -826,5 +826,6 @@
 - Q2715：/budgets 总预算/已使用/已承诺 **3 passed**。`12b0a598b`
 - Q2716：/budgets 执行率/预算列表/资产预算 **3 passed**。`f898395d8`
 - Q2717：/budgets 年度/类型/预算总额表头 **3 passed**。`98bd25c49`
-- Q2718：/budgets 剩余/已使用/已承诺表头 **3 passed**。
+- Q2718：/budgets 剩余/已使用/已承诺表头 **3 passed**。`02b9ff57e`
+- Q2719：/budgets 状态/操作表头/超支告警 **3 passed**。
 
