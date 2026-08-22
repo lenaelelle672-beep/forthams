@@ -292,5 +292,6 @@
 - Q2181：变卖处理/捐赠/不可逆 **3 passed**。`a595ad3cf`
 - Q2182：预估残值/紧急程度/确认提交 **3 passed**。`bd20d6489`
 - Q2183：先选资产提示/保存草稿/普通 **3 passed**。`a2ef22b6e`
-- Q2184：紧急 exact/审批流程/备注。无 exact 会撞 hidden option。
+- Q2184：紧急 exact/审批流程/备注。无 exact 会撞 hidden option。`6765e1082`
+- Q2185：取消/风险正文/备注 placeholder **3 passed**。
 
