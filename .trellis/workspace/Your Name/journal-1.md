@@ -380,5 +380,6 @@
 - Q2269：留痕/台/组 **3 passed**。`739b2b607`
 - Q2270：枚/IT 设备/办公家具 **3 passed**。`7ddc1101a`
 - Q2271：生产设备/低值耗材/条 **3 passed**。`0ee1bbfe1`
-- Q2272：roles_missing 信息不完整/角色缺失/重新登录。login3 有 WebGL。
+- Q2272：roles_missing 信息不完整/角色缺失/重新登录。login3 有 WebGL。`605b88b68`
+- Q2273：重试/无法验证/联系管理员 **3 passed**。
 

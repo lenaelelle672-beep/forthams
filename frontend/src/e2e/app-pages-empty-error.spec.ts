@@ -23823,6 +23823,34 @@ test.describe('Q2272 桌面角色缺失无权限空态', () => {
   });
 });
 
+test.describe('Q2273 桌面角色缺失说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/forbidden 空态「请重新登录后重试」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByText('请重新登录后重试').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden 空态「无法验证访问权限」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByText('无法验证访问权限').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden 空态「如问题持续请联系管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByText('如问题持续请联系管理员').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
