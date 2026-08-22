@@ -893,5 +893,6 @@
 - Q2782：/revaluations/new 查找/类型/提交申请 **3 passed**。`58022c080`
 - Q2783：/revaluations/new 新值/原因说明/证据材料 **3 passed**。`f5c56a59e`
 - Q2784：/revaluations/new 取消/资产搜索/证据placeholder **3 passed**。`23e38c395`
-- Q2785：/inspections/new 创建/取消/新增检验记录 **3 passed**。Helper 重启后续接。
+- Q2785：/inspections/new 创建/取消/新增检验记录 **3 passed**。Helper 重启后续接。`62763cbf7`
+- Q2786：/inspections/new 检验编号/扫码/检验类型 **3 passed**。
 

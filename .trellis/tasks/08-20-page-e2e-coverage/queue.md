@@ -1973,4 +1973,5 @@
 | Q2783 | done | 桌面空态 **3 passed**（/revaluations/new 新值/原因说明/证据材料）。禁 /m。 |
 | Q2784 | done | 桌面空态 **3 passed**（/revaluations/new 取消/资产搜索/证据placeholder）。禁 /m。 |
 | Q2785 | done | 桌面空态 **3 passed**（/inspections/new 创建/取消/新增检验记录）。禁 /m。 |
-| Q2786 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2786 | done | 桌面空态 **3 passed**（/inspections/new 检验编号/扫码/检验类型）。禁 /m。 |
+| Q2787 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
