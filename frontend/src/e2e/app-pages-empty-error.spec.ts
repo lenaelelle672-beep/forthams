@@ -31252,6 +31252,34 @@ test.describe('Q2538 桌面新建验收编号分类空态', () => {
   });
 });
 
+test.describe('Q2539 桌面新建验收地点保修空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/new 空态「存放地点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/new');
+    await expect(page.getByText('存放地点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/new 空态「保修期(月)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/new');
+    await expect(page.getByText('保修期(月)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/new 空态「创建验收单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/new');
+    await expect(page.getByText('创建验收单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
