@@ -454,5 +454,6 @@
 - Q2343：dashboard 维保/分类/查看全部 **3 passed**。`1ee44601f`
 - Q2344：dashboard 总价值/欢迎回来/系统管理员 **3 passed**。`3dadf96e2`
 - Q2345：/assets heading 台账/新建/导出全部 **3 passed**。`0e18337ae`
-- Q2346：/assets heading 台账/导出 PDF/总净值 **3 passed**。
+- Q2346：/assets heading 台账/导出 PDF/总净值 **3 passed**。`153037be7`
+- Q2347：/assets 新增资产/导入/高级筛选 **3 passed**。
 
