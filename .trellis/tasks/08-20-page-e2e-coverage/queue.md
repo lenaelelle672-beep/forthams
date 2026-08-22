@@ -1720,4 +1720,5 @@
 | Q2530 | done | 桌面空态 **3 passed**（/assignments/new 使用人ID/使用部门ID/取消）。禁 /m。 |
 | Q2531 | done | 桌面空态 **3 passed**（/borrows/new 备注 + /intake/new 选择供应商/总金额）。禁 /m。 |
 | Q2532 | done | 桌面空态 **3 passed**（/intake/new 验收备注/检查项名称/预期值）。禁 /m。 |
-| Q2533 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2533 | done | 桌面空态 **3 passed**（/intake/new 自动生成/必填/品牌）。禁 /m。 |
+| Q2534 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
