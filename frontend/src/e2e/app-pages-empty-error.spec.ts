@@ -18474,6 +18474,60 @@ test.describe('Q2082 桌面SAM扫描详情状态列头空态', () => {
   });
 });
 
+test.describe('Q2083 桌面SAM扫描详情建议与查看按钮空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api/, '');
+      if (path === '/sam/history') {
+        return fulfill(apiRoute, {
+          records: [{
+            id: 1,
+            scanDate: '2026-08-01T00:00:00',
+            totalLicenses: 1,
+            compliantCount: 1,
+            overusedCount: 0,
+            underusedCount: 0,
+            expiredCount: 0,
+            complianceRate: 100,
+          }],
+          total: 1,
+          size: 10,
+          current: 1,
+          pages: 1,
+        });
+      }
+      if (path === '/sam/1/details') {
+        return fulfill(apiRoute, { details: [] });
+      }
+      return mockApi(apiRoute);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam 点查看详情「建议」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await page.getByRole('button', { name: '查看详情' }).first().click();
+    await expect(page.getByText('建议').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/sam 空态「查看详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('button', { name: '查看详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam 点查看详情「暂无详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await page.getByRole('button', { name: '查看详情' }).first().click();
+    await expect(page.getByText('暂无详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
