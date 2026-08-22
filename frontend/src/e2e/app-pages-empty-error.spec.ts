@@ -34753,6 +34753,34 @@ test.describe('Q2663 桌面设备维保记录表头空态', () => {
   });
 });
 
+test.describe('Q2664 桌面设备维保记录其余表头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/equipment 空态 columnheader「技术员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('columnheader', { name: '技术员' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment 空态 columnheader「费用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('columnheader', { name: '费用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment 空态 columnheader「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('columnheader', { name: '操作' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

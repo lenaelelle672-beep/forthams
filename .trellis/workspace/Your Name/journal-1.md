@@ -770,5 +770,7 @@
 - Q2659：/equipment 新建维保记录/搜索/标题 **3 passed**。`51261d60d`
 - Q2660：/equipment 暂无设备/最近维保/暂无维保 **3 passed**。`0efb523c3`
 - Q2661：/equipment 设备名称/设备ID/上次维保表头 **3 passed**。`403cde484`
-- Q2662：/equipment 下次维保/使用率/维保状态表头 **3 passed**。
+- Q2662：/equipment 下次维保/使用率/维保状态表头 **3 passed**。`4dd74ed5e`
+- Q2663：/equipment 设备/日期/类型表头 **3 passed**。`66cf2cf9a`
+- Q2664：/equipment 技术员/费用/操作表头 **3 passed**。
 

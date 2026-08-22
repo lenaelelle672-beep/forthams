@@ -1851,4 +1851,5 @@
 | Q2661 | done | 桌面空态 **3 passed**（/equipment 设备名称/设备ID/上次维保表头）。禁 /m。 |
 | Q2662 | done | 桌面空态 **3 passed**（/equipment 下次维保/使用率/维保状态表头）。禁 /m。 |
 | Q2663 | done | 桌面空态 **3 passed**（/equipment 设备/日期/类型表头）。禁 /m。 |
-| Q2664 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2664 | done | 桌面空态 **3 passed**（/equipment 技术员/费用/操作表头）。禁 /m。 |
+| Q2665 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
