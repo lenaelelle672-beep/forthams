@@ -829,5 +829,6 @@
 - Q2718：/budgets 剩余/已使用/已承诺表头 **3 passed**。`02b9ff57e`
 - Q2719：/budgets 状态/操作表头/超支告警 **3 passed**。`eaa1c3beb`
 - Q2720：/budgets 合同锁定/运营/0项预算 **3 passed**。`d81fe288f`
-- Q2721：/analytics 标题/资产总数/本月维保 **3 passed**。
+- Q2721：/analytics 标题/资产总数/本月维保 **3 passed**。`c447f682e`
+- Q2722：/analytics 资产总值/待审批/数据范围 **3 passed**。
 
