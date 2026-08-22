@@ -858,5 +858,6 @@
 - Q2747：/disposals 清退列表/提示/新建文案 **3 passed**。`e194df681`
 - Q2748：/inspections 新增检验/标题/暂无记录 **3 passed**。`03a661be1`
 - Q2749：/inspections 搜索/总检验数/已过期 **3 passed**。`6fc63d82b`
-- Q2750：/inspections 检验编号/资产ID/检验类型表头 **3 passed**。
+- Q2750：/inspections 检验编号/资产ID/检验类型表头 **3 passed**。`a48bb831f`
+- Q2751：/inspections 检验日期/下次检验/检验机构表头 **3 passed**。
 

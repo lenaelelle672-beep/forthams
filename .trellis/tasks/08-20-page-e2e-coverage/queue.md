@@ -1938,4 +1938,5 @@
 | Q2748 | done | 桌面空态 **3 passed**（/inspections 新增检验/标题/暂无记录）。禁 /m。 |
 | Q2749 | done | 桌面空态 **3 passed**（/inspections 搜索/总检验数/已过期）。禁 /m。 |
 | Q2750 | done | 桌面空态 **3 passed**（/inspections 检验编号/资产ID/检验类型表头）。禁 /m。 |
-| Q2751 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2751 | done | 桌面空态 **3 passed**（/inspections 检验日期/下次检验/检验机构表头）。禁 /m。 |
+| Q2752 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
