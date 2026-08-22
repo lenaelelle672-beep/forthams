@@ -459,5 +459,6 @@
 - Q2348：/assets 资产列表/搜索 placeholder/闲置率 **3 passed**。`82cceb7c9`
 - Q2349：/assets 累计折旧/待处理维修/资产管理 **3 passed**。`bb3deee64`
 - Q2350：/assets 空表文案/待退役/维修中 **3 passed**。`3042d3223`
-- Q2351：/assets 已退役/已报废/已清退 **3 passed**。
+- Q2351：/assets 已退役/已报废/已清退 **3 passed**。`0be537c7b`
+- Q2352：/assets 闲置/条资产/本页 **3 passed**。
 

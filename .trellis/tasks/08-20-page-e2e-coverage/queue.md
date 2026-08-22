@@ -1539,4 +1539,5 @@
 | Q2349 | done | 桌面空态 **3 passed**（/assets 累计折旧/待处理维修/资产管理）。禁 /m。 |
 | Q2350 | done | 桌面空态 **3 passed**（/assets 空表文案/待退役/维修中）。禁 /m。 |
 | Q2351 | done | 桌面空态 **3 passed**（/assets 已退役/已报废/已清退）。禁 /m。 |
-| Q2352 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2352 | done | 桌面空态 **3 passed**（/assets 闲置/条资产/本页）。禁 /m。 |
+| Q2353 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
