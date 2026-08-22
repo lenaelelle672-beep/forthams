@@ -1868,4 +1868,5 @@
 | Q2678 | done | 桌面空态 **3 passed**（/purchase-orders 全部状态/部分收货/刷新）。禁 /m。 |
 | Q2679 | done | 桌面空态 **3 passed**（/approvals 发起申请/标题/暂无审批）。禁 /m。 |
 | Q2680 | done | 桌面空态 **3 passed**（/approvals 搜索/待我审批/我发起的）。禁 /m。 |
-| Q2681 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2681 | done | 桌面空态 **3 passed**（/approvals 已通过/已驳回/无待处理）。禁 /m。 |
+| Q2682 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
