@@ -1308,4 +1308,5 @@
 | Q2118 | done | 桌面空态 **3 passed**（/intake「验收单号」「验收日期」「总金额」）。禁 /m。 |
 | Q2119 | done | 桌面空态 **3 passed**（/intake「状态」「创建时间」「操作」）。禁 /m。 |
 | Q2120 | done | 桌面空态 **3 passed**（/purchase-orders「采购单号」「采购名称」「供应商」）。禁 /m。 |
-| Q2121 | in_progress | 桌面空态：/purchase-orders 列头「金额」「采购日期」「状态」。禁 /m。 |
+| Q2121 | done | 桌面空态 **3 passed**（/purchase-orders「金额」「采购日期」「状态」）。禁 /m。 |
+| Q2122 | in_progress | 桌面空态：/purchase-orders「操作」或 /asset-models 未覆盖。禁 /m。 |
