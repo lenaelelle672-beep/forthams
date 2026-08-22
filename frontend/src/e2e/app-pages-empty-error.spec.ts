@@ -10506,6 +10506,56 @@ test.describe('Q1819 桌面保险状态变体空态', () => {
   });
 });
 
+test.describe('Q1820 桌面保险理赔状态空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1 理赔「已批准」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/insurance/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, policyNo:'P1', insuranceName:'E2E', insuranceType:'PROPERTY', status:'ACTIVE', premium:1, coverage:1, deductible:0 } }) });
+      }
+      if (path === '/insurance/1/claims') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { records: [{ id:1, claimNo:'C1', status:'APPROVED', claimAmount:1, settledAmount:1 }], total:1 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/insurances/1');
+    await expect(page.getByText('已批准').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 理赔「已拒绝」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/insurance/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, policyNo:'P1', insuranceName:'E2E', insuranceType:'PROPERTY', status:'ACTIVE', premium:1, coverage:1, deductible:0 } }) });
+      }
+      if (path === '/insurance/1/claims') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { records: [{ id:1, claimNo:'C1', status:'REJECTED', claimAmount:1, settledAmount:0 }], total:1 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/insurances/1');
+    await expect(page.getByText('已拒绝').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「创建时间」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('创建时间').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
