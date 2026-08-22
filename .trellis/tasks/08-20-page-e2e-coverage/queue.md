@@ -1819,4 +1819,5 @@
 | Q2629 | done | 桌面空态 **3 passed**（/login 统一身份认证/账号placeholder/欢迎回来 heading）。禁 /m。 |
 | Q2630 | done | 桌面空态 **3 passed**（/403 heading/返回上一页/返回首页按钮）。禁 /m。 |
 | Q2631 | done | 桌面空态 **3 passed**（/404 全文/404/页面不存在）。禁 /m。 |
-| Q2632 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2632 | done | 桌面空态 **3 passed**（/forbidden 无权限说明/联系管理员/返回首页）。禁 /m。 |
+| Q2633 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

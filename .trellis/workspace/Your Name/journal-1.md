@@ -739,5 +739,6 @@
 - Q2628：/login MaxKey/忘记密码/密码placeholder **3 passed**。SSO 不是 button role。`15d86da49`
 - Q2629：/login 统一身份认证/账号placeholder/欢迎回来 heading **3 passed**。`036b383e3`
 - Q2630：/403 heading/返回上一页/返回首页按钮 **3 passed**。`197d65d47`
-- Q2631：/404 全文/404/页面不存在 **3 passed**。
+- Q2631：/404 全文/404/页面不存在 **3 passed**。`d063ca063`
+- Q2632：/forbidden 无权限说明/联系管理员/返回首页 **3 passed**。
 
