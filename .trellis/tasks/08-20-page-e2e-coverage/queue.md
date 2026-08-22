@@ -1391,4 +1391,5 @@
 | Q2201 | done | 桌面空态 **3 passed**（/disposals/transfer/new「转出方」「调出部门」「调出位置」）。禁 /m。 |
 | Q2202 | done | 桌面空态 **3 passed**（/disposals/transfer/new「转入方」「调入部门」「调入位置」）。禁 /m。 |
 | Q2203 | done | 桌面空态 **3 passed**（/disposals/transfer/new「资产选择」「添加资产」「已选」）。禁 /m。 |
-| Q2204 | in_progress | 桌面空态：/disposals/transfer/new「发布流程」或必填提示。禁 /m。 |
+| Q2204 | done | 桌面空态 **3 passed**（/disposals/transfer/new「发布流程」「资产转移流程」「紧急程度」）。禁 /m。 |
+| Q2205 | in_progress | 桌面空态：/disposals/transfer/new「处理人预览」「计算处理人」。禁 /m。 |
