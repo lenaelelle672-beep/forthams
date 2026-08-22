@@ -16462,6 +16462,34 @@ test.describe('Q2016 桌面流程设计器表单源码空态', () => {
   });
 });
 
+test.describe('Q2017 桌面流程表单未配置空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/ASSET_TRANSFER 空态「ASSET_TRANSFER」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_TRANSFER');
+    await expect(page.getByText('ASSET_TRANSFER').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_TRANSFER 空态「该流程尚未配置表单源码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_TRANSFER');
+    await expect(page.getByText('该流程尚未配置表单源码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_TRANSFER 空态「直接发起申请」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_TRANSFER');
+    await expect(page.getByText('直接发起申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

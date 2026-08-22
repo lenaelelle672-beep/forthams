@@ -1204,4 +1204,5 @@
 | Q2014 | done | 桌面空态 **3 passed**（/workflow-designer「审批角色」「审批模式」「用于发起页渲染和审批详情快照展示」）。禁 /m。 |
 | Q2015 | done | 桌面空态 **3 passed**（/workflow-designer「处理人预览」getByLabel「业务数据 JSON」「删除当前节点」）。禁 /m。 |
 | Q2016 | done | 桌面空态 **3 passed**（/workflow-designer 点表单源码「自定义表单 HTML」「表单源码会保存在流程定义中」「查看业务表单」）。禁 /m。 |
-| Q2017 | in_progress | 桌面空态：/workflow-designer 剩余或切 /workflow-form/ASSET_TRANSFER。禁 /m。 |
+| Q2017 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_TRANSFER「ASSET_TRANSFER」「该流程尚未配置表单源码」「直接发起申请」）。禁 /m。 |
+| Q2018 | in_progress | 桌面空态：/workflow-form/ASSET_CLEARANCE、ASSET_SCRAP、RETIREMENT 未配置标题。禁 /m。 |
