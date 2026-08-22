@@ -20267,6 +20267,34 @@ test.describe('Q2145 桌面工单详情部门描述空态', () => {
   });
 });
 
+test.describe('Q2146 桌面工单审批记录与预算年度空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/1 空态「审批记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByText('审批记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 空态「暂无审批记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByText('暂无审批记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets 空态「年度」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByText('年度').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

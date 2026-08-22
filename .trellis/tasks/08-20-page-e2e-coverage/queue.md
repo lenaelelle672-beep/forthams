@@ -1333,4 +1333,5 @@
 | Q2143 | done | 桌面空态 **3 passed**（/workorders/1「工单信息」「申请人」「SLA」）。禁 /m。 |
 | Q2144 | done | 桌面空态 **3 passed**（/workorders/1「工单号」「优先级」「创建时间」）。禁 /m。 |
 | Q2145 | done | 桌面空态 **3 passed**（/workorders/1「部门」「描述」、第二处「申请人」）。禁 /m。 |
-| Q2146 | in_progress | 桌面空态：/workorders/1 审批记录或 /budgets 未覆盖。禁 /m。 |
+| Q2146 | done | 桌面空态 **3 passed**（/workorders/1「审批记录」「暂无审批记录」、/budgets「年度」）。禁 /m。 |
+| Q2147 | in_progress | 桌面空态：/budgets 列头「类型」「预算总额」「剩余」。禁 /m。 |
