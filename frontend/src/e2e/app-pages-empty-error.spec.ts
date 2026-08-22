@@ -12328,6 +12328,41 @@ test.describe('Q1870 桌面借用详情信息字段空态', () => {
   });
 });
 
+test.describe('Q1871 桌面借用详情名称状态日期空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/borrows/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, assetNo:'B-001', assetName:'投影仪', status:'DRAFT' } }) });
+      }
+      return mockApi(route);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/borrows/1 空态「资产名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1');
+    await expect(page.getByText('资产名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/1 空态「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1');
+    await expect(page.getByText('状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/1 空态「借用日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1');
+    await expect(page.getByText('借用日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
