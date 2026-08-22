@@ -461,6 +461,7 @@ const router = createBrowserRouter([
           { path: 'budgets',      element: S(BudgetListPage) },
           { path: 'budgets/new',  element: S(BudgetFormPage) },
           { path: 'budgets/:id',  element: S(BudgetDetailPage) },
+          { path: 'budgets/:id/edit', element: S(BudgetFormPage) },
 
           // 资产领用归还
           { path: 'assignments',          element: S(AssignmentListPage) },
