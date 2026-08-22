@@ -1032,4 +1032,5 @@
 | Q1842 | done | 桌面空态 **3 passed**（/borrows/1/edit 编辑借用单/保存修改/返回）。禁 /m。 |
 | Q1843 | done | 桌面空态 **3 passed**（/borrows/1/edit「借用信息」「预计归还日期」「借用用途」）。禁 /m。 |
 | Q1844 | done | 桌面空态 **3 passed**（/borrows/1/edit「资产」「备注」「取消」）。禁 /m。 |
-| Q1845 | in_progress | 桌面空态：/inspections/1/edit 编辑页未覆盖文案 3 条（读 InspectionFormPage isEdit 分支硬编码中文）。禁 /m。 |
+| Q1845 | done | 桌面空态 **3 passed**（/inspections/1/edit 编辑检验记录/检验编号/资产ID；setFields 只填表单字段）。禁 /m。 |
+| Q1846 | in_progress | 桌面空态：/inspections/1/edit 未覆盖 3 条（读 InspectionFormPage：更新/取消/扫码）。禁 /m。 |

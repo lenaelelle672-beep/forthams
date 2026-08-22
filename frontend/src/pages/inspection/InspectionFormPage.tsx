@@ -78,8 +78,19 @@ function getWorkbenchInspectionPrefill(searchParams: URLSearchParams): Workbench
 }
 
 // 简单的 PhotoUpload 组件（使用 Ant Design）
+function parsePhotoValue(value?: unknown): string[] {
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === 'string');
+  if (typeof value !== 'string' || !value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
 const PhotoUpload: React.FC<{ value?: string; onChange?: (value: string) => void }> = ({ value, onChange }) => {
-  const [photos, setPhotos] = useState<string[]>(value ? JSON.parse(value) : []);
+  const [photos, setPhotos] = useState<string[]>(() => parsePhotoValue(value));
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -184,15 +195,25 @@ const InspectionFormPage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (inspectionData) {
-      const data = inspectionData as any;
-      form.setFieldsValue({
-        ...data,
-        inspectionDate: data.inspectionDate ? dayjs(data.inspectionDate) : undefined,
-        nextInspectionDate: data.nextInspectionDate ? dayjs(data.nextInspectionDate) : undefined,
-        certificateExpiry: data.certificateExpiry ? dayjs(data.certificateExpiry) : undefined
-      });
-    }
+    if (!inspectionData || typeof inspectionData !== 'object' || Array.isArray(inspectionData)) return;
+    const data = inspectionData as Inspection;
+    form.setFieldsValue({
+      inspectionNo: data.inspectionNo,
+      assetId: data.assetId,
+      templateId: data.templateId,
+      inspectionType: data.inspectionType,
+      inspectionDate: data.inspectionDate ? dayjs(data.inspectionDate) : undefined,
+      nextInspectionDate: data.nextInspectionDate ? dayjs(data.nextInspectionDate) : undefined,
+      inspectionAgency: data.inspectionAgency,
+      inspectorName: data.inspectorName,
+      result: data.result,
+      findings: data.findings,
+      photos: data.photos,
+      certificateNo: data.certificateNo,
+      certificateExpiry: data.certificateExpiry ? dayjs(data.certificateExpiry) : undefined,
+      cost: data.cost,
+      reportAttachment: data.reportAttachment,
+    });
   }, [inspectionData, form]);
 
   useEffect(() => {
