@@ -1604,4 +1604,5 @@
 | Q2414 | done | 桌面空态 **3 passed**（/contracts 维保/采购/租赁合同）。禁 /m。 |
 | Q2415 | done | 桌面空态 **3 passed**（/contracts 服务合同/已到期/时间轴视图）。禁 /m。 |
 | Q2416 | done | 桌面空态 **3 passed**（/purchase-orders heading/副标题/新增采购单）。禁 /m。 |
-| Q2417 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2417 | done | 桌面空态 **3 passed**（/purchase-orders 总采购单/已审批/搜索）。禁 /m。 |
+| Q2418 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
