@@ -865,5 +865,6 @@
 - Q2754：/inspections 全部类型/年度/定期检验 **3 passed**。`f042cd54a`
 - Q2755：/inspections 专项检验/全部结果/通过 **3 passed**。`a70f28e34`
 - Q2756：/inspections 不通过/附条件通过/搜索 **3 passed**。`c81919958`
-- Q2757：/inspection-records 新增/标题/暂无记录 **3 passed**。
+- Q2757：/inspection-records 新增/标题/暂无记录 **3 passed**。`ee4462b6d`
+- Q2758：/inspection-records 搜索/总记录/待检验 **3 passed**。
 
