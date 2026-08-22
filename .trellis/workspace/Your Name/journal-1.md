@@ -818,5 +818,6 @@
 - Q2707：/depreciation 折旧率/刷新/折旧计划 **3 passed**。`f249f867b`
 - Q2708：/revaluations 新增/标题/暂无记录 **3 passed**。`fcaf82dd9`
 - Q2709：/revaluations 总记录/已拒绝/价值调整 **3 passed**。`44beaee65`
-- Q2710：/revaluations 合计/需及时处理/本期已审批 **3 passed**。
+- Q2710：/revaluations 合计/需及时处理/本期已审批 **3 passed**。`cab9c4768`
+- Q2711：/revaluations 本期驳回/已通过/列表 **3 passed**。
 
