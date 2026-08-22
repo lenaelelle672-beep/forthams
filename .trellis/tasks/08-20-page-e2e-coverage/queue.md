@@ -1640,4 +1640,5 @@
 | Q2450 | done | 桌面空态 **3 passed**（/inspection-records heading/副标题/批量生成）。禁 /m。 |
 | Q2451 | done | 桌面空态 **3 passed**（/inspection-records 总记录/待检验/已过期不通过）。禁 /m。 |
 | Q2452 | done | 桌面空态 **3 passed**（/inspection-records 新增检验/搜索/空表）。禁 /m。 |
-| Q2453 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2453 | done | 桌面空态 **3 passed**（/disposals heading/全周期/本月处置总量）。禁 /m。 |
+| Q2454 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
