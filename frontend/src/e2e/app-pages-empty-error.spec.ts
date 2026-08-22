@@ -38113,6 +38113,34 @@ test.describe('Q2783 桌面新增减值重估说明空态', () => {
   });
 });
 
+test.describe('Q2784 桌面新增减值重估控件空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/revaluations/new 空态 button「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations/new');
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations/new 空态 placeholder「输入资产ID搜索...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations/new');
+    await expect(page.getByPlaceholder('输入资产ID搜索...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations/new 空态 placeholder「提供相关证明材料链接或描述（可选）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations/new');
+    await expect(page.getByPlaceholder('提供相关证明材料链接或描述（可选）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

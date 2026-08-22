@@ -1971,4 +1971,5 @@
 | Q2781 | done | 桌面空态 **3 passed**（/revaluations/new 返回列表/标题/副标题）。禁 /m。 |
 | Q2782 | done | 桌面空态 **3 passed**（/revaluations/new 查找/类型/提交申请）。禁 /m。 |
 | Q2783 | done | 桌面空态 **3 passed**（/revaluations/new 新值/原因说明/证据材料）。禁 /m。 |
-| Q2784 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2784 | done | 桌面空态 **3 passed**（/revaluations/new 取消/资产搜索/证据placeholder）。禁 /m。 |
+| Q2785 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
