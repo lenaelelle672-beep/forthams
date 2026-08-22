@@ -1705,4 +1705,5 @@
 | Q2515 | done | 桌面空态 **3 passed**（/workorders/new 紧急描述/中优先级/详细信息）。禁 /m。 |
 | Q2516 | done | 桌面空态 **3 passed**（/workorders/new 高优先级描述/低优先级/首页）。禁 /m。 |
 | Q2517 | done | 桌面空态 **3 passed**（/workorders/new 描述/placeholder/预计费用）。禁 /m。 |
-| Q2518 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2518 | done | 桌面空态 **3 passed**（/workorders/new 截止日期/人员安排/负责人）。禁 /m。 |
+| Q2519 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

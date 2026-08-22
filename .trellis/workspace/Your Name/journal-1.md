@@ -625,5 +625,6 @@
 - Q2514：/workorders/new 工单类型/关联资产/其他 **3 passed**。`64007fb64`
 - Q2515：/workorders/new 紧急描述/中优先级/详细信息 **3 passed**。`2d3f8a8ff`
 - Q2516：/workorders/new 高优先级描述/低优先级/首页 **3 passed**。`419094119`
-- Q2517：/workorders/new 描述/placeholder/预计费用 **3 passed**。
+- Q2517：/workorders/new 描述/placeholder/预计费用 **3 passed**。`d9001ac66`
+- Q2518：/workorders/new 截止日期/人员安排/负责人 **3 passed**。
 
