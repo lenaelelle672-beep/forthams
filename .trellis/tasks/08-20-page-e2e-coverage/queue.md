@@ -1781,4 +1781,5 @@
 | Q2591 | done | 桌面空态 **3 passed**（/bigscreen 副驾合外/318/319）。禁 /m。 |
 | Q2592 | done | 桌面空态 **3 passed**（/bigscreen 341/332/10架）。禁 /m。 |
 | Q2593 | done | 桌面空态 **3 passed**（/bigscreen 6架/88架/56件）。禁 /m。 |
-| Q2594 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2594 | done | 桌面空态 **3 passed**（/bigscreen 34.2%/4.8万/10）。禁 /m。 |
+| Q2595 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
