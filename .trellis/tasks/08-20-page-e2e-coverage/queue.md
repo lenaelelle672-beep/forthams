@@ -1142,4 +1142,5 @@
 | Q1952 | done | 桌面空态 **3 passed**（/risk-matrix 点「创建矩阵」后「严重度维度」「等级映射」「添加维度」）。禁 /m。 |
 | Q1953 | done | 桌面空态 **3 passed**（/risk-matrix 点「创建矩阵」后「概率维度配置」「创建」「取消」）。禁 /m。 |
 | Q1954 | done | 桌面空态 **3 passed**（/risk-assessments/1/edit「编辑风险评估」「资产ID」「可能性（1-5）」）。禁 /m。 |
-| Q1955 | in_progress | 桌面空态：/risk-assessments/1/edit「影响程度（1-5）」「缓解措施」「更新」。禁 /m。 |
+| Q1955 | done | 桌面空态 **3 passed**（/risk-assessments/1/edit「影响程度（1-5）」「缓解措施」「更新」）。禁 /m。 |
+| Q1956 | in_progress | 桌面空态：/risk-assessments/1/edit「评审日期」「取消」「评估人ID」。禁 /m。 |

@@ -14722,6 +14722,34 @@ test.describe('Q1954 桌面风险评估编辑标题空态', () => {
   });
 });
 
+test.describe('Q1955 桌面风险评估编辑字段空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-assessments/1/edit 空态「影响程度（1-5）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/1/edit');
+    await expect(page.getByText('影响程度（1-5）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/1/edit 空态「缓解措施」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/1/edit');
+    await expect(page.getByText('缓解措施').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/1/edit 空态「更新」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/1/edit');
+    await expect(page.getByRole('button', { name: /更\s*新/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
