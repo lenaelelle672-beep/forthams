@@ -857,5 +857,6 @@
 - Q2746：/disposals 报废转让/资产赔偿/资产调拨 **3 passed**。`15438fa3b`
 - Q2747：/disposals 清退列表/提示/新建文案 **3 passed**。`e194df681`
 - Q2748：/inspections 新增检验/标题/暂无记录 **3 passed**。`03a661be1`
-- Q2749：/inspections 搜索/总检验数/已过期 **3 passed**。
+- Q2749：/inspections 搜索/总检验数/已过期 **3 passed**。`6fc63d82b`
+- Q2750：/inspections 检验编号/资产ID/检验类型表头 **3 passed**。
 
