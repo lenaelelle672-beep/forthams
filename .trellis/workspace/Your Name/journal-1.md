@@ -493,5 +493,6 @@
 - Q2382：/inventory 平均进度/已盘资产/盘亏预警 **3 passed**。`99266b9ad`
 - Q2383：/inventory 决策摘要/进度趋势/筛选 **3 passed**。`6d4c56bab`
 - Q2384：/inventory 暂无任务/进行中/草稿 **3 passed**。`603b157cf`
-- Q2385：/inventory 已提交/导出/RFID **3 passed**。
+- Q2385：/inventory 已提交/导出/RFID **3 passed**。`e6f4e2011`
+- Q2386：/borrows heading/借用管理/新建借用单 **3 passed**。
 
