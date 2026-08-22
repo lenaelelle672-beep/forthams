@@ -1052,4 +1052,5 @@
 | Q1862 | done | 桌面空态 **3 passed**（/inspections/new「新增检验记录」「创建」「取消」）。禁 /m。 |
 | Q1863 | done | 桌面空态 **3 passed**（/assignments/1「领用单详情」「提交审批」「编辑」）。禁 /m。 |
 | Q1864 | done | 桌面空态 **3 passed**（/assignments/1「取消」「基本信息」「资产编号」）。禁 /m。 |
-| Q1865 | in_progress | 桌面空态：/assignments/1 未覆盖 3 条（读 AssignmentDetailPage：资产名称/领用类型/状态）。禁 /m。 |
+| Q1865 | done | 桌面空态 **3 passed**（/assignments/1「资产名称」「领用类型」「状态」）。禁 /m。 |
+| Q1866 | in_progress | 桌面空态：/assignments/1 未覆盖 3 条（读 AssignmentDetailPage：预计归还日期/草稿/待审批）。禁 /m。 |
