@@ -494,5 +494,6 @@
 - Q2383：/inventory 决策摘要/进度趋势/筛选 **3 passed**。`6d4c56bab`
 - Q2384：/inventory 暂无任务/进行中/草稿 **3 passed**。`603b157cf`
 - Q2385：/inventory 已提交/导出/RFID **3 passed**。`e6f4e2011`
-- Q2386：/borrows heading/借用管理/新建借用单 **3 passed**。
+- Q2386：/borrows heading/借用管理/新建借用单 **3 passed**。`c71c0a59e`
+- Q2387：/borrows 借用列表/记录管理/搜索 **3 passed**。
 
