@@ -1642,4 +1642,5 @@
 | Q2452 | done | 桌面空态 **3 passed**（/inspection-records 新增检验/搜索/空表）。禁 /m。 |
 | Q2453 | done | 桌面空态 **3 passed**（/disposals heading/全周期/本月处置总量）。禁 /m。 |
 | Q2454 | done | 桌面空态 **3 passed**（/disposals 回收价值/报废转让/工单管理）。禁 /m。 |
-| Q2455 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2455 | done | 桌面空态 **3 passed**（/disposals 清退列表/搜索/资产赔偿）。禁 /m。 |
+| Q2456 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
