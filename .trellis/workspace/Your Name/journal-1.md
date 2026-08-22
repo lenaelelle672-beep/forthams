@@ -912,5 +912,6 @@
 - Q2801：/workorders/new 描述placeholder/添加人员/上传文件 **3 passed**。`76e04922b`
 - Q2802：/assets/new 保存/取消/新增资产 **3 passed**。保存非 button name。`df023e969`
 - Q2803：/assets/new 基本信息/位置归属/财务信息 heading **3 passed**。`a8b7d8322`
-- Q2804：/assets/new 新建资产/填写进度/资产台账 **3 passed**。
+- Q2804：/assets/new 新建资产/填写进度/资产台账 **3 passed**。`3a7ea2387`
+- Q2805：/assets/new 名称/品牌/型号 placeholder **3 passed**。
 
