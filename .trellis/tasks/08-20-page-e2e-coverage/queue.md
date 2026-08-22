@@ -1194,4 +1194,5 @@
 | Q2004 | done | 桌面空态 **3 passed**（/workflow-designer 审批/办理/抄送节点描述）。禁 /m。 |
 | Q2005 | done | 桌面空态 **3 passed**（/workflow-designer 条件/结束描述 + 开始 helper）。禁 /m。 |
 | Q2006 | done | 桌面空态 **3 passed**（/workflow-designer 审批/办理/抄送 helper）。禁 /m。 |
-| Q2007 | in_progress | 桌面空态：/workflow-designer 条件/结束 helper +「未配置」。禁 /m。 |
+| Q2007 | done | 桌面空态 **3 passed**（/workflow-designer 条件/结束 helper +「未配置」）。禁 /m。 |
+| Q2008 | in_progress | 桌面空态：/workflow-designer 画布「提交资产申请」「部门负责人审批」「金额阈值判断」。禁 /m。 |

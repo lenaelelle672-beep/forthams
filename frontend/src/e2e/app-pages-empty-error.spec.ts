@@ -16179,6 +16179,34 @@ test.describe('Q2006 桌面流程设计器节点助手空态', () => {
   });
 });
 
+test.describe('Q2007 桌面流程设计器分支帮助空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-designer 空态「支持通过/驳回、满足/不满足双向分支」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('支持通过/驳回、满足/不满足双向分支').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 空态「适合结束审批、归档单据、推送通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('适合结束审批、归档单据、推送通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 空态「未配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('未配置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
