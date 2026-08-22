@@ -502,5 +502,6 @@
 - Q2391：/assignments heading/领用/新建领用单 **3 passed**。`6285fdeed`
 - Q2392：/assignments 领用列表/归还管理/搜索 **3 passed**。`0c1ab78fd`
 - Q2393：/assignments 搜索/总记录/已签收 **3 passed**。`0277bbb00`
-- Q2394：/assignments 待归还/长期领用/空表 **3 passed**。
+- Q2394：/assignments 待归还/长期领用/空表 **3 passed**。`4ad11f5b2`
+- Q2395：/assignments 短期借用/归还入库/调拨转移 **3 passed**。
 
