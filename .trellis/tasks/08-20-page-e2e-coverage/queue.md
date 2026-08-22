@@ -1469,4 +1469,5 @@
 | Q2279 | done | 桌面空态 **3 passed**（/workspace-preview「待审批」「刷新视图」「资产价值趋势」）。禁 /m。 |
 | Q2280 | done | 桌面空态 **3 passed**（/workspace-preview「分类分布」「维保预警」「最近工单」）。禁 /m。 |
 | Q2281 | done | 桌面空态 **3 passed**（/workspace-preview「净值」「部门资产统计」「查看全部」）。禁 /m。 |
-| Q2282 | in_progress | 桌面空态：/workspace-preview 菜单壳。禁 /m。 |
+| Q2282 | done | 桌面空态 **3 passed**（/workspace-preview「总价值」、部门 Top5、近12个月趋势）。禁 /m。 |
+| Q2283 | in_progress | 桌面空态：/fixed-assets/workbench?menu=home 同壳。禁 /m。 |
