@@ -16687,6 +16687,34 @@ test.describe('Q2024 桌面角色管理标题列头空态', () => {
   });
 });
 
+test.describe('Q2025 桌面部门岗位标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/depts 空态「部门管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await expect(page.getByText('部门管理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/posts 空态「岗位管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByText('岗位管理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fields 空态「自定义字段管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('自定义字段管理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -1212,4 +1212,5 @@
 | Q2022 | done | 桌面空态 **3 passed**（/system/menus「菜单管理」「暂无菜单数据，请通过 DDL 初始化种子数据」「类型」）。禁 /m。 |
 | Q2023 | done | 桌面空态 **3 passed**（/system/menus 表头「排序」「状态」「操作」）。禁 /m。 |
 | Q2024 | done | 桌面空态 **3 passed**（/system/roles「角色管理」「描述」「ID」）。禁 /m。 |
-| Q2025 | in_progress | 桌面空态：/system/users 未测标题或空表文案。禁 /m。 |
+| Q2025 | done | 桌面空态 **3 passed**（/system/depts「部门管理」、/system/posts「岗位管理」、/system/custom-fields「自定义字段管理」）。禁 /m。 |
+| Q2026 | in_progress | 桌面空态：/system/custom-fieldsets 或 /settings 未测文案。禁 /m。 |
