@@ -1454,4 +1454,5 @@
 | Q2264 | done | 桌面空态 **3 passed**（/bigscreen-3d「次数」「办公终端」「智能仓储」）。禁 /m。 |
 | Q2265 | done | 桌面空态 **3 passed**（/bigscreen-3d「RFID 标签」「审计链路」「维保到期」）。禁 /m。 |
 | Q2266 | done | 桌面空态 **3 passed**（/bigscreen-3d「借用超期」「标签离线」「审批积压」）。禁 /m。 |
-| Q2267 | in_progress | 桌面空态：/bigscreen-3d「盘点差异」「处理中」「已处理」。禁 /m。 |
+| Q2267 | done | 桌面空态 **3 passed**（/bigscreen-3d「盘点差异」「处理中」「已处理」）。禁 /m。 |
+| Q2268 | in_progress | 桌面空态：/bigscreen-3d「在线」「库位」「读写」。禁 /m。 |
