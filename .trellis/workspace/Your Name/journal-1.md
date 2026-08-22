@@ -801,5 +801,6 @@
 - Q2690：/maintenance/plans 新建计划/标题/暂无计划 **3 passed**。`937fb5d29`
 - Q2691：/maintenance/plans 搜索/计划名称/关联资产 **3 passed**。`73a2d02c3`
 - Q2692：/maintenance/plans 计划周期/负责人/下次执行 **3 passed**。`4dbcb7f3f`
-- Q2693：/maintenance/plans 优先级/状态/操作表头 **3 passed**。
+- Q2693：/maintenance/plans 优先级/状态/操作表头 **3 passed**。`31f01e017`
+- Q2694：/maintenance/plans 副标题/搜索/刷新 **3 passed**。表格/卡片/日历视图文案当前不可见。
 
