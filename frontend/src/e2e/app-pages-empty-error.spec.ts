@@ -17997,6 +17997,34 @@ test.describe('Q2068 桌面安全检查模板新增弹窗余项空态', () => {
   });
 });
 
+test.describe('Q2069 桌面安全检查执行工作台预填空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/execute 空态「固定资产工作台 / 点检执行」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('固定资产工作台 / 点检执行').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute 空态「已带入点检上下文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('已带入点检上下文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute 空态「注塑机 M-201」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('注塑机 M-201').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
