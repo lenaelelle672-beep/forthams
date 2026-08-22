@@ -1234,4 +1234,5 @@
 | Q2044 | done | 桌面空态 **3 passed**（/revaluations 表头「类型」「新值」「差额」）。禁 /m。 |
 | Q2045 | done | 桌面空态 **3 passed**（/fault-codes「故障代码管理」「故障代码」、点新增「新增故障代码」）。禁 /m。 |
 | Q2046 | done | 桌面空态 **3 passed**（/fault-codes 点新增「故障编码 *」「故障现象」「排序号」）。禁 /m。 |
-| Q2047 | in_progress | 桌面空态：/fault-codes 点新增 placeholder/创建/取消。禁 /m。 |
+| Q2047 | done | 桌面空态 **3 passed**（/fault-codes 点新增编码/描述 placeholder、「创建」）。禁 /m。 |
+| Q2048 | in_progress | 桌面空态：/fault-codes 点新增「取消」或换 /categories。禁 /m。 |

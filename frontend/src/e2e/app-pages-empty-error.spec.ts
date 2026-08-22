@@ -17329,6 +17329,37 @@ test.describe('Q2046 桌面故障代码新建表单空态', () => {
   });
 });
 
+test.describe('Q2047 桌面故障代码新建占位与提交空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fault-codes 点新增根节点 placeholder「请输入故障编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await page.getByRole('button', { name: '新增根节点' }).first().click();
+    await expect(page.getByPlaceholder('请输入故障编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes 点新增根节点 placeholder「请输入描述」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await page.getByRole('button', { name: '新增根节点' }).first().click();
+    await expect(page.getByPlaceholder('请输入描述').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes 点新增根节点「创建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await page.getByRole('button', { name: '新增根节点' }).first().click();
+    await expect(page.getByRole('button', { name: '创建' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
