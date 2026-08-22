@@ -1741,4 +1741,5 @@
 | Q2551 | done | 桌面空态 **3 passed**（/assets/new 品牌厂商/纬度范围/RFID标签）。禁 /m。 |
 | Q2552 | done | 桌面空态 **3 passed**（/assets/new 经度范围/原值元/净值元）。禁 /m。 |
 | Q2553 | done | 桌面空态 **3 passed**（/assets/new 保修期月/折旧率范围/是否重要设备）。禁 /m。 |
-| Q2554 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2554 | done | 桌面空态 **3 passed**（/assets/new 资产分类*/资产状态/规格型号）。禁 /m。 |
+| Q2555 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
