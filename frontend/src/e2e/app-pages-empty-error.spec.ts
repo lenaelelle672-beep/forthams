@@ -27275,6 +27275,34 @@ test.describe('Q2396 桌面入库验收标题空态', () => {
   });
 });
 
+test.describe('Q2397 桌面入库验收搜索空表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake 空态 placeholder「搜索验收单号...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByPlaceholder('搜索验收单号...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake 空态「搜索」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('button', { name: '搜索' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake 空态「暂无验收单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByText('暂无验收单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -504,5 +504,6 @@
 - Q2393：/assignments 搜索/总记录/已签收 **3 passed**。`0277bbb00`
 - Q2394：/assignments 待归还/长期领用/空表 **3 passed**。`4ad11f5b2`
 - Q2395：/assignments 短期借用/归还入库/调拨转移 **3 passed**。`0426a1d7f`
-- Q2396：/intake heading/副标题/新建验收单 **3 passed**。
+- Q2396：/intake heading/副标题/新建验收单 **3 passed**。`ce627e75d`
+- Q2397：/intake 搜索 placeholder/搜索/暂无验收单 **3 passed**。
 
