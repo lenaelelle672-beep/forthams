@@ -1318,4 +1318,5 @@
 | Q2128 | done | 桌面空态 **3 passed**（/equipment「日期」「类型」「费用」）。禁 /m。 |
 | Q2129 | done | 桌面空态 **3 passed**（/maintenance「资产ID」「维保类型」「维保日期」）。禁 /m。 |
 | Q2130 | done | 桌面空态 **3 passed**（/maintenance「执行人」「费用」「下次维保」）。禁 /m。 |
-| Q2131 | in_progress | 桌面空态：/maintenance「操作」或 /maintenance/plans 列头。禁 /m。 |
+| Q2131 | done | 桌面空态 **3 passed**（/maintenance「操作」、/maintenance/plans「计划名称」「关联资产」）。禁 /m。 |
+| Q2132 | in_progress | 桌面空态：/maintenance/plans 列头「计划周期」「负责人」「下次执行」。禁 /m。 |
