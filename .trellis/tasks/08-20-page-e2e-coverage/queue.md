@@ -1045,4 +1045,5 @@
 | Q1855 | done | 桌面空态 **3 passed**（/inspections/1/upload「检验编号:」「共 0 张」「INSP-001」）。禁 /m。 |
 | Q1856 | done | 桌面空态 **3 passed**（/inspections/1「检验详情」「编辑」「检验编号」）。禁 /m。 |
 | Q1857 | done | 桌面空态 **3 passed**（/inspections/1「资产ID」「检验类型」「检验日期」）。禁 /m。 |
-| Q1858 | in_progress | 桌面空态：/inspections/1 未覆盖 3 条（读 InspectionDetailPage：下次检验日期/检验结果/检验机构）。禁 /m。 |
+| Q1858 | done | 桌面空态 **3 passed**（/inspections/1「下次检验日期」「检验结果」「检验机构」）。禁 /m。 |
+| Q1859 | in_progress | 桌面空态：/inspections/1 未覆盖 3 条（读 InspectionDetailPage：检验人/证书编号/证书到期日）。禁 /m。 |
