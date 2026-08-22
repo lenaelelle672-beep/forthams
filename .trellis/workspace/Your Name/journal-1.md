@@ -921,5 +921,6 @@
 - Q2810：/assets/new 资产名称/分类/重要设备 **3 passed**。`a5908fb1f`
 - Q2811：/assets/new 品牌厂商/纬度/RFID标签 **3 passed**。`89fa3323c`
 - Q2812：/assets/new 经度/原值/净值标签 **3 passed**。`1442bd587`
-- Q2813：/assets/new 保修期/折旧率/资产状态 **3 passed**。
+- Q2813：/assets/new 保修期/折旧率/资产状态 **3 passed**。`978b06e68`
+- Q2814：/assets/new 规格型号/部门位置/描述备注 **3 passed**。
 
