@@ -16431,6 +16431,37 @@ test.describe('Q2015 桌面流程设计器预览删除空态', () => {
   });
 });
 
+test.describe('Q2016 桌面流程设计器表单源码空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-designer 点表单源码空态「自定义表单 HTML（保存草稿后生效）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await page.getByText('表单源码', { exact: true }).first().click();
+    await expect(page.getByText('自定义表单 HTML（保存草稿后生效）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 点表单源码空态「表单源码会保存在流程定义中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await page.getByText('表单源码', { exact: true }).first().click();
+    await expect(page.getByText('表单源码会保存在流程定义中').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 点表单源码空态「查看业务表单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await page.getByText('表单源码', { exact: true }).first().click();
+    await expect(page.getByText('查看业务表单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
