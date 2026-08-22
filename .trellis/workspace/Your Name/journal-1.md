@@ -622,5 +622,6 @@
 - Q2511：盘点类型/全盘点 + /workorders/new 新建工单 **3 passed**。`7d2297781`
 - Q2512：/workorders/new 工单管理/基本信息/优先级 **3 passed**。`622720791`
 - Q2513：/workorders/new 标题/placeholder/资产关联 **3 passed**。`a2745c288`
-- Q2514：/workorders/new 工单类型/关联资产/其他 **3 passed**。
+- Q2514：/workorders/new 工单类型/关联资产/其他 **3 passed**。`64007fb64`
+- Q2515：/workorders/new 紧急描述/中优先级/详细信息 **3 passed**。
 
