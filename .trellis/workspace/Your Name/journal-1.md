@@ -455,5 +455,6 @@
 - Q2344：dashboard 总价值/欢迎回来/系统管理员 **3 passed**。`3dadf96e2`
 - Q2345：/assets heading 台账/新建/导出全部 **3 passed**。`0e18337ae`
 - Q2346：/assets heading 台账/导出 PDF/总净值 **3 passed**。`153037be7`
-- Q2347：/assets 新增资产/导入/高级筛选 **3 passed**。
+- Q2347：/assets 新增资产/导入/高级筛选 **3 passed**。`87fb5df1a`
+- Q2348：/assets 资产列表/搜索 placeholder/闲置率 **3 passed**。
 

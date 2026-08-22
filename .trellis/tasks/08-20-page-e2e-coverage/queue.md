@@ -1535,4 +1535,5 @@
 | Q2345 | done | 桌面空态 **3 passed**（/assets heading 台账/新建/导出全部）。禁 /m。 |
 | Q2346 | done | 桌面空态 **3 passed**（/assets heading 台账/导出 PDF/总净值）。禁 /m。 |
 | Q2347 | done | 桌面空态 **3 passed**（/assets 新增资产/导入/高级筛选）。禁 /m。 |
-| Q2348 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2348 | done | 桌面空态 **3 passed**（/assets 资产列表/搜索 placeholder/闲置率）。禁 /m。 |
+| Q2349 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
