@@ -1847,4 +1847,5 @@
 | Q2657 | done | 桌面空态 **3 passed**（/idle 部门/闲置天数/状态表头）。禁 /m。 |
 | Q2658 | done | 桌面空态 **3 passed**（/idle 操作表头/标题/暂无数据）。禁 /m。 |
 | Q2659 | done | 桌面空态 **3 passed**（/equipment 新建维保记录/搜索/标题）。禁 /m。 |
-| Q2660 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2660 | done | 桌面空态 **3 passed**（/equipment 暂无设备/最近维保/暂无维保）。禁 /m。 |
+| Q2661 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
