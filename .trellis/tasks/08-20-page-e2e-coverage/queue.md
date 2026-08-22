@@ -1559,4 +1559,5 @@
 | Q2369 | done | 桌面空态 **3 passed**（/maintenance heading/设备维护/新增维保）。禁 /m。 |
 | Q2370 | done | 桌面空态 **3 passed**（/maintenance 维保列表/记录管理/搜索）。禁 /m。 |
 | Q2371 | done | 桌面空态 **3 passed**（/maintenance 计划中/执行中/逾期）。禁 /m。 |
-| Q2372 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2372 | done | 桌面空态 **3 passed**（/maintenance 已完成/刷新/全部类型）。禁 /m。 |
+| Q2373 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

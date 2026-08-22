@@ -479,5 +479,6 @@
 - Q2368：/idle 已认领/历史记录/暂无数据 **3 passed**。`4f75ebf76`
 - Q2369：/maintenance heading/设备维护/新增维保 **3 passed**。`57636a811`
 - Q2370：/maintenance 维保列表/记录管理/搜索 **3 passed**。`f6b81f30e`
-- Q2371：/maintenance 计划中/执行中/逾期 **3 passed**。
+- Q2371：/maintenance 计划中/执行中/逾期 **3 passed**。`6c49715f3`
+- Q2372：/maintenance 已完成/刷新/全部类型 **3 passed**。
 
