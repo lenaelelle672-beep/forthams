@@ -1017,4 +1017,5 @@
 | Q1827 | done | 桌面空态 **3 passed**（/spare-parts/1「基本信息」「备件编码」「规格型号」）。禁 /m。 |
 | Q1828 | done | 桌面空态 **3 passed**（/spare-parts/1「计量单位」「单价」「领用记录」）。禁 /m。 |
 | Q1829 | done | 桌面空态 **3 passed**（/spare-parts/1「停用」「启用」「缺货」）。禁 /m。 |
-| Q1830 | in_progress | 桌面空态：/spare-parts/1 未覆盖 3 条（读 SparePartDetailPage：状态；description「编码:」；usages 有数据见「工单 #」）。禁 /m。 |
+| Q1830 | done | 桌面空态 **3 passed**（/spare-parts/1「状态」「编码:」「工单 #」）。禁 /m。 |
+| Q1831 | in_progress | 桌面空态：/intake/1 详情未覆盖文案 3 条（读 IntakeDetailPage 硬编码中文，禁 /m）。 |
