@@ -365,5 +365,6 @@
 - Q2254：menu id/六域 nav/子项 aside label。sso 仅两条稳定文案。`55ce286f9`
 - Q2255：全部完成/专属 API/技术支持 catalog **3 passed**。`6a83b20c8`
 - Q2256：V3 registry/metadata/tech-support **3 passed**。`f5e27e22e`
-- Q2257：3D 大屏标题/SUMMARY/CATEGORY **3 passed**。
+- Q2257：3D 大屏标题/SUMMARY/CATEGORY **3 passed**。`a2b8d52e5`
+- Q2258：FORECAST/IOT/TOP 5 **3 passed**。
 
