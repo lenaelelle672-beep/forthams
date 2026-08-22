@@ -1991,4 +1991,5 @@
 | Q2801 | done | 桌面空态 **3 passed**（/workorders/new 描述placeholder/添加人员/上传文件）。禁 /m。 |
 | Q2802 | done | 桌面空态 **3 passed**（/assets/new 保存/取消/新增资产）。禁 /m。 |
 | Q2803 | done | 桌面空态 **3 passed**（/assets/new 基本信息/位置归属/财务信息 heading）。禁 /m。 |
-| Q2804 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2804 | done | 桌面空态 **3 passed**（/assets/new 新建资产/填写进度/资产台账）。禁 /m。 |
+| Q2805 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
