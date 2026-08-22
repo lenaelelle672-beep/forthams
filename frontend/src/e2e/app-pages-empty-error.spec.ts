@@ -16631,6 +16631,34 @@ test.describe('Q2022 桌面菜单管理空表空态', () => {
   });
 });
 
+test.describe('Q2023 桌面菜单管理列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/menus 空态「排序」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByText('排序', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus 空态「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByText('状态', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus 空态「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByText('操作', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

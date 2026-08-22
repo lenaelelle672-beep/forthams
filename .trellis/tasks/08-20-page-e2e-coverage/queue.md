@@ -1210,4 +1210,5 @@
 | Q2020 | done | 桌面空态 **3 passed**（/manufacturers「正常」「停用」「状态：」）。禁 /m。 |
 | Q2021 | done | 桌面空态 **3 passed**（/manufacturers 点新增「备注」、/vendors「暂无供应商数据」「刷新」）。禁 /m。 |
 | Q2022 | done | 桌面空态 **3 passed**（/system/menus「菜单管理」「暂无菜单数据，请通过 DDL 初始化种子数据」「类型」）。禁 /m。 |
-| Q2023 | in_progress | 桌面空态：/system/menus 表头「排序」「状态」「操作」。禁 /m。 |
+| Q2023 | done | 桌面空态 **3 passed**（/system/menus 表头「排序」「状态」「操作」）。禁 /m。 |
+| Q2024 | in_progress | 桌面空态：/system/roles 未测标题或空表文案。禁 /m。 |
