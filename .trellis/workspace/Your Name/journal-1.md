@@ -689,5 +689,6 @@
 - Q2578：/workflow-form 清退/报废 编码 + COMPENSATION 源码提示 **3 passed**。`2efdf8782`
 - Q2579：/bigscreen 今日新增/借用/调拨 **3 passed**。`65b903d7c`
 - Q2580：/bigscreen 昨日取消/盘点/返库 **3 passed**。`b506225c8`
-- Q2581：/bigscreen 定检/故障/备勤飞机 **3 passed**。
+- Q2581：/bigscreen 定检/故障/备勤飞机 **3 passed**。`dbaa28ce7`
+- Q2582：/bigscreen 天气因素/航空管制/机械故障 **3 passed**。
 
