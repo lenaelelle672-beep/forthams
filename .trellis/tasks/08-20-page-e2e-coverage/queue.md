@@ -1623,4 +1623,5 @@
 | Q2433 | done | 桌面空态 **3 passed**（/revaluations 总记录/已拒绝/空表）。禁 /m。 |
 | Q2434 | done | 桌面空态 **3 passed**（/revaluations 合计/需及时处理/本期已审批）。禁 /m。 |
 | Q2435 | done | 桌面空态 **3 passed**（/budgets heading/资产预算/新增预算）。禁 /m。 |
-| Q2436 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2436 | done | 桌面空态 **3 passed**（/budgets 总预算/已使用/已承诺）。禁 /m。 |
+| Q2437 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
