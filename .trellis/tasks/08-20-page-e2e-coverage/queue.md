@@ -1135,4 +1135,5 @@
 | Q1945 | done | 桌面空态 **3 passed**（/risk-assessments/new「评估人ID」「创建」+ placeholder「输入资产ID」）。禁 /m。 |
 | Q1946 | done | 桌面空态 **3 passed**（/risk-assessments/new「取消」+ placeholder「描述风险缓解措施」「评估人ID」）。禁 /m。 |
 | Q1947 | done | 桌面空态 **3 passed**（/risk-assessments/new「自动计算的风险等级」「LOW（低危）」「1 - 极低」）。禁 /m。 |
-| Q1948 | in_progress | 桌面空态：/risk-matrix「风险矩阵配置」及相关说明（读页确认）。禁 /m。 |
+| Q1948 | done | 桌面空态 **3 passed**（/risk-matrix「风险矩阵配置」「管理风险评估的概率维度、严重度维度和等级映射规则」「创建矩阵」）。禁 /m。 |
+| Q1949 | in_progress | 桌面空态：/risk-matrix 列头「矩阵名称」「状态」「创建时间」。禁 /m。 |
