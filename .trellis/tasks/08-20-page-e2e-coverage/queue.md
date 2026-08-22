@@ -1830,4 +1830,5 @@
 | Q2640 | done | 桌面空态 **3 passed**（/vendor-portal heading/编码/密码 placeholder）。禁 /m。 |
 | Q2641 | done | 桌面空态 **3 passed**（/vendor-portal 登录按钮/供应商门户/登录）。禁 /m。 |
 | Q2642 | done | 桌面空态 **3 passed**（/login4 账号/密码 placeholder/登录按钮）。禁 /m。 |
-| Q2643 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2643 | done | 桌面空态 **3 passed**（/login4 忘记密码/记住用户名/SSO link）。禁 /m。 |
+| Q2644 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
