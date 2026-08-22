@@ -926,5 +926,6 @@
 - Q2815：/assets/new 500字/资产描述/200字 **3 passed**。`02042ec2a`
 - Q2816：/assets/new 图片文件/父子关系/主附属 **3 passed**。`db11018d1`
 - Q2817：/assets/new 先保存父子/先保存附件/附件 **3 passed**。`2f990318f`
-- Q2818：/borrows/new 创建借用单/返回/标题 **3 passed**。
+- Q2818：/borrows/new 创建借用单/返回/标题 **3 passed**。`06e382b2a`
+- Q2819：/borrows/new 借用信息/归还日期/用途 **3 passed**。
 
