@@ -367,5 +367,6 @@
 - Q2256：V3 registry/metadata/tech-support **3 passed**。`f5e27e22e`
 - Q2257：3D 大屏标题/SUMMARY/CATEGORY **3 passed**。`a2b8d52e5`
 - Q2258：FORECAST/IOT/TOP 5 **3 passed**。`0c790d389`
-- Q2259：WARNING/开场动画/当前城市 **3 passed**。
+- Q2259：WARNING/开场动画/当前城市 **3 passed**。`acbec0c43`
+- Q2260：资产总数/在用资产/地图节点 **3 passed**。
 

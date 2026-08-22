@@ -1447,4 +1447,5 @@
 | Q2257 | done | 桌面空态 **3 passed**（/bigscreen-3d「固定资产智慧运营大屏」「SUMMARY」「CATEGORY」）。禁 /m。 |
 | Q2258 | done | 桌面空态 **3 passed**（/bigscreen-3d「FORECAST」「IOT」「TOP 5」）。禁 /m。 |
 | Q2259 | done | 桌面空态 **3 passed**（/bigscreen-3d「WARNING」「开场动画」「当前城市」）。禁 /m。 |
-| Q2260 | in_progress | 桌面空态：/bigscreen-3d「资产总数」「在用资产」「地图节点」。禁 /m。 |
+| Q2260 | done | 桌面空态 **3 passed**（/bigscreen-3d「资产总数」「在用资产」「地图节点」）。禁 /m。 |
+| Q2261 | in_progress | 桌面空态：/bigscreen-3d「资产原值」「资产净值」。禁 /m。 |
