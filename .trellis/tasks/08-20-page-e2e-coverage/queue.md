@@ -1228,4 +1228,5 @@
 | Q2038 | done | 桌面空态 **3 passed**（/idle 表头「部门」「状态」「操作」）。禁 /m。 |
 | Q2039 | done | 桌面空态 **3 passed**（/depreciation「折旧管理」「折旧方法」「当期折旧」）。禁 /m。 |
 | Q2040 | done | 桌面空态 **3 passed**（/depreciation「累计折旧」「折旧率」「全部方法」）。禁 /m。 |
-| Q2041 | in_progress | 桌面空态：/depreciation「查询/重置」或剩余表头。禁 /m。 |
+| Q2041 | done | 桌面空态 **3 passed**（/depreciation「查询」「重置」「原值」）。禁 /m。 |
+| Q2042 | in_progress | 桌面空态：/depreciation「净值/状态」或换 /revaluations。禁 /m。 |
