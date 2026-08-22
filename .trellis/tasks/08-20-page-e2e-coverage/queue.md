@@ -1191,4 +1191,5 @@
 | Q2001 | done | 桌面空态 **3 passed**（/workflow-designer「节点面板」「拖拽到画布创建节点，或点击按钮快速追加」「开始节点」）。禁 /m。 |
 | Q2002 | done | 桌面空态 **3 passed**（/workflow-designer「审批节点」「办理节点」「抄送节点」）。禁 /m。 |
 | Q2003 | done | 桌面空态 **3 passed**（/workflow-designer「条件分支」「结束节点」「流程入口与触发条件」）。禁 /m。 |
-| Q2004 | in_progress | 桌面空态：/workflow-designer 审批/办理/抄送节点描述。禁 /m。 |
+| Q2004 | done | 桌面空态 **3 passed**（/workflow-designer 审批/办理/抄送节点描述）。禁 /m。 |
+| Q2005 | in_progress | 桌面空态：/workflow-designer 条件/结束描述 + 开始 helper。禁 /m。 |

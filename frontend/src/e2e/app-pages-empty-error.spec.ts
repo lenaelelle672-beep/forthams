@@ -16095,6 +16095,34 @@ test.describe('Q2003 桌面流程设计器分支结束空态', () => {
   });
 });
 
+test.describe('Q2004 桌面流程设计器节点描述空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-designer 空态「指派审批人并定义会签规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('指派审批人并定义会签规则').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 空态「指派办理人完成阻塞处理步骤」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('指派办理人完成阻塞处理步骤').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 空态「向角色或用户发送非阻塞通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('向角色或用户发送非阻塞通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
