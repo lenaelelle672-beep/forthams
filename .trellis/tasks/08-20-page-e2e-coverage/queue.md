@@ -1376,4 +1376,5 @@
 | Q2186 | done | 桌面空态 **3 passed**（/disposals/scrap/new「资产报废申请」「填写信息」「选择资产」）。禁 /m。 |
 | Q2187 | done | 桌面空态 **3 passed**（/disposals/scrap/new「报废配置」「确认提交」「基本信息」）。禁 /m。 |
 | Q2188 | done | 桌面空态 **3 passed**（/disposals/scrap/new「报废编号」「申请人」「报废原因」）。禁 /m。 |
-| Q2189 | in_progress | 桌面空态：/disposals/scrap/new 设备老化或处置方式。禁 /m。 |
+| Q2189 | done | 桌面空态 **3 passed**（/disposals/scrap/new「处置方式」「添加资产」「暂无已选资产」）。禁 /m。 |
+| Q2190 | in_progress | 桌面空态：/disposals/scrap/new「变卖处理」「报废拆解」「捐赠」。禁 /m。 |
