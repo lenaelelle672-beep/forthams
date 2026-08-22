@@ -1002,4 +1002,5 @@
 | Q1812 | done | 桌面空态 **3 passed**（/budgets/1/edit 编辑预算/修改预算信息/更新预算；补 budgets/:id/edit 路由；从 404 未挂载列表移除该 path）。禁 /m。 |
 | Q1813 | done | 桌面空态 **3 passed**（/budgets/1 详情「维保」「运营」「已审批」）。禁 /m。 |
 | Q1814 | done | 桌面空态 **3 passed**（/budgets/1「已关闭」、失败态「返回列表」、「2026年 · 采购预算」）。禁 /m。 |
-| Q1815 | in_progress | 桌面空态：保险编辑页未覆盖文案（读 InsuranceFormPage isEdit + InsuranceDetailPage navigate 目标；对齐 /insurances/:id/edit）。禁 /m。 |
+| Q1815 | done | 桌面空态 **3 passed**（/insurances/1/edit 编辑保险/保存/返回；补路由并对齐 navigate）。禁 /m。 |
+| Q1816 | in_progress | 桌面空态：/insurances/1 详情未覆盖 3 条（读 InsuranceDetailPage：保险详情/理赔记录/新增理赔）。禁 /m。 |

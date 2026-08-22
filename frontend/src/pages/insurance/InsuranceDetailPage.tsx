@@ -85,7 +85,7 @@ const InsuranceDetailPage: React.FC = () => {
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/insurance')}>
               返回
             </Button>
-            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/insurance/${id}/edit`)}>
+            <Button type="primary" icon={<EditOutlined />} onClick={() => navigate(`/insurances/${id}/edit`)}>
               编辑
             </Button>
           </Space>
@@ -123,7 +123,11 @@ const InsuranceDetailPage: React.FC = () => {
           </div>
           <Table
             columns={claimColumns}
-            dataSource={(claimsData as any)?.list ?? (claimsData as any)?.records ?? []}
+            dataSource={Array.isArray((claimsData as any)?.records)
+              ? (claimsData as any).records
+              : Array.isArray((claimsData as any)?.list)
+                ? (claimsData as any).list
+                : []}
             loading={claimsLoading}
             rowKey="id"
             pagination={{

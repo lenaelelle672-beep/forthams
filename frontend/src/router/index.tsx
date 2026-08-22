@@ -498,6 +498,7 @@ const router = createBrowserRouter([
           { path: 'insurances',      element: S(InsuranceListPage) },
           { path: 'insurances/new',  element: S(InsuranceFormPage) },
           { path: 'insurances/:id',  element: S(InsuranceDetailPage) },
+          { path: 'insurances/:id/edit', element: S(InsuranceFormPage) },
 
           // Phase 5: 检验/年检管理
           { path: 'inspection-templates', element: S(InspectionTemplatePage) },

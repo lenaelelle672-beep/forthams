@@ -70,7 +70,11 @@ const InsuranceListPage: React.FC = () => {
 
   /* ── Derived data ─────────────────────────────────────────────────────── */
 
-  const list: Insurance[] = (data as any)?.list || [];
+  const list: Insurance[] = Array.isArray((data as any)?.records)
+    ? (data as any).records
+    : Array.isArray((data as any)?.list)
+      ? (data as any).list
+      : [];
   const total: number = (data as any)?.total || 0;
 
 
@@ -239,7 +243,7 @@ const InsuranceListPage: React.FC = () => {
           </button>
           <button
             className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-medium text-slate-600 transition hover:border-amber-200 hover:text-amber-600"
-            onClick={(e) => { e.stopPropagation(); navigate(`/insurance/${row.id}/edit`); }}
+            onClick={(e) => { e.stopPropagation(); navigate(`/insurances/${row.id}/edit`); }}
           >
             <Pencil className="h-3.5 w-3.5" />
             编辑

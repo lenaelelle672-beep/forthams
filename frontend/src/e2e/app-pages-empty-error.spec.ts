@@ -10339,6 +10339,34 @@ test.describe('Q1814 桌面预算详情状态与删除', () => {
   });
 });
 
+test.describe('Q1815 桌面保险编辑空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1/edit 空态「编辑保险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1/edit');
+    await expect(page.getByText('编辑保险').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1/edit 空态「保存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1/edit');
+    await expect(page.getByRole('button', { name: '保存' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1/edit 空态「返回」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1/edit');
+    await expect(page.getByRole('button', { name: '返回' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
@@ -10930,7 +10958,7 @@ test.describe('未测路由 / 权限 / 404', () => {
     '/analytics/tco/1', '/analytics/health/1', '/analytics/reliability/1',
     '/m/unknown-xyz', '/m/work-orders/1', '/m/notifications/1', '/m/scan/1', '/m/profile/1',
     '/retirement/1/edit', '/approvals/1/edit', '/disposals/1/edit', '/intake/1/edit',
-    '/compensation/1/edit', '/insurances/1/edit', '/spare-parts/1/edit',
+    '/compensation/1/edit', '/spare-parts/1/edit',
     '/workflows-v2/1', '/fixed-assets/foo', '/vendor-portal/1',
     '/login/foo', '/forbidden/1', '/sso-callback/1', '/workspace-preview/1',
     '/stocktaking-cycles/1/edit', '/revaluations/1/edit', '/depreciation/1/edit',
