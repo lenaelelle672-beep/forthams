@@ -1717,4 +1717,5 @@
 | Q2527 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 返回列表/保存 + /risk-assessments/new 1-极小）。禁 /m。 |
 | Q2528 | done | 桌面空态 **3 passed**（/disposals/transfer/new 调拨说明 + /workorders/new 紧急/高）。禁 /m。 |
 | Q2529 | done | 桌面空态 **3 passed**（/workorders/new 中/低 + /stocktaking-cycles/new *）。禁 /m。 |
-| Q2530 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2530 | done | 桌面空态 **3 passed**（/assignments/new 使用人ID/使用部门ID/取消）。禁 /m。 |
+| Q2531 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

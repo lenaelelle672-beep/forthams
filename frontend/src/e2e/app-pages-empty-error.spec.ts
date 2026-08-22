@@ -31000,6 +31000,34 @@ test.describe('Q2529 桌面新建工单中低优先级空态', () => {
   });
 });
 
+test.describe('Q2530 桌面新建领用单占位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assignments/new 空态 placeholder「使用人 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/new');
+    await expect(page.getByPlaceholder('使用人 ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/new 空态 placeholder「使用部门 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/new');
+    await expect(page.getByPlaceholder('使用部门 ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/new 空态「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/new');
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
