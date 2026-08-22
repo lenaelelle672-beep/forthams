@@ -813,5 +813,6 @@
 - Q2702：/depreciation 本月总额/待计算/已完成 **3 passed**。`2823c44fd`
 - Q2703：/depreciation 全部方法/直线法/双倍余额 **3 passed**。`84c9d0d17`
 - Q2704：/depreciation 年数总和/工作量/计划标题 **3 passed**。`7c0233430`
-- Q2705：/depreciation 折旧方法/当期/累计表头 **3 passed**。
+- Q2705：/depreciation 折旧方法/当期/累计表头 **3 passed**。`07cb773ee`
+- Q2706：/depreciation 原值/净值/状态表头 **3 passed**。
 
