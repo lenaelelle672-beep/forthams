@@ -998,4 +998,5 @@
 | Q1808 | done | 桌面空态 **3 passed**（/budgets/1「已使用」「已承诺」「剩余」）。禁 /m。 |
 | Q1809 | done | 桌面空态 **3 passed**（/budgets/1「执行率」「编辑」「删除」）。禁 /m。 |
 | Q1810 | done | 桌面空态 **3 passed**（/budgets/1 点删除确认框三文案）。禁 /m。 |
-| Q1811 | in_progress | 桌面空态：/budgets/1 点删除「取消」；详情「采购」「草稿」badge（默认 paged 时 getTypeLabel/getStatusLabel 可能是 '-'，若不可见则 mock 详情 {budgetType:'PURCHASE',status:'DRAFT'}）。禁 /m。 |
+| Q1811 | done | 桌面空态 **3 passed**（/budgets/1 点删除「取消」、详情「采购」「草稿」）。禁 /m。 |
+| Q1812 | in_progress | 桌面空态：/budgets/1/edit 编辑页未覆盖文案 3 条（读 BudgetFormPage isEdit 分支：编辑预算/修改预算信息/更新预算）。禁 /m。 |

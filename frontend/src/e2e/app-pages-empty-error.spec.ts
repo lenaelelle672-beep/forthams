@@ -10169,6 +10169,51 @@ test.describe('Q1810 桌面预算删除确认空态', () => {
   });
 });
 
+test.describe('Q1811 桌面预算详情空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/1 点删除「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/1');
+    await page.getByRole('button', { name: '删除' }).click();
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 详情「采购」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/budgets/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, budgetYear:2026, budgetType:'PURCHASE', status:'DRAFT', totalAmount:100, usedAmount:0, committedAmount:0 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/budgets/1');
+    await expect(page.getByText('采购').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 详情「草稿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/budgets/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, budgetYear:2026, budgetType:'PURCHASE', status:'DRAFT', totalAmount:100, usedAmount:0, committedAmount:0 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/budgets/1');
+    await expect(page.getByText('草稿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
