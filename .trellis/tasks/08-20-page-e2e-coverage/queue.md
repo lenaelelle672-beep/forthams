@@ -1671,4 +1671,5 @@
 | Q2481 | done | 桌面空态 **3 passed**（/system/posts heading/岗位/新增岗位）。禁 /m。 |
 | Q2482 | done | 桌面空态 **3 passed**（/system/posts 岗位列表/总量/空表）。禁 /m。 |
 | Q2483 | done | 桌面空态 **3 passed**（/system/custom-fields heading/副标题/搜索）。禁 /m。 |
-| Q2484 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2484 | done | 桌面空态 **3 passed**（自定义字段空表 + 字段集标题/搜索）。禁 /m。 |
+| Q2485 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
