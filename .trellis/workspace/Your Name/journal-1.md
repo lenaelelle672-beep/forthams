@@ -570,5 +570,6 @@
 - Q2459：/gis 数据来源/关联资产 + /analytics heading **3 passed**。`a1466384a`
 - Q2460：/analytics 副标题/数据范围/近12个月 **3 passed**。`c3de93c31`
 - Q2461：/analytics 价值趋势/分类分布/页脚 **3 passed**。`7933135cb`
-- Q2462：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。
+- Q2462：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。`8c1796b8c`
+- Q2463：/analytics/health heading/副标题/平均健康分 **3 passed**。
 
