@@ -19004,6 +19004,34 @@ test.describe('Q2100 桌面通知工作台建议后半空态', () => {
   });
 });
 
+test.describe('Q2101 桌面TCO查询栏标签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/tco 空态「TCO 全生命周期成本」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByText('TCO 全生命周期成本').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco 空态「部门ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByText('部门ID', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco 空态「分类ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByText('分类ID', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
