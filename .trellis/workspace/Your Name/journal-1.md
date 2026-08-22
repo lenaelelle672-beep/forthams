@@ -751,5 +751,6 @@
 - Q2640：/vendor-portal heading/编码/密码 placeholder **3 passed**。无 seedSession。`44e404d79`
 - Q2641：/vendor-portal 登录按钮/供应商门户/登录 **3 passed**。无 seedSession。`9a8e5ed32`
 - Q2642：/login4 账号/密码 placeholder/登录按钮 **3 passed**。无 seedSession。`5863c09eb`
-- Q2643：/login4 忘记密码/记住用户名/SSO link **3 passed**。无 seedSession。
+- Q2643：/login4 忘记密码/记住用户名/SSO link **3 passed**。无 seedSession。`be8c7d69d`
+- Q2644：/login4 登录表单/用户名/显示密码 **3 passed**。无 seedSession。
 
