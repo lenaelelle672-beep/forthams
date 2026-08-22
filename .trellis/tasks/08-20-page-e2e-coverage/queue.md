@@ -1105,4 +1105,5 @@
 | Q1915 | done | 桌面空态 **3 passed**（/inventory/cycle-count 点「新增规则」后 placeholder「不填表示无上限」「JSON数组：[1,2,3] 或留空表示全部」+「确定」）。禁 /m。 |
 | Q1916 | done | 桌面空态 **3 passed**（/inventory/cycle-count 点「新增规则」后「取消」+ 弹窗「新增规则」+「月度盘点」）。禁 /m。 |
 | Q1917 | done | 桌面空态 **3 passed**（/inventory/abc-classification「ABC 分类管理」「ABC 分类规则」「资产列表」）。禁 /m。 |
-| Q1918 | in_progress | 桌面空态：/inventory/abc-classification「A 类（高价值）」「B 类（中价值）」「C 类（低价值）」。禁 /m。 |
+| Q1918 | done | 桌面空态 **3 passed**（/inventory/abc-classification「A 类（高价值）」「B 类（中价值）」「C 类（低价值）」）。禁 /m。 |
+| Q1919 | in_progress | 桌面空态：/inventory/abc-classification 列头「资产编号」「资产名称」「分类」。禁 /m。 |
