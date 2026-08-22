@@ -1185,4 +1185,5 @@
 | Q1995 | done | 桌面空态 **3 passed**（/workflows「ASSET_CLEARANCE」「ASSET_SCRAP」「ASSET_COMPENSATION」）。禁 /m。 |
 | Q1996 | done | 桌面空态 **3 passed**（/workflows「RETIREMENT」「当前页」；点新建「从模板创建」）。禁 /m。 |
 | Q1997 | done | 桌面空态 **3 passed**（/workflow-designer「流程中心 / 设计器」「保存草稿」「发布流程」）。禁 /m。 |
-| Q1998 | in_progress | 桌面空态：/workflow-designer「计算处理人」「重新读取后端定义」「个节点」。禁 /m。 |
+| Q1998 | done | 桌面空态 **3 passed**（/workflow-designer「计算处理人」「重新读取后端定义」「个节点」）。禁 /m。 |
+| Q1999 | in_progress | 桌面空态：/workflow-designer「删除节点」「撤销」「重做」。禁 /m。 |
