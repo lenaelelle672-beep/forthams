@@ -832,5 +832,6 @@
 - Q2721：/analytics 标题/资产总数/本月维保 **3 passed**。`c447f682e`
 - Q2722：/analytics 资产总值/待审批/数据范围 **3 passed**。`8aba16462`
 - Q2723：/analytics 近12个月/价值趋势/分类分布 **3 passed**。`c2df5df9a`
-- Q2724：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。
+- Q2724：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。`9e90fa5e0`
+- Q2725：/analytics 暂无分类/部门排行/副标题 **3 passed**。
 

@@ -1912,4 +1912,5 @@
 | Q2722 | done | 桌面空态 **3 passed**（/analytics 资产总值/待审批/数据范围）。禁 /m。 |
 | Q2723 | done | 桌面空态 **3 passed**（/analytics 近12个月/价值趋势/分类分布）。禁 /m。 |
 | Q2724 | done | 桌面空态 **3 passed**（/analytics 部门排行/处置统计/暂无趋势）。禁 /m。 |
-| Q2725 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2725 | done | 桌面空态 **3 passed**（/analytics 暂无分类/部门排行/副标题）。禁 /m。 |
+| Q2726 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
