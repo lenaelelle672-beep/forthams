@@ -1520,4 +1520,5 @@
 | Q2330 | done | 桌面空态 **3 passed**（preview 运营首页产品页地标/工作台切换）。禁 /m。 |
 | Q2331 | done | 桌面空态 **3 passed**（preview 欢迎回来/查看全部/近12个月）。禁 /m。 |
 | Q2332 | done | 桌面空态 **3 passed**（preview 系统管理员/总价值/刷新视图）。禁 /m。 |
-| Q2333 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2333 | done | 桌面空态 **3 passed**（preview 待审批/导出数据/净值）。禁 /m。 |
+| Q2334 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

@@ -440,5 +440,6 @@
 - Q2329：基础维护/设计稿/B端预览。设计稿仅 preview。`dda8785e4`
 - Q2330：preview 产品页地标/工作台切换 **3 passed**。`bd19598e7`
 - Q2331：preview 欢迎回来/查看全部/近12个月 **3 passed**。`187506683`
-- Q2332：preview 系统管理员/总价值/刷新视图 **3 passed**。
+- Q2332：preview 系统管理员/总价值/刷新视图 **3 passed**。`c8cba7a7e`
+- Q2333：preview 待审批/导出数据/净值 **3 passed**。
 
