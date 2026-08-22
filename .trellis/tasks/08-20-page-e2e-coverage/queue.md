@@ -1797,4 +1797,5 @@
 | Q2607 | done | 桌面空态 **3 passed**（/bigscreen 2350/8800/2100）。禁 /m。 |
 | Q2608 | done | 桌面空态 **3 passed**（/bigscreen 10.77/5.78/12.24）。禁 /m。 |
 | Q2609 | done | 桌面空态 **3 passed**（/bigscreen 75.2%/18/32）。禁 /m。 |
-| Q2610 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2610 | done | 桌面空态 **3 passed**（/bigscreen 0.22↑/1.46↑/0.00-）。禁 /m。 |
+| Q2611 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
