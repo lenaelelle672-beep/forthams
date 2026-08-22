@@ -1987,4 +1987,5 @@
 | Q2797 | done | 桌面空态 **3 passed**（/workorders/new 提交工单/取消/标题）。禁 /m。 |
 | Q2798 | done | 桌面空态 **3 passed**（/workorders/new 基本信息/详细信息/人员安排 heading）。禁 /m。 |
 | Q2799 | done | 桌面空态 **3 passed**（/workorders/new 优先级/资产关联/附件 heading）。禁 /m。 |
-| Q2800 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2800 | done | 桌面空态 **3 passed**（/workorders/new 处理提示/标题placeholder/资产搜索）。禁 /m。 |
+| Q2801 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

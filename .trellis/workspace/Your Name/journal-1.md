@@ -907,5 +907,6 @@
 - Q2796：/stocktaking-cycles/new 标题/保存/返回列表 **3 passed**。全盘点 option 关闭不可见。`c10b3967f`
 - Q2797：/workorders/new 提交工单/取消/标题 **3 passed**。`e33953273`
 - Q2798：/workorders/new 基本信息/详细信息/人员安排 heading **3 passed**。`4b663b2d3`
-- Q2799：/workorders/new 优先级/资产关联/附件 heading **3 passed**。
+- Q2799：/workorders/new 优先级/资产关联/附件 heading **3 passed**。`fe4f74924`
+- Q2800：/workorders/new 处理提示/标题placeholder/资产搜索 **3 passed**。
 
