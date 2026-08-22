@@ -1008,4 +1008,6 @@
 | Q1818 | done | 桌面空态 **3 passed**（/insurances/1「已赔付金额」「赔付日期」「事故描述」）。禁 /m。 |
 | Q1819 | done | 桌面空态 **3 passed**（/insurances/1「已过期」「已取消」「待处理」）。禁 /m。 |
 | Q1820 | done | 桌面空态 **3 passed**（/insurances/1「已批准」「已拒绝」「创建时间」）。禁 /m。 |
-| Q1821 | in_progress | 桌面空态：/insurances/1 详情操作未覆盖 3 条（读 InsuranceDetailPage extra：编辑/返回；Descriptions「保单号」）。禁 /m。 |
+| Q1821 | done | 桌面空态 **3 passed**（/insurances/1「编辑」「返回」「保单号」）。禁 /m。 |
+| Q1822 | done | 桌面空态 **3 passed**（/insurances/1「保险名称」「保险类型」「保险公司」）。禁 /m。 |
+| Q1823 | in_progress | 桌面空态：/insurances/1 Descriptions 未覆盖 3 条（读 InsuranceDetailPage：保费/保额/免赔额）。禁 /m。 |

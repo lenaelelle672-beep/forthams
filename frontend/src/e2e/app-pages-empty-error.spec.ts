@@ -10556,6 +10556,90 @@ test.describe('Q1820 桌面保险理赔状态空态', () => {
   });
 });
 
+test.describe('Q1821 桌面保险详情操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1 空态「编辑」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByRole('button', { name: '编辑' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「返回」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByRole('button', { name: '返回' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「保单号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('保单号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q1822 桌面保险详情字段空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1 空态「保险名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('保险名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「保险类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('保险类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「保险公司」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('保险公司').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q1823 桌面保险详情金额空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1 空态「保费」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('保费').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「保额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('保额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「免赔额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('免赔额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
