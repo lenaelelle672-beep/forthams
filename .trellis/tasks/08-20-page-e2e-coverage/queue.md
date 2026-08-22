@@ -1648,4 +1648,5 @@
 | Q2458 | done | 桌面空态 **3 passed**（/gis heading/副标题/资产定位管理）。禁 /m。 |
 | Q2459 | done | 桌面空态 **3 passed**（/gis 数据来源/关联资产 + /analytics heading）。禁 /m。 |
 | Q2460 | done | 桌面空态 **3 passed**（/analytics 副标题/数据范围/近12个月）。禁 /m。 |
-| Q2461 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2461 | done | 桌面空态 **3 passed**（/analytics 价值趋势/分类分布/页脚）。禁 /m。 |
+| Q2462 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
