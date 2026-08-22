@@ -10780,6 +10780,50 @@ test.describe('Q1828 桌面备件字段空态', () => {
   });
 });
 
+test.describe('Q1829 桌面备件状态变体空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/spare-parts/1 详情「停用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/1');
+    await expect(page.getByText('停用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/1 详情「启用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/spare-parts/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, partName:'E2E备件', partNo:'SP-001', currentStock:1, safetyStock:0, status:'ENABLED', unit:'个' } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/spare-parts/1');
+    await expect(page.getByText('启用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/1 详情「缺货」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/spare-parts/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, partName:'E2E备件', partNo:'SP-001', currentStock:1, safetyStock:5, status:'ENABLED', unit:'个' } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/spare-parts/1');
+    await expect(page.getByText('缺货').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
