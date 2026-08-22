@@ -995,4 +995,5 @@
 | Q1805 | done | 桌面空态 **3 passed**（/budgets/new「维保预算」「运营预算」「已审批」）。禁 /m。 |
 | Q1806 | done | 桌面空态 **3 passed**（/budgets/new「已关闭」、/budgets/1「预算执行进度」「审批人」）。禁 /m。 |
 | Q1807 | done | 桌面空态 **3 passed**（/budgets/1「预算详情」「基本信息」「预算总额」）。禁 /m。 |
-| Q1808 | in_progress | 桌面空态：/budgets/1「已使用」「已承诺」「剩余」。禁 /m。 |
+| Q1808 | done | 桌面空态 **3 passed**（/budgets/1「已使用」「已承诺」「剩余」）。禁 /m。 |
+| Q1809 | in_progress | 桌面空态：/budgets/1「执行率」「编辑」「删除」。禁 /m。 |
