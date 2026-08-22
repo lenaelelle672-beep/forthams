@@ -508,5 +508,6 @@
 - Q2397：/intake 搜索 placeholder/搜索/暂无验收单 **3 passed**。`e8ff1daad`
 - Q2398：/intake 待质检/质检中/部分验收 **3 passed**。`5bb1c32ff`
 - Q2399：/intake 已验收/草稿/已驳回 **3 passed**。`76025050d`
-- Q2400：/insurances heading/保单/新增保险 **3 passed**。
+- Q2400：/insurances heading/保单/新增保险 **3 passed**。`951ed3b2a`
+- Q2401：/insurances 保单列表/台账管理/重置筛选 **3 passed**。
 

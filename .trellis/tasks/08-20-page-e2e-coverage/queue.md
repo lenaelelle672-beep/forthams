@@ -1588,4 +1588,5 @@
 | Q2398 | done | 桌面空态 **3 passed**（/intake 待质检/质检中/部分验收）。禁 /m。 |
 | Q2399 | done | 桌面空态 **3 passed**（/intake 已验收/草稿/已驳回）。禁 /m。 |
 | Q2400 | done | 桌面空态 **3 passed**（/insurances heading/保单/新增保险）。禁 /m。 |
-| Q2401 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2401 | done | 桌面空态 **3 passed**（/insurances 保单列表/台账管理/重置筛选）。禁 /m。 |
+| Q2402 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
