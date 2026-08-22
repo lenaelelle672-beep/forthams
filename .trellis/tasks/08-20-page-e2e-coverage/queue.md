@@ -1078,4 +1078,5 @@
 | Q1888 | done | 桌面空态 **3 passed**（/inspection-records「待检验」「已过期/不通过」「搜索」）。禁 /m。 |
 | Q1889 | done | 桌面空态 **3 passed**（/inspection-records「重置」「至」+ placeholder「检验编号/检验机构/检验人」）。禁 /m。 |
 | Q1890 | done | 桌面空态 **3 passed**（/inspection-records 筛选「全部类型」「年度检验」「定期检验」）。禁 /m。 |
-| Q1891 | in_progress | 桌面空态：/inspection-records 筛选「专项检验」「全部结果」「不通过」。禁 /m。 |
+| Q1891 | done | 桌面空态 **3 passed**（/inspection-records 筛选「专项检验」「全部结果」「不通过」）。禁 /m。 |
+| Q1892 | in_progress | 桌面空态：/inspection-records「附条件通过」+ 列头「检验编号」「资产ID」。禁 /m。 |
