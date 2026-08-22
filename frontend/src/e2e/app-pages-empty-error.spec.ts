@@ -18025,6 +18025,34 @@ test.describe('Q2069 桌面安全检查执行工作台预填空态', () => {
   });
 });
 
+test.describe('Q2070 桌面安全检查执行工作台重点空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/execute 空态「温度 / 振动 / 电流」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('温度 / 振动 / 电流').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute 空态「高温点位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('高温点位').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute 空态「18 个高温点位待确认」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('18 个高温点位待确认').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
