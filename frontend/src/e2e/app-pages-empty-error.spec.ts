@@ -34284,6 +34284,33 @@ test.describe('Q2646 桌面登录5表单控件空态', () => {
   });
 });
 
+test.describe('Q2647 桌面登录5辅助控件空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+  });
+
+  test('/login5 空态 button「忘记密码?」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('button', { name: '忘记密码?' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态 checkbox「记住用户名」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('checkbox', { name: '记住用户名' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态 link「UNIVIEW 统一身份认证」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('link', { name: 'UNIVIEW 统一身份认证' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
