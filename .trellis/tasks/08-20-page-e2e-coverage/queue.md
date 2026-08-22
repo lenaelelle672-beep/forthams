@@ -1259,4 +1259,5 @@
 | Q2069 | done | 桌面空态 **3 passed**（/safety-checklists/execute?source=quick-safety 工作台/点检上下文/注塑机）。禁 /m。 |
 | Q2070 | done | 桌面空态 **3 passed**（execute?source=quick-safety「温度 / 振动 / 电流」「高温点位」「18 个高温点位待确认」）。禁 /m。 |
 | Q2071 | done | 桌面空态 **3 passed**（execute?source=quick-safety「资产：」「重点：」「来自固定资产工作台快捷入口」）。禁 /m。 |
-| Q2072 | in_progress | 桌面空态：execute?source=quick-safety「风险：」或说明后半。禁 /m。 |
+| Q2072 | done | 桌面空态 **3 passed**（execute?source=quick-safety「风险：」「建议优先核对」「现场安全规则命中点位」）。禁 /m。 |
+| Q2073 | in_progress | 桌面空态：/licenses 未覆盖可见文案。禁 /m。 |

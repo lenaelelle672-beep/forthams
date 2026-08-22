@@ -18081,6 +18081,34 @@ test.describe('Q2071 桌面安全检查执行工作台标签空态', () => {
   });
 });
 
+test.describe('Q2072 桌面安全检查执行工作台风险说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/execute 空态「风险：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('风险：').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute 空态「建议优先核对」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('建议优先核对').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/execute 空态「现场安全规则命中点位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/execute?source=quick-safety');
+    await expect(page.getByText('现场安全规则命中点位').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
