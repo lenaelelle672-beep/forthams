@@ -1804,4 +1804,5 @@
 | Q2614 | done | 桌面空态 **3 passed**（/bigscreen 关舱门/起飞/落地）。禁 /m。 |
 | Q2615 | done | 桌面空态 **3 passed**（/bigscreen-3d 降级 heading/WebGL 文案/面板提示）。禁 /m。 |
 | Q2616 | done | 桌面空态 **3 passed**（/bigscreen-3d 播放中/0.0万/42%）。禁 /m。 |
-| Q2617 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2617 | done | 桌面空态 **3 passed**（/bigscreen-3d 24%/21%/13%）。禁 /m。 |
+| Q2618 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

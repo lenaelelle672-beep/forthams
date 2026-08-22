@@ -724,5 +724,6 @@
 - Q2613：/bigscreen 12/75/13 **3 passed**。硬截止仍为 18:00。`7b93e439c`
 - Q2614：/bigscreen 关舱门/起飞/落地 **3 passed**。`eca99ce98`
 - Q2615：/bigscreen-3d 降级 heading/WebGL 文案/面板提示 **3 passed**。城市名在降级模式不可见。硬截止仍为 18:00。`1e510763c`
-- Q2616：/bigscreen-3d 播放中/0.0万/42% **3 passed**。
+- Q2616：/bigscreen-3d 播放中/0.0万/42% **3 passed**。`1224c40a4`
+- Q2617：/bigscreen-3d 24%/21%/13% **3 passed**。
 

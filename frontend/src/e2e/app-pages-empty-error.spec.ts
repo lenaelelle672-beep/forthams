@@ -33457,6 +33457,34 @@ test.describe('Q2616 桌面三维大屏降级指标空态', () => {
   });
 });
 
+test.describe('Q2617 桌面三维大屏分类占比空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen-3d 空态「24%」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('24%').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「21%」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('21%').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「13%」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('13%').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
