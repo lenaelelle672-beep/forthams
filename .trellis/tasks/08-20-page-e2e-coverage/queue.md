@@ -1822,4 +1822,5 @@
 | Q2632 | done | 桌面空态 **3 passed**（/forbidden 无权限说明/联系管理员/返回首页）。禁 /m。 |
 | Q2633 | done | 桌面空态 **3 passed**（/forbidden heading/返回上一页/无访问权限）。禁 /m。 |
 | Q2634 | done | 桌面空态 **3 passed**（/sso-callback 返回登录按钮/SSO失败/Token缺失）。禁 /m。 |
-| Q2635 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2635 | done | 桌面空态 **3 passed**（/dashboard 核心指标/运营首页 heading/总资产数）。禁 /m。 |
+| Q2636 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
