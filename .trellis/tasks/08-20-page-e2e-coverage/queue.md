@@ -1853,4 +1853,5 @@
 | Q2663 | done | 桌面空态 **3 passed**（/equipment 设备/日期/类型表头）。禁 /m。 |
 | Q2664 | done | 桌面空态 **3 passed**（/equipment 技术员/费用/操作表头）。禁 /m。 |
 | Q2665 | done | 桌面空态 **3 passed**（/fault-codes 新增根节点/标题/空态引导）。禁 /m。 |
-| Q2666 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2666 | done | 桌面空态 **3 passed**（/fault-codes 节点总数/故障现象/故障原因）。禁 /m。 |
+| Q2667 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
