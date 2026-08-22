@@ -609,5 +609,6 @@
 - Q2498：/assignments/new 长期领用/使用人/创建 **3 passed**。`5c46b12ec`
 - Q2499：/budgets/new 新增预算/创建记录/预算年度 **3 passed**。`b208f6515`
 - Q2500：/budgets/new 预算类型/采购预算/预算总额 **3 passed**。`97a9700c2`
-- Q2501：/budgets/new 部门ID/分类ID/返回列表 **3 passed**。
+- Q2501：/budgets/new 部门ID/分类ID/返回列表 **3 passed**。`7e07ca445`
+- Q2502：/intake/new 新建验收单/填写信息/验收单信息 **3 passed**。
 
