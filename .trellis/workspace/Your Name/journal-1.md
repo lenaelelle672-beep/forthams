@@ -516,5 +516,6 @@
 - Q2405：/insurances 全部类型/起始/结束 **3 passed**。`421a9479f`
 - Q2406：/spare-parts heading/备件/新增备件 **3 passed**。`2b3e21907`
 - Q2407：/spare-parts 备件列表/库存管理/总数 **3 passed**。`0d8405ad7`
-- Q2408：/spare-parts 库存告警/已启用/搜索 **3 passed**。
+- Q2408：/spare-parts 库存告警/已启用/搜索 **3 passed**。`82884b93b`
+- Q2409：/spare-parts 库存总价值/搜索/空表 **3 passed**。
 
