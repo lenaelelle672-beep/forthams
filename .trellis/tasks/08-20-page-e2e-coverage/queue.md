@@ -1907,4 +1907,5 @@
 | Q2717 | done | 桌面空态 **3 passed**（/budgets 年度/类型/预算总额表头）。禁 /m。 |
 | Q2718 | done | 桌面空态 **3 passed**（/budgets 剩余/已使用/已承诺表头）。禁 /m。 |
 | Q2719 | done | 桌面空态 **3 passed**（/budgets 状态/操作表头/超支告警）。禁 /m。 |
-| Q2720 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2720 | done | 桌面空态 **3 passed**（/budgets 合同锁定/运营/0项预算）。禁 /m。 |
+| Q2721 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
