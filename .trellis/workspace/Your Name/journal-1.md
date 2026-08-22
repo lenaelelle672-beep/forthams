@@ -391,5 +391,6 @@
 - Q2280：分类分布/维保预警/最近工单 **3 passed**。`4ca1aafbf`
 - Q2281：净值/部门资产统计/查看全部 **3 passed**。`d23caf46a`
 - Q2282：总价值/Top5/近12个月 **3 passed**。`71a1c3f02`
-- Q2283：workbench?menu=home 总价值/Top5/近12个月。
+- Q2283：workbench?menu=home 总价值/Top5/近12个月。`ef25c0b1c`
+- Q2284：workbench/assets 台账/新建/资产总览 **3 passed**。
 
