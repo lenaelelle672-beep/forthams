@@ -10860,6 +10860,62 @@ test.describe('Q1830 桌面备件编码与领用空态', () => {
   });
 });
 
+test.describe('Q1831 桌面入库详情空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/1 空态「验收单详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByRole('heading', { name: '验收单详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 空态「基本信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByRole('heading', { name: '基本信息' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 空态「验收单号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByText('验收单号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q1832 桌面入库详情字段空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/1 空态「验收日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByText('验收日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 空态「总金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByText('总金额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 空态「创建时间」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByText('创建时间').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
