@@ -741,5 +741,6 @@
 - Q2630：/403 heading/返回上一页/返回首页按钮 **3 passed**。`197d65d47`
 - Q2631：/404 全文/404/页面不存在 **3 passed**。`d063ca063`
 - Q2632：/forbidden 无权限说明/联系管理员/返回首页 **3 passed**。`364622b98`
-- Q2633：/forbidden heading/返回上一页/无访问权限 **3 passed**。
+- Q2633：/forbidden heading/返回上一页/无访问权限 **3 passed**。`9db0ec824`
+- Q2634：/sso-callback 返回登录按钮/SSO失败/Token缺失 **3 passed**。无 seedSession。
 

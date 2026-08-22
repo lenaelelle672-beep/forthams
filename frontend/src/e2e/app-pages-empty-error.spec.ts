@@ -33928,6 +33928,33 @@ test.describe('Q2633 桌面forbidden标题返回空态', () => {
   });
 });
 
+test.describe('Q2634 桌面SSO回调失败按钮空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+  });
+
+  test('/sso-callback 空态 button「返回登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByRole('button', { name: '返回登录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sso-callback 空态「SSO 登录失败」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('SSO 登录失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sso-callback 空态「Token 缺失，SSO 登录失败」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('Token 缺失，SSO 登录失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
