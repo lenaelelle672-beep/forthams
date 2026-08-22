@@ -890,5 +890,6 @@
 - Q2779：/budgets/new 部门ID/分类ID/创建预算 **3 passed**。`2e6d4506f`
 - Q2780：/budgets/new 取消/状态/取消文案 **3 passed**。采购预算/草稿是关闭 option。`87bd6fc88`
 - Q2781：/revaluations/new 返回列表/标题/副标题 **3 passed**。`324b6a98d`
-- Q2782：/revaluations/new 查找/类型/提交申请 **3 passed**。
+- Q2782：/revaluations/new 查找/类型/提交申请 **3 passed**。`58022c080`
+- Q2783：/revaluations/new 新值/原因说明/证据材料 **3 passed**。
 
