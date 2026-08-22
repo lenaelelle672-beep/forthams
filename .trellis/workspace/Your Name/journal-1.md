@@ -461,5 +461,6 @@
 - Q2350：/assets 空表文案/待退役/维修中 **3 passed**。`3042d3223`
 - Q2351：/assets 已退役/已报废/已清退 **3 passed**。`0be537c7b`
 - Q2352：/assets 闲置/条资产/本页 **3 passed**。`639dcbff7`
-- Q2353：/approvals heading/发起申请/待我审批 **3 passed**。
+- Q2353：/approvals heading/发起申请/待我审批 **3 passed**。`3bace6256`
+- Q2354：/approvals 我发起的/已通过/待审批 **3 passed**。
 

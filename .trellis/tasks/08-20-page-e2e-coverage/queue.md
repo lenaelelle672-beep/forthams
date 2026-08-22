@@ -1541,4 +1541,5 @@
 | Q2351 | done | 桌面空态 **3 passed**（/assets 已退役/已报废/已清退）。禁 /m。 |
 | Q2352 | done | 桌面空态 **3 passed**（/assets 闲置/条资产/本页）。禁 /m。 |
 | Q2353 | done | 桌面空态 **3 passed**（/approvals heading/发起申请/待我审批）。禁 /m。 |
-| Q2354 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2354 | done | 桌面空态 **3 passed**（/approvals 我发起的/已通过/待审批）。禁 /m。 |
+| Q2355 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
