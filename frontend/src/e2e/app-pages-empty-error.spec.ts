@@ -27891,6 +27891,34 @@ test.describe('Q2418 桌面采购订单状态筛选空态', () => {
   });
 });
 
+test.describe('Q2419 桌面故障代码标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fault-codes 空态 heading「故障代码管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByRole('heading', { name: '故障代码管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes 空态「故障树」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByText('故障树').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes 空态「新增根节点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByText('新增根节点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
