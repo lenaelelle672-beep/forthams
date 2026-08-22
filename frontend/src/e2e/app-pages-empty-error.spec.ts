@@ -35705,6 +35705,34 @@ test.describe('Q2697 桌面通知中心操作空态', () => {
   });
 });
 
+test.describe('Q2698 桌面通知中心分类空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/notifications 空态「审批通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('审批通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「预警通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('预警通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「系统通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByText('系统通知').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
