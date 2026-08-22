@@ -429,5 +429,6 @@
 - Q2318：待处理维修/累计折旧/导出PDF **3 passed**。`8e4786ed7`
 - Q2319：未找到记录/调整筛选/资产列表 **3 passed**。`5d782d101`
 - Q2320：搜索 placeholder/资产管理/我的资产 **3 passed**。`57ecbb857`
-- Q2321：顶栏 title 全屏/密度/通知。settings 菜单未切。
+- Q2321：顶栏 title 全屏/密度/通知。settings 菜单未切。`aec102e7a`
+- Q2322：个人中心 title/快捷操作/工作台菜单 **3 passed**。
 
