@@ -11329,6 +11329,34 @@ test.describe('Q1841 桌面领用编辑空态', () => {
   });
 });
 
+test.describe('Q1842 桌面借用编辑空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/borrows/1/edit 空态「编辑借用单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1/edit');
+    await expect(page.getByRole('heading', { name: '编辑借用单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/1/edit 空态「保存修改」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1/edit');
+    await expect(page.getByRole('button', { name: '保存修改' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/1/edit 空态「返回」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1/edit');
+    await expect(page.getByRole('button', { name: '返回' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
