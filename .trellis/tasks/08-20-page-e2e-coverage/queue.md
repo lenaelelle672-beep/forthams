@@ -1022,4 +1022,5 @@
 | Q1832 | done | 桌面空态 **3 passed**（/intake/1「验收日期」「总金额」「创建时间」）。禁 /m。 |
 | Q1833 | done | 桌面空态 **3 passed**（/intake/1「检查项」「入库资产列表」「状态」）。禁 /m。 |
 | Q1834 | done | 桌面空态 **3 passed**（/intake/1「提交验收」「取消」「验收通过」）。禁 /m。 |
-| Q1835 | in_progress | 桌面空态：/intake/1 操作按钮 3 条（读 IntakeDetailPage：PENDING_INSPECT「保存质检结果」「驳回」；失败态「返回列表」）。禁 /m。 |
+| Q1835 | done | 桌面空态 **3 passed**（/intake/1「保存质检结果」「驳回」、失败态「返回列表」）。禁 /m。 |
+| Q1836 | in_progress | 桌面空态：/intake/1 StatusBadge 3 条（读 INTAKE_STATUS_CONFIG：草稿/待质检/质检中，须 mock status）。禁 /m。 |

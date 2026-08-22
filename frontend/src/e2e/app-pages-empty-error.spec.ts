@@ -10996,6 +10996,51 @@ test.describe('Q1834 桌面入库详情操作空态', () => {
   });
 });
 
+test.describe('Q1835 桌面入库详情操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/1 待质检「保存质检结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'PENDING_INSPECT' } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByRole('button', { name: '保存质检结果' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 待质检「驳回」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'PENDING_INSPECT' } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByRole('button', { name: '驳回' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 失败态「返回列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/intake-orders/1'));
+    await page.goto('/intake/1');
+    await expect(page.getByRole('button', { name: '返回列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
