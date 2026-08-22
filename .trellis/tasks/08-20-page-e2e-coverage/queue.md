@@ -1374,4 +1374,5 @@
 | Q2184 | done | 桌面空态 **3 passed**（/disposals/clearance/new「紧急」exact、「审批流程」「备注」）。禁 /m。 |
 | Q2185 | done | 桌面空态 **3 passed**（/disposals/clearance/new「取消」、风险正文、备注 placeholder）。禁 /m。 |
 | Q2186 | done | 桌面空态 **3 passed**（/disposals/scrap/new「资产报废申请」「填写信息」「选择资产」）。禁 /m。 |
-| Q2187 | in_progress | 桌面空态：/disposals/scrap/new「报废配置」「确认提交」。禁 /m。 |
+| Q2187 | done | 桌面空态 **3 passed**（/disposals/scrap/new「报废配置」「确认提交」「基本信息」）。禁 /m。 |
+| Q2188 | in_progress | 桌面空态：/disposals/scrap/new「报废编号」「申请人」「报废原因」。禁 /m。 |
