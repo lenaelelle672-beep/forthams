@@ -407,5 +407,6 @@
 - Q2296：dashboard 完整趋势/Top5/欢迎回来 **3 passed**。`245923646`
 - Q2297：profile SUPER_ADMIN/套餐/ADMIN。h1 不是系统管理员。`61440fce3`
 - Q2298：岗位 metadata-only/no-persistence/no-assignment **3 passed**。`0a484fbdb`
-- Q2299：no-permission-effect/preview/CUSTOM **3 passed**。
+- Q2299：no-permission-effect/preview/CUSTOM **3 passed**。`958f1ac04`
+- Q2300：dataScope/部门清单/角色数据范围 **3 passed**。
 

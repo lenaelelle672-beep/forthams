@@ -1487,4 +1487,5 @@
 | Q2297 | done | 桌面空态 **3 passed**（/profile SUPER_ADMIN/当前套餐/ADMIN。heading 名不是系统管理员）。禁 /m。 |
 | Q2298 | done | 桌面空态 **3 passed**（v3 岗位 metadata-only/no-persistence/no-assignment）。禁 /m。 |
 | Q2299 | done | 桌面空态 **3 passed**（v3 no-permission-effect/preview/CUSTOM）。禁 /m。 |
-| Q2300 | in_progress | 桌面空态：/fixed-assets/workbenchv3「可收紧 dataScope」。禁 /m。 |
+| Q2300 | done | 桌面空态 **3 passed**（v3 可收紧 dataScope/部门清单/角色数据范围）。禁 /m。 |
+| Q2301 | in_progress | 桌面空态：继续 V3 组织权限描述。禁 /m。 |
