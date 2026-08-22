@@ -2002,4 +2002,5 @@
 | Q2812 | done | 桌面空态 **3 passed**（/assets/new 经度/原值/净值标签）。禁 /m。 |
 | Q2813 | done | 桌面空态 **3 passed**（/assets/new 保修期/折旧率/资产状态）。禁 /m。 |
 | Q2814 | done | 桌面空态 **3 passed**（/assets/new 规格型号/部门位置/描述备注）。禁 /m。 |
-| Q2815 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2815 | done | 桌面空态 **3 passed**（/assets/new 500字/资产描述/200字）。禁 /m。 |
+| Q2816 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
