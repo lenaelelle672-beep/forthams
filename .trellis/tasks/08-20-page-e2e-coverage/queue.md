@@ -1264,4 +1264,5 @@
 | Q2074 | done | 桌面空态 **3 passed**（/licenses 列头「类型」「厂商」「版本」）。禁 /m。 |
 | Q2075 | done | 桌面空态 **3 passed**（/licenses 列头「到期日期」「状态」「操作」）。禁 /m。 |
 | Q2076 | done | 桌面空态 **3 passed**（/licenses「软件许可证管理」「状态：」「全部」）。禁 /m。 |
-| Q2077 | in_progress | 桌面空态：/licenses 筛选「有效」「已到期」「暂停」。禁 /m。 |
+| Q2077 | done | 桌面空态 **3 passed**（/licenses 筛选「有效」「已到期」「暂停」）。禁 /m。 |
+| Q2078 | in_progress | 桌面空态：/licenses 点新增「到期日期」或「¥」，或 /sam 剩余。禁 /m。 |
