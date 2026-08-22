@@ -631,5 +631,6 @@
 - Q2520：/workorders/new 上传文件/处理提示/提交工单 **3 passed**。`e30a13c93`
 - Q2521：/workorders/new 搜索资产/填写参考/取消 **3 passed**。`4e97e87f3`
 - Q2522：/risk-assessments/new 新增风险评估/资产ID/placeholder **3 passed**。`281b9a77d`
-- Q2523：/risk-assessments/new 可能性/影响程度/缓解措施 **3 passed**。
+- Q2523：/risk-assessments/new 可能性/影响程度/缓解措施 **3 passed**。`341464687`
+- Q2524：/risk-assessments/new 缓解placeholder/评审日期/评估人ID **3 passed**。
 
