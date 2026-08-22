@@ -534,5 +534,6 @@
 - Q2423：/maintenance/plans heading/副标题/新建计划 **3 passed**。`bc27bceb3`
 - Q2424：/maintenance/plans 搜索/空表 **3 passed**。`7a7c0789e`
 - Q2425：/maintenance/plans 刷新/全部状态/暂停 **3 passed**。`f4d4133b1`
-- Q2426：/stocktaking-cycles heading/副标题/新建周期 **3 passed**。
+- Q2426：/stocktaking-cycles heading/副标题/新建周期 **3 passed**。`099c765bd`
+- Q2427：/stocktaking-cycles 总周期/已计划/空表 **3 passed**。
 
