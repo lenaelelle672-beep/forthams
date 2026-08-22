@@ -1608,4 +1608,5 @@
 | Q2418 | done | 桌面空态 **3 passed**（/purchase-orders 刷新/全部状态/部分收货）。禁 /m。 |
 | Q2419 | done | 桌面空态 **3 passed**（/fault-codes heading/故障树/新增根节点）。禁 /m。 |
 | Q2420 | done | 桌面空态 **3 passed**（/fault-codes 故障代码/三级体系/现象原因措施）。禁 /m。 |
-| Q2421 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2421 | done | 桌面空态 **3 passed**（/fault-codes 暂无代码/节点总数/故障现象）。禁 /m。 |
+| Q2422 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
