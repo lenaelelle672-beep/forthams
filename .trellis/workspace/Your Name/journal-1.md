@@ -687,5 +687,6 @@
 - Q2576：/workflow-form/ASSET_RETIREMENT 编码/未配置/直接发起 **3 passed**。`ae5566bdb`
 - Q2577：/workflow-form ASSET_RETIREMENT 源码提示 + COMPENSATION/TRANSFER 编码 **3 passed**。`7b550cf2c`
 - Q2578：/workflow-form 清退/报废 编码 + COMPENSATION 源码提示 **3 passed**。`2efdf8782`
-- Q2579：/bigscreen 今日新增/借用/调拨 **3 passed**。
+- Q2579：/bigscreen 今日新增/借用/调拨 **3 passed**。`65b903d7c`
+- Q2580：/bigscreen 昨日取消/盘点/返库 **3 passed**。
 
