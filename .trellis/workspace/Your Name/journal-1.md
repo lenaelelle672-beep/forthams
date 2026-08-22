@@ -559,5 +559,6 @@
 - Q2448：/asset-models 全部模型/正常/停用 **3 passed**。`434308200`
 - Q2449：/asset-models 搜索/全部分类/全部制造商 **3 passed**。`c99c382d0`
 - Q2450：/inspection-records heading/副标题/批量生成 **3 passed**。`7ce6aff66`
-- Q2451：/inspection-records 总记录/待检验/已过期不通过 **3 passed**。
+- Q2451：/inspection-records 总记录/待检验/已过期不通过 **3 passed**。`0777e86ed`
+- Q2452：/inspection-records 新增检验/搜索/空表 **3 passed**。
 
