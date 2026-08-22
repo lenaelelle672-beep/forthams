@@ -1012,4 +1012,6 @@
 | Q1822 | done | 桌面空态 **3 passed**（/insurances/1「保险名称」「保险类型」「保险公司」）。禁 /m。 |
 | Q1823 | done | 桌面空态 **3 passed**（/insurances/1「保费」「保额」「免赔额」）。禁 /m。 |
 | Q1824 | done | 桌面空态 **3 passed**（/insurances/1「开始日期」「结束日期」「备注」）。禁 /m。 |
-| Q1825 | in_progress | 桌面空态：/spare-parts/1 详情未覆盖文案 3 条（读 SparePartDetailPage 详情分支硬编码中文，禁 /m）。 |
+| Q1825 | done | 桌面空态 **3 passed**（/spare-parts/1「返回」「编辑」「当前库存」）。禁 /m。 |
+| Q1826 | done | 桌面空态 **3 passed**（/spare-parts/1「安全库存」「库存状态」「库存正常」）。禁 /m。 |
+| Q1827 | in_progress | 桌面空态：/spare-parts/1 基本信息未覆盖 3 条（读 SparePartDetailPage：基本信息/备件编码/规格型号）。禁 /m。 |
