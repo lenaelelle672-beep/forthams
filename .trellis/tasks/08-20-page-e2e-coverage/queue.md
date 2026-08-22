@@ -1153,4 +1153,5 @@
 | Q1963 | done | 桌面空态 **3 passed**（/report-builder「报表名称」「报表类型」「图表类型」）。禁 /m。 |
 | Q1964 | done | 桌面空态 **3 passed**（/report-builder「已选字段」「生成预览」「保存报表」）。禁 /m。 |
 | Q1965 | done | 桌面空态 **3 passed**（/report-builder「数据预览」「表格」「柱状图」）。禁 /m。 |
-| Q1966 | in_progress | 桌面空态：/report-builder「折线图」「饼图」+ placeholder「输入报表名称」。禁 /m。 |
+| Q1966 | done | 桌面空态 **3 passed**（/report-builder「折线图」「饼图」+ placeholder「输入报表名称」）。禁 /m。 |
+| Q1967 | in_progress | 桌面空态：/report-builder 字段「资产编码」「资产名称」「资产分类」。禁 /m。 |
