@@ -1724,4 +1724,5 @@
 | Q2534 | done | 桌面空态 **3 passed**（/intake/new 型号/序列号/供应商）。禁 /m。 |
 | Q2535 | done | 桌面空态 **3 passed**（/intake/new 选择分类/0.00/资产备注）。禁 /m。 |
 | Q2536 | done | 桌面空态 **3 passed**（/intake/new 选择地点/12/入库资产）。禁 /m。 |
-| Q2537 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2537 | done | 桌面空态 **3 passed**（/intake/new 资产#1/添加/资产名称*）。禁 /m。 |
+| Q2538 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
