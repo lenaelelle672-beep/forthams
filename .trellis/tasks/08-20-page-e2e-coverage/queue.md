@@ -1676,4 +1676,5 @@
 | Q2486 | done | 桌面空态 **3 passed**（/workflows 返回处置/从模板创建/流程总数）。禁 /m。 |
 | Q2487 | done | 桌面空态 **3 passed**（/workflows 全部业务流程/可用于发起/待完善发布）。禁 /m。 |
 | Q2488 | done | 桌面空态 **3 passed**（/workflows 暂停发起/搜索/草稿中）。禁 /m。 |
-| Q2489 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2489 | done | 桌面空态 **3 passed**（/workflows 已发布/已停用 + /compensation/new 赔偿编号）。禁 /m。 |
+| Q2490 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
