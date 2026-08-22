@@ -1238,4 +1238,5 @@
 | Q2048 | done | 桌面空态 **3 passed**（/fault-codes 点新增「取消」、/categories「分类结构」、点添加根分类说明）。禁 /m。 |
 | Q2049 | done | 桌面空态 **3 passed**（/categories 点添加根分类「分类名称」「分类编码」与名称 placeholder）。禁 /m。 |
 | Q2050 | done | 桌面空态 **3 passed**（/categories 点添加根分类编码 placeholder、「创建」「取消」）。禁 /m。 |
-| Q2051 | in_progress | 桌面空态：/locations 未测标题/表头或新建弹窗。禁 /m。 |
+| Q2051 | done | 桌面空态 **3 passed**（/purchase-orders「全部状态」「待审批」「刷新」）。禁 /m。 |
+| Q2052 | in_progress | 桌面空态：/purchase-orders 点新增采购单表单。禁 /m。 |
