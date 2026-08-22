@@ -1162,4 +1162,5 @@
 | Q1972 | done | 桌面空态 **3 passed**（/report-builder 字段「能耗费用」「总成本」+ 分组「财务」）。禁 /m。 |
 | Q1973 | done | 桌面空态 **3 passed**（/report-builder 分组「资产」「运维」+ 字段「状态」；option「资产报表」hidden）。禁 /m。 |
 | Q1974 | done | 桌面空态 **3 passed**（/analytics/tco「资产 TCO 构成」「请输入资产ID查询」「资产ID」）。禁 /m。 |
-| Q1975 | in_progress | 桌面空态：/analytics/tco「部门ID」「分类ID」+ 其余卡片标题（读页确认）。禁 /m。 |
+| Q1975 | done | 桌面空态 **3 passed**（/analytics/tco「TCO 趋势 (近12个月)」「部门 TCO 排行」「请先查询资产」）。禁 /m。 |
+| Q1976 | in_progress | 桌面空态：/analytics/tco「分类 TCO 排行」「请输入部门ID查询」「请输入分类ID查询」。禁 /m。 |
