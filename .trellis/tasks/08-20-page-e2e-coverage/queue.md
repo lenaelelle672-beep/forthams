@@ -1715,4 +1715,5 @@
 | Q2525 | done | 桌面空态 **3 passed**（/risk-assessments/new 评估人placeholder/创建/风险等级）。禁 /m。 |
 | Q2526 | done | 桌面空态 **3 passed**（/risk-assessments/new 取消/1-极低 + /workorders/new 填写说明）。禁 /m。 |
 | Q2527 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 返回列表/保存 + /risk-assessments/new 1-极小）。禁 /m。 |
-| Q2528 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2528 | done | 桌面空态 **3 passed**（/disposals/transfer/new 调拨说明 + /workorders/new 紧急/高）。禁 /m。 |
+| Q2529 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
