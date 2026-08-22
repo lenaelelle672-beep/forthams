@@ -447,5 +447,6 @@
 - Q2336：vendor-portal heading/placeholder/登录按钮 **3 passed**。`0bc8f3241`
 - Q2337：密码 placeholder/门户/编码 **3 passed**。`0ed536dac`
 - Q2338：/403 heading/返回上一页/返回首页 **3 passed**。`c4d9d9c49`
-- Q2339：/404 完整标题拆分 **3 passed**。
+- Q2339：/404 完整标题拆分 **3 passed**。`72bac44c3`
+- Q2340：dashboard heading/总资产数/在用资产 **3 passed**。
 
