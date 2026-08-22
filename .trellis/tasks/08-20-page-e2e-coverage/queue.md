@@ -1207,4 +1207,5 @@
 | Q2017 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_TRANSFER「ASSET_TRANSFER」「该流程尚未配置表单源码」「直接发起申请」）。禁 /m。 |
 | Q2018 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_CLEARANCE、ASSET_SCRAP、RETIREMENT 编码标题）。禁 /m。 |
 | Q2019 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_COMPENSATION 编码 + 设计器表单源码提示 +「直接发起申请」）。禁 /m。 |
-| Q2020 | in_progress | 桌面空态：切下一桌面页 /categories 未测文案。禁 /m。 |
+| Q2020 | done | 桌面空态 **3 passed**（/manufacturers「正常」「停用」「状态：」）。禁 /m。 |
+| Q2021 | in_progress | 桌面空态：/manufacturers 点新增「备注」；或 /vendors 未测文案。禁 /m。 |
