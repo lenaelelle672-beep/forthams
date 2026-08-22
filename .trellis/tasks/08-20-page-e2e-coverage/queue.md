@@ -1997,4 +1997,5 @@
 | Q2807 | done | 桌面空态 **3 passed**（/assets/new 纬度/经度/RFID placeholder）。禁 /m。 |
 | Q2808 | done | 桌面空态 **3 passed**（/assets/new 原值/净值/保修期 placeholder）。禁 /m。 |
 | Q2809 | done | 桌面空态 **3 passed**（/assets/new 折旧率/描述/备注 placeholder）。禁 /m。 |
-| Q2810 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2810 | done | 桌面空态 **3 passed**（/assets/new 资产名称/分类/重要设备）。禁 /m。 |
+| Q2811 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
