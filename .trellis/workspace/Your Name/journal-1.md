@@ -592,5 +592,6 @@
 - Q2481：/system/posts heading/岗位/新增岗位 **3 passed**。`9cd12b871`
 - Q2482：/system/posts 岗位列表/总量/空表 **3 passed**。`08ec32333`
 - Q2483：/system/custom-fields heading/副标题/搜索 **3 passed**。`c78775e56`
-- Q2484：自定义字段空表 + 字段集标题/搜索 **3 passed**。
+- Q2484：自定义字段空表 + 字段集标题/搜索 **3 passed**。`9c572f22d`
+- Q2485：/workflows heading/副标题/新建流程 **3 passed**。
 
