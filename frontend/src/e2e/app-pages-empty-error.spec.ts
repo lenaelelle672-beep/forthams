@@ -30356,6 +30356,34 @@ test.describe('Q2506 桌面备件申请标题空态', () => {
   });
 });
 
+test.describe('Q2507 桌面备件申请库存信息空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/spare-parts/new 空态「当前库存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('当前库存').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/new 空态「安全库存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('安全库存').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/new 空态「申请信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('申请信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

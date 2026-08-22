@@ -614,5 +614,6 @@
 - Q2503：/intake/new 验收日期/供应商/选择供应商 **3 passed**。`e4962e4bf`
 - Q2504：/insurances/new 新增保险/保单号/placeholder **3 passed**。`dbfbb3b7f`
 - Q2505：/insurances/new 保险名称/placeholder/类型 **3 passed**。`ec4d86d6a`
-- Q2506：/spare-parts/new 备件申请/描述/返回 **3 passed**。
+- Q2506：/spare-parts/new 备件申请/描述/返回 **3 passed**。`92ac8aaba`
+- Q2507：/spare-parts/new 当前库存/安全库存/申请信息 **3 passed**。
 
