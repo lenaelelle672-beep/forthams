@@ -1042,4 +1042,5 @@
 | Q1852 | done | 桌面空态 **3 passed**（/inspections/1/upload「检验照片上传」「上传新照片」「选择照片」）。禁 /m。 |
 | Q1853 | done | 桌面空态 **3 passed**（/inspections/1/upload「已上传照片」「暂无已上传的照片」「返回详情页」）。禁 /m。 |
 | Q1854 | done | 桌面空态 **3 passed**（/inspections/1/upload「检验记录列表」「检验记录详情」「照片上传」）。禁 /m。 |
-| Q1855 | in_progress | 桌面空态：/inspections/1/upload 未覆盖 3 条（读 InspectionUploadPage：检验编号:/共 0 张 + /inspections/1 详情页未覆盖首条）。禁 /m。 |
+| Q1855 | done | 桌面空态 **3 passed**（/inspections/1/upload「检验编号:」「共 0 张」「INSP-001」）。禁 /m。 |
+| Q1856 | in_progress | 桌面空态：/inspections/1 未覆盖 3 条（读 InspectionDetailPage：检验详情/编辑/检验编号）。禁 /m。 |
