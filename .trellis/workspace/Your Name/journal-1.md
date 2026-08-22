@@ -544,5 +544,6 @@
 - Q2433：/revaluations 总记录/已拒绝/空表 **3 passed**。`d834ba8dc`
 - Q2434：/revaluations 合计/需及时处理/本期已审批 **3 passed**。`592de7cea`
 - Q2435：/budgets heading/资产预算/新增预算 **3 passed**。`28fbb8d3e`
-- Q2436：/budgets 总预算/已使用/已承诺 **3 passed**。
+- Q2436：/budgets 总预算/已使用/已承诺 **3 passed**。`069ec4c1e`
+- Q2437：/budgets 执行率/预算列表/空表 **3 passed**。
 
