@@ -529,5 +529,6 @@
 - Q2418：/purchase-orders 刷新/全部状态/部分收货 **3 passed**。`0ead88ed8`
 - Q2419：/fault-codes heading/故障树/新增根节点 **3 passed**。`e6e4f3e28`
 - Q2420：/fault-codes 故障代码/三级体系/现象原因措施 **3 passed**。`610fc587a`
-- Q2421：/fault-codes 暂无代码/节点总数/故障现象 **3 passed**。
+- Q2421：/fault-codes 暂无代码/节点总数/故障现象 **3 passed**。`f0a948ca9`
+- Q2422：/fault-codes 故障原因/解决措施/空树描述 **3 passed**。
 
