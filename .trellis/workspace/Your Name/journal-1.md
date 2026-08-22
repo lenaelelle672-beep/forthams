@@ -841,5 +841,6 @@
 - Q2730：/analytics/reliability 排名/可用性/副标题 **3 passed**。「按 MTBF」是关闭 option。`129e1a39b`
 - Q2731：/audit 标题/搜索/导出 **3 passed**。`28cc37249`
 - Q2732：/audit 总操作数/今日操作/活跃用户 **3 passed**。`1aad2421d`
-- Q2733：/audit 风险事件/最近7天/操作趋势 **3 passed**。
+- Q2733：/audit 风险事件/最近7天/操作趋势 **3 passed**。`48d9b39d2`
+- Q2734：/audit 类型分布/最近操作/系统日志 **3 passed**。
 
