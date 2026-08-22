@@ -656,5 +656,6 @@
 - Q2545：/intake/new 品牌/型号/序列号标签 **3 passed**。`b4bfe6de7`
 - Q2546：/assets/new 戴尔服务器/Dell/PowerEdge **3 passed**。`82be87f2b`
 - Q2547：/assets/new SN/供应商/机房 **3 passed**。`526790e05`
-- Q2548：/assets/new 纬度/经度/RFID **3 passed**。
+- Q2548：/assets/new 纬度/经度/RFID **3 passed**。`236b961f5`
+- Q2549：/assets/new 原值/净值/保修月 **3 passed**。
 
