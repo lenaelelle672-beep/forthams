@@ -1034,4 +1034,5 @@
 | Q1844 | done | 桌面空态 **3 passed**（/borrows/1/edit「资产」「备注」「取消」）。禁 /m。 |
 | Q1845 | done | 桌面空态 **3 passed**（/inspections/1/edit 编辑检验记录/检验编号/资产ID；setFields 只填表单字段）。禁 /m。 |
 | Q1846 | done | 桌面空态 **3 passed**（/inspections/1/edit「检验模板」「检验类型」「检验日期」）。禁 /m。 |
-| Q1847 | in_progress | 桌面空态：/inspections/1/edit 未覆盖 3 条（读 InspectionFormPage：下次检验日期/检验机构/检验人）。禁 /m。 |
+| Q1847 | done | 桌面空态 **3 passed**（/inspections/1/edit「下次检验日期」「检验机构」「检验人」）。禁 /m。 |
+| Q1848 | in_progress | 桌面空态：/inspections/1/edit 未覆盖 3 条（读 InspectionFormPage：检验结果/检查发现/检验照片）。禁 /m。 |

@@ -11483,6 +11483,41 @@ test.describe('Q1846 桌面检验编辑操作空态', () => {
   });
 });
 
+test.describe('Q1847 桌面检验编辑日期机构人空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/inspections/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, inspectionNo:'INSP-001', assetId:1, inspectionType:'ANNUAL', result:'PENDING' } }) });
+      }
+      return mockApi(route);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections/1/edit 空态「下次检验日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/edit');
+    await expect(page.getByText('下次检验日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/edit 空态「检验机构」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/edit');
+    await expect(page.getByText('检验机构').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/edit 空态「检验人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/edit');
+    await expect(page.getByText('检验人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
