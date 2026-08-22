@@ -467,5 +467,6 @@
 - Q2356：/approvals 全部类型/暂无审批/空表描述 **3 passed**。`5b63a266a`
 - Q2357：/approvals 资产调拨/清退/报废 **3 passed**。`bd22828cb`
 - Q2358：/approvals 工单申请/至/全部状态 **3 passed**。`8f8371bd1`
-- Q2359：/inspections heading/副标题/新增检验 **3 passed**。
+- Q2359：/inspections heading/副标题/新增检验 **3 passed**。`be57ca9ed`
+- Q2360：/inspections 总检验数/已过期/搜索 placeholder **3 passed**。
 
