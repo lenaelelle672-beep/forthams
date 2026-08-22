@@ -18250,6 +18250,37 @@ test.describe('Q2077 桌面许可证状态筛选pill空态', () => {
   });
 });
 
+test.describe('Q2078 桌面许可证新增到期与币种空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/licenses 点新增许可证「到期日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await page.getByRole('button', { name: '新增许可证' }).first().click();
+    await expect(page.locator('[role="dialog"]').getByText('到期日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/licenses 点新增许可证「¥」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await page.getByRole('button', { name: '新增许可证' }).first().click();
+    await expect(page.getByText('¥').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/licenses 点新增许可证标题「新增许可证」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await page.getByRole('button', { name: '新增许可证' }).first().click();
+    await expect(page.getByRole('heading', { name: '新增许可证' })).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
