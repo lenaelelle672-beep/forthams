@@ -1722,4 +1722,5 @@
 | Q2532 | done | 桌面空态 **3 passed**（/intake/new 验收备注/检查项名称/预期值）。禁 /m。 |
 | Q2533 | done | 桌面空态 **3 passed**（/intake/new 自动生成/必填/品牌）。禁 /m。 |
 | Q2534 | done | 桌面空态 **3 passed**（/intake/new 型号/序列号/供应商）。禁 /m。 |
-| Q2535 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2535 | done | 桌面空态 **3 passed**（/intake/new 选择分类/0.00/资产备注）。禁 /m。 |
+| Q2536 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

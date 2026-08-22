@@ -642,5 +642,6 @@
 - Q2531：/borrows/new 备注 + /intake/new 选择供应商/总金额 **3 passed**。`38a409cf0`
 - Q2532：/intake/new 验收备注/检查项名称/预期值 **3 passed**。`18affd944`
 - Q2533：/intake/new 自动生成/必填/品牌 **3 passed**。`2ea35fed1`
-- Q2534：/intake/new 型号/序列号/供应商 **3 passed**。
+- Q2534：/intake/new 型号/序列号/供应商 **3 passed**。`2a4243c73`
+- Q2535：/intake/new 选择分类/0.00/资产备注 **3 passed**。
 
