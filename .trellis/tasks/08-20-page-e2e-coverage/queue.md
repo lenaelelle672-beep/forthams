@@ -1336,4 +1336,5 @@
 | Q2146 | done | 桌面空态 **3 passed**（/workorders/1「审批记录」「暂无审批记录」、/budgets「年度」）。禁 /m。 |
 | Q2147 | done | 桌面空态 **3 passed**（/budgets「类型」「预算总额」「剩余」）。禁 /m。 |
 | Q2148 | done | 桌面空态 **3 passed**（/budgets「已使用」「已承诺」「状态」）。禁 /m。 |
-| Q2149 | in_progress | 桌面空态：/budgets「操作」或 /budgets/new 未覆盖。禁 /m。 |
+| Q2149 | done | 桌面空态 **3 passed**（/budgets「操作」、/retirement「申请编号」「资产编号」）。禁 /m。 |
+| Q2150 | in_progress | 桌面空态：/retirement 列头「资产名称」「分类」「原值」。禁 /m。 |

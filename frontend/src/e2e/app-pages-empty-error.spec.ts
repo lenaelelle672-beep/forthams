@@ -20351,6 +20351,34 @@ test.describe('Q2148 桌面预算已使用承诺状态列头空态', () => {
   });
 });
 
+test.describe('Q2149 桌面预算操作与退役列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets 空态「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByText('操作').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement 空态「申请编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('申请编号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement 空态「资产编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('资产编号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
