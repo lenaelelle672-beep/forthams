@@ -1556,4 +1556,5 @@
 | Q2366 | done | 桌面空态 **3 passed**（/idle 闲置总量/已发布公告/待处理）。禁 /m。 |
 | Q2367 | done | 桌面空态 **3 passed**（/idle 待审批认领/已完成认领/公告中）。禁 /m。 |
 | Q2368 | done | 桌面空态 **3 passed**（/idle 已认领/历史记录/暂无数据）。禁 /m。 |
-| Q2369 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2369 | done | 桌面空态 **3 passed**（/maintenance heading/设备维护/新增维保）。禁 /m。 |
+| Q2370 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
