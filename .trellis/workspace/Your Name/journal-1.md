@@ -784,5 +784,6 @@
 - Q2673：/purchase-orders 新增/标题/搜索 **3 passed**。`f05b18a8d`
 - Q2674：/purchase-orders 采购单号/名称/供应商表头 **3 passed**。`8e990ffac`
 - Q2675：/purchase-orders 金额/采购日期/状态表头 **3 passed**。`8b8e4621c`
-- Q2676：/purchase-orders 操作/刷新/副标题 **3 passed**。
+- Q2676：/purchase-orders 操作/刷新/副标题 **3 passed**。`f5aee1dd2`
+- Q2677：/purchase-orders 总采购单/已审批/待审批 **3 passed**。
 

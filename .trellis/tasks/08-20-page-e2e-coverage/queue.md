@@ -1864,4 +1864,5 @@
 | Q2674 | done | 桌面空态 **3 passed**（/purchase-orders 采购单号/名称/供应商表头）。禁 /m。 |
 | Q2675 | done | 桌面空态 **3 passed**（/purchase-orders 金额/采购日期/状态表头）。禁 /m。 |
 | Q2676 | done | 桌面空态 **3 passed**（/purchase-orders 操作/刷新/副标题）。禁 /m。 |
-| Q2677 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2677 | done | 桌面空态 **3 passed**（/purchase-orders 总采购单/已审批/待审批）。禁 /m。 |
+| Q2678 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
