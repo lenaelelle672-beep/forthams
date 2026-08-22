@@ -1156,4 +1156,5 @@
 | Q1966 | done | 桌面空态 **3 passed**（/report-builder「折线图」「饼图」+ placeholder「输入报表名称」）。禁 /m。 |
 | Q1967 | done | 桌面空态 **3 passed**（/report-builder 字段「资产编码」「资产名称」「资产分类」）。禁 /m。 |
 | Q1968 | done | 桌面空态 **3 passed**（/report-builder 字段「原值」「净值」「购入日期」）。禁 /m。 |
-| Q1969 | in_progress | 桌面空态：/report-builder 字段「位置」「使用部门」「工单数量」。禁 /m。 |
+| Q1969 | done | 桌面空态 **3 passed**（/report-builder 字段「位置」「使用部门」「工单数量」）。禁 /m。 |
+| Q1970 | in_progress | 桌面空态：/report-builder 字段「保养次数」「故障次数」「MTBF」。禁 /m。 |
