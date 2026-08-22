@@ -1577,4 +1577,5 @@
 | Q2387 | done | 桌面空态 **3 passed**（/borrows 借用列表/记录管理/搜索）。禁 /m。 |
 | Q2388 | done | 桌面空态 **3 passed**（/borrows 搜索/导出/借用总数）。禁 /m。 |
 | Q2389 | done | 桌面空态 **3 passed**（/borrows 已借出/已逾期/空表文案）。禁 /m。 |
-| Q2390 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2390 | done | 桌面空态 **3 passed**（/borrows 已审批/已归还/已取消）。禁 /m。 |
+| Q2391 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

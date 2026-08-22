@@ -497,5 +497,6 @@
 - Q2386：/borrows heading/借用管理/新建借用单 **3 passed**。`c71c0a59e`
 - Q2387：/borrows 借用列表/记录管理/搜索 **3 passed**。`8523a0265`
 - Q2388：/borrows 搜索/导出/借用总数 **3 passed**。`5f56e51c5`
-- Q2389：/borrows 已借出/已逾期/空表文案 **3 passed**。
+- Q2389：/borrows 已借出/已逾期/空表文案 **3 passed**。`ce88448b2`
+- Q2390：/borrows 已审批/已归还/已取消 **3 passed**。
 
