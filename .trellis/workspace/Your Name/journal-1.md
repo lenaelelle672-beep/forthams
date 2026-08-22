@@ -762,5 +762,6 @@
 - Q2651：/login5 系统管理员/资产管理员/运维人员按钮 **3 passed**。无 seedSession。`7825fd384`
 - Q2652：/login5 部门负责人/全域权限/资源审批 **3 passed**。无 seedSession。「全生命周期」substring 命中隐藏段落。`a431ce859`
 - Q2653：/login5 巡检维修/系统管理员/资产管理员 **3 passed**。无 seedSession。`45f83adca`
-- Q2654：/idle 发布公告/待处理/条结果 **3 passed**。
+- Q2654：/idle 发布公告/待处理/条结果 **3 passed**。`7a5575ab9`
+- Q2655：/idle 公告中/待审批/已认领页签 **3 passed**。
 
