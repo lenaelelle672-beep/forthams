@@ -1806,4 +1806,5 @@
 | Q2616 | done | 桌面空态 **3 passed**（/bigscreen-3d 播放中/0.0万/42%）。禁 /m。 |
 | Q2617 | done | 桌面空态 **3 passed**（/bigscreen-3d 24%/21%/13%）。禁 /m。 |
 | Q2618 | done | 桌面空态 **3 passed**（/bigscreen-3d 开场动画：/当前城市：/地图节点：）。禁 /m。 |
-| Q2619 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2619 | done | 桌面空态 **3 passed**（/bigscreen-3d 112/36/131）。禁 /m。 |
+| Q2620 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
