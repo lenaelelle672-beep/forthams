@@ -1151,4 +1151,5 @@
 | Q1961 | done | 桌面空态 **3 passed**（/sam 扫描历史列头「扫描时间」「总许可」「过期」）。禁 /m。 |
 | Q1962 | done | 桌面空态 **3 passed**（/report-builder「自定义报表构建器」「通过拖拽选择字段，快速创建自定义报表」「可用字段」）。禁 /m。 |
 | Q1963 | done | 桌面空态 **3 passed**（/report-builder「报表名称」「报表类型」「图表类型」）。禁 /m。 |
-| Q1964 | in_progress | 桌面空态：/report-builder「已选字段」「生成预览」「保存报表」。禁 /m。 |
+| Q1964 | done | 桌面空态 **3 passed**（/report-builder「已选字段」「生成预览」「保存报表」）。禁 /m。 |
+| Q1965 | in_progress | 桌面空态：/report-builder「数据预览」「表格」「柱状图」。禁 /m。 |

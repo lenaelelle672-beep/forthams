@@ -14974,6 +14974,34 @@ test.describe('Q1963 桌面报表构建器配置区空态', () => {
   });
 });
 
+test.describe('Q1964 桌面报表构建器操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder 空态「已选字段」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByText('已选字段').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder 空态「生成预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByText('生成预览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder 空态「保存报表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByText('保存报表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
