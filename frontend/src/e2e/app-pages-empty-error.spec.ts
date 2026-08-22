@@ -10110,6 +10110,34 @@ test.describe('Q1808 桌面预算详情空态', () => {
   });
 });
 
+test.describe('Q1809 桌面预算详情空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/1 空态「执行率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/1');
+    await expect(page.getByText('执行率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 空态「编辑」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/1');
+    await expect(page.getByRole('button', { name: '编辑' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 空态「删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/1');
+    await expect(page.getByRole('button', { name: '删除' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
