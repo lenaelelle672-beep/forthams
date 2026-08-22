@@ -1039,4 +1039,5 @@
 | Q1849 | done | 桌面空态 **3 passed**（/inspections/1/edit「证书编号」「证书到期日」「检验费用」）。禁 /m。 |
 | Q1850 | done | 桌面空态 **3 passed**（/inspections/1/edit「报告附件」「更新」「取消」）。禁 /m。 |
 | Q1851 | done | 桌面空态 **3 passed**（/inspections/1/edit「扫码」「自动生成或手动输入」「输入资产ID」）。禁 /m。 |
-| Q1852 | in_progress | 桌面空态：/inspections/1/upload 未覆盖 3 条（读 InspectionUploadPage：检验照片上传/上传新照片/选择照片）。禁 /m。 |
+| Q1852 | done | 桌面空态 **3 passed**（/inspections/1/upload「检验照片上传」「上传新照片」「选择照片」）。禁 /m。 |
+| Q1853 | in_progress | 桌面空态：/inspections/1/upload 未覆盖 3 条（读 InspectionUploadPage：已上传照片/暂无已上传的照片/返回详情页）。禁 /m。 |
