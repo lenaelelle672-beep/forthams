@@ -1745,4 +1745,5 @@
 | Q2555 | done | 桌面空态 **3 passed**（/assets/new 位置说明/描述备注/字数）。禁 /m。 |
 | Q2556 | done | 桌面空态 **3 passed**（/assets/new 资产描述/200字/图片文件）。禁 /m。 |
 | Q2557 | done | 桌面空态 **3 passed**（/assets/new 父子关系/主附属/先保存）。禁 /m。 |
-| Q2558 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2558 | done | 桌面空态 **3 passed**（/assets/new 资产名称*/新增资产 + /intake/new 备注）。禁 /m。 |
+| Q2559 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
