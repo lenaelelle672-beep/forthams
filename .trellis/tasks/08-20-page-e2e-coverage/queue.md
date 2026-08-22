@@ -1693,4 +1693,5 @@
 | Q2503 | done | 桌面空态 **3 passed**（/intake/new 验收日期/供应商/选择供应商）。禁 /m。 |
 | Q2504 | done | 桌面空态 **3 passed**（/insurances/new 新增保险/保单号/placeholder）。禁 /m。 |
 | Q2505 | done | 桌面空态 **3 passed**（/insurances/new 保险名称/placeholder/类型）。禁 /m。 |
-| Q2506 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2506 | done | 桌面空态 **3 passed**（/spare-parts/new 备件申请/描述/返回）。禁 /m。 |
+| Q2507 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
