@@ -1513,4 +1513,5 @@
 | Q2323 | done | 桌面空态 **3 passed**（/workspace-preview 顶栏 title 全屏/通知/个人中心）。禁 /m。 |
 | Q2324 | done | 桌面空态 **3 passed**（/workspace-preview 密度 title、工作台菜单、快捷操作）。禁 /m。 |
 | Q2325 | done | 桌面空态 **3 passed**（/workspace-preview 侧栏运营首页/我的资产/流程待办）。禁 /m。 |
-| Q2326 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2326 | done | 桌面空态 **3 passed**（/workspace-preview 侧栏资产总览/设备/工单）。禁 /m。 |
+| Q2327 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

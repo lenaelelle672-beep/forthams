@@ -433,5 +433,6 @@
 - Q2322：个人中心 title/快捷操作/工作台菜单 **3 passed**。`9a5e07853`
 - Q2323：preview 顶栏 title 全屏/通知/个人中心 **3 passed**。`d230e0649`
 - Q2324：密度 title/工作台菜单/快捷操作 **3 passed**。`ec9a3a0b8`
-- Q2325：preview 侧栏运营首页/我的资产/流程待办 **3 passed**。
+- Q2325：preview 侧栏运营首页/我的资产/流程待办 **3 passed**。`86c6ae7f9`
+- Q2326：preview 侧栏资产总览/设备/工单 **3 passed**。
 
