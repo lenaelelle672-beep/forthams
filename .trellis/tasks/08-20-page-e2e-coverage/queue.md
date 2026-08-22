@@ -1082,4 +1082,5 @@
 | Q1892 | done | 桌面空态 **3 passed**（/inspection-records「附条件通过」+ 列头「检验编号」「资产ID」）。禁 /m。 |
 | Q1893 | done | 桌面空态 **3 passed**（/inspection-records 列头「检验类型」「检验日期」「下次检验」）。禁 /m。 |
 | Q1894 | done | 桌面空态 **3 passed**（/inspection-records 列头「检验机构」「检验人」「结果」）。禁 /m。 |
-| Q1895 | in_progress | 桌面空态：/inspection-records 列头「操作」+「暂无检验记录」「当前没有可显示的数据」。禁 /m。 |
+| Q1895 | done | 桌面空态 **3 passed**（/inspection-records 列头「操作」+「暂无检验记录」「当前没有可显示的数据」）。禁 /m。 |
+| Q1896 | in_progress | 桌面空态：/stocktaking-cycles/new「返回列表」「新建盘点周期」「周期名称」。禁 /m。 |
