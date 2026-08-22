@@ -1225,4 +1225,5 @@
 | Q2035 | done | 桌面空态 **3 passed**（/floorplans 点新建「名称 *」「创建」「取消」）。禁 /m。 |
 | Q2036 | done | 桌面空态 **3 passed**（/idle「闲置资产管理」「待处理」「历史记录」）。禁 /m。 |
 | Q2037 | done | 桌面空态 **3 passed**（/idle 表头「资产编号」「资产名称」、页签「待审批」）。禁 /m。 |
-| Q2038 | in_progress | 桌面空态：/idle 表头「部门/状态/操作」。禁 /m。 |
+| Q2038 | done | 桌面空态 **3 passed**（/idle 表头「部门」「状态」「操作」）。禁 /m。 |
+| Q2039 | in_progress | 桌面空态：/depreciation 未测标题/表头或筛选。禁 /m。 |
