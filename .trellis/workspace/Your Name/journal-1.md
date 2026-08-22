@@ -664,5 +664,6 @@
 - Q2553：/assets/new 保修期月/折旧率范围/是否重要设备 **3 passed**。`c08e31083`
 - Q2554：/assets/new 资产分类*/资产状态/规格型号 **3 passed**。`a6412a38f`
 - Q2555：/assets/new 位置说明/描述备注/字数 **3 passed**。formSections.description 未渲染。`fa32e23de`
-- Q2556：/assets/new 资产描述/200字/图片文件 **3 passed**。
+- Q2556：/assets/new 资产描述/200字/图片文件 **3 passed**。`7effaeb42`
+- Q2557：/assets/new 父子关系/主附属/先保存 **3 passed**。500 票。
 
