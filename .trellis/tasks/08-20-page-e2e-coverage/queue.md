@@ -1146,4 +1146,5 @@
 | Q1956 | done | 桌面空态 **3 passed**（/risk-assessments/1/edit「评审日期」「取消」「评估人ID」）。禁 /m。 |
 | Q1957 | done | 桌面空态 **3 passed**（/sam「SAM 合规管理」「总许可数」「合规」）。禁 /m。 |
 | Q1958 | done | 桌面空态 **3 passed**（/sam「超用」「闲置」「已过期」）。禁 /m。 |
-| Q1959 | in_progress | 桌面空态：/sam「合规率」及剩余图表标题（读页确认）。禁 /m。 |
+| Q1959 | done | 桌面空态 **3 passed**（/sam「合规率」「许可类型分布」「风险告警」）。禁 /m。 |
+| Q1960 | in_progress | 桌面空态：/sam「席位使用率 TOP」「扫描历史」「暂无高风险项」。禁 /m。 |

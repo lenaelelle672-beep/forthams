@@ -14834,6 +14834,34 @@ test.describe('Q1958 桌面SAM合规用量统计空态', () => {
   });
 });
 
+test.describe('Q1959 桌面SAM合规图表标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam 空态「合规率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByText('合规率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam 空态「许可类型分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByText('许可类型分布').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam 空态「风险告警」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByText('风险告警').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
