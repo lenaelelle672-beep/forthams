@@ -477,5 +477,6 @@
 - Q2366：/idle 闲置总量/已发布公告/待处理 **3 passed**。`f975eaad5`
 - Q2367：/idle 待审批认领/已完成认领/公告中 **3 passed**。`3a7febbae`
 - Q2368：/idle 已认领/历史记录/暂无数据 **3 passed**。`4f75ebf76`
-- Q2369：/maintenance heading/设备维护/新增维保 **3 passed**。
+- Q2369：/maintenance heading/设备维护/新增维保 **3 passed**。`57636a811`
+- Q2370：/maintenance 维保列表/记录管理/搜索 **3 passed**。
 
