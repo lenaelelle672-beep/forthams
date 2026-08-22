@@ -1320,4 +1320,5 @@
 | Q2130 | done | 桌面空态 **3 passed**（/maintenance「执行人」「费用」「下次维保」）。禁 /m。 |
 | Q2131 | done | 桌面空态 **3 passed**（/maintenance「操作」、/maintenance/plans「计划名称」「关联资产」）。禁 /m。 |
 | Q2132 | done | 桌面空态 **3 passed**（/maintenance/plans「计划周期」「负责人」「下次执行」）。禁 /m。 |
-| Q2133 | in_progress | 桌面空态：/maintenance/plans 列头「优先级」「状态」「操作」。禁 /m。 |
+| Q2133 | done | 桌面空态 **3 passed**（/maintenance/plans「优先级」「状态」「操作」）。禁 /m。 |
+| Q2134 | in_progress | 桌面空态：/workorders 未覆盖列头。禁 /m。 |
