@@ -1423,4 +1423,5 @@
 | Q2233 | done | 桌面空态 **3 passed**（/fixed-assets/workbench「欢迎回来」「运营首页」「总资产数」）。禁 /m。 |
 | Q2234 | done | 桌面空态 **3 passed**（/fixed-assets/workbench「在用资产」「闲置资产」「导出数据」）。禁 /m。 |
 | Q2235 | done | 桌面空态 **3 passed**（/fixed-assets/workbench「待审批」「刷新视图」「资产价值趋势」）。禁 /m。 |
-| Q2236 | in_progress | 桌面空态：/fixed-assets/workbench「分类分布」「维保预警」。禁 /m。 |
+| Q2236 | done | 桌面空态 **3 passed**（/fixed-assets/workbench「分类分布」「维保预警」「最近工单」）。禁 /m。 |
+| Q2237 | in_progress | 桌面空态：/fixed-assets/workbench「净值」「部门资产统计」。禁 /m。 |
