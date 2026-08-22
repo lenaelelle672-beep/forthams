@@ -1768,4 +1768,5 @@
 | Q2578 | done | 桌面空态 **3 passed**（/workflow-form 清退/报废 编码 + COMPENSATION 源码提示）。禁 /m。 |
 | Q2579 | done | 桌面空态 **3 passed**（/bigscreen 今日新增/借用/调拨）。禁 /m。 |
 | Q2580 | done | 桌面空态 **3 passed**（/bigscreen 昨日取消/盘点/返库）。禁 /m。 |
-| Q2581 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2581 | done | 桌面空态 **3 passed**（/bigscreen 定检/故障/备勤飞机）。禁 /m。 |
+| Q2582 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
