@@ -1459,4 +1459,5 @@
 | Q2269 | done | 桌面空态 **3 passed**（/bigscreen-3d「留痕」「台」「组」）。禁 /m。 |
 | Q2270 | done | 桌面空态 **3 passed**（/bigscreen-3d「枚」「IT 设备」「办公家具」）。禁 /m。 |
 | Q2271 | done | 桌面空态 **3 passed**（/bigscreen-3d「生产设备」「低值耗材」「条」）。禁 /m。 |
-| Q2272 | in_progress | 桌面空态：/login3 无 WebGL 文案或 /workspace-preview。禁 /m。 |
+| Q2272 | done | 桌面空态 **3 passed**（/forbidden?reason=roles_missing 信息不完整/角色缺失/重新登录）。禁 /m。 |
+| Q2273 | in_progress | 桌面空态：/forbidden?reason=roles_missing「请重新登录后重试」。禁 /m。 |
