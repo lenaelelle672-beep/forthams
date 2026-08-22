@@ -1666,4 +1666,5 @@
 | Q2476 | done | 桌面空态 **3 passed**（/system/roles 角色列表/总数/空表）。禁 /m。 |
 | Q2477 | done | 桌面空态 **3 passed**（/system/depts heading/组织架构/新增部门）。禁 /m。 |
 | Q2478 | done | 桌面空态 **3 passed**（/system/depts 部门总数/正常/顶级）。禁 /m。 |
-| Q2479 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2479 | done | 桌面空态 **3 passed**（/system/depts 搜索/个部门/新增）。禁 /m。 |
+| Q2480 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
