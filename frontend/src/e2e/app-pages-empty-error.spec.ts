@@ -10423,6 +10423,89 @@ test.describe('Q1817 桌面保险理赔表列空态', () => {
   });
 });
 
+test.describe('Q1818 桌面保险理赔表列空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1 空态「已赔付金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('已赔付金额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「赔付日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('赔付日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 空态「事故描述」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/1');
+    await expect(page.getByText('事故描述').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q1819 桌面保险状态变体空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/1 详情「已过期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/insurance/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, policyNo:'P1', insuranceName:'E2E', insuranceType:'PROPERTY', status:'EXPIRED', premium:1, coverage:1, deductible:0 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/insurances/1');
+    await expect(page.getByText('已过期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 详情「已取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/insurance/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, policyNo:'P1', insuranceName:'E2E', insuranceType:'PROPERTY', status:'CANCELLED', premium:1, coverage:1, deductible:0 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/insurances/1');
+    await expect(page.getByText('已取消').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/1 理赔「待处理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/insurance/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, policyNo:'P1', insuranceName:'E2E', insuranceType:'PROPERTY', status:'ACTIVE', premium:1, coverage:1, deductible:0 } }) });
+      }
+      if (path === '/insurance/1/claims') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { records: [{ id:1, claimNo:'C1', status:'PENDING', claimAmount:1, settledAmount:0 }], total:1 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/insurances/1');
+    await expect(page.getByText('待处理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
