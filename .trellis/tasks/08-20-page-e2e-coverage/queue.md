@@ -1910,4 +1910,5 @@
 | Q2720 | done | 桌面空态 **3 passed**（/budgets 合同锁定/运营/0项预算）。禁 /m。 |
 | Q2721 | done | 桌面空态 **3 passed**（/analytics 标题/资产总数/本月维保）。禁 /m。 |
 | Q2722 | done | 桌面空态 **3 passed**（/analytics 资产总值/待审批/数据范围）。禁 /m。 |
-| Q2723 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2723 | done | 桌面空态 **3 passed**（/analytics 近12个月/价值趋势/分类分布）。禁 /m。 |
+| Q2724 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
