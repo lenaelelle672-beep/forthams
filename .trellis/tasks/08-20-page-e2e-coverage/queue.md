@@ -1629,4 +1629,5 @@
 | Q2439 | done | 桌面空态 **3 passed**（/retirement heading/面包屑/新建申请）。禁 /m。 |
 | Q2440 | done | 桌面空态 **3 passed**（/retirement 副标题/退役总价值/待审核）。禁 /m。 |
 | Q2441 | done | 桌面空态 **3 passed**（/retirement 残值回收/退役原因/空表）。禁 /m。 |
-| Q2442 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2442 | done | 桌面空态 **3 passed**（/retirement 异常已驳回/已撤回/审批中）。禁 /m。 |
+| Q2443 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

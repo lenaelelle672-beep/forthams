@@ -549,5 +549,6 @@
 - Q2438：/budgets 超支告警/合同锁定/运营 **3 passed**。`dd9c8822e`
 - Q2439：/retirement heading/面包屑/新建申请 **3 passed**。`487905337`
 - Q2440：/retirement 副标题/退役总价值/待审核 **3 passed**。`d39fd80d8`
-- Q2441：/retirement 残值回收/退役原因/空表 **3 passed**。
+- Q2441：/retirement 残值回收/退役原因/空表 **3 passed**。`1d9d725bd`
+- Q2442：/retirement 异常已驳回/已撤回/审批中 **3 passed**。
 
