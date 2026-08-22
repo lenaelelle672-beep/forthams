@@ -1426,4 +1426,5 @@
 | Q2236 | done | 桌面空态 **3 passed**（/fixed-assets/workbench「分类分布」「维保预警」「最近工单」）。禁 /m。 |
 | Q2237 | done | 桌面空态 **3 passed**（/fixed-assets/workbench「净值」「部门资产统计」「查看全部」）。禁 /m。 |
 | Q2238 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「系统管理 V3 工作台」「用户管理」「当前分组」）。禁 /m。 |
-| Q2239 | in_progress | 桌面空态：/fixed-assets/workbenchv3「已接入」「部门组织」。禁 /m。 |
+| Q2239 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「已接入」「部门组织」「组织权限」）。禁 /m。 |
+| Q2240 | in_progress | 桌面空态：/fixed-assets/workbenchv3「流程平台」「基础资料」「角色权限」。禁 /m。 |
