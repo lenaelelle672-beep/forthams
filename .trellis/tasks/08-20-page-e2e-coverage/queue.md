@@ -1304,4 +1304,5 @@
 | Q2114 | done | 桌面空态 **3 passed**（/borrows「资产编号」「资产名称」「借用日期」）。禁 /m。 |
 | Q2115 | done | 桌面空态 **3 passed**（/borrows「预计归还」「用途」「操作」）。禁 /m。 |
 | Q2116 | done | 桌面空态 **3 passed**（/assignments「资产编号」「资产名称」「领用类型」）。禁 /m。 |
-| Q2117 | in_progress | 桌面空态：/assignments 列头「状态」「预计归还」「创建时间」。禁 /m。 |
+| Q2117 | done | 桌面空态 **3 passed**（/assignments「状态」「预计归还」「创建时间」）。禁 /m。 |
+| Q2118 | in_progress | 桌面空态：/assignments「操作」或 /intake 未覆盖。禁 /m。 |
