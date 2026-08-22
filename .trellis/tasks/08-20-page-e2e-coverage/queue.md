@@ -1795,4 +1795,5 @@
 | Q2605 | done | 桌面空态 **3 passed**（/bigscreen 座位数/耗油量/节油量）。禁 /m。 |
 | Q2606 | done | 桌面空态 **3 passed**（/bigscreen 燃油价格/关舱门时刻/客座率值）。禁 /m。 |
 | Q2607 | done | 桌面空态 **3 passed**（/bigscreen 2350/8800/2100）。禁 /m。 |
-| Q2608 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2608 | done | 桌面空态 **3 passed**（/bigscreen 10.77/5.78/12.24）。禁 /m。 |
+| Q2609 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
