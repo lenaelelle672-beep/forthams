@@ -1026,4 +1026,5 @@
 | Q1836 | done | 桌面空态 **3 passed**（/intake/1 检查项「名称」「预期值」「实际值」）。禁 /m。 |
 | Q1837 | done | 桌面空态 **3 passed**（/intake/1「结果」「备注」「资产编号」）。禁 /m。 |
 | Q1838 | done | 桌面空态 **3 passed**（/intake/1「资产名称」「品牌」「型号」）。禁 /m。 |
-| Q1839 | in_progress | 桌面空态：/intake/1 资产表头与检查结果 3 条（读 IntakeDetailPage：原值/购置日期；checkItems 无 result 见「待检」）。禁 /m。 |
+| Q1839 | done | 桌面空态 **3 passed**（/intake/1「原值」「购置日期」「待检」）。禁 /m。 |
+| Q1840 | in_progress | 桌面空态：/intake/1 检查结果变体 3 条（读 IntakeDetailPage：通过/不通过/驳回原因，须 mock result 与 rejectReason）。禁 /m。 |
