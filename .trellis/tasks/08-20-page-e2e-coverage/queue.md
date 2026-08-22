@@ -1198,4 +1198,5 @@
 | Q2008 | done | 桌面空态 **3 passed**（/workflow-designer 画布「提交资产申请」「部门负责人审批」「金额阈值判断」）。禁 /m。 |
 | Q2009 | done | 桌面空态 **3 passed**（/workflow-designer 画布「财务复核」「流程结束」「大额采购」）。禁 /m。 |
 | Q2010 | done | 桌面空态 **3 passed**（/workflow-designer「常规采购」「节点名称」「节点说明」）。禁 /m。 |
-| Q2011 | in_progress | 桌面空态：/workflow-designer「节点编码」「条连线」「环节子表单/区段」。禁 /m。 |
+| Q2011 | done | 桌面空态 **3 passed**（/workflow-designer「节点编码」「条连线」「环节子表单/区段」）。禁 /m。 |
+| Q2012 | in_progress | 桌面空态：/workflow-designer「区段名称」「历史摘要字段」「子表单 HTML」。禁 /m。 |
