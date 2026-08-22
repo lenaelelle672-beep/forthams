@@ -1526,4 +1526,5 @@
 | Q2336 | done | 桌面空态 **3 passed**（/vendor-portal heading/placeholder/登录按钮）。禁 /m。 |
 | Q2337 | done | 桌面空态 **3 passed**（/vendor-portal 密码 placeholder/门户/编码）。禁 /m。 |
 | Q2338 | done | 桌面空态 **3 passed**（/403 heading 无访问权限/返回上一页/返回首页）。禁 /m。 |
-| Q2339 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2339 | done | 桌面空态 **3 passed**（/404 完整标题/页面不存在/404）。禁 /m。 |
+| Q2340 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
