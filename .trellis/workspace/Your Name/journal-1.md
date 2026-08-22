@@ -839,5 +839,6 @@
 - Q2728：/analytics/reliability 故障间隔/修复时间/可用率 **3 passed**。`c8e2c0f98`
 - Q2729：/analytics/reliability 月均故障率/总故障0/趋势 **3 passed**。`a47bac6b2`
 - Q2730：/analytics/reliability 排名/可用性/副标题 **3 passed**。「按 MTBF」是关闭 option。`129e1a39b`
-- Q2731：/audit 标题/搜索/导出 **3 passed**。
+- Q2731：/audit 标题/搜索/导出 **3 passed**。`28cc37249`
+- Q2732：/audit 总操作数/今日操作/活跃用户 **3 passed**。
 
