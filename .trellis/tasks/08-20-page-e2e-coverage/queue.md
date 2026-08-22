@@ -1440,4 +1440,5 @@
 | Q2250 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「套餐状态」「联系人摘要」「按域聚合」）。禁 /m。 |
 | Q2251 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 44项覆盖/流程平台9/9/组织权限8/8）。禁 /m。 |
 | Q2252 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 基础资料6/6/集成5/5/消息8/8）。禁 /m。 |
-| Q2253 | in_progress | 桌面空态：/fixed-assets/workbenchv3「系统参数组 8/8」。禁 /m。 |
+| Q2253 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 系统参数8/8/权限专项/写操作补强）。禁 /m。 |
+| Q2254 | in_progress | 桌面空态：/sso-callback 未覆盖。禁 /m。 |
