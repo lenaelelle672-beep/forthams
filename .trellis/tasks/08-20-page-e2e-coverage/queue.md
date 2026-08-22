@@ -1064,4 +1064,5 @@
 | Q1874 | done | 桌面空态 **3 passed**（/assignments/new「基本信息」「领用类型」「资产」）。禁 /m。 |
 | Q1875 | done | 桌面空态 **3 passed**（/assignments/new「使用人」「使用部门 ID」「预计归还日期」）。禁 /m。 |
 | Q1876 | done | 桌面空态 **3 passed**（/assignments/new「备注」「取消」「长期领用」）。禁 /m。 |
-| Q1877 | in_progress | 桌面空态：/assignments/new 未覆盖 3 条（读 AssignmentFormPage：短期借用/归还入库/调拨转移）。禁 /m。 |
+| Q1877 | done | 桌面空态 **3 passed**（/assignments/new「短期借用」「归还入库」「调拨转移」）。禁 /m。 |
+| Q1878 | in_progress | 桌面空态：/assignments/new placeholder 3 条（使用人 ID/使用部门 ID/备注）。禁 /m。 |
