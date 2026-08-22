@@ -1505,4 +1505,5 @@
 | Q2315 | done | 桌面空态 **3 passed**（menu=my-assets 产品页地标/台账）。禁 /m。 |
 | Q2316 | done | 桌面空态 **3 passed**（my-assets 新建/导出全部/共0条）。禁 /m。 |
 | Q2317 | done | 桌面空态 **3 passed**（my-assets 总净值/闲置率/导入）。禁 /m。 |
-| Q2318 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2318 | done | 桌面空态 **3 passed**（my-assets 待处理维修/累计折旧/导出PDF）。禁 /m。 |
+| Q2319 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
