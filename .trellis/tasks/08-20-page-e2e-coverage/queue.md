@@ -1857,4 +1857,5 @@
 | Q2667 | done | 桌面空态 **3 passed**（/fault-codes 解决措施/故障树/现象原因措施）。禁 /m。 |
 | Q2668 | done | 桌面空态 **3 passed**（/contracts 新增合同/合同编号/合同名称）。禁 /m。 |
 | Q2669 | done | 桌面空态 **3 passed**（/contracts 类型/金额/操作表头）。禁 /m。 |
-| Q2670 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2670 | done | 桌面空态 **3 passed**（/contracts 搜索/标题/刷新）。禁 /m。 |
+| Q2671 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
