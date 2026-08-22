@@ -1330,4 +1330,5 @@
 | Q2140 | done | 桌面空态 **3 passed**（/workorders/new「处理提示」「提交工单」「取消」）。禁 /m。 |
 | Q2141 | done | 桌面空态 **3 passed**（/workorders/new 提示正文、select「维修」）。禁 /m。 |
 | Q2142 | done | 桌面空态 **3 passed**（/workorders/new「附件」「上传文件」、/workorders/1「工单详情」）。禁 /m。 |
-| Q2143 | in_progress | 桌面空态：/workorders/1 详情未覆盖文案。禁 /m。 |
+| Q2143 | done | 桌面空态 **3 passed**（/workorders/1「工单信息」「申请人」「SLA」）。禁 /m。 |
+| Q2144 | in_progress | 桌面空态：/workorders/1「工单号」「优先级」「创建时间」。禁 /m。 |

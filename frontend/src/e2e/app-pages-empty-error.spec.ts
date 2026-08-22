@@ -20183,6 +20183,34 @@ test.describe('Q2142 桌面工单新建附件与详情空态', () => {
   });
 });
 
+test.describe('Q2143 桌面工单详情信息栏空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/1 空态「工单信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByText('工单信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 空态「申请人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByText('申请人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 空态「SLA」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByText('SLA').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
