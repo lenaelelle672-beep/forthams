@@ -1109,4 +1109,5 @@
 | Q1919 | done | 桌面空态 **3 passed**（/inventory/abc-classification 列头「资产编号」「资产名称」「分类」）。禁 /m。 |
 | Q1920 | done | 桌面空态 **3 passed**（/inventory/abc-classification 列头「ABC 分类」「原值」+「需月度盘点」）。禁 /m。 |
 | Q1921 | done | 桌面空态 **3 passed**（/inventory/abc-classification「需季度盘点」「需年度盘点」+ 点批量重新分类「确定」）。禁 /m。 |
-| Q1922 | in_progress | 桌面空态：/safety-checklists/config 标题与主操作（先读页确认 3 文案）。禁 /m。 |
+| Q1922 | done | 桌面空态 **3 passed**（/safety-checklists/config「安全检查表模板」「配置检查表模板与检查项清单」「全部模板」）。禁 /m。 |
+| Q1923 | in_progress | 桌面空态：/safety-checklists/config「已启用」「已禁用」「模板列表」。禁 /m。 |
