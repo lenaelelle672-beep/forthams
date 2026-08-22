@@ -1014,4 +1014,6 @@
 | Q1824 | done | 桌面空态 **3 passed**（/insurances/1「开始日期」「结束日期」「备注」）。禁 /m。 |
 | Q1825 | done | 桌面空态 **3 passed**（/spare-parts/1「返回」「编辑」「当前库存」）。禁 /m。 |
 | Q1826 | done | 桌面空态 **3 passed**（/spare-parts/1「安全库存」「库存状态」「库存正常」）。禁 /m。 |
-| Q1827 | in_progress | 桌面空态：/spare-parts/1 基本信息未覆盖 3 条（读 SparePartDetailPage：基本信息/备件编码/规格型号）。禁 /m。 |
+| Q1827 | done | 桌面空态 **3 passed**（/spare-parts/1「基本信息」「备件编码」「规格型号」）。禁 /m。 |
+| Q1828 | done | 桌面空态 **3 passed**（/spare-parts/1「计量单位」「单价」「领用记录」）。禁 /m。 |
+| Q1829 | in_progress | 桌面空态：/spare-parts/1 状态变体 3 条（读 SparePartDetailPage：停用/启用/缺货，须 mock status 与库存）。禁 /m。 |
