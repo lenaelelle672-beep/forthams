@@ -677,5 +677,6 @@
 - Q2566：/inspection-templates 点新增 状态/确定/取消 **3 passed**。`91a9d3ee5`
 - Q2567：/workflow-form/ASSET_BORROW 编码/未配置/直接发起 **3 passed**。`8275d366f`
 - Q2568：/workflow-form/ASSET_ASSIGNMENT 编码/未配置/直接发起 **3 passed**。`b6cf61913`
-- Q2569：/workflow-form/ASSET_INTAKE 编码/未配置/直接发起 **3 passed**。
+- Q2569：/workflow-form/ASSET_INTAKE 编码/未配置/直接发起 **3 passed**。`c41c8e76c`
+- Q2570：/workflow-form 借用/领用/验收 表单源码提示 **3 passed**。
 

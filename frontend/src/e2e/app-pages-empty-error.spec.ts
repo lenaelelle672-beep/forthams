@@ -32141,6 +32141,34 @@ test.describe('Q2569 桌面验收流程表单空态', () => {
   });
 });
 
+test.describe('Q2570 桌面流程表单源码提示空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/ASSET_BORROW 空态「请在工作流设计器的「表单源码」标签页中添加表单 HTML。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_BORROW');
+    await expect(page.getByText('请在工作流设计器的「表单源码」标签页中添加表单 HTML。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_ASSIGNMENT 空态「请在工作流设计器的「表单源码」标签页中添加表单 HTML。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_ASSIGNMENT');
+    await expect(page.getByText('请在工作流设计器的「表单源码」标签页中添加表单 HTML。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_INTAKE 空态「请在工作流设计器的「表单源码」标签页中添加表单 HTML。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_INTAKE');
+    await expect(page.getByText('请在工作流设计器的「表单源码」标签页中添加表单 HTML。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
