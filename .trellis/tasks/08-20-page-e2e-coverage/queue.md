@@ -1528,4 +1528,5 @@
 | Q2338 | done | 桌面空态 **3 passed**（/403 heading 无访问权限/返回上一页/返回首页）。禁 /m。 |
 | Q2339 | done | 桌面空态 **3 passed**（/404 完整标题/页面不存在/404）。禁 /m。 |
 | Q2340 | done | 桌面空态 **3 passed**（/dashboard heading 运营首页/总资产数/在用资产）。禁 /m。 |
-| Q2341 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2341 | done | 桌面空态 **3 passed**（/dashboard 闲置资产/待审批/导出数据）。禁 /m。 |
+| Q2342 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
