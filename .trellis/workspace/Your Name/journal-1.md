@@ -525,5 +525,6 @@
 - Q2414：/contracts 维保/采购/租赁合同 **3 passed**。`de6dfccf8`
 - Q2415：/contracts 服务合同/已到期/时间轴视图 **3 passed**。`86dfbf4aa`
 - Q2416：/purchase-orders heading/副标题/新增采购单 **3 passed**。`c41f4663d`
-- Q2417：/purchase-orders 总采购单/已审批/搜索 **3 passed**。
+- Q2417：/purchase-orders 总采购单/已审批/搜索 **3 passed**。`1375d900e`
+- Q2418：/purchase-orders 刷新/全部状态/部分收货 **3 passed**。
 
