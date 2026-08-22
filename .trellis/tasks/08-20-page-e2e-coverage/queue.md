@@ -1713,4 +1713,5 @@
 | Q2523 | done | 桌面空态 **3 passed**（/risk-assessments/new 可能性/影响程度/缓解措施）。禁 /m。 |
 | Q2524 | done | 桌面空态 **3 passed**（/risk-assessments/new 缓解placeholder/评审日期/评估人ID）。禁 /m。 |
 | Q2525 | done | 桌面空态 **3 passed**（/risk-assessments/new 评估人placeholder/创建/风险等级）。禁 /m。 |
-| Q2526 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2526 | done | 桌面空态 **3 passed**（/risk-assessments/new 取消/1-极低 + /workorders/new 填写说明）。禁 /m。 |
+| Q2527 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
