@@ -13490,6 +13490,34 @@ test.describe('Q1911 桌面循环盘点规则价值操作空态', () => {
   });
 });
 
+test.describe('Q1912 桌面循环盘点规则说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/cycle-count 空态「C类（一般资产）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('C类（一般资产）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 空态「季度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('季度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 空态「年度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('年度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

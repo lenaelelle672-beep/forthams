@@ -1099,4 +1099,5 @@
 | Q1909 | done | 桌面空态 **3 passed**（/inventory/cycle-count「循环盘点规则配置（ABC分类）」「触发A类盘点」「A类（关键资产）」）。禁 /m。 |
 | Q1910 | done | 桌面空态 **3 passed**（/inventory/cycle-count 列头「分类」「盘点频率」「最小价值」）。禁 /m。 |
 | Q1911 | done | 桌面空态 **3 passed**（/inventory/cycle-count 列头「最大价值」「操作」+「B类（重要资产）」）。禁 /m。 |
-| Q1912 | in_progress | 桌面空态：/inventory/cycle-count「C类（一般资产）」「季度盘点」「年度盘点」。禁 /m。 |
+| Q1912 | done | 桌面空态 **3 passed**（/inventory/cycle-count「C类（一般资产）」「季度盘点」「年度盘点」）。禁 /m。 |
+| Q1913 | in_progress | 桌面空态：/inventory/cycle-count 点「新增规则」后「ABC分类」「盘点频率」「最小价值（元）」。禁 /m。 |
