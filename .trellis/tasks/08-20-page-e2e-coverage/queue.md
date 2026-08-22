@@ -1597,4 +1597,5 @@
 | Q2407 | done | 桌面空态 **3 passed**（/spare-parts 备件列表/库存管理/总数）。禁 /m。 |
 | Q2408 | done | 桌面空态 **3 passed**（/spare-parts 库存告警/已启用/搜索）。禁 /m。 |
 | Q2409 | done | 桌面空态 **3 passed**（/spare-parts 库存总价值/搜索/空表）。禁 /m。 |
-| Q2410 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2410 | done | 桌面空态 **3 passed**（/spare-parts 启用/停用/全部）。禁 /m。 |
+| Q2411 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

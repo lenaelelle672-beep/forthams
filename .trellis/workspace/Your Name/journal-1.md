@@ -517,5 +517,6 @@
 - Q2406：/spare-parts heading/备件/新增备件 **3 passed**。`2b3e21907`
 - Q2407：/spare-parts 备件列表/库存管理/总数 **3 passed**。`0d8405ad7`
 - Q2408：/spare-parts 库存告警/已启用/搜索 **3 passed**。`82884b93b`
-- Q2409：/spare-parts 库存总价值/搜索/空表 **3 passed**。
+- Q2409：/spare-parts 库存总价值/搜索/空表 **3 passed**。`36ee559fe`
+- Q2410：/spare-parts 启用/停用/全部 **3 passed**。
 
