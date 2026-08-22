@@ -12048,6 +12048,41 @@ test.describe('Q1862 桌面检验新建标题操作空态', () => {
   });
 });
 
+test.describe('Q1863 桌面领用详情标题操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/assignments/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, assetNo:'A-001', assetName:'笔记本', status:'DRAFT' } }) });
+      }
+      return mockApi(route);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/assignments/1 空态「领用单详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByText('领用单详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/1 空态「提交审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByText('提交审批').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/1 空态「编辑」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByRole('button', { name: /编\s*辑/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
