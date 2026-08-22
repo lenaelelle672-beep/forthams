@@ -691,5 +691,6 @@
 - Q2580：/bigscreen 昨日取消/盘点/返库 **3 passed**。`b506225c8`
 - Q2581：/bigscreen 定检/故障/备勤飞机 **3 passed**。`dbaa28ce7`
 - Q2582：/bigscreen 天气因素/航空管制/机械故障 **3 passed**。`a236ffa55`
-- Q2583：/bigscreen 飞机调配/机场原因/旅客原因 **3 passed**。
+- Q2583：/bigscreen 飞机调配/机场原因/旅客原因 **3 passed**。`a2cfc99d3`
+- Q2584：/bigscreen 成都-北京/返航/备降 **3 passed**。
 
