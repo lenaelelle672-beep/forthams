@@ -1449,4 +1449,5 @@
 | Q2259 | done | 桌面空态 **3 passed**（/bigscreen-3d「WARNING」「开场动画」「当前城市」）。禁 /m。 |
 | Q2260 | done | 桌面空态 **3 passed**（/bigscreen-3d「资产总数」「在用资产」「地图节点」）。禁 /m。 |
 | Q2261 | done | 桌面空态 **3 passed**（/bigscreen-3d「资产原值」「资产净值」、英文副标题）。禁 /m。 |
-| Q2262 | in_progress | 桌面空态：/bigscreen-3d「四川全域」或成都市。禁 /m。 |
+| Q2262 | done | 桌面空态 **3 passed**（/bigscreen-3d「四川全域」「成都市」「在线率」）。禁 /m。 |
+| Q2263 | in_progress | 桌面空态：/bigscreen-3d「件」或播放中。禁 /m。 |

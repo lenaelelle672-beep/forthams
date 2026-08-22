@@ -23515,6 +23515,34 @@ test.describe('Q2261 桌面3D大屏价值与英文标题空态', () => {
   });
 });
 
+test.describe('Q2262 桌面3D大屏城市与在线率空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen-3d 空态「四川全域」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('四川全域').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「成都市」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('成都市').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「在线率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('在线率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
