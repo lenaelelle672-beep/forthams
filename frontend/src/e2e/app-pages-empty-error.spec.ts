@@ -15983,6 +15983,34 @@ test.describe('Q1999 桌面流程设计器快捷键空态', () => {
   });
 });
 
+test.describe('Q2000 桌面流程设计器画布提示空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-designer 空态「滚轮缩放 · 拖拽布点 · 连线分流 · 拖拽吸附对齐」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('滚轮缩放 · 拖拽布点 · 连线分流 · 拖拽吸附对齐').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 空态「节点属性」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('节点属性').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer 空态「表单源码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByText('表单源码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
