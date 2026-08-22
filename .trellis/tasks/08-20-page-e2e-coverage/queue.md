@@ -1068,4 +1068,5 @@
 | Q1878 | done | 桌面空态 **3 passed**（/assignments/new placeholder「使用人 ID」「使用部门 ID」「备注」）。禁 /m。 |
 | Q1879 | done | 桌面空态 **3 passed**（/borrows/new「新建借用单」「创建借用单」「返回」）。禁 /m。 |
 | Q1880 | done | 桌面空态 **3 passed**（/borrows/new「借用信息」「资产」「预计归还日期」）。禁 /m。 |
-| Q1881 | in_progress | 桌面空态：/borrows/new 未覆盖 3 条（读 BorrowFormPage：借用用途/备注/取消）。禁 /m。 |
+| Q1881 | done | 桌面空态 **3 passed**（/borrows/new「借用用途」「备注」「取消」）。禁 /m。 |
+| Q1882 | in_progress | 桌面空态：读 router 下一未覆盖桌面详情/表单（禁 /m），优先 /inspection-templates 或 /inspection-records。 |
