@@ -1871,4 +1871,5 @@
 | Q2681 | done | 桌面空态 **3 passed**（/approvals 已通过/已驳回/无待处理）。禁 /m。 |
 | Q2682 | done | 桌面空态 **3 passed**（/approvals 资产调拨/清退/报废）。禁 /m。 |
 | Q2683 | done | 桌面空态 **3 passed**（/approvals 工单申请/全部类型/待审批）。禁 /m。 |
-| Q2684 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2684 | done | 桌面空态 **3 passed**（/maintenance 新增维保/标题/搜索）。禁 /m。 |
+| Q2685 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

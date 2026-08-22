@@ -791,5 +791,6 @@
 - Q2680：/approvals 搜索/待我审批/我发起的 **3 passed**。`5b24a1257`
 - Q2681：/approvals 已通过/已驳回/无待处理 **3 passed**。`c16f4345b`
 - Q2682：/approvals 资产调拨/清退/报废 **3 passed**。`fc336de7f`
-- Q2683：/approvals 工单申请/全部类型/待审批 **3 passed**。「全部状态」是关闭 option。
+- Q2683：/approvals 工单申请/全部类型/待审批 **3 passed**。「全部状态」是关闭 option。`f0c477b8f`
+- Q2684：/maintenance 新增维保/标题/搜索 **3 passed**。
 
