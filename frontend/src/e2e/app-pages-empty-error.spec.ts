@@ -33401,6 +33401,34 @@ test.describe('Q2614 桌面大屏关舱起飞落地空态', () => {
   });
 });
 
+test.describe('Q2615 桌面三维大屏降级空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen-3d 空态 heading「3D 地图已切换为安全降级模式」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByRole('heading', { name: '3D 地图已切换为安全降级模式' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「当前环境无法创建 WebGL 渲染上下文，已阻止 3D 资源加载。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('当前环境无法创建 WebGL 渲染上下文，已阻止 3D 资源加载。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「资产指标面板仍可访问；如需完整 3D 大屏，请在支持 WebGL 的浏览器或启用硬件加速后重试。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('资产指标面板仍可访问；如需完整 3D 大屏，请在支持 WebGL 的浏览器或启用硬件加速后重试。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
