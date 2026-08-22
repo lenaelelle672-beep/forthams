@@ -1920,4 +1920,5 @@
 | Q2730 | done | 桌面空态 **3 passed**（/analytics/reliability 排名/可用性/副标题）。禁 /m。 |
 | Q2731 | done | 桌面空态 **3 passed**（/audit 标题/搜索/导出）。禁 /m。 |
 | Q2732 | done | 桌面空态 **3 passed**（/audit 总操作数/今日操作/活跃用户）。禁 /m。 |
-| Q2733 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2733 | done | 桌面空态 **3 passed**（/audit 风险事件/最近7天/操作趋势）。禁 /m。 |
+| Q2734 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
