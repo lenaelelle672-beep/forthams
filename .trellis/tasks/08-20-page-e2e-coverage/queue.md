@@ -1959,4 +1959,5 @@
 | Q2769 | done | 桌面空态 **3 passed**（/inspection-templates 模板名称/检验类型/检验周期表头）。禁 /m。 |
 | Q2770 | done | 桌面空态 **3 passed**（/inspection-templates 状态/创建时间/操作表头）。禁 /m。 |
 | Q2771 | done | 桌面空态 **3 passed**（/stocktaking-cycles 新建/标题/暂无周期）。禁 /m。 |
-| Q2772 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2772 | done | 桌面空态 **3 passed**（/stocktaking-cycles 总周期/进行中/已完成）。禁 /m。 |
+| Q2773 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

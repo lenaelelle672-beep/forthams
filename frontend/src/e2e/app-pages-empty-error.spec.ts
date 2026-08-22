@@ -37777,6 +37777,34 @@ test.describe('Q2771 桌面盘点周期操作空态', () => {
   });
 });
 
+test.describe('Q2772 桌面盘点周期统计空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/stocktaking-cycles 空态「总周期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByText('总周期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles 空态「进行中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByText('进行中').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles 空态「已完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByText('已完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
