@@ -26855,6 +26855,34 @@ test.describe('Q2381 桌面盘点任务统计空态', () => {
   });
 });
 
+test.describe('Q2382 桌面盘点进度预警空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory 空态「平均进度」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByText('平均进度').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory 空态「已盘资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByText('已盘资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory 空态「盘亏预警」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByText('盘亏预警').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
