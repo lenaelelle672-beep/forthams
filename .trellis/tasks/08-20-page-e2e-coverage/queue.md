@@ -1443,4 +1443,5 @@
 | Q2253 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 系统参数8/8/权限专项/写操作补强）。禁 /m。 |
 | Q2254 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 menu id、六域导航、子项导航）。禁 /m。 |
 | Q2255 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 全部完成/专属 API/技术支持 catalog）。禁 /m。 |
-| Q2256 | in_progress | 桌面空态：/bigscreen 未覆盖。禁 /m。 |
+| Q2256 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 V3 registry/metadata/tech-support）。禁 /m。 |
+| Q2257 | in_progress | 桌面空态：/bigscreen-3d「固定资产智慧运营大屏」。禁 /m。 |

@@ -363,5 +363,6 @@
 - Q2252：基础资料6/6/集成5/5/消息8/8 **3 passed**。`9a2d89748`
 - Q2253：系统参数8/8/权限专项/写操作补强 **3 passed**。`1d85cecc0`
 - Q2254：menu id/六域 nav/子项 aside label。sso 仅两条稳定文案。`55ce286f9`
-- Q2255：全部完成/专属 API/技术支持 catalog **3 passed**。
+- Q2255：全部完成/专属 API/技术支持 catalog **3 passed**。`6a83b20c8`
+- Q2256：V3 registry/metadata/tech-support **3 passed**。
 
