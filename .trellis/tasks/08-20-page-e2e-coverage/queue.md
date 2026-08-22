@@ -1138,4 +1138,5 @@
 | Q1948 | done | 桌面空态 **3 passed**（/risk-matrix「风险矩阵配置」「管理风险评估的概率维度、严重度维度和等级映射规则」「创建矩阵」）。禁 /m。 |
 | Q1949 | done | 桌面空态 **3 passed**（/risk-matrix 列头「矩阵名称」「状态」「创建时间」）。禁 /m。 |
 | Q1950 | done | 桌面空态 **3 passed**（/risk-matrix 列头「操作」+「暂无矩阵配置」+ 点创建「创建矩阵配置」）。禁 /m。 |
-| Q1951 | in_progress | 桌面空态：/risk-matrix 点「创建矩阵」后「矩阵名称」+ placeholder「输入矩阵名称」+「保存」。禁 /m。 |
+| Q1951 | done | 桌面空态 **3 passed**（/risk-matrix 点「创建矩阵」后「矩阵名称」+ placeholder「输入矩阵名称」+「概率维度」）。禁 /m。 |
+| Q1952 | in_progress | 桌面空态：/risk-matrix 点「创建矩阵」后「严重度维度」「等级映射」「添加维度」。禁 /m。 |
