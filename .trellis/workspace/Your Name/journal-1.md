@@ -870,5 +870,6 @@
 - Q2759：/inspection-records 检验编号/资产ID/检验类型表头 **3 passed**。`2fe6120e7`
 - Q2760：/inspection-records 检验日期/下次检验/检验机构表头 **3 passed**。`c8cc10aec`
 - Q2761：/inspection-records 检验人/结果/操作表头 **3 passed**。`0d6f845a9`
-- Q2762：/inspection-records 副标题/批量生成/无数据 **3 passed**。
+- Q2762：/inspection-records 副标题/批量生成/无数据 **3 passed**。`18c7d220d`
+- Q2763：/inspection-records 已过期不通过/通过/搜索 **3 passed**。
 
