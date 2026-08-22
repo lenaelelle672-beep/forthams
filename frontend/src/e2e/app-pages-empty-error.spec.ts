@@ -9960,6 +9960,36 @@ test.describe('Q1803 桌面预算新建空态', () => {
   });
 });
 
+test.describe('Q1804 桌面预算新建空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/new 空态「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByText('状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「草稿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    const statusSelect = page.locator('select').filter({ hasText: '草稿' }).first();
+    await statusSelect.click();
+    await expect(statusSelect).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
