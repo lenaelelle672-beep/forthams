@@ -1253,4 +1253,5 @@
 | Q2063 | done | 桌面空态 **3 passed**（/risk-matrix 点创建矩阵严重度「一般」「非常严重」「灾难性」）。禁 /m。 |
 | Q2064 | done | 桌面空态 **3 passed**（/risk-matrix 点等级映射 CRITICAL/HIGH、「最低分数」）。禁 /m。 |
 | Q2065 | done | 桌面空态 **3 passed**（/risk-matrix 点等级映射 MEDIUM/LOW、风险等级 placeholder）。禁 /m。 |
-| Q2066 | in_progress | 桌面空态：/risk-matrix 点等级映射「按 minScore 降序排列」或分数 20/10。禁 /m。 |
+| Q2066 | done | 桌面空态 **3 passed**（/risk-matrix 点等级映射「按 minScore 降序排列」、分数 20/10）。禁 /m。 |
+| Q2067 | in_progress | 桌面空态：/risk-matrix 点等级映射分数 4/0 或「风险等级映射规则」。禁 /m。 |
