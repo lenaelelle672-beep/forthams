@@ -26435,6 +26435,34 @@ test.describe('Q2366 桌面闲置资产统计标签空态', () => {
   });
 });
 
+test.describe('Q2367 桌面闲置资产认领标签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/idle 空态「待审批认领」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/idle');
+    await expect(page.getByText('待审批认领').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/idle 空态「已完成认领」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/idle');
+    await expect(page.getByText('已完成认领').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/idle 空态「公告中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/idle');
+    await expect(page.getByText('公告中').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

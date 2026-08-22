@@ -1554,4 +1554,5 @@
 | Q2364 | done | 桌面空态 **3 passed**（/inspections 附条件通过/搜索/不通过）。禁 /m。 |
 | Q2365 | done | 桌面空态 **3 passed**（/idle heading/副标题/发布公告）。禁 /m。 |
 | Q2366 | done | 桌面空态 **3 passed**（/idle 闲置总量/已发布公告/待处理）。禁 /m。 |
-| Q2367 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2367 | done | 桌面空态 **3 passed**（/idle 待审批认领/已完成认领/公告中）。禁 /m。 |
+| Q2368 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
