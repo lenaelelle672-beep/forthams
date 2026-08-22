@@ -20575,6 +20575,34 @@ test.describe('Q2156 桌面退役新建残值评估空态', () => {
   });
 });
 
+test.describe('Q2157 桌面退役新建备注与提交空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement/new 空态「备注与说明」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('备注与说明').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/new 空态「退役操作不可逆」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('退役操作不可逆').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/new 空态「提交退役申请」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('提交退役申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

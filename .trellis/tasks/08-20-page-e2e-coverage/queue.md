@@ -1344,4 +1344,5 @@
 | Q2154 | done | 桌面空态 **3 passed**（/retirement/new「资产退役申请」「新建申请」「资产选择」）。禁 /m。 |
 | Q2155 | done | 桌面空态 **3 passed**（/retirement/new「退役管理」「折旧时间线」「退役原因」）。禁 /m。 |
 | Q2156 | done | 桌面空态 **3 passed**（/retirement/new「残值评估」「资产 ID *」「返回」）。禁 /m。 |
-| Q2157 | in_progress | 桌面空态：/retirement/new 提交或残值 placeholder。禁 /m。 |
+| Q2157 | done | 桌面空态 **3 passed**（/retirement/new「备注与说明」「退役操作不可逆」「提交退役申请」）。禁 /m。 |
+| Q2158 | in_progress | 桌面空态：/retirement/new 审批提示或取消。禁 /m。 |
