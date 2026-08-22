@@ -853,5 +853,6 @@
 - Q2742：/disposals 搜索/本月总量/回收价值 **3 passed**。`6cd810c5f`
 - Q2743：/disposals 处置单号/资产信息/申请人表头 **3 passed**。`d77fb634d`
 - Q2744：/disposals 申请日期/状态/操作表头 **3 passed**。`b2a65dd20`
-- Q2745：/disposals 资产清退/工单管理/全周期 **3 passed**。
+- Q2745：/disposals 资产清退/工单管理/全周期 **3 passed**。`47e40636d`
+- Q2746：/disposals 报废转让/资产赔偿/资产调拨 **3 passed**。
 
