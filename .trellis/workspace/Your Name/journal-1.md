@@ -538,5 +538,6 @@
 - Q2427：/stocktaking-cycles 总周期/已计划/空表 **3 passed**。`02304359a`
 - Q2428：/stocktaking-cycles 已暂停/全部状态/进行中 **3 passed**。`6775f4384`
 - Q2429：/inspection-templates 标题/新增模板/名称 placeholder **3 passed**。`5b41251d2`
-- Q2430：/inspection-templates 搜索/重置/检验类型 **3 passed**。
+- Q2430：/inspection-templates 搜索/重置/检验类型 **3 passed**。`844a1f0ab`
+- Q2431：/inspection-templates 空表/检验周期/创建时间 **3 passed**。
 
