@@ -1444,4 +1444,5 @@
 | Q2254 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 menu id、六域导航、子项导航）。禁 /m。 |
 | Q2255 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 全部完成/专属 API/技术支持 catalog）。禁 /m。 |
 | Q2256 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 V3 registry/metadata/tech-support）。禁 /m。 |
-| Q2257 | in_progress | 桌面空态：/bigscreen-3d「固定资产智慧运营大屏」。禁 /m。 |
+| Q2257 | done | 桌面空态 **3 passed**（/bigscreen-3d「固定资产智慧运营大屏」「SUMMARY」「CATEGORY」）。禁 /m。 |
+| Q2258 | in_progress | 桌面空态：/bigscreen-3d「FORECAST」「IOT」「TOP 5」。禁 /m。 |
