@@ -14096,6 +14096,34 @@ test.describe('Q1932 桌面安全检查历史结果列头空态', () => {
   });
 });
 
+test.describe('Q1933 桌面安全检查历史操作筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/history 空态「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByText('操作').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/history 空态「全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByText('全部').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/history 空态「进行中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByText('进行中').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
