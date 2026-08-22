@@ -1428,4 +1428,5 @@
 | Q2238 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「系统管理 V3 工作台」「用户管理」「当前分组」）。禁 /m。 |
 | Q2239 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「已接入」「部门组织」「组织权限」）。禁 /m。 |
 | Q2240 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「流程平台」「基础资料」「角色权限」）。禁 /m。 |
-| Q2241 | in_progress | 桌面空态：/fixed-assets/workbenchv3「菜单权限」「岗位管理」「数据权限」。禁 /m。 |
+| Q2241 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「菜单权限」「岗位管理」「数据权限」）。禁 /m。 |
+| Q2242 | in_progress | 桌面空态：/fixed-assets/workbenchv3「交接管理」「租户管理」「集成配置」。禁 /m。 |
