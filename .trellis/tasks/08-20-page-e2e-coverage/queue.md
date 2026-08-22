@@ -1172,4 +1172,5 @@
 | Q1982 | done | 桌面空态 **3 passed**（/workflows「当前版本」「发布快照」「审批/办理」）。禁 /m。 |
 | Q1983 | done | 桌面空态 **3 passed**（/workflows「总节点」「本地草稿」「可发起状态」）。禁 /m。 |
 | Q1984 | done | 桌面空态 **3 passed**（/workflows「业务对象」「更新时间」「发布时间」）。禁 /m。 |
-| Q1985 | in_progress | 桌面空态：/workflows「创建时间」「更新人」「发布人」。禁 /m。 |
+| Q1985 | done | 桌面空态 **3 passed**（/workflows「创建时间」「更新人」「发布人」）。禁 /m。 |
+| Q1986 | in_progress | 桌面空态：/workflows「发起入口」「契约状态」「阻断原因」。禁 /m。 |
