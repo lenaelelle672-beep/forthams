@@ -1585,4 +1585,5 @@
 | Q2395 | done | 桌面空态 **3 passed**（/assignments 短期借用/归还入库/调拨转移）。禁 /m。 |
 | Q2396 | done | 桌面空态 **3 passed**（/intake heading/副标题/新建验收单）。禁 /m。 |
 | Q2397 | done | 桌面空态 **3 passed**（/intake 搜索 placeholder/搜索/暂无验收单）。禁 /m。 |
-| Q2398 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2398 | done | 桌面空态 **3 passed**（/intake 待质检/质检中/部分验收）。禁 /m。 |
+| Q2399 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
