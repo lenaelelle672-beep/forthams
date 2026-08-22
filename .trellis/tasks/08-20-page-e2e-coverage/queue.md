@@ -1462,4 +1462,5 @@
 | Q2272 | done | 桌面空态 **3 passed**（/forbidden?reason=roles_missing 信息不完整/角色缺失/重新登录）。禁 /m。 |
 | Q2273 | done | 桌面空态 **3 passed**（/forbidden?reason=roles_missing 重试/无法验证/联系管理员）。禁 /m。 |
 | Q2274 | done | 桌面空态 **3 passed**（/sso-callback「SSO 登录」「Token 缺失」「SSO 登录失败」）。禁 /m。 |
-| Q2275 | in_progress | 桌面空态：/vendor-portal 未覆盖占位。禁 /m。 |
+| Q2275 | done | 桌面空态 **3 passed**（/bigscreen-3d「泸州市」「德阳市」「自贡市」。空资产绵阳不在 TOP5）。禁 /m。 |
+| Q2276 | in_progress | 桌面空态：/bigscreen-3d「攀枝花市」。禁 /m。 |
