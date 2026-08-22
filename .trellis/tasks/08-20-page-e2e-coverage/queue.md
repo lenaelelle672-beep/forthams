@@ -1467,4 +1467,5 @@
 | Q2277 | done | 桌面空态 **3 passed**（/workspace-preview「运营首页」「总资产数」「欢迎回来」）。禁 /m。 |
 | Q2278 | done | 桌面空态 **3 passed**（/workspace-preview「在用资产」「闲置资产」「导出数据」）。禁 /m。 |
 | Q2279 | done | 桌面空态 **3 passed**（/workspace-preview「待审批」「刷新视图」「资产价值趋势」）。禁 /m。 |
-| Q2280 | in_progress | 桌面空态：/workspace-preview「分类分布」「维保预警」。禁 /m。 |
+| Q2280 | done | 桌面空态 **3 passed**（/workspace-preview「分类分布」「维保预警」「最近工单」）。禁 /m。 |
+| Q2281 | in_progress | 桌面空态：/workspace-preview「净值」「部门资产统计」。禁 /m。 |
