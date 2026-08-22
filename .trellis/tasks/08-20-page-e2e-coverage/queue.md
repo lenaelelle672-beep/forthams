@@ -1915,4 +1915,5 @@
 | Q2725 | done | 桌面空态 **3 passed**（/analytics 暂无分类/部门排行/副标题）。禁 /m。 |
 | Q2726 | done | 桌面空态 **3 passed**（/analytics 数据来源/价值趋势/分类分布 heading）。禁 /m。 |
 | Q2727 | done | 桌面空态 **3 passed**（/analytics/reliability 标题/暂无排名/暂无趋势）。禁 /m。 |
-| Q2728 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2728 | done | 桌面空态 **3 passed**（/analytics/reliability 故障间隔/修复时间/可用率）。禁 /m。 |
+| Q2729 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

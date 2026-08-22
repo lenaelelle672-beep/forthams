@@ -36545,6 +36545,34 @@ test.describe('Q2727 桌面可靠性分析标题空态', () => {
   });
 });
 
+test.describe('Q2728 桌面可靠性分析指标空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/reliability 空态「平均故障间隔」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByText('平均故障间隔').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability 空态「平均修复时间」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByText('平均修复时间').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability 空态「设备可用率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByText('设备可用率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

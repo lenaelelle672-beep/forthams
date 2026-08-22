@@ -835,5 +835,6 @@
 - Q2724：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。`9e90fa5e0`
 - Q2725：/analytics 暂无分类/部门排行/副标题 **3 passed**。`cf9b71348`
 - Q2726：/analytics 数据来源/价值趋势/分类分布 heading **3 passed**。`23d1358ea`
-- Q2727：/analytics/reliability 标题/暂无排名/暂无趋势 **3 passed**。
+- Q2727：/analytics/reliability 标题/暂无排名/暂无趋势 **3 passed**。`487646b88`
+- Q2728：/analytics/reliability 故障间隔/修复时间/可用率 **3 passed**。
 
