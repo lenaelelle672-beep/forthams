@@ -772,5 +772,6 @@
 - Q2661：/equipment 设备名称/设备ID/上次维保表头 **3 passed**。`403cde484`
 - Q2662：/equipment 下次维保/使用率/维保状态表头 **3 passed**。`4dd74ed5e`
 - Q2663：/equipment 设备/日期/类型表头 **3 passed**。`66cf2cf9a`
-- Q2664：/equipment 技术员/费用/操作表头 **3 passed**。
+- Q2664：/equipment 技术员/费用/操作表头 **3 passed**。`65771a89a`
+- Q2665：/fault-codes 新增根节点/标题/空态引导 **3 passed**。
 

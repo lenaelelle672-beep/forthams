@@ -34781,6 +34781,34 @@ test.describe('Q2664 桌面设备维保记录其余表头空态', () => {
   });
 });
 
+test.describe('Q2665 桌面故障代码操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fault-codes 空态 button「新增根节点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByRole('button', { name: '新增根节点' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes 空态 heading「故障代码管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByRole('heading', { name: '故障代码管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fault-codes 空态「点击「新增根节点」创建第一级故障现象」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fault-codes');
+    await expect(page.getByText('点击「新增根节点」创建第一级故障现象').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
