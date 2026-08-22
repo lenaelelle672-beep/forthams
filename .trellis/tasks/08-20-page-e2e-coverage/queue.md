@@ -1243,4 +1243,5 @@
 | Q2053 | done | 桌面空态 **3 passed**（/inspections「总检验数」「通过」「不通过」）。禁 /m。 |
 | Q2054 | done | 桌面空态 **3 passed**（/inspections「已过期」「检验编号」「资产ID」）。禁 /m。 |
 | Q2055 | done | 桌面空态 **3 passed**（/inspections 表头「检验类型」「检验日期」「下次检验」）。禁 /m。 |
-| Q2056 | in_progress | 桌面空态：/inspections 表头「检验机构/结果/操作」。禁 /m。 |
+| Q2056 | done | 桌面空态 **3 passed**（/inspections 表头「检验机构」「结果」「操作」）。禁 /m。 |
+| Q2057 | in_progress | 桌面空态：/inspection-templates 未测标题/空表。禁 /m。 |
