@@ -29880,6 +29880,34 @@ test.describe('Q2489 桌面业务流程发布停用空态', () => {
   });
 });
 
+test.describe('Q2490 桌面赔偿配置方式空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/compensation/new 空态「赔偿配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation/new');
+    await expect(page.getByText('赔偿配置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation/new 空态「现金赔偿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation/new');
+    await expect(page.getByText('现金赔偿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation/new 空态「等价物赔偿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation/new');
+    await expect(page.getByText('等价物赔偿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
