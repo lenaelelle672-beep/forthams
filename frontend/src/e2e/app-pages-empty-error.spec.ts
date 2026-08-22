@@ -15758,6 +15758,34 @@ test.describe('Q1991 桌面流程中心转移说明空态', () => {
   });
 });
 
+test.describe('Q1992 桌面流程中心处置说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflows 空态「用于闲置资产清退、部门审批、库房确认及 IT 审核的流程定义。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('用于闲置资产清退、部门审批、库房确认及 IT 审核的流程定义。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「用于资产报废转让多级审批、收款确认与核算归档的流程定义。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('用于资产报废转让多级审批、收款确认与核算归档的流程定义。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「用于资产损失赔偿、信息安全审批、财务审批与库房接收的流程定义。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('用于资产损失赔偿、信息安全审批、财务审批与库房接收的流程定义。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

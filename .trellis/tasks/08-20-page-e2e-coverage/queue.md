@@ -1179,4 +1179,5 @@
 | Q1989 | done | 桌面空态 **3 passed**（/workflows「资产赔偿流程」「资产退役流程」「首页」）。禁 /m。 |
 | Q1990 | done | 桌面空态 **3 passed**（/workflows「上一页」「下一页」「末页」）。禁 /m。 |
 | Q1991 | done | 桌面空态 **3 passed**（/workflows「未知」「业务：资产转移」「用于资产转出、转入确认及双方部门资产管理员审批的流程定义。」）。禁 /m。 |
-| Q1992 | in_progress | 桌面空态：/workflows 清退/报废/赔偿说明文案。禁 /m。 |
+| Q1992 | done | 桌面空态 **3 passed**（/workflows 清退/报废/赔偿说明）。禁 /m。 |
+| Q1993 | in_progress | 桌面空态：/workflows 退役说明 +「业务：资产清退」「业务：资产报废转让」。禁 /m。 |
