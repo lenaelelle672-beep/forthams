@@ -716,5 +716,6 @@
 - Q2605：/bigscreen 座位数/耗油量/节油量 **3 passed**。`ba3b12c39`
 - Q2606：/bigscreen 燃油价格/关舱门时刻/客座率值 **3 passed**。`5bace4e3c`
 - Q2607：/bigscreen 2350/8800/2100 **3 passed**。`af989b175`
-- Q2608：/bigscreen 10.77/5.78/12.24 **3 passed**。
+- Q2608：/bigscreen 10.77/5.78/12.24 **3 passed**。`52fa99303`
+- Q2609：/bigscreen 75.2%/18/32 **3 passed**。
 
