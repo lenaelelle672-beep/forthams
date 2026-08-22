@@ -37441,6 +37441,34 @@ test.describe('Q2759 桌面检验记录表头空态', () => {
   });
 });
 
+test.describe('Q2760 桌面检验记录其余表头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspection-records 空态 columnheader「检验日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByRole('columnheader', { name: '检验日期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-records 空态 columnheader「下次检验」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByRole('columnheader', { name: '下次检验' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-records 空态 columnheader「检验机构」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByRole('columnheader', { name: '检验机构' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
