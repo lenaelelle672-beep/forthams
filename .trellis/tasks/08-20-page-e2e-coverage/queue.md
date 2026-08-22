@@ -1435,4 +1435,5 @@
 | Q2245 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 部门树/角色绑定/权限库存描述）。禁 /m。 |
 | Q2246 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 租户主数据/交接摘要/数据范围）。禁 /m。 |
 | Q2247 | done | 桌面空态 **3 passed**（/404「404 — 页面不存在」及拆分）。禁 /m。 |
-| Q2248 | in_progress | 桌面空态：/forbidden 未覆盖。禁 /m。 |
+| Q2248 | done | 桌面空态 **3 passed**（/forbidden「无访问权限」「您没有访问此页面的权限」「返回首页」）。禁 /m。 |
+| Q2249 | in_progress | 桌面空态：/login 未覆盖。禁 /m。 |
