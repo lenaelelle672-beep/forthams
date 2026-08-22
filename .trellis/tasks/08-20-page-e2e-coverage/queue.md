@@ -1000,4 +1000,5 @@
 | Q1810 | done | 桌面空态 **3 passed**（/budgets/1 点删除确认框三文案）。禁 /m。 |
 | Q1811 | done | 桌面空态 **3 passed**（/budgets/1 点删除「取消」、详情「采购」「草稿」）。禁 /m。 |
 | Q1812 | done | 桌面空态 **3 passed**（/budgets/1/edit 编辑预算/修改预算信息/更新预算；补 budgets/:id/edit 路由；从 404 未挂载列表移除该 path）。禁 /m。 |
-| Q1813 | in_progress | 桌面空态：/budgets/1 详情类型/状态未覆盖变体 3 条（读 BudgetDetailPage getTypeLabel/getStatusLabel：维保/运营/已审批，须 mock budgetType/status）。禁 /m。 |
+| Q1813 | done | 桌面空态 **3 passed**（/budgets/1 详情「维保」「运营」「已审批」）。禁 /m。 |
+| Q1814 | in_progress | 桌面空态：/budgets/1 详情未覆盖 3 条（读 BudgetDetailPage：已关闭徽章；点确认删除 toast「预算删除成功」；删除失败 toast「删除失败」）。禁 /m。 |
