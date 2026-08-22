@@ -1815,4 +1815,5 @@
 | Q2625 | done | 桌面空态 **3 passed**（/login 2026/©/·）。禁 /m。 |
 | Q2626 | done | 桌面空态 **3 passed**（/login link 全息版/流星版 + label 用户名）。禁 /m。 |
 | Q2627 | done | 桌面空态 **3 passed**（/login label 密码/button 登录系统/checkbox 记住用户名）。禁 /m。 |
-| Q2628 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2628 | done | 桌面空态 **3 passed**（/login MaxKey/忘记密码/密码placeholder）。禁 /m。 |
+| Q2629 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
