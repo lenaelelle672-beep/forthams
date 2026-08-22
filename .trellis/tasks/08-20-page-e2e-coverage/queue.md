@@ -1177,4 +1177,5 @@
 | Q1987 | done | 桌面空态 **3 passed**（/workflows「未记录」「未读取」「显示第」）。禁 /m。 |
 | Q1988 | done | 桌面空态 **3 passed**（/workflows「资产转移流程」「资产清退流程」「资产报废转让流程」）。禁 /m。 |
 | Q1989 | done | 桌面空态 **3 passed**（/workflows「资产赔偿流程」「资产退役流程」「首页」）。禁 /m。 |
-| Q1990 | in_progress | 桌面空态：/workflows「上一页」「下一页」「末页」。禁 /m。 |
+| Q1990 | done | 桌面空态 **3 passed**（/workflows「上一页」「下一页」「末页」）。禁 /m。 |
+| Q1991 | in_progress | 桌面空态：/workflows「未知」「业务：资产转移」「用于资产转出、转入确认及双方部门资产管理员审批的流程定义。」。禁 /m。 |
