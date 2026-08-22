@@ -16956,6 +16956,36 @@ test.describe('Q2033 桌面GIS自定义时间范围弹窗空态', () => {
   });
 });
 
+test.describe('Q2034 桌面GIS自定义时间应用取消空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis 点自定义「应用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '自定义' }).click();
+    await expect(page.getByRole('button', { name: '应用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点自定义「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '自定义' }).click();
+    await expect(page.getByRole('button', { name: '取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 空态「全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByText('全部', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
