@@ -1028,4 +1028,5 @@
 | Q1838 | done | 桌面空态 **3 passed**（/intake/1「资产名称」「品牌」「型号」）。禁 /m。 |
 | Q1839 | done | 桌面空态 **3 passed**（/intake/1「原值」「购置日期」「待检」）。禁 /m。 |
 | Q1840 | done | 桌面空态 **3 passed**（/intake/1「通过」「不通过」「驳回原因」）。禁 /m。 |
-| Q1841 | in_progress | 桌面空态：/assignments/1/edit 编辑页未覆盖文案 3 条（读 AssignmentFormPage isEdit 分支硬编码中文）。禁 /m。 |
+| Q1841 | done | 桌面空态 **3 passed**（/assignments/1/edit 编辑领用单/保存修改/返回）。禁 /m。 |
+| Q1842 | in_progress | 桌面空态：/borrows/1/edit 编辑页未覆盖文案 3 条（读 BorrowFormPage isEdit 分支硬编码中文）。禁 /m。 |
