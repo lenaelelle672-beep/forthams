@@ -1127,4 +1127,5 @@
 | Q1937 | done | 桌面空态 **3 passed**（/risk-assessments「风险矩阵（5x5）」「风险评估记录」「极低」）。禁 /m。 |
 | Q1938 | done | 桌面空态 **3 passed**（/risk-assessments 轴标签「极高」「极小」「极大」）。禁 /m。 |
 | Q1939 | done | 桌面空态 **3 passed**（/risk-assessments 筛选「重大」「高危」「中危」）。禁 /m。 |
-| Q1940 | in_progress | 桌面空态：/risk-assessments 筛选「低危」「全部」+「新增评估」（已有则换列头）。禁 /m。 |
+| Q1940 | done | 桌面空态 **3 passed**（/risk-assessments 筛选「低危」「全部」+ 列头「资产ID」）。禁 /m。 |
+| Q1941 | in_progress | 桌面空态：/risk-assessments 列头「可能性」「影响程度」「风险等级」。禁 /m。 |
