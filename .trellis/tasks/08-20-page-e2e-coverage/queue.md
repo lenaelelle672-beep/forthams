@@ -1982,4 +1982,5 @@
 | Q2792 | done | 桌面空态 **3 passed**（/inspections/new 检验人/检查发现/证书编号 placeholder）。禁 /m。 |
 | Q2793 | done | 桌面空态 **3 passed**（/inspections/new 资产ID/模板/附件 placeholder）。禁 /m。 |
 | Q2794 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 返回列表/保存/标题）。禁 /m。 |
-| Q2795 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2795 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 周期名称/placeholder/盘点类型）。禁 /m。 |
+| Q2796 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

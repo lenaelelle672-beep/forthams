@@ -902,5 +902,6 @@
 - Q2791：/inspections/new 报告附件/编号placeholder/机构placeholder **3 passed**。`ea3aa2f5f`
 - Q2792：/inspections/new 检验人/检查发现/证书编号 placeholder **3 passed**。`ee06c1c0c`
 - Q2793：/inspections/new 资产ID/模板/附件 placeholder **3 passed**。`a33467e0e`
-- Q2794：/stocktaking-cycles/new 返回列表/保存/标题 **3 passed**。
+- Q2794：/stocktaking-cycles/new 返回列表/保存/标题 **3 passed**。`d7faf29aa`
+- Q2795：/stocktaking-cycles/new 周期名称/placeholder/盘点类型 **3 passed**。周期名称无关联 label。
 
