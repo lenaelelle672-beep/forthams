@@ -18364,6 +18364,61 @@ test.describe('Q2080 桌面SAM扫描详情弹窗空态', () => {
   });
 });
 
+test.describe('Q2081 桌面SAM扫描详情席位列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (apiRoute) => {
+      const path = new URL(apiRoute.request().url()).pathname.replace(/^\/api/, '');
+      if (path === '/sam/history') {
+        return fulfill(apiRoute, {
+          records: [{
+            id: 1,
+            scanDate: '2026-08-01T00:00:00',
+            totalLicenses: 1,
+            compliantCount: 1,
+            overusedCount: 0,
+            underusedCount: 0,
+            expiredCount: 0,
+            complianceRate: 100,
+          }],
+          total: 1,
+          size: 10,
+          current: 1,
+          pages: 1,
+        });
+      }
+      if (path === '/sam/1/details') {
+        return fulfill(apiRoute, { details: [] });
+      }
+      return mockApi(apiRoute);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam 点查看详情「总席位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await page.getByRole('button', { name: '查看详情' }).first().click();
+    await expect(page.getByText('总席位').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/sam 点查看详情「已用席位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await page.getByRole('button', { name: '查看详情' }).first().click();
+    await expect(page.getByText('已用席位').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/sam 点查看详情「使用率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await page.getByRole('button', { name: '查看详情' }).first().click();
+    await expect(page.getByText('使用率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
