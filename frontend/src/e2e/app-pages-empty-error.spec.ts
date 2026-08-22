@@ -25218,6 +25218,34 @@ test.describe('Q2322 桌面工作台顶栏个人中心空态', () => {
   });
 });
 
+test.describe('Q2323 桌面工作台预览顶栏title空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workspace-preview 空态 title「切换全屏」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByTitle('切换全屏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workspace-preview 空态 title「通知中心」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByTitle('通知中心').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workspace-preview 空态 title「个人中心」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByTitle('个人中心').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
