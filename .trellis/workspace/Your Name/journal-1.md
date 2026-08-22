@@ -634,5 +634,6 @@
 - Q2523：/risk-assessments/new 可能性/影响程度/缓解措施 **3 passed**。`341464687`
 - Q2524：/risk-assessments/new 缓解placeholder/评审日期/评估人ID **3 passed**。`c80e76f6b`
 - Q2525：/risk-assessments/new 评估人placeholder/创建/风险等级 **3 passed**。Antd 按钮 accessible name 为「创 建」。`e81d76271`
-- Q2526：/risk-assessments/new 取消/1-极低 + /workorders/new 填写说明 **3 passed**。
+- Q2526：/risk-assessments/new 取消/1-极低 + /workorders/new 填写说明 **3 passed**。`6ba907bb6`
+- Q2527：/stocktaking-cycles/new 返回列表/保存 + /risk-assessments/new 1-极小 **3 passed**。
 
