@@ -901,5 +901,6 @@
 - Q2790：/inspections/new 证书编号/到期日/检验费用 **3 passed**。`b482bb536`
 - Q2791：/inspections/new 报告附件/编号placeholder/机构placeholder **3 passed**。`ea3aa2f5f`
 - Q2792：/inspections/new 检验人/检查发现/证书编号 placeholder **3 passed**。`ee06c1c0c`
-- Q2793：/inspections/new 资产ID/模板/附件 placeholder **3 passed**。
+- Q2793：/inspections/new 资产ID/模板/附件 placeholder **3 passed**。`a33467e0e`
+- Q2794：/stocktaking-cycles/new 返回列表/保存/标题 **3 passed**。
 
