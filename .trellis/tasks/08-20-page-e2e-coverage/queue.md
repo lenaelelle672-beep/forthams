@@ -1889,4 +1889,5 @@
 | Q2699 | done | 桌面空态 **3 passed**（/notifications 共0条/全部/引导文案）。禁 /m。 |
 | Q2700 | done | 桌面空态 **3 passed**（/depreciation 批量计算/标题/暂无计划）。禁 /m。 |
 | Q2701 | done | 桌面空态 **3 passed**（/depreciation 搜索/查询/重置）。禁 /m。 |
-| Q2702 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2702 | done | 桌面空态 **3 passed**（/depreciation 本月总额/待计算/已完成）。禁 /m。 |
+| Q2703 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
