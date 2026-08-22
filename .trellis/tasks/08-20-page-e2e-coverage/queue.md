@@ -1085,4 +1085,5 @@
 | Q1895 | done | 桌面空态 **3 passed**（/inspection-records 列头「操作」+「暂无检验记录」「当前没有可显示的数据」）。禁 /m。 |
 | Q1896 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new「返回列表」「新建盘点周期」「周期名称」）。禁 /m。 |
 | Q1897 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new「盘点类型」+ placeholder「例如：2024年6月循环盘点」+「保存」；option「全盘点」hidden 不测）。禁 /m。 |
-| Q1898 | in_progress | 桌面空态：/stocktaking-cycles「循环盘点周期」「管理库存盘点计划与执行周期」「总周期」。禁 /m。 |
+| Q1898 | done | 桌面空态 **3 passed**（/stocktaking-cycles「循环盘点周期」「管理库存盘点计划与执行周期」「总周期」）。禁 /m。 |
+| Q1899 | in_progress | 桌面空态：/stocktaking-cycles「进行中」「已完成」「已计划」。禁 /m。 |
