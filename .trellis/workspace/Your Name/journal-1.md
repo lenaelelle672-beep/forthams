@@ -914,5 +914,6 @@
 - Q2803：/assets/new 基本信息/位置归属/财务信息 heading **3 passed**。`a8b7d8322`
 - Q2804：/assets/new 新建资产/填写进度/资产台账 **3 passed**。`3a7ea2387`
 - Q2805：/assets/new 名称/品牌/型号 placeholder **3 passed**。`3b071a2d8`
-- Q2806：/assets/new 序列号/供应商/位置 placeholder **3 passed**。
+- Q2806：/assets/new 序列号/供应商/位置 placeholder **3 passed**。`978961d37`
+- Q2807：/assets/new 纬度/经度/RFID placeholder **3 passed**。
 
