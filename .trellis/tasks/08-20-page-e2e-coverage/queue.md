@@ -1949,4 +1949,5 @@
 | Q2759 | done | 桌面空态 **3 passed**（/inspection-records 检验编号/资产ID/检验类型表头）。禁 /m。 |
 | Q2760 | done | 桌面空态 **3 passed**（/inspection-records 检验日期/下次检验/检验机构表头）。禁 /m。 |
 | Q2761 | done | 桌面空态 **3 passed**（/inspection-records 检验人/结果/操作表头）。禁 /m。 |
-| Q2762 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2762 | done | 桌面空态 **3 passed**（/inspection-records 副标题/批量生成/无数据）。禁 /m。 |
+| Q2763 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
