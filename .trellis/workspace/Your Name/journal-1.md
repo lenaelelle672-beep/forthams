@@ -541,5 +541,6 @@
 - Q2430：/inspection-templates 搜索/重置/检验类型 **3 passed**。`844a1f0ab`
 - Q2431：/inspection-templates 空表/检验周期/创建时间 **3 passed**。`68038497a`
 - Q2432：/revaluations heading/价值调整/新增 **3 passed**。`0005dd6c0`
-- Q2433：/revaluations 总记录/已拒绝/空表 **3 passed**。
+- Q2433：/revaluations 总记录/已拒绝/空表 **3 passed**。`d834ba8dc`
+- Q2434：/revaluations 合计/需及时处理/本期已审批 **3 passed**。
 
