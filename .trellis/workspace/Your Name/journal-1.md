@@ -209,5 +209,6 @@
 - Q2098：处置建议/告警处置上下文/转预测维保 **3 passed**。`6c15f6438`
 - Q2099：安全告警/异常列表/工作台告警上下文 **3 passed**。`3fd0c3c96`
 - Q2100：影响资产/处置动作/必要时 **3 passed**。`61eb3e21d`
-- Q2101：TCO 标题与部门/分类ID **3 passed**。
+- Q2101：TCO 标题与部门/分类ID **3 passed**。`0695d9a11`
+- Q2102：暂无排名/趋势、select 按 MTBF **3 passed**。option 不可见，用 select hasText。
 
