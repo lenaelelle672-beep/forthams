@@ -882,5 +882,6 @@
 - Q2771：/stocktaking-cycles 新建/标题/暂无周期 **3 passed**。`610fcabdd`
 - Q2772：/stocktaking-cycles 总周期/进行中/已完成 **3 passed**。`d8f6fbf8b`
 - Q2773：/stocktaking-cycles 周期名称/类型/状态表头 **3 passed**。`1405a4542`
-- Q2774：/stocktaking-cycles 开始/结束/操作表头 **3 passed**。
+- Q2774：/stocktaking-cycles 开始/结束/操作表头 **3 passed**。`b03ecc9dc`
+- Q2775：/stocktaking-cycles 已计划/已暂停/全部状态 **3 passed**。
 

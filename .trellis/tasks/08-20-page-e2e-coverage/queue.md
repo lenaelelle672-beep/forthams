@@ -1962,4 +1962,5 @@
 | Q2772 | done | 桌面空态 **3 passed**（/stocktaking-cycles 总周期/进行中/已完成）。禁 /m。 |
 | Q2773 | done | 桌面空态 **3 passed**（/stocktaking-cycles 周期名称/类型/状态表头）。禁 /m。 |
 | Q2774 | done | 桌面空态 **3 passed**（/stocktaking-cycles 开始/结束/操作表头）。禁 /m。 |
-| Q2775 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2775 | done | 桌面空态 **3 passed**（/stocktaking-cycles 已计划/已暂停/全部状态）。禁 /m。 |
+| Q2776 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
