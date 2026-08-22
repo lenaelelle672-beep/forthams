@@ -1508,4 +1508,5 @@
 | Q2318 | done | 桌面空态 **3 passed**（my-assets 待处理维修/累计折旧/导出PDF）。禁 /m。 |
 | Q2319 | done | 桌面空态 **3 passed**（my-assets 未找到记录/调整筛选/资产列表）。禁 /m。 |
 | Q2320 | done | 桌面空态 **3 passed**（my-assets 搜索 placeholder/资产管理/我的资产）。禁 /m。 |
-| Q2321 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2321 | done | 桌面空态 **3 passed**（顶栏 title 全屏/密度/通知中心。settings 菜单未切页）。禁 /m。 |
+| Q2322 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

@@ -428,5 +428,6 @@
 - Q2317：my-assets 总净值/闲置率/导入 **3 passed**。`4aae76bba`
 - Q2318：待处理维修/累计折旧/导出PDF **3 passed**。`8e4786ed7`
 - Q2319：未找到记录/调整筛选/资产列表 **3 passed**。`5d782d101`
-- Q2320：搜索 placeholder/资产管理/我的资产 **3 passed**。
+- Q2320：搜索 placeholder/资产管理/我的资产 **3 passed**。`57ecbb857`
+- Q2321：顶栏 title 全屏/密度/通知。settings 菜单未切。
 
