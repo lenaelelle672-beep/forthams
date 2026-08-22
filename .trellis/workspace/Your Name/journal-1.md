@@ -603,5 +603,6 @@
 - Q2492：/compensation/new 申请标题/赔偿申请/标准流程 **3 passed**。`5c08b0074`
 - Q2493：/retirement/new 申请标题/新建申请/资产选择 **3 passed**。`ea82b92e9`
 - Q2494：/retirement/new 搜索/空搜提示/退役管理 **3 passed**。`b82960c38`
-- Q2495：/borrows/new 新建借用单/借用信息/归还日期 **3 passed**。
+- Q2495：/borrows/new 新建借用单/借用信息/归还日期 **3 passed**。`eae663ce7`
+- Q2496：/borrows/new 请选择资产/用途/创建 **3 passed**。
 
