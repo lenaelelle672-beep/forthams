@@ -756,5 +756,6 @@
 - Q2645：/login4 固定资产平台/密码/UNIVIEW heading **3 passed**。无 seedSession。默认皮肤非「固定资产智能运维中枢」。`f17ed8606`
 - Q2646：/login5 账号/密码 placeholder/登录按钮 **3 passed**。无 seedSession。`e1d055eea`
 - Q2647：/login5 忘记密码/记住用户名/SSO link **3 passed**。无 seedSession。`4737f55e7`
-- Q2648：/login5 登录表单/用户名/显示密码 **3 passed**。无 seedSession。
+- Q2648：/login5 登录表单/用户名/显示密码 **3 passed**。无 seedSession。`ce750e7f3`
+- Q2649：/login5 组织账号文案/密码/登录系统 **3 passed**。无 seedSession。/login5 默认皮肤非 /login4。
 
