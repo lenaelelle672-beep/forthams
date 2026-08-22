@@ -563,5 +563,6 @@
 - Q2452：/inspection-records 新增检验/搜索/空表 **3 passed**。`d0cd15e13`
 - Q2453：/disposals heading/全周期/本月处置总量 **3 passed**。`465428026`
 - Q2454：/disposals 回收价值/报废转让/工单管理 **3 passed**。`fb1d58b6f`
-- Q2455：/disposals 清退列表/搜索/资产赔偿 **3 passed**。
+- Q2455：/disposals 清退列表/搜索/资产赔偿 **3 passed**。`53063224b`
+- Q2456：/disposals 空表/新建清退/资产调拨 **3 passed**。
 
