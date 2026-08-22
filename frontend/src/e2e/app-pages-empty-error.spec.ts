@@ -13518,6 +13518,37 @@ test.describe('Q1912 桌面循环盘点规则说明空态', () => {
   });
 });
 
+test.describe('Q1913 桌面循环盘点规则新增弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/cycle-count 点新增规则「ABC分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByText('ABC分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 点新增规则「盘点频率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByText('盘点频率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 点新增规则「最小价值（元）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByText('最小价值（元）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
