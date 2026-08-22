@@ -33681,6 +33681,33 @@ test.describe('Q2624 桌面大屏单位空态', () => {
   });
 });
 
+test.describe('Q2625 桌面登录页版权年份空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+  });
+
+  test('/login 空态「2026」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('2026').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「©」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('©').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「·」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('·').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
