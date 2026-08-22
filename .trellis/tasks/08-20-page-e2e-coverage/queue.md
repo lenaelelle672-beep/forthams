@@ -1129,4 +1129,5 @@
 | Q1939 | done | 桌面空态 **3 passed**（/risk-assessments 筛选「重大」「高危」「中危」）。禁 /m。 |
 | Q1940 | done | 桌面空态 **3 passed**（/risk-assessments 筛选「低危」「全部」+ 列头「资产ID」）。禁 /m。 |
 | Q1941 | done | 桌面空态 **3 passed**（/risk-assessments 列头「可能性」「影响程度」「风险等级」）。禁 /m。 |
-| Q1942 | in_progress | 桌面空态：/risk-assessments 列头「缓解措施」「评审日期」「操作」。禁 /m。 |
+| Q1942 | done | 桌面空态 **3 passed**（/risk-assessments 列头「缓解措施」「评审日期」「操作」）。禁 /m。 |
+| Q1943 | in_progress | 桌面空态：/risk-assessments/new「新增风险评估」及相关表单文案（读页确认）。禁 /m。 |
