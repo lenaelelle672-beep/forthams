@@ -1313,4 +1313,5 @@
 | Q2123 | done | 桌面空态 **3 passed**（/asset-models「分类」「制造商」「状态」）。禁 /m。 |
 | Q2124 | done | 桌面空态 **3 passed**（/asset-models「字段集」「描述」「操作」）。禁 /m。 |
 | Q2125 | done | 桌面空态 **3 passed**（/equipment「设备名称」「设备ID」「上次维保」）。禁 /m。 |
-| Q2126 | in_progress | 桌面空态：/equipment 列头「下次维保」「使用率」「维保状态」。禁 /m。 |
+| Q2126 | done | 桌面空态 **3 passed**（/equipment「下次维保」「使用率」「维保状态」）。禁 /m。 |
+| Q2127 | in_progress | 桌面空态：/equipment「操作」或设备维保表头。禁 /m。 |
