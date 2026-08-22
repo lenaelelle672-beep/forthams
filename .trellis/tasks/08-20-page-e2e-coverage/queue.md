@@ -1089,4 +1089,5 @@
 | Q1899 | done | 桌面空态 **3 passed**（/stocktaking-cycles「进行中」「已完成」「已计划」）。禁 /m。 |
 | Q1900 | done | 桌面空态 **3 passed**（/stocktaking-cycles「全部状态」「已暂停」「已取消」）。禁 /m。 |
 | Q1901 | done | 桌面空态 **3 passed**（/stocktaking-cycles 列头「周期名称」「类型」「状态」）。禁 /m。 |
-| Q1902 | in_progress | 桌面空态：/stocktaking-cycles 列头「开始时间」「结束时间」「操作」。禁 /m。 |
+| Q1902 | done | 桌面空态 **3 passed**（/stocktaking-cycles 列头「开始时间」「结束时间」「操作」）。禁 /m。 |
+| Q1903 | in_progress | 桌面空态：/stocktaking-cycles/1「返回列表」「周期信息」「统计信息」。禁 /m。 |
