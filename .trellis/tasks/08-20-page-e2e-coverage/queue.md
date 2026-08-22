@@ -1793,4 +1793,5 @@
 | Q2603 | done | 桌面空态 **3 passed**（/bigscreen 264人/计划航班/客座率）。禁 /m。 |
 | Q2604 | done | 桌面空态 **3 passed**（/bigscreen 承运人数/VIP/特殊旅客）。禁 /m。 |
 | Q2605 | done | 桌面空态 **3 passed**（/bigscreen 座位数/耗油量/节油量）。禁 /m。 |
-| Q2606 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2606 | done | 桌面空态 **3 passed**（/bigscreen 燃油价格/关舱门时刻/客座率值）。禁 /m。 |
+| Q2607 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

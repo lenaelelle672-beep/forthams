@@ -33149,6 +33149,34 @@ test.describe('Q2605 桌面大屏座位油量空态', () => {
   });
 });
 
+test.describe('Q2606 桌面大屏燃油时刻空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen 空态「燃油价格（元/吨）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('燃油价格（元/吨）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen 空态「关舱门：13:05　起飞：15:30　落地：14:10」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('关舱门：13:05　起飞：15:30　落地：14:10').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/bigscreen 空态「87.68%」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen');
+    await expect(page.getByText('87.68%').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
