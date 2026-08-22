@@ -33485,6 +33485,34 @@ test.describe('Q2617 桌面三维大屏分类占比空态', () => {
   });
 });
 
+test.describe('Q2618 桌面三维大屏状态标签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/bigscreen-3d 空态「开场动画：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('开场动画：').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「当前城市：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('当前城市：').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+
+  test('/bigscreen-3d 空态「地图节点：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/bigscreen-3d');
+    await expect(page.getByText('地图节点：').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('WebGL') && !item.includes('ErrorBoundary'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
