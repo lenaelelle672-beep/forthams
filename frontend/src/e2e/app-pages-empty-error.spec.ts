@@ -17676,6 +17676,34 @@ test.describe('Q2058 桌面风险评估中低危与热力图空态', () => {
   });
 });
 
+test.describe('Q2059 桌面风险矩阵轴标签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-assessments 空态「低」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await expect(page.getByRole('columnheader', { name: /低\s*\(\s*2\s*\)/ })).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments 空态「中等」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await expect(page.getByText('中等').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments 空态「高」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await expect(page.getByRole('columnheader', { name: /高\s*\(\s*4\s*\)/ })).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

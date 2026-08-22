@@ -1246,4 +1246,5 @@
 | Q2056 | done | 桌面空态 **3 passed**（/inspections 表头「检验机构」「结果」「操作」）。禁 /m。 |
 | Q2057 | done | 桌面空态 **3 passed**（/risk-assessments「全部评估」「重大风险」「高危风险」）。禁 /m。 |
 | Q2058 | done | 桌面空态 **3 passed**（/risk-assessments「中/低危」「项评估」「影响\\概率」）。禁 /m。 |
-| Q2059 | in_progress | 桌面空态：/risk-assessments 轴标签「低」「中等」「高」。禁 /m。 |
+| Q2059 | done | 桌面空态 **3 passed**（/risk-assessments 轴「低」「中等」「高」；单字轴用 columnheader+序号）。禁 /m。 |
+| Q2060 | in_progress | 桌面空态：/risk-assessments 轴「小」「大」或点单元格「关闭」。禁 /m。 |
