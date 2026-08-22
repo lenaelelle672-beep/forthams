@@ -598,5 +598,6 @@
 - Q2487：/workflows 全部业务流程/可用于发起/待完善发布 **3 passed**。`ee9cde031`
 - Q2488：/workflows 暂停发起/搜索/草稿中 **3 passed**。`2e4d13f63`
 - Q2489：/workflows 已发布/已停用 + /compensation/new 赔偿编号 **3 passed**。`8fc13282d`
-- Q2490：/compensation/new 赔偿配置/现金/等价物 **3 passed**。
+- Q2490：/compensation/new 赔偿配置/现金/等价物 **3 passed**。`aa674b452`
+- Q2491：/compensation/new 总金额/方式/预估 **3 passed**。
 

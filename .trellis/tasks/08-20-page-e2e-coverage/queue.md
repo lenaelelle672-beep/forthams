@@ -1678,4 +1678,5 @@
 | Q2488 | done | 桌面空态 **3 passed**（/workflows 暂停发起/搜索/草稿中）。禁 /m。 |
 | Q2489 | done | 桌面空态 **3 passed**（/workflows 已发布/已停用 + /compensation/new 赔偿编号）。禁 /m。 |
 | Q2490 | done | 桌面空态 **3 passed**（/compensation/new 赔偿配置/现金/等价物）。禁 /m。 |
-| Q2491 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2491 | done | 桌面空态 **3 passed**（/compensation/new 总金额/方式/预估）。禁 /m。 |
+| Q2492 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
