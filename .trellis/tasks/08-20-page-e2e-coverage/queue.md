@@ -1240,4 +1240,5 @@
 | Q2050 | done | 桌面空态 **3 passed**（/categories 点添加根分类编码 placeholder、「创建」「取消」）。禁 /m。 |
 | Q2051 | done | 桌面空态 **3 passed**（/purchase-orders「全部状态」「待审批」「刷新」）。禁 /m。 |
 | Q2052 | done | 桌面空态 **3 passed**（/inspections 副标题、「批量删除」「批量导出」）。禁 /m。 |
-| Q2053 | in_progress | 桌面空态：/inspections 统计卡或筛选。禁 /m。 |
+| Q2053 | done | 桌面空态 **3 passed**（/inspections「总检验数」「通过」「不通过」）。禁 /m。 |
+| Q2054 | in_progress | 桌面空态：/inspections「已过期」或表头。禁 /m。 |
