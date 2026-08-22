@@ -1418,4 +1418,5 @@
 | Q2228 | done | 桌面空态 **3 passed**（/assets/new「重要设备」「描述」「备注」）。禁 /m。 |
 | Q2229 | done | 桌面空态 **3 passed**（/assets/new「保存」「取消」「保修期」）。禁 /m。 |
 | Q2230 | done | 桌面空态 **3 passed**（/assets/new「折旧率」「纬度」「经度」）。禁 /m。 |
-| Q2231 | in_progress | 桌面空态：/assets/import-export 未覆盖标题。禁 /m。 |
+| Q2231 | done | 桌面空态 **3 passed**（/assets/import-export「资产批量导入导出」「导入」「导出」）。禁 /m。 |
+| Q2232 | in_progress | 桌面空态：/assets/import-export 导入面板未覆盖。禁 /m。 |

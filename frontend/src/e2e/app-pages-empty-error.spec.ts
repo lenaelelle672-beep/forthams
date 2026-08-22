@@ -22647,6 +22647,34 @@ test.describe('Q2230 桌面资产新折旧经纬度空态', () => {
   });
 });
 
+test.describe('Q2231 桌面资产导入导出标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/import-export 空态「资产批量导入导出」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('资产批量导入导出').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export 空态「导入」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('导入', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export 空态「导出」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByText('导出', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
