@@ -33844,6 +33844,34 @@ test.describe('Q2630 桌面403按钮空态', () => {
   });
 });
 
+test.describe('Q2631 桌面404页面空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/404 空态「404 — 页面不存在」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/404');
+    await expect(page.getByText('404 — 页面不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/404 空态「404」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/404');
+    await expect(page.getByText('404').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/404 空态「页面不存在」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/404');
+    await expect(page.getByText('页面不存在').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
