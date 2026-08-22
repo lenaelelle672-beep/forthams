@@ -1292,4 +1292,5 @@
 | Q2102 | done | 桌面空态 **3 passed**（/analytics/reliability「暂无排名数据」「暂无趋势数据」、select「按 MTBF」）。禁 /m。 |
 | Q2103 | done | 桌面空态 **3 passed**（/asset-health「暂无不健康资产」「最低分:」「刷新」）。禁 /m。 |
 | Q2104 | done | 桌面空态 **3 passed**（/asset-health「不健康资产列表」「所有资产状态良好」「共 0 条」）。禁 /m。 |
-| Q2105 | in_progress | 桌面空态：/asset-health 页头或 /profile 未覆盖。禁 /m。 |
+| Q2105 | done | 桌面空态 **3 passed**（/asset-health「资产健康评分」「基于年龄」「维修频率」）。禁 /m。 |
+| Q2106 | in_progress | 桌面空态：/asset-health 副标题「故障率」「利用率」「折旧进度」。禁 /m。 |
