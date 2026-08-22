@@ -733,5 +733,6 @@
 - Q2622：/bigscreen-3d 日期/0/四川全域 **3 passed**。硬截止仍为 18:00。`80b0befd0`
 - Q2623：/bigscreen KPI 资/率/值 **3 passed**。`4dea54194`
 - Q2624：/bigscreen %/万/件 **3 passed**。`f1cf57d3a`
-- Q2625：/login 2026/©/· **3 passed**。无 seedSession。硬截止仍为 18:00。
+- Q2625：/login 2026/©/· **3 passed**。无 seedSession。硬截止仍为 18:00。`d6e68df47`
+- Q2626：/login link 全息版/流星版 + label 用户名 **3 passed**。
 

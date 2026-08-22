@@ -1813,4 +1813,5 @@
 | Q2623 | done | 桌面空态 **3 passed**（/bigscreen KPI 资/率/值）。禁 /m。 |
 | Q2624 | done | 桌面空态 **3 passed**（/bigscreen %/万/件）。禁 /m。 |
 | Q2625 | done | 桌面空态 **3 passed**（/login 2026/©/·）。禁 /m。 |
-| Q2626 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2626 | done | 桌面空态 **3 passed**（/login link 全息版/流星版 + label 用户名）。禁 /m。 |
+| Q2627 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
