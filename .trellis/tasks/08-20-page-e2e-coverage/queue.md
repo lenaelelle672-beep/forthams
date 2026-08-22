@@ -1673,4 +1673,5 @@
 | Q2483 | done | 桌面空态 **3 passed**（/system/custom-fields heading/副标题/搜索）。禁 /m。 |
 | Q2484 | done | 桌面空态 **3 passed**（自定义字段空表 + 字段集标题/搜索）。禁 /m。 |
 | Q2485 | done | 桌面空态 **3 passed**（/workflows heading/副标题/新建流程）。禁 /m。 |
-| Q2486 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2486 | done | 桌面空态 **3 passed**（/workflows 返回处置/从模板创建/流程总数）。禁 /m。 |
+| Q2487 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
