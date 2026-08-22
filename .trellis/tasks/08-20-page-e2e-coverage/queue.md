@@ -1283,4 +1283,5 @@
 | Q2093 | done | 桌面空态 **3 passed**（/audit/1「变更前值」「变更后值」「变更时间」）。禁 /m。 |
 | Q2094 | done | 桌面空态 **3 passed**（/audit/1「用户代理」「请求 ID」「会话 ID」）。禁 /m。 |
 | Q2095 | done | 桌面空态 **3 passed**（/audit/1「租户 ID」「操作轨迹」「当前节点」）。禁 /m。 |
-| Q2096 | in_progress | 桌面空态：/audit/1「审计日志详情」或 /notifications 剩余。禁 /m。 |
+| Q2096 | done | 桌面空态 **3 passed**（/audit/1「审计日志详情」「IP 地址」「操作人」）。禁 /m。 |
+| Q2097 | in_progress | 桌面空态：/notifications 工作台预填或未覆盖文案。禁 /m。 |
