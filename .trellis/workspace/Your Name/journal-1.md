@@ -824,5 +824,6 @@
 - Q2713：/revaluations 条记录/价值调整记录/标题 **3 passed**。`67400806c`
 - Q2714：/budgets 新增预算/标题/暂无记录 **3 passed**。`dcf48ca03`
 - Q2715：/budgets 总预算/已使用/已承诺 **3 passed**。`12b0a598b`
-- Q2716：/budgets 执行率/预算列表/资产预算 **3 passed**。
+- Q2716：/budgets 执行率/预算列表/资产预算 **3 passed**。`f898395d8`
+- Q2717：/budgets 年度/类型/预算总额表头 **3 passed**。
 

@@ -1904,4 +1904,5 @@
 | Q2714 | done | 桌面空态 **3 passed**（/budgets 新增预算/标题/暂无记录）。禁 /m。 |
 | Q2715 | done | 桌面空态 **3 passed**（/budgets 总预算/已使用/已承诺）。禁 /m。 |
 | Q2716 | done | 桌面空态 **3 passed**（/budgets 执行率/预算列表/资产预算）。禁 /m。 |
-| Q2717 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2717 | done | 桌面空态 **3 passed**（/budgets 年度/类型/预算总额表头）。禁 /m。 |
+| Q2718 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
