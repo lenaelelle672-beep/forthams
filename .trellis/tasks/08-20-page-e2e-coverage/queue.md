@@ -1434,4 +1434,5 @@
 | Q2244 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「已接入真组件」「已注册模块」「四十四项菜单」）。禁 /m。 |
 | Q2245 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 部门树/角色绑定/权限库存描述）。禁 /m。 |
 | Q2246 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 租户主数据/交接摘要/数据范围）。禁 /m。 |
-| Q2247 | in_progress | 桌面空态：/404 未覆盖。禁 /m。 |
+| Q2247 | done | 桌面空态 **3 passed**（/404「404 — 页面不存在」及拆分）。禁 /m。 |
+| Q2248 | in_progress | 桌面空态：/forbidden 未覆盖。禁 /m。 |
