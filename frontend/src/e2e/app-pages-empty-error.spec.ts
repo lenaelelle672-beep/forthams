@@ -30188,6 +30188,34 @@ test.describe('Q2500 桌面新增预算类型金额空态', () => {
   });
 });
 
+test.describe('Q2501 桌面新增预算部门返回空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/new 空态「部门ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByText('部门ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「分类ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByText('分类ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「返回列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByText('返回列表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
