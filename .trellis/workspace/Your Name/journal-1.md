@@ -639,5 +639,6 @@
 - Q2528：/disposals/transfer/new 调拨说明 + /workorders/new 紧急/高 **3 passed**。login2 WebGL 不可用，改走转移申请。`850f8eef3`
 - Q2529：/workorders/new 中/低 + /stocktaking-cycles/new * **3 passed**。`6fc31ff26`
 - Q2530：/assignments/new 使用人ID/使用部门ID/取消 **3 passed**。`6aecd2afe`
-- Q2531：/borrows/new 备注 + /intake/new 选择供应商/总金额 **3 passed**。
+- Q2531：/borrows/new 备注 + /intake/new 选择供应商/总金额 **3 passed**。`38a409cf0`
+- Q2532：/intake/new 验收备注/检查项名称/预期值 **3 passed**。
 
