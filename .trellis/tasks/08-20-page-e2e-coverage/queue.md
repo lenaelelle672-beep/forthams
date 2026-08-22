@@ -1799,4 +1799,5 @@
 | Q2609 | done | 桌面空态 **3 passed**（/bigscreen 75.2%/18/32）。禁 /m。 |
 | Q2610 | done | 桌面空态 **3 passed**（/bigscreen 0.22↑/1.46↑/0.00-）。禁 /m。 |
 | Q2611 | done | 桌面空态 **3 passed**（/bigscreen 值班领导：/值班经理：/28）。禁 /m。 |
-| Q2612 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2612 | done | 桌面空态 **3 passed**（/bigscreen 24/20/16）。禁 /m。 |
+| Q2613 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
