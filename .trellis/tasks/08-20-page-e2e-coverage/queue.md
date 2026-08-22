@@ -1433,4 +1433,5 @@
 | Q2243 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「消息与通知」「系统参数」「用户只读列表」）。禁 /m。 |
 | Q2244 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3「已接入真组件」「已注册模块」「四十四项菜单」）。禁 /m。 |
 | Q2245 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 部门树/角色绑定/权限库存描述）。禁 /m。 |
-| Q2246 | in_progress | 桌面空态：/fixed-assets/workbenchv3 岗位租户交接描述。禁 /m。 |
+| Q2246 | done | 桌面空态 **3 passed**（/fixed-assets/workbenchv3 租户主数据/交接摘要/数据范围）。禁 /m。 |
+| Q2247 | in_progress | 桌面空态：/404 未覆盖。禁 /m。 |
