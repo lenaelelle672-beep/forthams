@@ -167,5 +167,6 @@
 - Q2056：检验机构/结果/操作 **3 passed**。`23e1a6322`
 - Q2057：全部评估/重大风险/高危风险 **3 passed**。`8d5c857bd`
 - Q2058：中/低危、项评估、影响\概率 **3 passed**。`34b749ec1`
-- Q2059：轴低/中等/高 **3 passed**。单字轴须 columnheader+序号，exact 找不到。
+- Q2059：轴低/中等/高 **3 passed**。单字轴须 columnheader+序号，exact 找不到。`b927753d2`
+- Q2060：轴小/大、点单元格关闭 **3 passed**。影响轴是 cell 不是 columnheader。
 

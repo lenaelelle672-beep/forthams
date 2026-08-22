@@ -1247,4 +1247,5 @@
 | Q2057 | done | 桌面空态 **3 passed**（/risk-assessments「全部评估」「重大风险」「高危风险」）。禁 /m。 |
 | Q2058 | done | 桌面空态 **3 passed**（/risk-assessments「中/低危」「项评估」「影响\\概率」）。禁 /m。 |
 | Q2059 | done | 桌面空态 **3 passed**（/risk-assessments 轴「低」「中等」「高」；单字轴用 columnheader+序号）。禁 /m。 |
-| Q2060 | in_progress | 桌面空态：/risk-assessments 轴「小」「大」或点单元格「关闭」。禁 /m。 |
+| Q2060 | done | 桌面空态 **3 passed**（/risk-assessments 轴「小」「大」、点单元格「关闭」）。禁 /m。 |
+| Q2061 | in_progress | 桌面空态：/risk-assessments 点单元格「风险评估详情」或「可能性：」。禁 /m。 |
