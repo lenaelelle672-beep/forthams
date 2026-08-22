@@ -19987,6 +19987,34 @@ test.describe('Q2135 桌面工单新建资产描述费用空态', () => {
   });
 });
 
+test.describe('Q2136 桌面工单新建截止负责人协作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/new 空态「截止日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('截止日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「负责人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('负责人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「协作人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('协作人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
