@@ -1417,4 +1417,5 @@
 | Q2227 | done | 桌面空态 **3 passed**（/assets/new「使用部门」「存放位置」「RFID」）。禁 /m。 |
 | Q2228 | done | 桌面空态 **3 passed**（/assets/new「重要设备」「描述」「备注」）。禁 /m。 |
 | Q2229 | done | 桌面空态 **3 passed**（/assets/new「保存」「取消」「保修期」）。禁 /m。 |
-| Q2230 | in_progress | 桌面空态：/assets/new「折旧率」「纬度」「经度」。禁 /m。 |
+| Q2230 | done | 桌面空态 **3 passed**（/assets/new「折旧率」「纬度」「经度」）。禁 /m。 |
+| Q2231 | in_progress | 桌面空态：/assets/import-export 未覆盖标题。禁 /m。 |
