@@ -919,5 +919,6 @@
 - Q2808：/assets/new 原值/净值/保修期 placeholder **3 passed**。`79057e64a`
 - Q2809：/assets/new 折旧率/描述/备注 placeholder **3 passed**。`f7de06678`
 - Q2810：/assets/new 资产名称/分类/重要设备 **3 passed**。`a5908fb1f`
-- Q2811：/assets/new 品牌厂商/纬度/RFID标签 **3 passed**。
+- Q2811：/assets/new 品牌厂商/纬度/RFID标签 **3 passed**。`89fa3323c`
+- Q2812：/assets/new 经度/原值/净值标签 **3 passed**。
 

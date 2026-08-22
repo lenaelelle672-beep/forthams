@@ -1999,4 +1999,5 @@
 | Q2809 | done | 桌面空态 **3 passed**（/assets/new 折旧率/描述/备注 placeholder）。禁 /m。 |
 | Q2810 | done | 桌面空态 **3 passed**（/assets/new 资产名称/分类/重要设备）。禁 /m。 |
 | Q2811 | done | 桌面空态 **3 passed**（/assets/new 品牌厂商/纬度/RFID标签）。禁 /m。 |
-| Q2812 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2812 | done | 桌面空态 **3 passed**（/assets/new 经度/原值/净值标签）。禁 /m。 |
+| Q2813 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
