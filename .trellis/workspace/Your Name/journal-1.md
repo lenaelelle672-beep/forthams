@@ -782,5 +782,6 @@
 - Q2671：/contracts 全部合同/即将到期/时间轴视图 **3 passed**。页签非 button。`7fa1bff87`
 - Q2672：/contracts 到期预警/30天/到期日期 **3 passed**。`4905e39f3`
 - Q2673：/purchase-orders 新增/标题/搜索 **3 passed**。`f05b18a8d`
-- Q2674：/purchase-orders 采购单号/名称/供应商表头 **3 passed**。
+- Q2674：/purchase-orders 采购单号/名称/供应商表头 **3 passed**。`8e990ffac`
+- Q2675：/purchase-orders 金额/采购日期/状态表头 **3 passed**。
 

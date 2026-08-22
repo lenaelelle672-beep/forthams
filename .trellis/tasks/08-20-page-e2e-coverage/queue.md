@@ -1862,4 +1862,5 @@
 | Q2672 | done | 桌面空态 **3 passed**（/contracts 到期预警/30天/到期日期）。禁 /m。 |
 | Q2673 | done | 桌面空态 **3 passed**（/purchase-orders 新增/标题/搜索）。禁 /m。 |
 | Q2674 | done | 桌面空态 **3 passed**（/purchase-orders 采购单号/名称/供应商表头）。禁 /m。 |
-| Q2675 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2675 | done | 桌面空态 **3 passed**（/purchase-orders 金额/采购日期/状态表头）。禁 /m。 |
+| Q2676 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
