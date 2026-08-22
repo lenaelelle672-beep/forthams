@@ -748,5 +748,6 @@
 - Q2637：/dashboard 暂无趋势/分类/工单数据 **3 passed**。`153335e02`
 - Q2638：/dashboard 导出数据/刷新视图/分类分布 heading **3 passed**。`08c3ecec9`
 - Q2639：/dashboard 趋势/工单/维保预警 heading **3 passed**。`dfee0b1a6`
-- Q2640：/vendor-portal heading/编码/密码 placeholder **3 passed**。无 seedSession。
+- Q2640：/vendor-portal heading/编码/密码 placeholder **3 passed**。无 seedSession。`44e404d79`
+- Q2641：/vendor-portal 登录按钮/供应商门户/登录 **3 passed**。无 seedSession。
 

@@ -34122,6 +34122,33 @@ test.describe('Q2640 桌面供应商门户登录空态', () => {
   });
 });
 
+test.describe('Q2641 桌面供应商门户登录按钮空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+  });
+
+  test('/vendor-portal 空态 button「登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByRole('button', { name: '登录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 空态「供应商门户」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByText('供应商门户').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 空态「登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByText('登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
