@@ -13697,6 +13697,34 @@ test.describe('Q1918 桌面ABC分类规则说明空态', () => {
   });
 });
 
+test.describe('Q1919 桌面ABC分类列表列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/abc-classification 空态「资产编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('资产编号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「资产名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('资产名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
