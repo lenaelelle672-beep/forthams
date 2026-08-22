@@ -594,5 +594,6 @@
 - Q2483：/system/custom-fields heading/副标题/搜索 **3 passed**。`c78775e56`
 - Q2484：自定义字段空表 + 字段集标题/搜索 **3 passed**。`9c572f22d`
 - Q2485：/workflows heading/副标题/新建流程 **3 passed**。`963454c5c`
-- Q2486：/workflows 返回处置/从模板创建/流程总数 **3 passed**。
+- Q2486：/workflows 返回处置/从模板创建/流程总数 **3 passed**。`514adb82c`
+- Q2487：/workflows 全部业务流程/可用于发起/待完善发布 **3 passed**。
 
