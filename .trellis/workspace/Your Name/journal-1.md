@@ -721,5 +721,6 @@
 - Q2610：/bigscreen 0.22↑/1.46↑/0.00- **3 passed**。`bf68a0c3f`
 - Q2611：/bigscreen 值班领导：/值班经理：/28 **3 passed**。硬截止仍为 18:00。`813768f6d`
 - Q2612：/bigscreen 24/20/16 **3 passed**。`6ae21d8cb`
-- Q2613：/bigscreen 12/75/13 **3 passed**。硬截止仍为 18:00。
+- Q2613：/bigscreen 12/75/13 **3 passed**。硬截止仍为 18:00。`7b93e439c`
+- Q2614：/bigscreen 关舱门/起飞/落地 **3 passed**。
 
