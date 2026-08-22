@@ -1899,4 +1899,5 @@
 | Q2709 | done | 桌面空态 **3 passed**（/revaluations 总记录/已拒绝/价值调整）。禁 /m。 |
 | Q2710 | done | 桌面空态 **3 passed**（/revaluations 合计/需及时处理/本期已审批）。禁 /m。 |
 | Q2711 | done | 桌面空态 **3 passed**（/revaluations 本期驳回/已通过/列表）。禁 /m。 |
-| Q2712 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2712 | done | 桌面空态 **3 passed**（/revaluations 类型/新值/差额表头）。禁 /m。 |
+| Q2713 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
