@@ -13580,6 +13580,37 @@ test.describe('Q1914 桌面循环盘点规则弹窗价值分类空态', () => {
   });
 });
 
+test.describe('Q1915 桌面循环盘点规则弹窗上限确定空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/cycle-count 点新增规则 placeholder「不填表示无上限」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByPlaceholder('不填表示无上限').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 点新增规则 placeholder「JSON数组：[1,2,3] 或留空表示全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByPlaceholder('JSON数组：[1,2,3] 或留空表示全部').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 点新增规则「确定」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByRole('button', { name: /确\s*定/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

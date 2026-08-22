@@ -1102,4 +1102,5 @@
 | Q1912 | done | 桌面空态 **3 passed**（/inventory/cycle-count「C类（一般资产）」「季度盘点」「年度盘点」）。禁 /m。 |
 | Q1913 | done | 桌面空态 **3 passed**（/inventory/cycle-count 点「新增规则」后「ABC分类」「盘点频率」「最小价值（元）」）。禁 /m。 |
 | Q1914 | done | 桌面空态 **3 passed**（/inventory/cycle-count 点「新增规则」后「最大价值（元）」「适用资产分类」+ placeholder「不填表示无下限」；antd Select placeholder 不测）。禁 /m。 |
-| Q1915 | in_progress | 桌面空态：/inventory/cycle-count 点「新增规则」后 placeholder「不填表示无上限」「JSON数组：[1,2,3] 或留空表示全部」+「确定」。禁 /m。 |
+| Q1915 | done | 桌面空态 **3 passed**（/inventory/cycle-count 点「新增规则」后 placeholder「不填表示无上限」「JSON数组：[1,2,3] 或留空表示全部」+「确定」）。禁 /m。 |
+| Q1916 | in_progress | 桌面空态：/inventory/cycle-count 点「新增规则」后「取消」「新增规则」+「月度盘点」。禁 /m。 |
