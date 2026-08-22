@@ -12188,6 +12188,41 @@ test.describe('Q1866 桌面领用详情日期状态流空态', () => {
   });
 });
 
+test.describe('Q1867 桌面领用详情后续状态流空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/assignments/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, assetNo:'A-001', assetName:'笔记本', status:'DRAFT' } }) });
+      }
+      return mockApi(route);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/assignments/1 空态「已审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByText('已审批').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/1 空态「已签收」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByText('已签收').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/1 空态「待归还」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByText('待归还').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
