@@ -1395,4 +1395,5 @@
 | Q2205 | done | 桌面空态 **3 passed**（/disposals/transfer/new「处理人预览」「计算处理人」、高优先级说明）。禁 /m。 |
 | Q2206 | done | 桌面空态 **3 passed**（/disposals/transfer/new「备注」「选填」「普通」）。禁 /m。 |
 | Q2207 | done | 桌面空态 **3 passed**（/disposals/transfer/new「取消」「保存草稿」「提交申请」）。禁 /m。 |
-| Q2208 | in_progress | 桌面空态：/disposals/transfer/new「返回」「自动保存」。禁 /m。 |
+| Q2208 | done | 桌面空态 **3 passed**（/disposals/transfer/new「返回」「自动保存」「必填」）。禁 /m。 |
+| Q2209 | in_progress | 桌面空态：/disposals/transfer/new「新建」或资产当前所属部门。禁 /m。 |
