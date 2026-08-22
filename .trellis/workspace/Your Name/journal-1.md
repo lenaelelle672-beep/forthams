@@ -662,5 +662,6 @@
 - Q2551：/assets/new 品牌厂商/纬度范围/RFID标签 **3 passed**。`aab8a739f`
 - Q2552：/assets/new 经度范围/原值元/净值元 **3 passed**。`a4253a0f4`
 - Q2553：/assets/new 保修期月/折旧率范围/是否重要设备 **3 passed**。`c08e31083`
-- Q2554：/assets/new 资产分类*/资产状态/规格型号 **3 passed**。
+- Q2554：/assets/new 资产分类*/资产状态/规格型号 **3 passed**。`a6412a38f`
+- Q2555：/assets/new 位置说明/描述备注/字数 **3 passed**。formSections.description 未渲染。
 

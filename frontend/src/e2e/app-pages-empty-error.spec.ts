@@ -31700,6 +31700,34 @@ test.describe('Q2554 桌面新建资产分类状态空态', () => {
   });
 });
 
+test.describe('Q2555 桌面新建资产分节说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态「使用部门与物理位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('使用部门与物理位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「描述与备注」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('描述与备注').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「已输入 0 / 500 字」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('已输入 0 / 500 字').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
