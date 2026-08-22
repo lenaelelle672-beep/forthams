@@ -1957,4 +1957,5 @@
 | Q2767 | done | 桌面空态 **3 passed**（/inspection-templates 新增/标题/暂无模板）。禁 /m。 |
 | Q2768 | done | 桌面空态 **3 passed**（/inspection-templates 模板名称/重置/搜索）。禁 /m。 |
 | Q2769 | done | 桌面空态 **3 passed**（/inspection-templates 模板名称/检验类型/检验周期表头）。禁 /m。 |
-| Q2770 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2770 | done | 桌面空态 **3 passed**（/inspection-templates 状态/创建时间/操作表头）。禁 /m。 |
+| Q2771 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
