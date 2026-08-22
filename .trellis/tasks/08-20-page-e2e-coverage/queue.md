@@ -1452,4 +1452,5 @@
 | Q2262 | done | 桌面空态 **3 passed**（/bigscreen-3d「四川全域」「成都市」「在线率」）。禁 /m。 |
 | Q2263 | done | 桌面空态 **3 passed**（/bigscreen-3d「序号」「异常事件」「报警」）。禁 /m。 |
 | Q2264 | done | 桌面空态 **3 passed**（/bigscreen-3d「次数」「办公终端」「智能仓储」）。禁 /m。 |
-| Q2265 | in_progress | 桌面空态：/bigscreen-3d「RFID 标签」「审计链路」。禁 /m。 |
+| Q2265 | done | 桌面空态 **3 passed**（/bigscreen-3d「RFID 标签」「审计链路」「维保到期」）。禁 /m。 |
+| Q2266 | in_progress | 桌面空态：/bigscreen-3d「借用超期」「标签离线」「审批积压」。禁 /m。 |
