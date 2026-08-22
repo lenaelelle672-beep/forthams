@@ -822,5 +822,6 @@
 - Q2711：/revaluations 本期驳回/已通过/列表 **3 passed**。`c9120985c`
 - Q2712：/revaluations 类型/新值/差额表头 **3 passed**。`661de70f3`
 - Q2713：/revaluations 条记录/价值调整记录/标题 **3 passed**。`67400806c`
-- Q2714：/budgets 新增预算/标题/暂无记录 **3 passed**。
+- Q2714：/budgets 新增预算/标题/暂无记录 **3 passed**。`dcf48ca03`
+- Q2715：/budgets 总预算/已使用/已承诺 **3 passed**。
 
