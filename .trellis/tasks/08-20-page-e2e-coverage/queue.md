@@ -1201,4 +1201,5 @@
 | Q2011 | done | 桌面空态 **3 passed**（/workflow-designer「节点编码」「条连线」「环节子表单/区段」）。禁 /m。 |
 | Q2012 | done | 桌面空态 **3 passed**（/workflow-designer「区段名称」「历史摘要字段」「子表单 HTML」）。禁 /m。 |
 | Q2013 | done | 桌面空态 **3 passed**（/workflow-designer「审批人类型」「按角色」「指定用户」）。禁 /m。 |
-| Q2014 | in_progress | 桌面空态：/workflow-designer「审批角色」「审批模式」「用于发起页渲染和审批详情快照展示」。禁 /m。 |
+| Q2014 | done | 桌面空态 **3 passed**（/workflow-designer「审批角色」「审批模式」「用于发起页渲染和审批详情快照展示」）。禁 /m。 |
+| Q2015 | in_progress | 桌面空态：/workflow-designer AssigneePreviewPanel / 删除节点按钮剩余文案。禁 /m。 |
