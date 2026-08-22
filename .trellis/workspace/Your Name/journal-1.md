@@ -710,5 +710,6 @@
 - Q2599：/bigscreen 执行航班/异常阈值/2小时内 **3 passed**。`536e1199c`
 - Q2600：/bigscreen 2-4小时/4小时以上/航班 **3 passed**。`07dde5332`
 - Q2601：/bigscreen 起站/延误状态/延误原因 **3 passed**。`f0d2dcf49`
-- Q2602：/bigscreen 国际/国内/8 **3 passed**。
+- Q2602：/bigscreen 国际/国内/8 **3 passed**。`bfe32fafb`
+- Q2603：/bigscreen 264人/计划航班/客座率 **3 passed**。
 
