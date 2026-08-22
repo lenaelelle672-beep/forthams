@@ -1119,4 +1119,5 @@
 | Q1929 | done | 桌面空态 **3 passed**（/safety-checklists/history「全部执行」「已完成」「通过」）。禁 /m。 |
 | Q1930 | done | 桌面空态 **3 passed**（/safety-checklists/history「不通过」「执行记录」「执行ID」）。禁 /m。 |
 | Q1931 | done | 桌面空态 **3 passed**（/safety-checklists/history 列头「模板ID」「资产ID」「执行人ID」）。禁 /m。 |
-| Q1932 | in_progress | 桌面空态：/safety-checklists/history 列头「执行日期」「状态」「总体结果」。禁 /m。 |
+| Q1932 | done | 桌面空态 **3 passed**（/safety-checklists/history 列头「执行日期」「状态」「总体结果」）。禁 /m。 |
+| Q1933 | in_progress | 桌面空态：/safety-checklists/history 列头「操作」+ 筛选「全部」「进行中」（先核对筛选文案）。禁 /m。 |
