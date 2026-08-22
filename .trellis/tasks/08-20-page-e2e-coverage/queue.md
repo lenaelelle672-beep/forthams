@@ -1993,4 +1993,5 @@
 | Q2803 | done | 桌面空态 **3 passed**（/assets/new 基本信息/位置归属/财务信息 heading）。禁 /m。 |
 | Q2804 | done | 桌面空态 **3 passed**（/assets/new 新建资产/填写进度/资产台账）。禁 /m。 |
 | Q2805 | done | 桌面空态 **3 passed**（/assets/new 名称/品牌/型号 placeholder）。禁 /m。 |
-| Q2806 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2806 | done | 桌面空态 **3 passed**（/assets/new 序列号/供应商/位置 placeholder）。禁 /m。 |
+| Q2807 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
