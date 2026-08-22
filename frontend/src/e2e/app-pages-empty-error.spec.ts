@@ -16896,6 +16896,35 @@ test.describe('Q2031 桌面GIS新建经度状态与空间搜索空态', () => {
   });
 });
 
+test.describe('Q2032 桌面GIS时间筛选与空间说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis 空态「近 12 月」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByText('近 12 月').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 空态「自定义」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByRole('button', { name: '自定义' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点选择空间单元「请先在「位置管理」中维护空间层级」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '选择空间单元' }).click();
+    await expect(page.getByText('请先在「位置管理」中维护空间层级').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
