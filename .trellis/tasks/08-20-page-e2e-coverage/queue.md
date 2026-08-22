@@ -1570,4 +1570,5 @@
 | Q2380 | done | 桌面空态 **3 passed**（/inventory heading/实时同步/新建任务）。禁 /m。 |
 | Q2381 | done | 桌面空态 **3 passed**（/inventory 任务总数/盘点任务/资产盘点管理）。禁 /m。 |
 | Q2382 | done | 桌面空态 **3 passed**（/inventory 平均进度/已盘资产/盘亏预警）。禁 /m。 |
-| Q2383 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2383 | done | 桌面空态 **3 passed**（/inventory 决策摘要/进度趋势/筛选）。禁 /m。 |
+| Q2384 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

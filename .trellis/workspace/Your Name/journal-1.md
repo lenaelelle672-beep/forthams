@@ -490,5 +490,6 @@
 - Q2379：/depreciation 待计算资产/已完成/刷新 **3 passed**。`85658265e`
 - Q2380：/inventory heading/实时同步/新建任务 **3 passed**。`820371e37`
 - Q2381：/inventory 任务总数/盘点任务/资产盘点管理 **3 passed**。`7b493aabb`
-- Q2382：/inventory 平均进度/已盘资产/盘亏预警 **3 passed**。
+- Q2382：/inventory 平均进度/已盘资产/盘亏预警 **3 passed**。`99266b9ad`
+- Q2383：/inventory 决策摘要/进度趋势/筛选 **3 passed**。
 
