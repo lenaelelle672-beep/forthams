@@ -35761,6 +35761,34 @@ test.describe('Q2699 桌面通知中心计数空态', () => {
   });
 });
 
+test.describe('Q2700 桌面折旧管理操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/depreciation 空态 button「批量计算折旧」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByRole('button', { name: '批量计算折旧' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation 空态 heading「折旧管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByRole('heading', { name: '折旧管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation 空态「暂无折旧计划数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByText('暂无折旧计划数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -1887,4 +1887,5 @@
 | Q2697 | done | 桌面空态 **3 passed**（/notifications 全部已读/标题/暂无通知）。禁 /m。 |
 | Q2698 | done | 桌面空态 **3 passed**（/notifications 审批/预警/系统通知）。禁 /m。 |
 | Q2699 | done | 桌面空态 **3 passed**（/notifications 共0条/全部/引导文案）。禁 /m。 |
-| Q2700 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2700 | done | 桌面空态 **3 passed**（/depreciation 批量计算/标题/暂无计划）。禁 /m。 |
+| Q2701 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
