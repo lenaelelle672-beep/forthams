@@ -1613,4 +1613,5 @@
 | Q2423 | done | 桌面空态 **3 passed**（/maintenance/plans heading/副标题/新建计划）。禁 /m。 |
 | Q2424 | done | 桌面空态 **3 passed**（/maintenance/plans 搜索/空表）。禁 /m。 |
 | Q2425 | done | 桌面空态 **3 passed**（/maintenance/plans 刷新/全部状态/暂停）。禁 /m。 |
-| Q2426 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2426 | done | 桌面空态 **3 passed**（/stocktaking-cycles heading/副标题/新建周期）。禁 /m。 |
+| Q2427 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
