@@ -35873,6 +35873,34 @@ test.describe('Q2703 桌面折旧管理方法筛选空态', () => {
   });
 });
 
+test.describe('Q2704 桌面折旧管理其余方法空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/depreciation 空态「年数总和法」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByText('年数总和法').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation 空态「工作量法」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByText('工作量法').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation 空态 heading「资产折旧计划管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByRole('heading', { name: '资产折旧计划管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
