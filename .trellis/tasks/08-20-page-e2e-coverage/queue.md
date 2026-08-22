@@ -1370,4 +1370,5 @@
 | Q2180 | done | 桌面空态 **3 passed**（/disposals/clearance/new「清退配置」「处理方式」「入库保管」）。禁 /m。 |
 | Q2181 | done | 桌面空态 **3 passed**（/disposals/clearance/new「变卖处理」「捐赠」「不可逆」）。禁 /m。 |
 | Q2182 | done | 桌面空态 **3 passed**（/disposals/clearance/new「预估残值」「紧急程度」「确认提交」）。禁 /m。 |
-| Q2183 | in_progress | 桌面空态：/disposals/clearance/new「请先选择至少一项资产后再提交」。禁 /m。 |
+| Q2183 | done | 桌面空态 **3 passed**（/disposals/clearance/new 先选资产提示、「保存草稿」「普通」）。禁 /m。 |
+| Q2184 | in_progress | 桌面空态：/disposals/clearance/new「紧急」「审批流程」「备注」。禁 /m。 |
