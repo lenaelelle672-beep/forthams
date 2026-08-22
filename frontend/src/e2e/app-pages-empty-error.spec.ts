@@ -30272,6 +30272,34 @@ test.describe('Q2503 桌面新建验收单字段空态', () => {
   });
 });
 
+test.describe('Q2504 桌面新增保险标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances/new 空态「新增保险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/new');
+    await expect(page.getByText('新增保险').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/new 空态「保单号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/new');
+    await expect(page.getByText('保单号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances/new 空态 placeholder「请输入保单号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances/new');
+    await expect(page.getByPlaceholder('请输入保单号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

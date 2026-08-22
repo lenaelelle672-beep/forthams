@@ -1691,4 +1691,5 @@
 | Q2501 | done | 桌面空态 **3 passed**（/budgets/new 部门ID/分类ID/返回列表）。禁 /m。 |
 | Q2502 | done | 桌面空态 **3 passed**（/intake/new 新建验收单/填写信息/验收单信息）。禁 /m。 |
 | Q2503 | done | 桌面空态 **3 passed**（/intake/new 验收日期/供应商/选择供应商）。禁 /m。 |
-| Q2504 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2504 | done | 桌面空态 **3 passed**（/insurances/new 新增保险/保单号/placeholder）。禁 /m。 |
+| Q2505 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
