@@ -1379,4 +1379,5 @@
 | Q2189 | done | 桌面空态 **3 passed**（/disposals/scrap/new「处置方式」「添加资产」「暂无已选资产」）。禁 /m。 |
 | Q2190 | done | 桌面空态 **3 passed**（/disposals/scrap/new「变卖处理」「报废拆解」「捐赠」）。禁 /m。 |
 | Q2191 | done | 桌面空态 **3 passed**（/disposals/scrap/new「预估残值」「审批流程」「备注」）。禁 /m。 |
-| Q2192 | in_progress | 桌面空态：/disposals/scrap/new「请先选择至少一项资产后再提交」。禁 /m。 |
+| Q2192 | done | 桌面空态 **3 passed**（/disposals/scrap/new 先选资产提示、「自动保存」「不可逆」）。禁 /m。 |
+| Q2193 | in_progress | 桌面空态：/disposals/scrap/new「标准流程需部门经理」或取消。禁 /m。 |
