@@ -707,5 +707,6 @@
 - Q2596：/bigscreen 风速/多云/星期四 **3 passed**。`03910ba5e`
 - Q2597：/bigscreen 英文副标题/2/15 **3 passed**。`fa4c9a392`
 - Q2598：/bigscreen 186架/在册飞机/176架 **3 passed**。`a68810adf`
-- Q2599：/bigscreen 执行航班/异常阈值/2小时内 **3 passed**。
+- Q2599：/bigscreen 执行航班/异常阈值/2小时内 **3 passed**。`536e1199c`
+- Q2600：/bigscreen 2-4小时/4小时以上/航班 **3 passed**。
 
