@@ -1546,4 +1546,5 @@
 | Q2356 | done | 桌面空态 **3 passed**（/approvals 全部类型/暂无审批/空表描述）。禁 /m。 |
 | Q2357 | done | 桌面空态 **3 passed**（/approvals 资产调拨/清退/报废）。禁 /m。 |
 | Q2358 | done | 桌面空态 **3 passed**（/approvals 工单申请/至/全部状态）。禁 /m。 |
-| Q2359 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2359 | done | 桌面空态 **3 passed**（/inspections heading/副标题/新增检验）。禁 /m。 |
+| Q2360 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
