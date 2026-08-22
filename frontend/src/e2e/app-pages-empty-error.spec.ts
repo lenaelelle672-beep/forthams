@@ -16518,6 +16518,34 @@ test.describe('Q2018 桌面流程表单其他类型空态', () => {
   });
 });
 
+test.describe('Q2019 桌面流程表单赔偿说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/ASSET_COMPENSATION 空态「ASSET_COMPENSATION」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_COMPENSATION');
+    await expect(page.getByText('ASSET_COMPENSATION').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_COMPENSATION 空态「请在工作流设计器的「表单源码」标签页中添加表单 HTML。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_COMPENSATION');
+    await expect(page.getByText('请在工作流设计器的「表单源码」标签页中添加表单 HTML。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_COMPENSATION 空态「直接发起申请」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_COMPENSATION');
+    await expect(page.getByText('直接发起申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
