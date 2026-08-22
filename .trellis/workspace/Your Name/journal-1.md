@@ -623,5 +623,6 @@
 - Q2512：/workorders/new 工单管理/基本信息/优先级 **3 passed**。`622720791`
 - Q2513：/workorders/new 标题/placeholder/资产关联 **3 passed**。`a2745c288`
 - Q2514：/workorders/new 工单类型/关联资产/其他 **3 passed**。`64007fb64`
-- Q2515：/workorders/new 紧急描述/中优先级/详细信息 **3 passed**。
+- Q2515：/workorders/new 紧急描述/中优先级/详细信息 **3 passed**。`2d3f8a8ff`
+- Q2516：/workorders/new 高优先级描述/低优先级/首页 **3 passed**。
 

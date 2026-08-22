@@ -30608,6 +30608,34 @@ test.describe('Q2515 桌面新建工单优先级描述空态', () => {
   });
 });
 
+test.describe('Q2516 桌面新建工单优先级补充空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/new 空态「优先处理，可能影响业务」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('优先处理，可能影响业务').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「有空时处理即可」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('有空时处理即可').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/new 空态「首页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/new');
+    await expect(page.getByText('首页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
