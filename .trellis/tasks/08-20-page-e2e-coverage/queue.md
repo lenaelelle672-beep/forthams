@@ -1663,4 +1663,5 @@
 | Q2473 | done | 桌面空态 **3 passed**（/system/users 用户总量/角色数/岗位数）。禁 /m。 |
 | Q2474 | done | 桌面空态 **3 passed**（/system/users 用户列表/搜索/空表）。禁 /m。 |
 | Q2475 | done | 桌面空态 **3 passed**（/system/roles heading/RBAC/新增角色）。禁 /m。 |
-| Q2476 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2476 | done | 桌面空态 **3 passed**（/system/roles 角色列表/总数/空表）。禁 /m。 |
+| Q2477 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
