@@ -9990,6 +9990,40 @@ test.describe('Q1804 桌面预算新建空态', () => {
   });
 });
 
+test.describe('Q1805 桌面预算新建空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/new 空态「维保预算」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    const sel = page.locator('select').filter({ hasText: '维保预算' }).first();
+    await sel.click();
+    await expect(sel).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「运营预算」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    const sel = page.locator('select').filter({ hasText: '运营预算' }).first();
+    await sel.click();
+    await expect(sel).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「已审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    const sel = page.locator('select').filter({ hasText: '已审批' }).first();
+    await sel.click();
+    await expect(sel).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
