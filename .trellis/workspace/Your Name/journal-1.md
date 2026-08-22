@@ -820,5 +820,6 @@
 - Q2709：/revaluations 总记录/已拒绝/价值调整 **3 passed**。`44beaee65`
 - Q2710：/revaluations 合计/需及时处理/本期已审批 **3 passed**。`cab9c4768`
 - Q2711：/revaluations 本期驳回/已通过/列表 **3 passed**。`c9120985c`
-- Q2712：/revaluations 类型/新值/差额表头 **3 passed**。
+- Q2712：/revaluations 类型/新值/差额表头 **3 passed**。`661de70f3`
+- Q2713：/revaluations 条记录/价值调整记录/标题 **3 passed**。
 
