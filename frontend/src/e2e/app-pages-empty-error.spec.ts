@@ -25554,6 +25554,29 @@ test.describe('Q2334 桌面工作台预览工单维保空态', () => {
   });
 });
 
+test.describe('Q2335 桌面SSO返回登录空态', () => {
+  test('/sso-callback 空态「返回登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('返回登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sso-callback 空态「Token 缺失，SSO 登录失败」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('Token 缺失，SSO 登录失败').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sso-callback 空态「SSO 登录中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sso-callback');
+    await expect(page.getByText('SSO 登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -1522,4 +1522,5 @@
 | Q2332 | done | 桌面空态 **3 passed**（preview 系统管理员/总价值/刷新视图）。禁 /m。 |
 | Q2333 | done | 桌面空态 **3 passed**（preview 待审批/导出数据/净值）。禁 /m。 |
 | Q2334 | done | 桌面空态 **3 passed**（preview 最近工单/维保预警/分类分布）。禁 /m。 |
-| Q2335 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2335 | done | 桌面空态 **3 passed**（/sso-callback 返回登录/完整错误/SSO 登录）。禁 /m。 |
+| Q2336 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

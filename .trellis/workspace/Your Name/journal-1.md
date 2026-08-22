@@ -442,5 +442,6 @@
 - Q2331：preview 欢迎回来/查看全部/近12个月 **3 passed**。`187506683`
 - Q2332：preview 系统管理员/总价值/刷新视图 **3 passed**。`c8cba7a7e`
 - Q2333：preview 待审批/导出数据/净值 **3 passed**。`b3fa4a309`
-- Q2334：preview 最近工单/维保预警/分类分布 **3 passed**。
+- Q2334：preview 最近工单/维保预警/分类分布 **3 passed**。`b759bb817`
+- Q2335：sso 返回登录/完整错误/SSO 登录 **3 passed**。
 
