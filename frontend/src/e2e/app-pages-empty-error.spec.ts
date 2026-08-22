@@ -28647,6 +28647,34 @@ test.describe('Q2445 桌面重要设备空表记录空态', () => {
   });
 });
 
+test.describe('Q2446 桌面重要设备筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/equipment 空态「维保状态:」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByText('维保状态:').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment 空态「已过期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByText('已过期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment 空态「维修中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByText('维修中').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
