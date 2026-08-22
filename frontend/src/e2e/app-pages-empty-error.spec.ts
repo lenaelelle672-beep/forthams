@@ -35201,6 +35201,34 @@ test.describe('Q2679 桌面审批中心操作空态', () => {
   });
 });
 
+test.describe('Q2680 桌面审批中心筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/approvals 空态 placeholder「搜索编号、标题或发起人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByPlaceholder('搜索编号、标题或发起人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态「待我审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByText('待我审批').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态「我发起的」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByText('我发起的').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

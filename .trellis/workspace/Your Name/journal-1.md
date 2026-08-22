@@ -787,5 +787,6 @@
 - Q2676：/purchase-orders 操作/刷新/副标题 **3 passed**。`f5aee1dd2`
 - Q2677：/purchase-orders 总采购单/已审批/待审批 **3 passed**。`c070a52df`
 - Q2678：/purchase-orders 全部状态/部分收货/刷新 **3 passed**。`9576aa9e0`
-- Q2679：/approvals 发起申请/标题/暂无审批 **3 passed**。
+- Q2679：/approvals 发起申请/标题/暂无审批 **3 passed**。`57732b3e3`
+- Q2680：/approvals 搜索/待我审批/我发起的 **3 passed**。
 
