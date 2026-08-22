@@ -582,5 +582,6 @@
 - Q2471：/analytics/reliability 修复时间/可用率/按MTBF **3 passed**。`bae69540a`
 - Q2472：/system/users heading/用户/新增用户 **3 passed**。`b64f01dca`
 - Q2473：/system/users 用户总量/角色数/岗位数 **3 passed**。`de09fe406`
-- Q2474：/system/users 用户列表/搜索/空表 **3 passed**。
+- Q2474：/system/users 用户列表/搜索/空表 **3 passed**。`e9d7f8c7d`
+- Q2475：/system/roles heading/RBAC/新增角色 **3 passed**。
 

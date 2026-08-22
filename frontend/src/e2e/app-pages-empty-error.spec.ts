@@ -29459,6 +29459,34 @@ test.describe('Q2474 桌面用户列表搜索空表空态', () => {
   });
 });
 
+test.describe('Q2475 桌面角色管理标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/roles 空态 heading「角色管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByRole('heading', { name: '角色管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles 空态「RBAC」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByText('RBAC').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles 空态「新增角色」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByText('新增角色').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
