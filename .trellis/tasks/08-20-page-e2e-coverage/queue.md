@@ -1631,4 +1631,5 @@
 | Q2441 | done | 桌面空态 **3 passed**（/retirement 残值回收/退役原因/空表）。禁 /m。 |
 | Q2442 | done | 桌面空态 **3 passed**（/retirement 异常已驳回/已撤回/审批中）。禁 /m。 |
 | Q2443 | done | 桌面空态 **3 passed**（/equipment heading/副标题/新建维保记录）。禁 /m。 |
-| Q2444 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2444 | done | 桌面空态 **3 passed**（/equipment 总设备数/维保中/正常运行）。禁 /m。 |
+| Q2445 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

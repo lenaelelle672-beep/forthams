@@ -551,5 +551,6 @@
 - Q2440：/retirement 副标题/退役总价值/待审核 **3 passed**。`d39fd80d8`
 - Q2441：/retirement 残值回收/退役原因/空表 **3 passed**。`1d9d725bd`
 - Q2442：/retirement 异常已驳回/已撤回/审批中 **3 passed**。`09feb6364`
-- Q2443：/equipment heading/副标题/新建维保记录 **3 passed**。
+- Q2443：/equipment heading/副标题/新建维保记录 **3 passed**。`323a6abcd`
+- Q2444：/equipment 总设备数/维保中/正常运行 **3 passed**。
 
