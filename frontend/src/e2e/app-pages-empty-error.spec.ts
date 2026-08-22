@@ -26939,6 +26939,34 @@ test.describe('Q2384 桌面盘点空表状态空态', () => {
   });
 });
 
+test.describe('Q2385 桌面盘点提交导出空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory 空态「已提交」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByText('已提交').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory 空态「导出」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByRole('button', { name: '导出' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory 空态「RFID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByText('RFID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
