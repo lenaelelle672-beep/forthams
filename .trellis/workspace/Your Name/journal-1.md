@@ -471,5 +471,6 @@
 - Q2360：/inspections 总检验数/已过期/搜索 placeholder **3 passed**。`0695bff6b`
 - Q2361：/inspections 批量删除/批量导出/重置 **3 passed**。`ef747f7e1`
 - Q2362：/inspections 全部类型/年度检验/定期检验 **3 passed**。`cfdbb1c4d`
-- Q2363：/inspections 专项检验/全部结果/暂无记录 **3 passed**。
+- Q2363：/inspections 专项检验/全部结果/暂无记录 **3 passed**。`a7bb7ee39`
+- Q2364：/inspections 附条件通过/搜索/不通过 **3 passed**。
 

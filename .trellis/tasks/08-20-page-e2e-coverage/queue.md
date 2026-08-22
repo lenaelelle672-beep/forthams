@@ -1551,4 +1551,5 @@
 | Q2361 | done | 桌面空态 **3 passed**（/inspections 批量删除/批量导出/重置）。禁 /m。 |
 | Q2362 | done | 桌面空态 **3 passed**（/inspections 全部类型/年度检验/定期检验）。禁 /m。 |
 | Q2363 | done | 桌面空态 **3 passed**（/inspections 专项检验/全部结果/暂无记录）。禁 /m。 |
-| Q2364 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2364 | done | 桌面空态 **3 passed**（/inspections 附条件通过/搜索/不通过）。禁 /m。 |
+| Q2365 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

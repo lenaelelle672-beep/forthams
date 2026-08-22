@@ -26351,6 +26351,34 @@ test.describe('Q2363 桌面检验年检结果空表空态', () => {
   });
 });
 
+test.describe('Q2364 桌面检验年检条件搜索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections 空态「附条件通过」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByText('附条件通过').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections 空态「搜索」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '搜索' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections 空态「不通过」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByText('不通过').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
