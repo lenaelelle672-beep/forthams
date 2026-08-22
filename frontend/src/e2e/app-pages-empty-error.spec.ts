@@ -32026,6 +32026,37 @@ test.describe('Q2565 桌面检验模板状态空态', () => {
   });
 });
 
+test.describe('Q2566 桌面检验模板弹窗按钮空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspection-templates 点新增模板「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).first().click();
+    await expect(page.getByText('状态', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板「确定」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).first().click();
+    await expect(page.getByRole('button', { name: /确\s*定/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).first().click();
+    await expect(page.getByRole('button', { name: /取\s*消/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

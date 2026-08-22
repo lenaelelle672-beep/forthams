@@ -673,5 +673,6 @@
 - Q2562：/asset-models 点新增 选择字段集/型号/选择制造商 **3 passed**。`ffaeda0ff`
 - Q2563：/inspection-templates 点新增 年度模板/类别ID/检验周期 **3 passed**。`00d398689`
 - Q2564：/inspection-templates 点新增 检查项/类别ID/定期检验 **3 passed**。`809e7877c`
-- Q2565：/inspection-templates 点新增 启用/模板名称/检验类型 **3 passed**。
+- Q2565：/inspection-templates 点新增 启用/模板名称/检验类型 **3 passed**。`0f4593835`
+- Q2566：/inspection-templates 点新增 状态/确定/取消 **3 passed**。
 

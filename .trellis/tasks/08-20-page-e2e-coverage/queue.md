@@ -1753,4 +1753,5 @@
 | Q2563 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 年度模板/类别ID/检验周期）。禁 /m。 |
 | Q2564 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 检查项/类别ID/定期检验）。禁 /m。 |
 | Q2565 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 启用/模板名称/检验类型）。禁 /m。 |
-| Q2566 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2566 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 状态/确定/取消）。禁 /m。 |
+| Q2567 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
