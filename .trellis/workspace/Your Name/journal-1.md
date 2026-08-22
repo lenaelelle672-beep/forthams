@@ -627,5 +627,6 @@
 - Q2516：/workorders/new 高优先级描述/低优先级/首页 **3 passed**。`419094119`
 - Q2517：/workorders/new 描述/placeholder/预计费用 **3 passed**。`d9001ac66`
 - Q2518：/workorders/new 截止日期/人员安排/负责人 **3 passed**。`86ce86eef`
-- Q2519：/workorders/new 协作人/添加人员/附件 **3 passed**。
+- Q2519：/workorders/new 协作人/添加人员/附件 **3 passed**。`2cccd291c`
+- Q2520：/workorders/new 上传文件/处理提示/提交工单 **3 passed**。
 
