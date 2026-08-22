@@ -1494,4 +1494,5 @@
 | Q2304 | done | 桌面空态 **3 passed**（v3「8/8 已接入」「9/9 已接入」「6/6 已接入」）。禁 /m。 |
 | Q2305 | done | 桌面空态 **3 passed**（todo 真实产品页/主体、「我发起的」）。禁 /m。 |
 | Q2306 | done | 桌面空态 **3 passed**（todo「已通过」「已驳回」、搜索 placeholder）。禁 /m。 |
-| Q2307 | in_progress | 桌面空态：/fixed-assets/workbench?menu=todo「当前没有待处理的审批事项」。禁 /m。 |
+| Q2307 | done | 桌面空态 **3 passed**（todo 空列表提示、「发起申请」「审批」）。禁 /m。 |
+| Q2308 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
