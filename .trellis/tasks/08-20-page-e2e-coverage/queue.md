@@ -1230,4 +1230,6 @@
 | Q2040 | done | 桌面空态 **3 passed**（/depreciation「累计折旧」「折旧率」「全部方法」）。禁 /m。 |
 | Q2041 | done | 桌面空态 **3 passed**（/depreciation「查询」「重置」「原值」）。禁 /m。 |
 | Q2042 | done | 桌面空态 **3 passed**（/depreciation「净值」「状态」、/revaluations「资产减值/重估」）。禁 /m。 |
-| Q2043 | in_progress | 桌面空态：/revaluations 未测副标题/表头/筛选。禁 /m。 |
+| Q2043 | done | 桌面空态 **3 passed**（/revaluations「价值调整」「资产价值调整记录」「条记录」）。禁 /m。 |
+| Q2044 | done | 桌面空态 **3 passed**（/revaluations 表头「类型」「新值」「差额」）。禁 /m。 |
+| Q2045 | in_progress | 桌面空态：/revaluations 表头「查看」或换 /fault-codes。禁 /m。 |
