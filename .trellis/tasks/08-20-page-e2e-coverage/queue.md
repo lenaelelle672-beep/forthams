@@ -1953,4 +1953,5 @@
 | Q2763 | done | 桌面空态 **3 passed**（/inspection-records 已过期不通过/通过/搜索）。禁 /m。 |
 | Q2764 | done | 桌面空态 **3 passed**（/inspection-records 重置/全部类型/年度检验）。禁 /m。 |
 | Q2765 | done | 桌面空态 **3 passed**（/inspection-records 定期/专项/全部结果）。禁 /m。 |
-| Q2766 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2766 | done | 桌面空态 **3 passed**（/inspection-records 不通过/附条件通过/至）。禁 /m。 |
+| Q2767 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
