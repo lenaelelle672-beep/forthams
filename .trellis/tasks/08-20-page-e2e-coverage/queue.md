@@ -1929,4 +1929,5 @@
 | Q2739 | done | 桌面空态 **3 passed**（/audit 副标题/趋势 heading/类型分布 heading）。禁 /m。 |
 | Q2740 | done | 桌面空态 **3 passed**（/audit 最近操作 heading/审计日志/导出）。禁 /m。 |
 | Q2741 | done | 桌面空态 **3 passed**（/disposals 新建清退/标题/暂无记录）。禁 /m。 |
-| Q2742 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2742 | done | 桌面空态 **3 passed**（/disposals 搜索/本月总量/回收价值）。禁 /m。 |
+| Q2743 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

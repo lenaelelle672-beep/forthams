@@ -849,5 +849,6 @@
 - Q2738：/audit 筛选/显示/项共 **3 passed**。`78727ac51`
 - Q2739：/audit 副标题/趋势 heading/类型分布 heading **3 passed**。`a87262bf8`
 - Q2740：/audit 最近操作 heading/审计日志/导出 **3 passed**。`6105b9c4f`
-- Q2741：/disposals 新建清退/标题/暂无记录 **3 passed**。
+- Q2741：/disposals 新建清退/标题/暂无记录 **3 passed**。`a227a30fb`
+- Q2742：/disposals 搜索/本月总量/回收价值 **3 passed**。
 
