@@ -28059,6 +28059,34 @@ test.describe('Q2424 桌面维保计划搜索空表空态', () => {
   });
 });
 
+test.describe('Q2425 桌面维保计划状态筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/maintenance/plans 空态「刷新」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance/plans');
+    await expect(page.getByRole('button', { name: '刷新' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/maintenance/plans 空态「全部状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance/plans');
+    await expect(page.getByRole('button', { name: '全部状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/maintenance/plans 空态「暂停」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance/plans');
+    await expect(page.getByText('暂停').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
