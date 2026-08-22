@@ -1779,4 +1779,5 @@
 | Q2589 | done | 桌面空态 **3 passed**（/bigscreen 重庆/哈尔滨/杭州-北京）。禁 /m。 |
 | Q2590 | done | 桌面空态 **3 passed**（/bigscreen 重点/取消/机长合外）。禁 /m。 |
 | Q2591 | done | 桌面空态 **3 passed**（/bigscreen 副驾合外/318/319）。禁 /m。 |
-| Q2592 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2592 | done | 桌面空态 **3 passed**（/bigscreen 341/332/10架）。禁 /m。 |
+| Q2593 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
