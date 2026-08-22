@@ -1361,4 +1361,5 @@
 | Q2171 | done | 桌面空态 **3 passed**（/compensation「等价物赔偿」「维修恢复」「审批流程」）。禁 /m。 |
 | Q2172 | done | 桌面空态 **3 passed**（/compensation「取消」「保存草稿」「提交申请」）。禁 /m。 |
 | Q2173 | done | 桌面空态 **3 passed**（/disposals「处置单号」「资产信息」「申请人」）。禁 /m。 |
-| Q2174 | in_progress | 桌面空态：/disposals 列头「申请日期」「状态」「操作」。禁 /m。 |
+| Q2174 | done | 桌面空态 **3 passed**（/disposals「申请日期」「状态」「操作」）。禁 /m。 |
+| Q2175 | in_progress | 桌面空态：/disposals tab 或 /notifications 备注。禁 /m。 |
