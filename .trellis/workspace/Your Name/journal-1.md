@@ -705,5 +705,6 @@
 - Q2594：/bigscreen 34.2%/4.8万/10 **3 passed**。硬截止仍为 18:00。`c54ed82a5`
 - Q2595：/bigscreen 王珂玉/吴菲菲段琪/湿度52% **3 passed**。`87cdc51fc`
 - Q2596：/bigscreen 风速/多云/星期四 **3 passed**。`03910ba5e`
-- Q2597：/bigscreen 英文副标题/2/15 **3 passed**。
+- Q2597：/bigscreen 英文副标题/2/15 **3 passed**。`fa4c9a392`
+- Q2598：/bigscreen 186架/在册飞机/176架 **3 passed**。
 
