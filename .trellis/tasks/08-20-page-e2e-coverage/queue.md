@@ -1145,4 +1145,5 @@
 | Q1955 | done | 桌面空态 **3 passed**（/risk-assessments/1/edit「影响程度（1-5）」「缓解措施」「更新」）。禁 /m。 |
 | Q1956 | done | 桌面空态 **3 passed**（/risk-assessments/1/edit「评审日期」「取消」「评估人ID」）。禁 /m。 |
 | Q1957 | done | 桌面空态 **3 passed**（/sam「SAM 合规管理」「总许可数」「合规」）。禁 /m。 |
-| Q1958 | in_progress | 桌面空态：/sam「超用」「闲置」「已过期」。禁 /m。 |
+| Q1958 | done | 桌面空态 **3 passed**（/sam「超用」「闲置」「已过期」）。禁 /m。 |
+| Q1959 | in_progress | 桌面空态：/sam「合规率」及剩余图表标题（读页确认）。禁 /m。 |
