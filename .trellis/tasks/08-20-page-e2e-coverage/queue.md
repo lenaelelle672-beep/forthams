@@ -1754,4 +1754,5 @@
 | Q2564 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 检查项/类别ID/定期检验）。禁 /m。 |
 | Q2565 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 启用/模板名称/检验类型）。禁 /m。 |
 | Q2566 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 状态/确定/取消）。禁 /m。 |
-| Q2567 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2567 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_BORROW 编码/未配置/直接发起）。禁 /m。 |
+| Q2568 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
