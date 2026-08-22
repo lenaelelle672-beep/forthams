@@ -728,5 +728,6 @@
 - Q2617：/bigscreen-3d 24%/21%/13% **3 passed**。`8ba6eead7`
 - Q2618：/bigscreen-3d 开场动画：/当前城市：/地图节点： **3 passed**。`ea1e4f0ef`
 - Q2619：/bigscreen-3d 112/36/131 **3 passed**。硬截止仍为 18:00。`312b3bcc5`
-- Q2620：/bigscreen-3d 39/98/420 **3 passed**。
+- Q2620：/bigscreen-3d 39/98/420 **3 passed**。`24813806b`
+- Q2621：/bigscreen-3d 96/100/21 **3 passed**。
 
