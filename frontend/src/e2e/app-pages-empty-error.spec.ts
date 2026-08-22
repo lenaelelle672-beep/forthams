@@ -15786,6 +15786,34 @@ test.describe('Q1992 桌面流程中心处置说明空态', () => {
   });
 });
 
+test.describe('Q1993 桌面流程中心退役与业务标签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflows 空态「用于资产退役审批、部门审核及资产状态变更的流程定义。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('用于资产退役审批、部门审核及资产状态变更的流程定义。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「业务：资产清退」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('业务：资产清退').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「业务：资产报废转让」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('业务：资产报废转让').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
