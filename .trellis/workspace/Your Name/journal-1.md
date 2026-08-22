@@ -572,5 +572,6 @@
 - Q2461：/analytics 价值趋势/分类分布/页脚 **3 passed**。`7933135cb`
 - Q2462：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。`8c1796b8c`
 - Q2463：/analytics/health heading/副标题/平均健康分 **3 passed**。`54c630b1e`
-- Q2464：/analytics/health 健康/警告/危险资产 **3 passed**。
+- Q2464：/analytics/health 健康/警告/危险资产 **3 passed**。`13bc2241d`
+- Q2465：/analytics/health 评分分布 + /analytics/tco 标题 **3 passed**。
 
