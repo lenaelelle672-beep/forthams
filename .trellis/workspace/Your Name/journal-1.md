@@ -886,5 +886,6 @@
 - Q2775：/stocktaking-cycles 已计划/已暂停/全部状态 **3 passed**。`96206d905`
 - Q2776：/stocktaking-cycles 已取消/副标题/标题 **3 passed**。`03b890a47`
 - Q2777：/budgets/new 返回列表/新增预算/创建记录 **3 passed**。`17a91decf`
-- Q2778：/budgets/new 预算年度/类型/总额 **3 passed**。
+- Q2778：/budgets/new 预算年度/类型/总额 **3 passed**。`54406ddf7`
+- Q2779：/budgets/new 部门ID/分类ID/创建预算 **3 passed**。
 

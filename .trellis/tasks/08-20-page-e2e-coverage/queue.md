@@ -1966,4 +1966,5 @@
 | Q2776 | done | 桌面空态 **3 passed**（/stocktaking-cycles 已取消/副标题/标题）。禁 /m。 |
 | Q2777 | done | 桌面空态 **3 passed**（/budgets/new 返回列表/新增预算/创建记录）。禁 /m。 |
 | Q2778 | done | 桌面空态 **3 passed**（/budgets/new 预算年度/类型/总额）。禁 /m。 |
-| Q2779 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2779 | done | 桌面空态 **3 passed**（/budgets/new 部门ID/分类ID/创建预算）。禁 /m。 |
+| Q2780 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
