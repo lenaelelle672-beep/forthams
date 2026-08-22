@@ -1625,4 +1625,5 @@
 | Q2435 | done | 桌面空态 **3 passed**（/budgets heading/资产预算/新增预算）。禁 /m。 |
 | Q2436 | done | 桌面空态 **3 passed**（/budgets 总预算/已使用/已承诺）。禁 /m。 |
 | Q2437 | done | 桌面空态 **3 passed**（/budgets 执行率/预算列表/空表）。禁 /m。 |
-| Q2438 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2438 | done | 桌面空态 **3 passed**（/budgets 超支告警/合同锁定/运营）。禁 /m。 |
+| Q2439 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
