@@ -12986,6 +12986,34 @@ test.describe('Q1893 桌面检验记录类型日期列头空态', () => {
   });
 });
 
+test.describe('Q1894 桌面检验记录机构结果列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspection-records 空态「检验机构」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByText('检验机构').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-records 空态「检验人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByText('检验人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-records 空态「结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByText('结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
