@@ -35649,6 +35649,34 @@ test.describe('Q2695 桌面个人中心套餐空态', () => {
   });
 });
 
+test.describe('Q2696 桌面个人中心账号空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/profile 空态「SUPER_ADMIN」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/profile');
+    await expect(page.getByText('SUPER_ADMIN').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/profile 空态「系统管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/profile');
+    await expect(page.getByText('系统管理员').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/profile 空态「ADMIN」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/profile');
+    await expect(page.getByText('ADMIN').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

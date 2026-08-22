@@ -1883,4 +1883,5 @@
 | Q2693 | done | 桌面空态 **3 passed**（/maintenance/plans 优先级/状态/操作表头）。禁 /m。 |
 | Q2694 | done | 桌面空态 **3 passed**（/maintenance/plans 副标题/搜索/刷新）。禁 /m。 |
 | Q2695 | done | 桌面空态 **3 passed**（/profile 当前套餐/系统管理员/ADMIN）。禁 /m。 |
-| Q2696 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2696 | done | 桌面空态 **3 passed**（/profile SUPER_ADMIN/系统管理员/ADMIN）。禁 /m。 |
+| Q2697 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
