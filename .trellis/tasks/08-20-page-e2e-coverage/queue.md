@@ -1367,4 +1367,5 @@
 | Q2177 | done | 桌面空态 **3 passed**（/disposals/clearance/new「资产清退申请」「风险提示」「基本信息」）。禁 /m。 |
 | Q2178 | done | 桌面空态 **3 passed**（/disposals/clearance/new「清退编号」「申请人」「申请日期」）。禁 /m。 |
 | Q2179 | done | 桌面空态 **3 passed**（/disposals/clearance/new「清退原因」「资产选择」「添加资产」）。禁 /m。 |
-| Q2180 | in_progress | 桌面空态：/disposals/clearance/new 清退配置或步骤。禁 /m。 |
+| Q2180 | done | 桌面空态 **3 passed**（/disposals/clearance/new「清退配置」「处理方式」「入库保管」）。禁 /m。 |
+| Q2181 | in_progress | 桌面空态：/disposals/clearance/new「变卖处理」「捐赠」「不可逆」。禁 /m。 |
