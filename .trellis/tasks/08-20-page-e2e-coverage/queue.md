@@ -988,4 +988,5 @@
 | Q1798 | done | 桌面空态 **3 passed**（/spare-parts/new 安全库存单价申请信息）。禁 /m。 |
 | Q1799 | done | 桌面空态 **3 passed**（/spare-parts/new 缺口待确认到货）。禁 /m。 |
 | Q1800 | done | 桌面空态 **3 passed**（/spare-parts/new 备件申请提交返回）。禁 /m。 |
-| Q1801 | in_progress | 桌面空态：/spare-parts/new「按维保工单、库存下限和供应商交期创建备件保障记录」。禁 /m。 |
+| Q1801 | done | 桌面空态 **3 passed**（备件副标题、预算返回列表年度）。禁 /m。 |
+| Q1802 | in_progress | 桌面空态：/budgets/new「预算类型」「采购预算」「创建预算」。禁 /m。 |

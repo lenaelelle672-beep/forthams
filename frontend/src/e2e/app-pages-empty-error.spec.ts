@@ -9874,6 +9874,34 @@ test.describe('Q1800 桌面备件空态', () => {
   });
 });
 
+test.describe('Q1801 桌面备件预算空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/spare-parts/new 空态「按维保工单、库存下限和供应商交期创建备件保障记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('按维保工单、库存下限和供应商交期创建备件保障记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「返回列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByRole('button', { name: '返回列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态「预算年度」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByText('预算年度').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
