@@ -878,5 +878,6 @@
 - Q2767：/inspection-templates 新增/标题/暂无模板 **3 passed**。标题非 heading。`50ab117b5`
 - Q2768：/inspection-templates 模板名称/重置/搜索 **3 passed**。「检验类型」非 placeholder。`102c94b78`
 - Q2769：/inspection-templates 模板名称/检验类型/检验周期表头 **3 passed**。`72319bcbd`
-- Q2770：/inspection-templates 状态/创建时间/操作表头 **3 passed**。
+- Q2770：/inspection-templates 状态/创建时间/操作表头 **3 passed**。`8b9637313`
+- Q2771：/stocktaking-cycles 新建/标题/暂无周期 **3 passed**。
 
