@@ -531,5 +531,6 @@
 - Q2420：/fault-codes 故障代码/三级体系/现象原因措施 **3 passed**。`610fc587a`
 - Q2421：/fault-codes 暂无代码/节点总数/故障现象 **3 passed**。`f0a948ca9`
 - Q2422：/fault-codes 故障原因/解决措施/空树描述 **3 passed**。`b999fd284`
-- Q2423：/maintenance/plans heading/副标题/新建计划 **3 passed**。
+- Q2423：/maintenance/plans heading/副标题/新建计划 **3 passed**。`bc27bceb3`
+- Q2424：/maintenance/plans 搜索/空表 **3 passed**。
 
