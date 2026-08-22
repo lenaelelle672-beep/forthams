@@ -26743,6 +26743,34 @@ test.describe('Q2377 桌面折旧方法胶囊空态', () => {
   });
 });
 
+test.describe('Q2378 桌面折旧统计空表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/depreciation 空态「工作量法」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByText('工作量法').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation 空态「本月折旧总额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByText('本月折旧总额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/depreciation 空态「暂无折旧计划数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByText('暂无折旧计划数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
