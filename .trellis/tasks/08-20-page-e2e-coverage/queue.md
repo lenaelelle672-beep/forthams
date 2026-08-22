@@ -1687,4 +1687,5 @@
 | Q2497 | done | 桌面空态 **3 passed**（/assignments/new 新建领用单/基本信息/领用类型）。禁 /m。 |
 | Q2498 | done | 桌面空态 **3 passed**（/assignments/new 长期领用/使用人/创建）。禁 /m。 |
 | Q2499 | done | 桌面空态 **3 passed**（/budgets/new 新增预算/创建记录/预算年度）。禁 /m。 |
-| Q2500 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2500 | done | 桌面空态 **3 passed**（/budgets/new 预算类型/采购预算/预算总额）。禁 /m。 |
+| Q2501 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
