@@ -799,5 +799,6 @@
 - Q2688：/maintenance 计划中/执行中/逾期 **3 passed**。`d18bd2d68`
 - Q2689：/maintenance 已完成/刷新/设备维护 **3 passed**。`abcaf78b7`
 - Q2690：/maintenance/plans 新建计划/标题/暂无计划 **3 passed**。`937fb5d29`
-- Q2691：/maintenance/plans 搜索/计划名称/关联资产 **3 passed**。
+- Q2691：/maintenance/plans 搜索/计划名称/关联资产 **3 passed**。`73a2d02c3`
+- Q2692：/maintenance/plans 计划周期/负责人/下次执行 **3 passed**。
 
