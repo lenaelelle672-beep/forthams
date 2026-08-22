@@ -1074,4 +1074,5 @@
 | Q1884 | done | 桌面空态 **3 passed**（/inspection-templates 列头「状态」「创建时间」「操作」）。禁 /m。 |
 | Q1885 | done | 桌面空态 **3 passed**（/inspection-templates placeholder「模板名称」「检验类型」+「新增模板」）。禁 /m。 |
 | Q1886 | done | 桌面空态 **3 passed**（/inspection-records「检验记录管理」「创建、编辑和追踪设备检验记录」「批量生成」）。禁 /m。 |
-| Q1887 | in_progress | 桌面空态：/inspection-records「新增检验」「总记录」「通过」。禁 /m。 |
+| Q1887 | done | 桌面空态 **3 passed**（/inspection-records「新增检验」「总记录」「通过」）。禁 /m。 |
+| Q1888 | in_progress | 桌面空态：/inspection-records「待检验」「已过期/不通过」「搜索」。禁 /m。 |
