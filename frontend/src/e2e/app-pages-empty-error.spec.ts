@@ -24042,6 +24042,34 @@ test.describe('Q2280 桌面工作台预览分类维保空态', () => {
   });
 });
 
+test.describe('Q2281 桌面工作台预览净值部门空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workspace-preview 空态「净值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByText('净值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workspace-preview 空态「部门资产统计」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByText('部门资产统计').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workspace-preview 空态「查看全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByText('查看全部').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
