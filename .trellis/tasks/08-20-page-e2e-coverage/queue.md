@@ -1786,4 +1786,5 @@
 | Q2596 | done | 桌面空态 **3 passed**（/bigscreen 风速/多云/星期四）。禁 /m。 |
 | Q2597 | done | 桌面空态 **3 passed**（/bigscreen 英文副标题/2/15）。禁 /m。 |
 | Q2598 | done | 桌面空态 **3 passed**（/bigscreen 186架/在册飞机/176架）。禁 /m。 |
-| Q2599 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2599 | done | 桌面空态 **3 passed**（/bigscreen 执行航班/异常阈值/2小时内）。禁 /m。 |
+| Q2600 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
