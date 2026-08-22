@@ -1524,4 +1524,5 @@
 | Q2334 | done | 桌面空态 **3 passed**（preview 最近工单/维保预警/分类分布）。禁 /m。 |
 | Q2335 | done | 桌面空态 **3 passed**（/sso-callback 返回登录/完整错误/SSO 登录）。禁 /m。 |
 | Q2336 | done | 桌面空态 **3 passed**（/vendor-portal heading/placeholder/登录按钮）。禁 /m。 |
-| Q2337 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2337 | done | 桌面空态 **3 passed**（/vendor-portal 密码 placeholder/门户/编码）。禁 /m。 |
+| Q2338 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

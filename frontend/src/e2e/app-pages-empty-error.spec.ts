@@ -25600,6 +25600,29 @@ test.describe('Q2336 桌面供应商门户标题空态', () => {
   });
 });
 
+test.describe('Q2337 桌面供应商门户密码空态', () => {
+  test('/vendor-portal 空态 placeholder「密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByPlaceholder('密码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 空态「供应商门户」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByText('供应商门户').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 空态「供应商编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByPlaceholder('供应商编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
