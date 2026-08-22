@@ -1160,4 +1160,5 @@
 | Q1970 | done | 桌面空态 **3 passed**（/report-builder 字段「保养次数」「故障次数」「MTBF」）。禁 /m。 |
 | Q1971 | done | 桌面空态 **3 passed**（/report-builder 字段「MTTR」「折旧金额」「维保费用」）。禁 /m。 |
 | Q1972 | done | 桌面空态 **3 passed**（/report-builder 字段「能耗费用」「总成本」+ 分组「财务」）。禁 /m。 |
-| Q1973 | in_progress | 桌面空态：/reports「报表中心」及相关可见文案（读页确认）。禁 /m。 |
+| Q1973 | done | 桌面空态 **3 passed**（/report-builder 分组「资产」「运维」+ 字段「状态」；option「资产报表」hidden）。禁 /m。 |
+| Q1974 | in_progress | 桌面空态：/report-builder「将字段拖拽到此处，或点击左侧字段添加」已测则换「点击"生成预览"查看数据」。禁 /m。 |
