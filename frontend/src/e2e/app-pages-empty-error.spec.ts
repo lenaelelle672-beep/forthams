@@ -16771,6 +16771,35 @@ test.describe('Q2027 桌面GIS地图标题空态', () => {
   });
 });
 
+test.describe('Q2028 桌面GIS筛选与弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis 空态「资产分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByText('资产分布').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 空态「全部状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByText('全部状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点资产定位管理「纬度 (-90~90)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await expect(page.getByText('纬度 (-90~90)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
