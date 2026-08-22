@@ -923,5 +923,6 @@
 - Q2812：/assets/new 经度/原值/净值标签 **3 passed**。`1442bd587`
 - Q2813：/assets/new 保修期/折旧率/资产状态 **3 passed**。`978b06e68`
 - Q2814：/assets/new 规格型号/部门位置/描述备注 **3 passed**。`52401d408`
-- Q2815：/assets/new 500字/资产描述/200字 **3 passed**。
+- Q2815：/assets/new 500字/资产描述/200字 **3 passed**。`02042ec2a`
+- Q2816：/assets/new 图片文件/父子关系/主附属 **3 passed**。
 
