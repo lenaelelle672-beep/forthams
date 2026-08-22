@@ -1668,4 +1668,5 @@
 | Q2478 | done | 桌面空态 **3 passed**（/system/depts 部门总数/正常/顶级）。禁 /m。 |
 | Q2479 | done | 桌面空态 **3 passed**（/system/depts 搜索/个部门/新增）。禁 /m。 |
 | Q2480 | done | 桌面空态 **3 passed**（/system/menus heading/树形/新增菜单）。禁 /m。 |
-| Q2481 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2481 | done | 桌面空态 **3 passed**（/system/posts heading/岗位/新增岗位）。禁 /m。 |
+| Q2482 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
