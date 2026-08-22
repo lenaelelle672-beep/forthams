@@ -1644,4 +1644,5 @@
 | Q2454 | done | 桌面空态 **3 passed**（/disposals 回收价值/报废转让/工单管理）。禁 /m。 |
 | Q2455 | done | 桌面空态 **3 passed**（/disposals 清退列表/搜索/资产赔偿）。禁 /m。 |
 | Q2456 | done | 桌面空态 **3 passed**（/disposals 空表/新建清退/资产调拨）。禁 /m。 |
-| Q2457 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2457 | done | 桌面空态 **3 passed**（/profile 当前套餐/系统管理员 + /retirement 首页）。禁 /m。 |
+| Q2458 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
