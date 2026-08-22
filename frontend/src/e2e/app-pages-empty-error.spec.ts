@@ -13753,6 +13753,35 @@ test.describe('Q1920 桌面ABC分类列头说明空态', () => {
   });
 });
 
+test.describe('Q1921 桌面ABC分类盘点周期说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/abc-classification 空态「需季度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('需季度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「需年度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('需年度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 点批量重新分类「确定」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await page.getByRole('button', { name: /批\s*量\s*重\s*新\s*分\s*类/ }).click();
+    await expect(page.getByRole('button', { name: /确\s*定/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
