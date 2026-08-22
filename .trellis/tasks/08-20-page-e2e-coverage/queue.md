@@ -1324,4 +1324,5 @@
 | Q2134 | done | 桌面空态 **3 passed**（/workorders/new「新建工单」「标题 *」「工单类型」）。禁 /m。 |
 | Q2135 | done | 桌面空态 **3 passed**（/workorders/new「关联资产」「描述」「预计费用」）。禁 /m。 |
 | Q2136 | done | 桌面空态 **3 passed**（/workorders/new「截止日期」「负责人」「协作人」）。禁 /m。 |
-| Q2137 | in_progress | 桌面空态：/workorders/new placeholder 或优先级。禁 /m。 |
+| Q2137 | done | 桌面空态 **3 passed**（/workorders/new placeholder 标题/描述/添加人员）。禁 /m。 |
+| Q2138 | in_progress | 桌面空态：/workorders/new 优先级或提交按钮。禁 /m。 |
