@@ -779,5 +779,6 @@
 - Q2668：/contracts 新增合同/合同编号/合同名称 **3 passed**。`3f35e9dc4`
 - Q2669：/contracts 类型/金额/操作表头 **3 passed**。`a2c176e54`
 - Q2670：/contracts 搜索/标题/刷新 **3 passed**。`3840f8f5b`
-- Q2671：/contracts 全部合同/即将到期/时间轴视图 **3 passed**。页签非 button。
+- Q2671：/contracts 全部合同/即将到期/时间轴视图 **3 passed**。页签非 button。`7fa1bff87`
+- Q2672：/contracts 到期预警/30天/到期日期 **3 passed**。
 
