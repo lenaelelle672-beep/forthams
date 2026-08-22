@@ -561,5 +561,6 @@
 - Q2450：/inspection-records heading/副标题/批量生成 **3 passed**。`7ce6aff66`
 - Q2451：/inspection-records 总记录/待检验/已过期不通过 **3 passed**。`0777e86ed`
 - Q2452：/inspection-records 新增检验/搜索/空表 **3 passed**。`d0cd15e13`
-- Q2453：/disposals heading/全周期/本月处置总量 **3 passed**。
+- Q2453：/disposals heading/全周期/本月处置总量 **3 passed**。`465428026`
+- Q2454：/disposals 回收价值/报废转让/工单管理 **3 passed**。
 
