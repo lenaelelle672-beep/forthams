@@ -1595,4 +1595,5 @@
 | Q2405 | done | 桌面空态 **3 passed**（/insurances 全部类型/起始/结束）。禁 /m。 |
 | Q2406 | done | 桌面空态 **3 passed**（/spare-parts heading/备件/新增备件）。禁 /m。 |
 | Q2407 | done | 桌面空态 **3 passed**（/spare-parts 备件列表/库存管理/总数）。禁 /m。 |
-| Q2408 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2408 | done | 桌面空态 **3 passed**（/spare-parts 库存告警/已启用/搜索）。禁 /m。 |
+| Q2409 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
