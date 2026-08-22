@@ -22675,6 +22675,34 @@ test.describe('Q2231 桌面资产导入导出标题空态', () => {
   });
 });
 
+test.describe('Q2232 桌面智能报告无任务空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/smart-report 空态「未指定盘点任务 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/smart-report');
+    await expect(page.getByText('未指定盘点任务 ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/smart-report 空态「返回盘点列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/smart-report');
+    await expect(page.getByText('返回盘点列表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/smart-report 空态「盘点任务」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/smart-report');
+    await expect(page.getByText('盘点任务').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
