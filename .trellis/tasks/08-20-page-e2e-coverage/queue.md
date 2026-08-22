@@ -1811,4 +1811,5 @@
 | Q2621 | done | 桌面空态 **3 passed**（/bigscreen-3d 96/100/21）。禁 /m。 |
 | Q2622 | done | 桌面空态 **3 passed**（/bigscreen-3d 日期/0/四川全域）。禁 /m。 |
 | Q2623 | done | 桌面空态 **3 passed**（/bigscreen KPI 资/率/值）。禁 /m。 |
-| Q2624 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2624 | done | 桌面空态 **3 passed**（/bigscreen %/万/件）。禁 /m。 |
+| Q2625 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

@@ -731,5 +731,6 @@
 - Q2620：/bigscreen-3d 39/98/420 **3 passed**。`24813806b`
 - Q2621：/bigscreen-3d 96/100/21 **3 passed**。`ec6055912`
 - Q2622：/bigscreen-3d 日期/0/四川全域 **3 passed**。硬截止仍为 18:00。`80b0befd0`
-- Q2623：/bigscreen KPI 资/率/值 **3 passed**。
+- Q2623：/bigscreen KPI 资/率/值 **3 passed**。`4dea54194`
+- Q2624：/bigscreen %/万/件 **3 passed**。
 
