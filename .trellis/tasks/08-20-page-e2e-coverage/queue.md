@@ -1340,4 +1340,5 @@
 | Q2150 | done | 桌面空态 **3 passed**（/retirement「资产名称」「分类」「原值」）。禁 /m。 |
 | Q2151 | done | 桌面空态 **3 passed**（/retirement「残值」「退役原因」「申请人」）。禁 /m。 |
 | Q2152 | done | 桌面空态 **3 passed**（/retirement「状态」「操作」「新建退役申请」）。禁 /m。 |
-| Q2153 | in_progress | 桌面空态：/retirement「资产退役管理」「暂无退役申请记录」。禁 /m。 |
+| Q2153 | done | 桌面空态 **3 passed**（/retirement「资产退役管理」「暂无退役申请记录」、搜索 placeholder）。禁 /m。 |
+| Q2154 | in_progress | 桌面空态：/retirement/new 未覆盖。禁 /m。 |
