@@ -1413,4 +1413,5 @@
 | Q2223 | done | 桌面空态 **3 passed**（/assets/new「财务信息」「资产名称」「附件」。关联资产新建不渲染）。禁 /m。 |
 | Q2224 | done | 桌面空态 **3 passed**（/assets/new「品牌」「资产分类」「状态」。编号新建不渲染）。禁 /m。 |
 | Q2225 | done | 桌面空态 **3 passed**（/assets/new「型号」「序列号」「供应商」）。禁 /m。 |
-| Q2226 | in_progress | 桌面空态：/assets/new「原值」「当前净值」「购置日期」。禁 /m。 |
+| Q2226 | done | 桌面空态 **3 passed**（/assets/new「原值」「当前净值」「购置日期」）。禁 /m。 |
+| Q2227 | in_progress | 桌面空态：/assets/new「使用部门」「存放位置」「RFID」。禁 /m。 |
