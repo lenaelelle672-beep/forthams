@@ -676,5 +676,6 @@
 - Q2565：/inspection-templates 点新增 启用/模板名称/检验类型 **3 passed**。`0f4593835`
 - Q2566：/inspection-templates 点新增 状态/确定/取消 **3 passed**。`91a9d3ee5`
 - Q2567：/workflow-form/ASSET_BORROW 编码/未配置/直接发起 **3 passed**。`8275d366f`
-- Q2568：/workflow-form/ASSET_ASSIGNMENT 编码/未配置/直接发起 **3 passed**。
+- Q2568：/workflow-form/ASSET_ASSIGNMENT 编码/未配置/直接发起 **3 passed**。`b6cf61913`
+- Q2569：/workflow-form/ASSET_INTAKE 编码/未配置/直接发起 **3 passed**。
 
