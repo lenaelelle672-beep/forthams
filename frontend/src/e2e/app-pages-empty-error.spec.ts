@@ -20855,6 +20855,34 @@ test.describe('Q2166 桌面赔偿申请日期类型资产空态', () => {
   });
 });
 
+test.describe('Q2167 桌面赔偿申请责任字段空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/compensation 空态「损坏日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByText('损坏日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation 空态「责任人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByText('责任人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation 空态「责任部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByText('责任部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
