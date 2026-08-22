@@ -469,5 +469,6 @@
 - Q2358：/approvals 工单申请/至/全部状态 **3 passed**。`8f8371bd1`
 - Q2359：/inspections heading/副标题/新增检验 **3 passed**。`be57ca9ed`
 - Q2360：/inspections 总检验数/已过期/搜索 placeholder **3 passed**。`0695bff6b`
-- Q2361：/inspections 批量删除/批量导出/重置 **3 passed**。
+- Q2361：/inspections 批量删除/批量导出/重置 **3 passed**。`ef747f7e1`
+- Q2362：/inspections 全部类型/年度检验/定期检验 **3 passed**。
 
