@@ -527,5 +527,6 @@
 - Q2416：/purchase-orders heading/副标题/新增采购单 **3 passed**。`c41f4663d`
 - Q2417：/purchase-orders 总采购单/已审批/搜索 **3 passed**。`1375d900e`
 - Q2418：/purchase-orders 刷新/全部状态/部分收货 **3 passed**。`0ead88ed8`
-- Q2419：/fault-codes heading/故障树/新增根节点 **3 passed**。
+- Q2419：/fault-codes heading/故障树/新增根节点 **3 passed**。`e6e4f3e28`
+- Q2420：/fault-codes 故障代码/三级体系/现象原因措施 **3 passed**。
 
