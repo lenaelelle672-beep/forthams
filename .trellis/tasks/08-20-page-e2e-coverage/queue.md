@@ -1285,4 +1285,5 @@
 | Q2095 | done | 桌面空态 **3 passed**（/audit/1「租户 ID」「操作轨迹」「当前节点」）。禁 /m。 |
 | Q2096 | done | 桌面空态 **3 passed**（/audit/1「审计日志详情」「IP 地址」「操作人」）。禁 /m。 |
 | Q2097 | done | 桌面空态 **3 passed**（/notifications?source=quick-alert「工作台带入」「工作台告警处理」「核对告警来源」）。禁 /m。 |
-| Q2098 | in_progress | 桌面空态：/notifications?source=quick-alert「处置建议」「告警处置上下文」或维保说明。禁 /m。 |
+| Q2098 | done | 桌面空态 **3 passed**（/notifications?source=quick-alert「处置建议」「告警处置上下文」「转预测维保工单」）。禁 /m。 |
+| Q2099 | in_progress | 桌面空态：/notifications?source=security-event 或 data-alert 预填。禁 /m。 |
