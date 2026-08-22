@@ -1817,4 +1817,5 @@
 | Q2627 | done | 桌面空态 **3 passed**（/login label 密码/button 登录系统/checkbox 记住用户名）。禁 /m。 |
 | Q2628 | done | 桌面空态 **3 passed**（/login MaxKey/忘记密码/密码placeholder）。禁 /m。 |
 | Q2629 | done | 桌面空态 **3 passed**（/login 统一身份认证/账号placeholder/欢迎回来 heading）。禁 /m。 |
-| Q2630 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2630 | done | 桌面空态 **3 passed**（/403 heading/返回上一页/返回首页按钮）。禁 /m。 |
+| Q2631 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
