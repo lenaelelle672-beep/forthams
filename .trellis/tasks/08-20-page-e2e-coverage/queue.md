@@ -1579,4 +1579,5 @@
 | Q2389 | done | 桌面空态 **3 passed**（/borrows 已借出/已逾期/空表文案）。禁 /m。 |
 | Q2390 | done | 桌面空态 **3 passed**（/borrows 已审批/已归还/已取消）。禁 /m。 |
 | Q2391 | done | 桌面空态 **3 passed**（/assignments heading/领用/新建领用单）。禁 /m。 |
-| Q2392 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2392 | done | 桌面空态 **3 passed**（/assignments 领用列表/归还管理/搜索）。禁 /m。 |
+| Q2393 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

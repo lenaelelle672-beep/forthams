@@ -499,5 +499,6 @@
 - Q2388：/borrows 搜索/导出/借用总数 **3 passed**。`5f56e51c5`
 - Q2389：/borrows 已借出/已逾期/空表文案 **3 passed**。`ce88448b2`
 - Q2390：/borrows 已审批/已归还/已取消 **3 passed**。`d62e1447b`
-- Q2391：/assignments heading/领用/新建领用单 **3 passed**。
+- Q2391：/assignments heading/领用/新建领用单 **3 passed**。`6285fdeed`
+- Q2392：/assignments 领用列表/归还管理/搜索 **3 passed**。
 
