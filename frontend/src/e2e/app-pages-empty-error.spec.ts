@@ -37805,6 +37805,34 @@ test.describe('Q2772 桌面盘点周期统计空态', () => {
   });
 });
 
+test.describe('Q2773 桌面盘点周期表头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/stocktaking-cycles 空态 columnheader「周期名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('columnheader', { name: '周期名称' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles 空态 columnheader「类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('columnheader', { name: '类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles 空态 columnheader「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('columnheader', { name: '状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
