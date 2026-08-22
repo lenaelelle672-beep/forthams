@@ -17733,6 +17733,37 @@ test.describe('Q2060 桌面风险矩阵影响轴与单元格弹窗空态', () =>
   });
 });
 
+test.describe('Q2061 桌面风险矩阵单元格详情空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-assessments 点单元格空态「风险评估详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await page.locator('td').filter({ hasText: '项评估' }).first().click();
+    await expect(page.getByText('风险评估详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments 点单元格空态「可能性：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await page.locator('td').filter({ hasText: '项评估' }).first().click();
+    await expect(page.getByText(/可能性：/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments 点单元格空态「影响：」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await page.locator('td').filter({ hasText: '项评估' }).first().click();
+    await expect(page.getByText(/影响：/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
