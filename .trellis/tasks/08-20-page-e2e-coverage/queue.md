@@ -1591,4 +1591,5 @@
 | Q2401 | done | 桌面空态 **3 passed**（/insurances 保单列表/台账管理/重置筛选）。禁 /m。 |
 | Q2402 | done | 桌面空态 **3 passed**（/insurances 保单总数/生效中/总保费）。禁 /m。 |
 | Q2403 | done | 桌面空态 **3 passed**（/insurances 财产险/责任险/空表）。禁 /m。 |
-| Q2404 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2404 | done | 桌面空态 **3 passed**（/insurances 车险/全部状态/搜索 placeholder）。禁 /m。 |
+| Q2405 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
