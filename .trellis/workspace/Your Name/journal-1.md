@@ -616,5 +616,6 @@
 - Q2505：/insurances/new 保险名称/placeholder/类型 **3 passed**。`ec4d86d6a`
 - Q2506：/spare-parts/new 备件申请/描述/返回 **3 passed**。`92ac8aaba`
 - Q2507：/spare-parts/new 当前库存/安全库存/申请信息 **3 passed**。`a2684b2c8`
-- Q2508：/spare-parts/new 备件编码/名称/placeholder **3 passed**。
+- Q2508：/spare-parts/new 备件编码/名称/placeholder **3 passed**。`65e4937f2`
+- Q2509：/spare-parts/new 规格型号/补足缺口/预计到货 **3 passed**。
 
