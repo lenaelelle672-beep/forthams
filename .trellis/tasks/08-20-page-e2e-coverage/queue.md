@@ -1682,4 +1682,5 @@
 | Q2492 | done | 桌面空态 **3 passed**（/compensation/new 申请标题/赔偿申请/标准流程）。禁 /m。 |
 | Q2493 | done | 桌面空态 **3 passed**（/retirement/new 申请标题/新建申请/资产选择）。禁 /m。 |
 | Q2494 | done | 桌面空态 **3 passed**（/retirement/new 搜索/空搜提示/退役管理）。禁 /m。 |
-| Q2495 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2495 | done | 桌面空态 **3 passed**（/borrows/new 新建借用单/借用信息/归还日期）。禁 /m。 |
+| Q2496 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
