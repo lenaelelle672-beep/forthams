@@ -1575,4 +1575,5 @@
 | Q2385 | done | 桌面空态 **3 passed**（/inventory 已提交/导出/RFID）。禁 /m。 |
 | Q2386 | done | 桌面空态 **3 passed**（/borrows heading/借用管理/新建借用单）。禁 /m。 |
 | Q2387 | done | 桌面空态 **3 passed**（/borrows 借用列表/记录管理/搜索）。禁 /m。 |
-| Q2388 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2388 | done | 桌面空态 **3 passed**（/borrows 搜索/导出/借用总数）。禁 /m。 |
+| Q2389 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
