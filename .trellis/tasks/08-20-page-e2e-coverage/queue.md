@@ -1563,4 +1563,5 @@
 | Q2373 | done | 桌面空态 **3 passed**（/maintenance 新增/全部/空表文案）。禁 /m。 |
 | Q2374 | done | 桌面空态 **3 passed**（/depreciation heading/折旧/批量计算）。禁 /m。 |
 | Q2375 | done | 桌面空态 **3 passed**（/depreciation 折旧计划/计划管理/搜索）。禁 /m。 |
-| Q2376 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2376 | done | 桌面空态 **3 passed**（/depreciation 查询/重置/全部方法）。禁 /m。 |
+| Q2377 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

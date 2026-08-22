@@ -483,5 +483,6 @@
 - Q2372：/maintenance 已完成/刷新/全部类型 **3 passed**。`5e1a81dc4`
 - Q2373：/maintenance 新增/全部/空表文案 **3 passed**。`52f750844`
 - Q2374：/depreciation heading/折旧/批量计算 **3 passed**。`cc7e0e00b`
-- Q2375：/depreciation 折旧计划/计划管理/搜索 **3 passed**。
+- Q2375：/depreciation 折旧计划/计划管理/搜索 **3 passed**。`7e0fd00ee`
+- Q2376：/depreciation 查询/重置/全部方法 **3 passed**。
 
