@@ -764,5 +764,6 @@
 - Q2653：/login5 巡检维修/系统管理员/资产管理员 **3 passed**。无 seedSession。`45f83adca`
 - Q2654：/idle 发布公告/待处理/条结果 **3 passed**。`7a5575ab9`
 - Q2655：/idle 公告中/待审批/已认领页签 **3 passed**。`ac45cc48f`
-- Q2656：/idle 历史记录/资产编号/资产名称表头 **3 passed**。
+- Q2656：/idle 历史记录/资产编号/资产名称表头 **3 passed**。`bffc76602`
+- Q2657：/idle 部门/闲置天数/状态表头 **3 passed**。
 
