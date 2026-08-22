@@ -1020,4 +1020,5 @@
 | Q1830 | done | 桌面空态 **3 passed**（/spare-parts/1「状态」「编码:」「工单 #」）。禁 /m。 |
 | Q1831 | done | 桌面空态 **3 passed**（/intake/1「验收单详情」「基本信息」「验收单号」）。禁 /m。 |
 | Q1832 | done | 桌面空态 **3 passed**（/intake/1「验收日期」「总金额」「创建时间」）。禁 /m。 |
-| Q1833 | in_progress | 桌面空态：/intake/1 区块标题未覆盖 3 条（读 IntakeDetailPage：检查项/入库资产列表/状态）。禁 /m。 |
+| Q1833 | done | 桌面空态 **3 passed**（/intake/1「检查项」「入库资产列表」「状态」）。禁 /m。 |
+| Q1834 | in_progress | 桌面空态：/intake/1 操作按钮 3 条（读 IntakeDetailPage：DRAFT「提交验收」「取消」；PENDING_INSPECT「验收通过」。mock /intake-orders/1）。禁 /m。 |
