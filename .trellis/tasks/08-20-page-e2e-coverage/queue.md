@@ -1311,4 +1311,5 @@
 | Q2121 | done | 桌面空态 **3 passed**（/purchase-orders「金额」「采购日期」「状态」）。禁 /m。 |
 | Q2122 | done | 桌面空态 **3 passed**（/purchase-orders「操作」、/asset-models「模型名称」「型号」）。禁 /m。 |
 | Q2123 | done | 桌面空态 **3 passed**（/asset-models「分类」「制造商」「状态」）。禁 /m。 |
-| Q2124 | in_progress | 桌面空态：/asset-models 列头「字段集」「描述」「操作」。禁 /m。 |
+| Q2124 | done | 桌面空态 **3 passed**（/asset-models「字段集」「描述」「操作」）。禁 /m。 |
+| Q2125 | in_progress | 桌面空态：/asset-models 标题或 /equipment 未覆盖。禁 /m。 |

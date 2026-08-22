@@ -19651,6 +19651,34 @@ test.describe('Q2123 桌面资产模型分类制造商状态列头空态', () =>
   });
 });
 
+test.describe('Q2124 桌面资产模型字段集描述操作列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/asset-models 空态「字段集」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await expect(page.getByText('字段集').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-models 空态「描述」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await expect(page.getByText('描述').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-models 空态「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await expect(page.getByText('操作').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
