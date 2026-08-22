@@ -211,5 +211,6 @@
 - Q2100：影响资产/处置动作/必要时 **3 passed**。`61eb3e21d`
 - Q2101：TCO 标题与部门/分类ID **3 passed**。`0695d9a11`
 - Q2102：暂无排名/趋势、select 按 MTBF **3 passed**。option 不可见，用 select hasText。`c72a85621`
-- Q2103：暂无不健康资产/最低分/刷新 **3 passed**。
+- Q2103：暂无不健康资产/最低分/刷新 **3 passed**。`adfe7d475`
+- Q2104：不健康资产列表/状态良好/共0条 **3 passed**。
 
