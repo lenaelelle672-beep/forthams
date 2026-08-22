@@ -1353,4 +1353,5 @@
 | Q2163 | done | 桌面空态 **3 passed**（/retirement/1「申请人」「申请时间」「更新时间」）。禁 /m。 |
 | Q2164 | done | 桌面空态 **3 passed**（/compensation「资产赔偿申请」「填写信息」「基本信息」）。禁 /m。 |
 | Q2165 | done | 桌面空态 **3 passed**（/compensation「赔偿编号」「申请人」「选择资产」）。禁 /m。 |
-| Q2166 | in_progress | 桌面空态：/compensation「申请日期」「损坏类型」「资产选择」。禁 /m。 |
+| Q2166 | done | 桌面空态 **3 passed**（/compensation「申请日期」「损坏类型」「资产选择」）。禁 /m。 |
+| Q2167 | in_progress | 桌面空态：/compensation「损坏日期」「责任人」「责任部门」。禁 /m。 |
