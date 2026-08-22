@@ -1350,4 +1350,5 @@
 | Q2160 | done | 桌面空态 **3 passed**（/retirement/new 原因 placeholder、「2020」「2025」）。禁 /m。 |
 | Q2161 | done | 桌面空态 **3 passed**（/retirement/1「退役申请」「申请详情」、返回列表或退役管理）。禁 /m。 |
 | Q2162 | done | 桌面空态 **3 passed**（/retirement/1「退役原因」「申请编号」「审批状态」）。禁 /m。 |
-| Q2163 | in_progress | 桌面空态：/retirement/1「申请人」「申请时间」「更新时间」。禁 /m。 |
+| Q2163 | done | 桌面空态 **3 passed**（/retirement/1「申请人」「申请时间」「更新时间」）。禁 /m。 |
+| Q2164 | in_progress | 桌面空态：/idle 或 /compensation 未覆盖。禁 /m。 |
