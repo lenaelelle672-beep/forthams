@@ -1824,4 +1824,5 @@
 | Q2634 | done | 桌面空态 **3 passed**（/sso-callback 返回登录按钮/SSO失败/Token缺失）。禁 /m。 |
 | Q2635 | done | 桌面空态 **3 passed**（/dashboard 核心指标/运营首页 heading/总资产数）。禁 /m。 |
 | Q2636 | done | 桌面空态 **3 passed**（/dashboard 在用/闲置/待审批）。禁 /m。 |
-| Q2637 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2637 | done | 桌面空态 **3 passed**（/dashboard 暂无趋势/分类/工单数据）。禁 /m。 |
+| Q2638 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

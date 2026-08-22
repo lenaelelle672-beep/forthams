@@ -744,5 +744,6 @@
 - Q2633：/forbidden heading/返回上一页/无访问权限 **3 passed**。`9db0ec824`
 - Q2634：/sso-callback 返回登录按钮/SSO失败/Token缺失 **3 passed**。无 seedSession。`3744ef4f1`
 - Q2635：/dashboard 核心指标/运营首页 heading/总资产数 **3 passed**。`e2557d79c`
-- Q2636：/dashboard 在用/闲置/待审批 **3 passed**。
+- Q2636：/dashboard 在用/闲置/待审批 **3 passed**。`8658d5249`
+- Q2637：/dashboard 暂无趋势/分类/工单数据 **3 passed**。
 
