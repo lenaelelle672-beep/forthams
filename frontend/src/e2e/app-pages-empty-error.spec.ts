@@ -30860,6 +30860,34 @@ test.describe('Q2524 桌面新增风险评估评审空态', () => {
   });
 });
 
+test.describe('Q2525 桌面新增风险评估提交空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-assessments/new 空态 placeholder「评估人ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByPlaceholder('评估人ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/new 空态「创建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByRole('button', { name: /创\s*建/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/new 空态「自动计算的风险等级：LOW（低危）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByText('自动计算的风险等级：LOW（低危）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
