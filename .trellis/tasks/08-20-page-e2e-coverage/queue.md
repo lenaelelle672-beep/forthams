@@ -1976,4 +1976,5 @@
 | Q2786 | done | 桌面空态 **3 passed**（/inspections/new 检验编号/扫码/检验类型）。禁 /m。 |
 | Q2787 | done | 桌面空态 **3 passed**（/inspections/new 资产ID/检验模板/检验日期）。禁 /m。 |
 | Q2788 | done | 桌面空态 **3 passed**（/inspections/new 下次检验/机构/检验人）。禁 /m。 |
-| Q2789 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2789 | done | 桌面空态 **3 passed**（/inspections/new 检验结果/检查发现/检验照片）。禁 /m。 |
+| Q2790 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
