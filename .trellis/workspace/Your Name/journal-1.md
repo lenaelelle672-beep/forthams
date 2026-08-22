@@ -702,5 +702,6 @@
 - Q2591：/bigscreen 副驾合外/318/319 **3 passed**。`f7395cc1a`
 - Q2592：/bigscreen 341/332/10架 **3 passed**。`729926965`
 - Q2593：/bigscreen 6架/88架/56件 **3 passed**。`35ed62bb4`
-- Q2594：/bigscreen 34.2%/4.8万/10 **3 passed**。硬截止仍为 18:00。
+- Q2594：/bigscreen 34.2%/4.8万/10 **3 passed**。硬截止仍为 18:00。`c54ed82a5`
+- Q2595：/bigscreen 王珂玉/吴菲菲段琪/湿度52% **3 passed**。
 
