@@ -863,5 +863,6 @@
 - Q2752：/inspections 结果/操作表头/副标题 **3 passed**。`b5794f8f6`
 - Q2753：/inspections 批量删除/导出/重置 **3 passed**。`cc4bd46c5`
 - Q2754：/inspections 全部类型/年度/定期检验 **3 passed**。`f042cd54a`
-- Q2755：/inspections 专项检验/全部结果/通过 **3 passed**。
+- Q2755：/inspections 专项检验/全部结果/通过 **3 passed**。`a70f28e34`
+- Q2756：/inspections 不通过/附条件通过/搜索 **3 passed**。
 

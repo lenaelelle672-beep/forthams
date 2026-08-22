@@ -1943,4 +1943,5 @@
 | Q2753 | done | 桌面空态 **3 passed**（/inspections 批量删除/导出/重置）。禁 /m。 |
 | Q2754 | done | 桌面空态 **3 passed**（/inspections 全部类型/年度/定期检验）。禁 /m。 |
 | Q2755 | done | 桌面空态 **3 passed**（/inspections 专项检验/全部结果/通过）。禁 /m。 |
-| Q2756 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2756 | done | 桌面空态 **3 passed**（/inspections 不通过/附条件通过/搜索）。禁 /m。 |
+| Q2757 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
