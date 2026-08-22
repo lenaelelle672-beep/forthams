@@ -1404,4 +1404,5 @@
 | Q2214 | done | 桌面空态 **3 passed**（/inspections/new「证书到期日」「检验费用」「报告附件」）。禁 /m。 |
 | Q2215 | done | 桌面空态 **3 passed**（/inspections/new「扫码」、编号/机构 placeholder）。禁 /m。 |
 | Q2216 | done | 桌面空态 **3 passed**（/inspections/new 检验人/发现/证书 placeholder）。禁 /m。 |
-| Q2217 | in_progress | 桌面空态：/inspection-templates 未覆盖。禁 /m。 |
+| Q2217 | done | 桌面空态 **3 passed**（/inspections/new 资产ID/模板/附件 placeholder）。禁 /m。 |
+| Q2218 | in_progress | 桌面空态：/stocktaking-cycles/new 未覆盖字段。禁 /m。 |

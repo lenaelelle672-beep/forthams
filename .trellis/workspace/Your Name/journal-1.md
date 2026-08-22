@@ -324,5 +324,6 @@
 - Q2213：检查发现/检验照片/证书编号 **3 passed**。`2e66b39e5`
 - Q2214：证书到期日/检验费用/报告附件 **3 passed**。`aa4d3b849`
 - Q2215：扫码/编号占位/机构占位 **3 passed**。`756f4c105`
-- Q2216：检验人/发现/证书 placeholder **3 passed**。
+- Q2216：检验人/发现/证书 placeholder **3 passed**。`6804c10c7`
+- Q2217：资产ID/模板/附件 placeholder。templates/records 已饱和。
 
