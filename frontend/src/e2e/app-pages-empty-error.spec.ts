@@ -17966,6 +17966,37 @@ test.describe('Q2067 桌面风险矩阵配置映射分数余项空态', () => {
   });
 });
 
+test.describe('Q2068 桌面安全检查模板新增弹窗余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/config 点新增模板标题「新增模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).click();
+    await expect(page.getByRole('heading', { name: '新增模板' })).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/safety-checklists/config 点新增模板「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).click();
+    await expect(page.locator('label', { hasText: '状态' })).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/safety-checklists/config 点新增模板弹窗「启用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).click();
+    await expect(page.locator('[role="dialog"]').getByText('启用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

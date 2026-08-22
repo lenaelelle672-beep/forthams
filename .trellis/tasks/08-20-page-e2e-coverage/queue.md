@@ -1255,4 +1255,5 @@
 | Q2065 | done | 桌面空态 **3 passed**（/risk-matrix 点等级映射 MEDIUM/LOW、风险等级 placeholder）。禁 /m。 |
 | Q2066 | done | 桌面空态 **3 passed**（/risk-matrix 点等级映射「按 minScore 降序排列」、分数 20/10）。禁 /m。 |
 | Q2067 | done | 桌面空态 **3 passed**（/risk-matrix 点等级映射分数 4/0、「风险等级映射规则」）。禁 /m。 |
-| Q2068 | in_progress | 桌面空态：/safety-checklists/config 点新增模板「取消」「状态」或标题。禁 /m。 |
+| Q2068 | done | 桌面空态 **3 passed**（/safety-checklists/config 点新增模板 heading、「状态」、弹窗「启用」）。禁 /m。 |
+| Q2069 | in_progress | 桌面空态：/safety-checklists/execute 或 /test-results 剩余可见文案。禁 /m。 |

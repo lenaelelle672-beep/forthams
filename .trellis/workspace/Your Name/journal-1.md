@@ -175,5 +175,6 @@
 - Q2064：等级映射 CRITICAL/HIGH/最低分数 **3 passed**。`313bd8fef`
 - Q2065：MEDIUM/LOW/风险等级 placeholder **3 passed**。`44de0bcd0`
 - Q2066：minScore 说明与分数 20/10 **3 passed**。`b85075f6d`
-- Q2067：分数 4/0、映射规则标题 **3 passed**。
+- Q2067：分数 4/0、映射规则标题 **3 passed**。`fc0f7aabd`
+- Q2068：新增模板 heading/状态/弹窗启用 **3 passed**。
 
