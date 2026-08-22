@@ -2004,4 +2004,5 @@
 | Q2814 | done | 桌面空态 **3 passed**（/assets/new 规格型号/部门位置/描述备注）。禁 /m。 |
 | Q2815 | done | 桌面空态 **3 passed**（/assets/new 500字/资产描述/200字）。禁 /m。 |
 | Q2816 | done | 桌面空态 **3 passed**（/assets/new 图片文件/父子关系/主附属）。禁 /m。 |
-| Q2817 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2817 | done | 桌面空态 **3 passed**（/assets/new 先保存父子/先保存附件/附件）。禁 /m。 |
+| Q2818 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
