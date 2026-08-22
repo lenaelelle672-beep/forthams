@@ -423,5 +423,6 @@
 - Q2312：总净值/闲置率/累计折旧 **3 passed**。`f92ae1f52`
 - Q2313：待处理维修/导出PDF/未找到记录 **3 passed**。`1bc9008e3`
 - Q2314：资产列表/管理/调整筛选 **3 passed**。`960a5b3fa`
-- Q2315：my-assets 产品页地标/台账 **3 passed**。
+- Q2315：my-assets 产品页地标/台账 **3 passed**。`83d9f9f86`
+- Q2316：my-assets 新建/导出全部/共0条 **3 passed**。
 
