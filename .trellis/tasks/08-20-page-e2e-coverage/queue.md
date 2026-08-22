@@ -1327,4 +1327,5 @@
 | Q2137 | done | 桌面空态 **3 passed**（/workorders/new placeholder 标题/描述/添加人员）。禁 /m。 |
 | Q2138 | done | 桌面空态 **3 passed**（/workorders/new「优先级」「详细信息」「紧急」）。禁 /m。 |
 | Q2139 | done | 桌面空态 **3 passed**（/workorders/new 优先级「高」「中」「低」）。禁 /m。 |
-| Q2140 | in_progress | 桌面空态：/workorders/new 工单类型或提交取消。禁 /m。 |
+| Q2140 | done | 桌面空态 **3 passed**（/workorders/new「处理提示」「提交工单」「取消」）。禁 /m。 |
+| Q2141 | in_progress | 桌面空态：/workorders/new 处理提示正文或工单类型选项。禁 /m。 |
