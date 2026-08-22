@@ -1168,4 +1168,5 @@
 | Q1978 | done | 桌面空态 **3 passed**（/analytics/health 表头空态不渲染；切 /analytics/reliability「可靠性分析」「MTBF」「MTTR」）。禁 /m。 |
 | Q1979 | done | 桌面空态 **3 passed**（/workflows「业务流程管理」「集中维护审批流程、发布状态、版本快照和业务入口。」「返回资产处置」）。禁 /m。 |
 | Q1980 | done | 桌面空态 **3 passed**（/workflows「条结果」「当前选中流程」「创建并发布默认流程」）。禁 /m。 |
-| Q1981 | in_progress | 桌面空态：/workflows「流程信息」「版本历史与回滚」「该流程尚未形成可发布版本，业务入口会被阻断。」。禁 /m。 |
+| Q1981 | done | 桌面空态 **3 passed**（/workflows「流程信息」「版本历史与回滚」「该流程尚未形成可发布版本，业务入口会被阻断。」）。禁 /m。 |
+| Q1982 | in_progress | 桌面空态：/workflows「当前版本」「发布快照」「审批/办理」。禁 /m。 |
