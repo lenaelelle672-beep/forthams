@@ -700,5 +700,6 @@
 - Q2589：/bigscreen 重庆/哈尔滨/杭州-北京 **3 passed**。`72b1a3a93`
 - Q2590：/bigscreen 重点/取消/机长合外 **3 passed**。`703d35418`
 - Q2591：/bigscreen 副驾合外/318/319 **3 passed**。`f7395cc1a`
-- Q2592：/bigscreen 341/332/10架 **3 passed**。
+- Q2592：/bigscreen 341/332/10架 **3 passed**。`729926965`
+- Q2593：/bigscreen 6架/88架/56件 **3 passed**。
 
