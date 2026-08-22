@@ -1601,4 +1601,5 @@
 | Q2411 | done | 桌面空态 **3 passed**（/contracts heading/副标题/新增合同）。禁 /m。 |
 | Q2412 | done | 桌面空态 **3 passed**（/contracts 全部合同/即将到期/30天内到期）。禁 /m。 |
 | Q2413 | done | 桌面空态 **3 passed**（/contracts 搜索 placeholder/全部类型/刷新）。禁 /m。 |
-| Q2414 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2414 | done | 桌面空态 **3 passed**（/contracts 维保/采购/租赁合同）。禁 /m。 |
+| Q2415 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

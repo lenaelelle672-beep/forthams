@@ -521,5 +521,6 @@
 - Q2410：/spare-parts 启用/停用/全部 **3 passed**。`9a2d7f3a7`
 - Q2411：/contracts heading/副标题/新增合同 **3 passed**。`f97604513`
 - Q2412：/contracts 全部合同/即将到期/30天内到期 **3 passed**。`50a6693d6`
-- Q2413：/contracts 搜索 placeholder/全部类型/刷新 **3 passed**。
+- Q2413：/contracts 搜索 placeholder/全部类型/刷新 **3 passed**。`a438360f3`
+- Q2414：/contracts 维保/采购/租赁合同 **3 passed**。
 
