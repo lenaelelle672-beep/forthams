@@ -19427,6 +19427,34 @@ test.describe('Q2115 桌面借用归还用途操作列头空态', () => {
   });
 });
 
+test.describe('Q2116 桌面领用列表列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assignments 空态「资产编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments');
+    await expect(page.getByText('资产编号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments 空态「资产名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments');
+    await expect(page.getByText('资产名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments 空态「领用类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments');
+    await expect(page.getByText('领用类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
