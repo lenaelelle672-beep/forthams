@@ -435,5 +435,6 @@
 - Q2324：密度 title/工作台菜单/快捷操作 **3 passed**。`ec9a3a0b8`
 - Q2325：preview 侧栏运营首页/我的资产/流程待办 **3 passed**。`86c6ae7f9`
 - Q2326：preview 侧栏资产总览/设备/工单 **3 passed**。`54d1e266d`
-- Q2327：preview 侧栏巡检/备件/数据监控 **3 passed**。
+- Q2327：preview 侧栏巡检/备件/数据监控 **3 passed**。`0ad68b7b2`
+- Q2328：preview 侧栏报表/告警/组织策略 **3 passed**。
 
