@@ -1700,4 +1700,5 @@
 | Q2510 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new heading/周期名称/placeholder）。禁 /m。 |
 | Q2511 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 盘点类型/全盘点 + /workorders/new 新建工单）。禁 /m。 |
 | Q2512 | done | 桌面空态 **3 passed**（/workorders/new 工单管理/基本信息/优先级）。禁 /m。 |
-| Q2513 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2513 | done | 桌面空态 **3 passed**（/workorders/new 标题/placeholder/资产关联）。禁 /m。 |
+| Q2514 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

@@ -620,5 +620,6 @@
 - Q2509：/spare-parts/new 规格型号/补足缺口/预计到货 **3 passed**。`6030d54d1`
 - Q2510：/stocktaking-cycles/new heading/周期名称/placeholder **3 passed**。`d02334ff5`
 - Q2511：盘点类型/全盘点 + /workorders/new 新建工单 **3 passed**。`7d2297781`
-- Q2512：/workorders/new 工单管理/基本信息/优先级 **3 passed**。
+- Q2512：/workorders/new 工单管理/基本信息/优先级 **3 passed**。`622720791`
+- Q2513：/workorders/new 标题/placeholder/资产关联 **3 passed**。
 
