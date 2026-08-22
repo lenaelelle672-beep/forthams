@@ -1363,4 +1363,5 @@
 | Q2173 | done | 桌面空态 **3 passed**（/disposals「处置单号」「资产信息」「申请人」）。禁 /m。 |
 | Q2174 | done | 桌面空态 **3 passed**（/disposals「申请日期」「状态」「操作」）。禁 /m。 |
 | Q2175 | done | 桌面空态 **3 passed**（/compensation「备注」、placeholder、合计）。禁 /m。 |
-| Q2176 | in_progress | 桌面空态：/compensation 损坏程度或 /disposals/clearance/new。禁 /m。 |
+| Q2176 | done | 桌面空态 **3 passed**（/compensation 损失说明 placeholder、「返回」「赔偿申请」）。禁 /m。 |
+| Q2177 | in_progress | 桌面空态：/disposals/clearance/new 未覆盖。禁 /m。 |
