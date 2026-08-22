@@ -990,4 +990,5 @@
 | Q1800 | done | 桌面空态 **3 passed**（/spare-parts/new 备件申请提交返回）。禁 /m。 |
 | Q1801 | done | 桌面空态 **3 passed**（备件副标题、预算返回列表年度）。禁 /m。 |
 | Q1802 | done | 桌面空态 **3 passed**（/budgets/new「预算类型」「采购预算」「创建预算」）。禁 /m。 |
-| Q1803 | in_progress | 桌面空态：/budgets/new「部门ID」「分类ID」「预算总额」。禁 /m。 |
+| Q1803 | done | 桌面空态 **3 passed**（/budgets/new「部门ID」「分类ID」「预算总额」）。禁 /m。 |
+| Q1804 | in_progress | 桌面空态：/budgets/new「状态」「草稿」「取消」。禁 /m。 |
