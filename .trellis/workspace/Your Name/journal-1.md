@@ -569,5 +569,6 @@
 - Q2458：/gis heading/副标题/资产定位管理 **3 passed**。`17e7d4d83`
 - Q2459：/gis 数据来源/关联资产 + /analytics heading **3 passed**。`a1466384a`
 - Q2460：/analytics 副标题/数据范围/近12个月 **3 passed**。`c3de93c31`
-- Q2461：/analytics 价值趋势/分类分布/页脚 **3 passed**。
+- Q2461：/analytics 价值趋势/分类分布/页脚 **3 passed**。`7933135cb`
+- Q2462：/analytics 部门排行/处置统计/暂无趋势 **3 passed**。
 
