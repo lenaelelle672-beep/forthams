@@ -1849,4 +1849,5 @@
 | Q2659 | done | 桌面空态 **3 passed**（/equipment 新建维保记录/搜索/标题）。禁 /m。 |
 | Q2660 | done | 桌面空态 **3 passed**（/equipment 暂无设备/最近维保/暂无维保）。禁 /m。 |
 | Q2661 | done | 桌面空态 **3 passed**（/equipment 设备名称/设备ID/上次维保表头）。禁 /m。 |
-| Q2662 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2662 | done | 桌面空态 **3 passed**（/equipment 下次维保/使用率/维保状态表头）。禁 /m。 |
+| Q2663 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
