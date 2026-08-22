@@ -1030,4 +1030,5 @@
 | Q1840 | done | 桌面空态 **3 passed**（/intake/1「通过」「不通过」「驳回原因」）。禁 /m。 |
 | Q1841 | done | 桌面空态 **3 passed**（/assignments/1/edit 编辑领用单/保存修改/返回）。禁 /m。 |
 | Q1842 | done | 桌面空态 **3 passed**（/borrows/1/edit 编辑借用单/保存修改/返回）。禁 /m。 |
-| Q1843 | in_progress | 桌面空态：/borrows/1/edit 表单未覆盖 3 条（读 BorrowFormPage：借用信息/预计归还日期/借用用途）。禁 /m。 |
+| Q1843 | done | 桌面空态 **3 passed**（/borrows/1/edit「借用信息」「预计归还日期」「借用用途」）。禁 /m。 |
+| Q1844 | in_progress | 桌面空态：/borrows/1/edit 表单未覆盖 3 条（读 BorrowFormPage：资产/备注/取消）。禁 /m。 |
