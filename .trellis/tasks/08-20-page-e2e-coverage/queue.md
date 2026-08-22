@@ -1010,4 +1010,6 @@
 | Q1820 | done | 桌面空态 **3 passed**（/insurances/1「已批准」「已拒绝」「创建时间」）。禁 /m。 |
 | Q1821 | done | 桌面空态 **3 passed**（/insurances/1「编辑」「返回」「保单号」）。禁 /m。 |
 | Q1822 | done | 桌面空态 **3 passed**（/insurances/1「保险名称」「保险类型」「保险公司」）。禁 /m。 |
-| Q1823 | in_progress | 桌面空态：/insurances/1 Descriptions 未覆盖 3 条（读 InsuranceDetailPage：保费/保额/免赔额）。禁 /m。 |
+| Q1823 | done | 桌面空态 **3 passed**（/insurances/1「保费」「保额」「免赔额」）。禁 /m。 |
+| Q1824 | done | 桌面空态 **3 passed**（/insurances/1「开始日期」「结束日期」「备注」）。禁 /m。 |
+| Q1825 | in_progress | 桌面空态：/spare-parts/1 详情未覆盖文案 3 条（读 SparePartDetailPage 详情分支硬编码中文，禁 /m）。 |
