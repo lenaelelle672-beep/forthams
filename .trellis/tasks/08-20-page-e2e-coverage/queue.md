@@ -1827,4 +1827,5 @@
 | Q2637 | done | 桌面空态 **3 passed**（/dashboard 暂无趋势/分类/工单数据）。禁 /m。 |
 | Q2638 | done | 桌面空态 **3 passed**（/dashboard 导出数据/刷新视图/分类分布 heading）。禁 /m。 |
 | Q2639 | done | 桌面空态 **3 passed**（/dashboard 趋势/工单/维保预警 heading）。禁 /m。 |
-| Q2640 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2640 | done | 桌面空态 **3 passed**（/vendor-portal heading/编码/密码 placeholder）。禁 /m。 |
+| Q2641 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
