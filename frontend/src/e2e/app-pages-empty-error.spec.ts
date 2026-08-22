@@ -31392,6 +31392,34 @@ test.describe('Q2543 桌面赔偿申请占位空态', () => {
   });
 });
 
+test.describe('Q2544 桌面退役残值备件单位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement/new 空态 placeholder「0.00」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByPlaceholder('0.00').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts/new 空态 placeholder「件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByPlaceholder('件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation/new 空态「暂无可选部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation/new');
+    await expect(page.getByText('暂无可选部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

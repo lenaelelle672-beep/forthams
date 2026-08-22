@@ -651,5 +651,6 @@
 - Q2540：/insurances/new 保险公司/保费/保额 **3 passed**。`7d6a704e5`
 - Q2541：/insurances/new 免赔额/备注 + /intake/new 购置日期 **3 passed**。`6c726fca1`
 - Q2542：/intake/new 原值/取消/验收日期 **3 passed**。硬截止改为 18:00。`0a0c172a7`
-- Q2543：/compensation/new 责任人/发现人/搜索资产 **3 passed**。
+- Q2543：/compensation/new 责任人/发现人/搜索资产 **3 passed**。`7ff7d6dc4`
+- Q2544：/retirement/new 0.00 + /spare-parts/new 件 + /compensation/new 暂无可选部门 **3 passed**。
 

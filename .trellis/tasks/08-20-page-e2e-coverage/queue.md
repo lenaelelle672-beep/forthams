@@ -1731,4 +1731,5 @@
 | Q2541 | done | 桌面空态 **3 passed**（/insurances/new 免赔额/备注 + /intake/new 购置日期）。禁 /m。 |
 | Q2542 | done | 桌面空态 **3 passed**（/intake/new 原值/取消/验收日期）。禁 /m。 |
 | Q2543 | done | 桌面空态 **3 passed**（/compensation/new 责任人/发现人/搜索资产）。禁 /m。 |
-| Q2544 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2544 | done | 桌面空态 **3 passed**（/retirement/new 0.00 + /spare-parts/new 件 + /compensation/new 暂无可选部门）。禁 /m。 |
+| Q2545 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
