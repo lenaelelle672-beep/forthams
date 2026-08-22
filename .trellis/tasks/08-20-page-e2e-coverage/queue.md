@@ -1697,4 +1697,5 @@
 | Q2507 | done | 桌面空态 **3 passed**（/spare-parts/new 当前库存/安全库存/申请信息）。禁 /m。 |
 | Q2508 | done | 桌面空态 **3 passed**（/spare-parts/new 备件编码/名称/placeholder）。禁 /m。 |
 | Q2509 | done | 桌面空态 **3 passed**（/spare-parts/new 规格型号/补足缺口/预计到货）。禁 /m。 |
-| Q2510 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2510 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new heading/周期名称/placeholder）。禁 /m。 |
+| Q2511 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
