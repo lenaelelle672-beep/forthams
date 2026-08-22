@@ -660,5 +660,6 @@
 - Q2549：/assets/new 原值/净值/保修月 **3 passed**。`773bf02f0`
 - Q2550：/assets/new 折旧率/用途/其他说明 **3 passed**。`743fa2bca`
 - Q2551：/assets/new 品牌厂商/纬度范围/RFID标签 **3 passed**。`aab8a739f`
-- Q2552：/assets/new 经度范围/原值元/净值元 **3 passed**。
+- Q2552：/assets/new 经度范围/原值元/净值元 **3 passed**。`a4253a0f4`
+- Q2553：/assets/new 保修期月/折旧率范围/是否重要设备 **3 passed**。
 
