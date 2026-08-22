@@ -668,5 +668,6 @@
 - Q2557：/assets/new 父子关系/主附属/先保存 **3 passed**。500 票。`9d08157b2`
 - Q2558：/assets/new 资产名称*/新增资产 + /intake/new 备注 **3 passed**。`4e4aebe96`
 - Q2559：/assets/new 先保存上传/填写进度/资产台账 **3 passed**。`36e6e853a`
-- Q2560：/locations 点新增 取消/位置编码/新增位置 **3 passed**。DialogDescription 不可见。
+- Q2560：/locations 点新增 取消/位置编码/新增位置 **3 passed**。DialogDescription 不可见。`bf7040ebc`
+- Q2561：/asset-models 点新增 模型描述/内部备注/规格JSON **3 passed**。
 
