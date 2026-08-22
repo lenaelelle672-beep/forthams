@@ -1758,4 +1758,5 @@
 | Q2568 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_ASSIGNMENT 编码/未配置/直接发起）。禁 /m。 |
 | Q2569 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_INTAKE 编码/未配置/直接发起）。禁 /m。 |
 | Q2570 | done | 桌面空态 **3 passed**（/workflow-form 借用/领用/验收 表单源码提示）。禁 /m。 |
-| Q2571 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2571 | done | 桌面空态 **3 passed**（/workflow-form 转移/清退/报废 表单源码提示）。禁 /m。 |
+| Q2572 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

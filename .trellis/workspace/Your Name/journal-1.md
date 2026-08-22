@@ -678,5 +678,6 @@
 - Q2567：/workflow-form/ASSET_BORROW 编码/未配置/直接发起 **3 passed**。`8275d366f`
 - Q2568：/workflow-form/ASSET_ASSIGNMENT 编码/未配置/直接发起 **3 passed**。`b6cf61913`
 - Q2569：/workflow-form/ASSET_INTAKE 编码/未配置/直接发起 **3 passed**。`c41c8e76c`
-- Q2570：/workflow-form 借用/领用/验收 表单源码提示 **3 passed**。
+- Q2570：/workflow-form 借用/领用/验收 表单源码提示 **3 passed**。`76e7135d7`
+- Q2571：/workflow-form 转移/清退/报废 表单源码提示 **3 passed**。
 
