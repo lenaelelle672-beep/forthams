@@ -1485,4 +1485,5 @@
 | Q2295 | done | 桌面空态 **3 passed**（workbench「欢迎回来，系统管理员」「查看全部」「近12个月」）。禁 /m。 |
 | Q2296 | done | 桌面空态 **3 passed**（/dashboard 完整趋势/Top5/欢迎回来）。禁 /m。 |
 | Q2297 | done | 桌面空态 **3 passed**（/profile SUPER_ADMIN/当前套餐/ADMIN。heading 名不是系统管理员）。禁 /m。 |
-| Q2298 | in_progress | 桌面空态：/notifications 未覆盖。禁 /m。 |
+| Q2298 | done | 桌面空态 **3 passed**（v3 岗位 metadata-only/no-persistence/no-assignment）。禁 /m。 |
+| Q2299 | in_progress | 桌面空态：/fixed-assets/workbenchv3「no-permission-effect」。禁 /m。 |
