@@ -54,6 +54,7 @@ See `.trellis/spec/dwk/dev-runtime.md`. Probe health, start missing frontend/bac
 - 补真实 `/:resource/:id/edit` 路由后，必须从 `app-pages-empty-error`「未测路由 / 404」未挂载列表移除该 path，否则已认证访问会误断言落到 /404（Q1812：`/budgets/1/edit`）。
 - antd 双汉字按钮 accessible name 中间有空格（「更 新」「取 消」「扫 码」）。空态用 `getByRole('button', { name: /更\s*新/ })`，禁止 `name: '更新'`。
 - native `<select>` 的 `<option>` 对 Playwright `toBeVisible` 为 hidden（Q1897：`/stocktaking-cycles/new`「全盘点」）。测可见 label / placeholder / 按钮，不要测 option 文本。
+- antd `Select` 的 placeholder 不是 input placeholder（Q1914：`getByPlaceholder('请选择')` 找不到）。用 `InputNumber`/`TextArea` 真 placeholder，或 `getByText`。
 - 登录变体：`src/e2e/login-variants-smoke.spec.ts`。`/login5` 走 `Login4Page` 且 h1 可能不是 role=heading，用 `region` landmark「UNIVIEW 固定资产平台登录」。
 - `locations`/`departments` 树展平必须 `Array.isArray` 再 `for...of`（`InventoryDetailPage`）；`paged({})` 当树会 `items is not iterable`。桌面 `/locations`、`/system/menus`、`/system/depts` tree 与 `/stocktaking/cycles` 喂纯对象时 heading 仍在、无 pageerror；`/gis/stats` 喂数组时同理。树节点 `children` 为对象时（locations/categories/fault-codes/depts/assets）须先 `Array.isArray` 再递归。预算 `alerts`/`execRates` 同理。
 - 列表页 `data.records` 必须 `Array.isArray` 后再给表格（许可证/设备/备件/供应商/领用/借用/入库/采购/制造商/检验/折旧/合同/报表/菜单树/部门树）。`records` 为对象时 heading 仍在、无 pageerror。桌面 e2e：`app-pages-smoke` grep `records 非数组`（不含 `/m`）。`/asset-models` 的 `manufacturers/options` 与 `categories/all`、入库详情 `checkItems`/`intakeAssets`、采购详情 `items` 同样先 `Array.isArray`。
