@@ -481,5 +481,6 @@
 - Q2370：/maintenance 维保列表/记录管理/搜索 **3 passed**。`f6b81f30e`
 - Q2371：/maintenance 计划中/执行中/逾期 **3 passed**。`6c49715f3`
 - Q2372：/maintenance 已完成/刷新/全部类型 **3 passed**。`5e1a81dc4`
-- Q2373：/maintenance 新增/全部/空表文案 **3 passed**。
+- Q2373：/maintenance 新增/全部/空表文案 **3 passed**。`52f750844`
+- Q2374：/depreciation heading/折旧/批量计算 **3 passed**。
 
