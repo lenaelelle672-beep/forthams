@@ -1298,4 +1298,5 @@
 | Q2108 | done | 桌面空态 **3 passed**（/contracts 点时间轴说明、/spare-parts「备件编码」「备件名称」）。禁 /m。 |
 | Q2109 | done | 桌面空态 **3 passed**（/spare-parts「当前库存」「安全库存」「单价」）。禁 /m。 |
 | Q2110 | done | 桌面空态 **3 passed**（/spare-parts「状态」「操作」「暂无备件」）。禁 /m。 |
-| Q2111 | in_progress | 桌面空态：/spare-parts/new 或 /insurances 未覆盖。禁 /m。 |
+| Q2111 | done | 桌面空态 **3 passed**（/insurances「保单号」「保险名称」「保险类型」）。禁 /m。 |
+| Q2112 | in_progress | 桌面空态：/insurances 列头「保险公司」「保费」「开始日期」。禁 /m。 |
