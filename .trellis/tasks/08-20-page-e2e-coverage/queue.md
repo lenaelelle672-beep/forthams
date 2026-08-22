@@ -1161,4 +1161,5 @@
 | Q1971 | done | 桌面空态 **3 passed**（/report-builder 字段「MTTR」「折旧金额」「维保费用」）。禁 /m。 |
 | Q1972 | done | 桌面空态 **3 passed**（/report-builder 字段「能耗费用」「总成本」+ 分组「财务」）。禁 /m。 |
 | Q1973 | done | 桌面空态 **3 passed**（/report-builder 分组「资产」「运维」+ 字段「状态」；option「资产报表」hidden）。禁 /m。 |
-| Q1974 | in_progress | 桌面空态：/report-builder「将字段拖拽到此处，或点击左侧字段添加」已测则换「点击"生成预览"查看数据」。禁 /m。 |
+| Q1974 | done | 桌面空态 **3 passed**（/analytics/tco「资产 TCO 构成」「请输入资产ID查询」「资产ID」）。禁 /m。 |
+| Q1975 | in_progress | 桌面空态：/analytics/tco「部门ID」「分类ID」+ 其余卡片标题（读页确认）。禁 /m。 |
