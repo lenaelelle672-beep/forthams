@@ -1244,4 +1244,5 @@
 | Q2054 | done | 桌面空态 **3 passed**（/inspections「已过期」「检验编号」「资产ID」）。禁 /m。 |
 | Q2055 | done | 桌面空态 **3 passed**（/inspections 表头「检验类型」「检验日期」「下次检验」）。禁 /m。 |
 | Q2056 | done | 桌面空态 **3 passed**（/inspections 表头「检验机构」「结果」「操作」）。禁 /m。 |
-| Q2057 | in_progress | 桌面空态：/inspection-templates 未测标题/空表。禁 /m。 |
+| Q2057 | done | 桌面空态 **3 passed**（/risk-assessments「全部评估」「重大风险」「高危风险」）。禁 /m。 |
+| Q2058 | in_progress | 桌面空态：/risk-assessments「中/低危」或热力图剩余。禁 /m。 |
