@@ -18138,6 +18138,34 @@ test.describe('Q2073 桌面许可证列表与购买日期空态', () => {
   });
 });
 
+test.describe('Q2074 桌面许可证列表类型厂商版本空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/licenses 空态「类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await expect(page.getByText('类型', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/licenses 空态「厂商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await expect(page.getByText('厂商', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/licenses 空态「版本」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await expect(page.getByText('版本', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
