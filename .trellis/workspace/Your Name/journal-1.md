@@ -718,5 +718,6 @@
 - Q2607：/bigscreen 2350/8800/2100 **3 passed**。`af989b175`
 - Q2608：/bigscreen 10.77/5.78/12.24 **3 passed**。`52fa99303`
 - Q2609：/bigscreen 75.2%/18/32 **3 passed**。`6ead9c27e`
-- Q2610：/bigscreen 0.22↑/1.46↑/0.00- **3 passed**。
+- Q2610：/bigscreen 0.22↑/1.46↑/0.00- **3 passed**。`bf68a0c3f`
+- Q2611：/bigscreen 值班领导：/值班经理：/28 **3 passed**。硬截止仍为 18:00。
 
