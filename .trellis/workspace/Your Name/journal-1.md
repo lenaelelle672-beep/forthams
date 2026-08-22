@@ -794,5 +794,6 @@
 - Q2683：/approvals 工单申请/全部类型/待审批 **3 passed**。「全部状态」是关闭 option。`f0c477b8f`
 - Q2684：/maintenance 新增维保/标题/搜索 **3 passed**。`f55d7ac54`
 - Q2685：/maintenance 资产ID/维保类型/维保日期表头 **3 passed**。`e44cbf824`
-- Q2686：/maintenance 执行人/费用/下次维保表头 **3 passed**。
+- Q2686：/maintenance 执行人/费用/下次维保表头 **3 passed**。`79858f4eb`
+- Q2687：/maintenance 操作表头/记录标题/空态引导 **3 passed**。
 

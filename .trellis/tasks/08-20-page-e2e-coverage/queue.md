@@ -1874,4 +1874,5 @@
 | Q2684 | done | 桌面空态 **3 passed**（/maintenance 新增维保/标题/搜索）。禁 /m。 |
 | Q2685 | done | 桌面空态 **3 passed**（/maintenance 资产ID/维保类型/维保日期表头）。禁 /m。 |
 | Q2686 | done | 桌面空态 **3 passed**（/maintenance 执行人/费用/下次维保表头）。禁 /m。 |
-| Q2687 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2687 | done | 桌面空态 **3 passed**（/maintenance 操作表头/记录标题/空态引导）。禁 /m。 |
+| Q2688 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
