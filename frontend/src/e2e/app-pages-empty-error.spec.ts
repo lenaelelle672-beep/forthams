@@ -11145,6 +11145,58 @@ test.describe('Q1837 桌面入库表头空态', () => {
   });
 });
 
+test.describe('Q1838 桌面入库资产表头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/1 资产「资产名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', intakeAssets: [{ id:1, assetNo:'A1', assetName:'设备' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('资产名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 资产「品牌」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', intakeAssets: [{ id:1, assetNo:'A1', assetName:'设备' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('品牌').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 资产「型号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', intakeAssets: [{ id:1, assetNo:'A1', assetName:'设备' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('型号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
