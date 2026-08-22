@@ -1357,4 +1357,5 @@
 | Q2167 | done | 桌面空态 **3 passed**（/compensation「损坏日期」「责任人」「责任部门」）。禁 /m。 |
 | Q2168 | done | 桌面空态 **3 passed**（/compensation「损坏详情」「发现人」「是否报险」）。禁 /m。 |
 | Q2169 | done | 桌面空态 **3 passed**（/compensation「资产损失说明」「赔偿配置」「赔偿方式」）。禁 /m。 |
-| Q2170 | in_progress | 桌面空态：/compensation「现金赔偿」「总赔偿金额」「确认提交」。禁 /m。 |
+| Q2170 | done | 桌面空态 **3 passed**（/compensation「现金赔偿」「总赔偿金额」「确认提交」）。禁 /m。 |
+| Q2171 | in_progress | 桌面空态：/compensation「等价物赔偿」「维修恢复」「审批流程」。禁 /m。 |

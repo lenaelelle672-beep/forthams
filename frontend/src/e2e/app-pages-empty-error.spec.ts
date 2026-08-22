@@ -20939,6 +20939,34 @@ test.describe('Q2169 桌面赔偿申请说明与配置空态', () => {
   });
 });
 
+test.describe('Q2170 桌面赔偿申请金额与提交空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/compensation 空态「现金赔偿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByText('现金赔偿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation 空态「总赔偿金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByText('总赔偿金额').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation 空态「确认提交」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation');
+    await expect(page.getByText('确认提交').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
