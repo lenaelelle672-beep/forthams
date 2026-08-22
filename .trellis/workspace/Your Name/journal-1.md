@@ -897,5 +897,6 @@
 - Q2786：/inspections/new 检验编号/扫码/检验类型 **3 passed**。`52aec7880`
 - Q2787：/inspections/new 资产ID/检验模板/检验日期 **3 passed**。资产ID 无关联 label。`a436c6ea1`
 - Q2788：/inspections/new 下次检验/机构/检验人 **3 passed**。`1c5579be6`
-- Q2789：/inspections/new 检验结果/检查发现/检验照片 **3 passed**。检验照片无关联 label。
+- Q2789：/inspections/new 检验结果/检查发现/检验照片 **3 passed**。检验照片无关联 label。`74466bbdc`
+- Q2790：/inspections/new 证书编号/到期日/检验费用 **3 passed**。
 
