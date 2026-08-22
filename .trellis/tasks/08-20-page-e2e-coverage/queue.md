@@ -1661,4 +1661,5 @@
 | Q2471 | done | 桌面空态 **3 passed**（/analytics/reliability 修复时间/可用率/按MTBF）。禁 /m。 |
 | Q2472 | done | 桌面空态 **3 passed**（/system/users heading/用户/新增用户）。禁 /m。 |
 | Q2473 | done | 桌面空态 **3 passed**（/system/users 用户总量/角色数/岗位数）。禁 /m。 |
-| Q2474 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2474 | done | 桌面空态 **3 passed**（/system/users 用户列表/搜索/空表）。禁 /m。 |
+| Q2475 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

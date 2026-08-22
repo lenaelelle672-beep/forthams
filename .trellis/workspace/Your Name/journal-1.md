@@ -581,5 +581,6 @@
 - Q2470：/analytics/reliability 趋势/平均故障间隔/月均故障率 **3 passed**。`74c7323a0`
 - Q2471：/analytics/reliability 修复时间/可用率/按MTBF **3 passed**。`bae69540a`
 - Q2472：/system/users heading/用户/新增用户 **3 passed**。`b64f01dca`
-- Q2473：/system/users 用户总量/角色数/岗位数 **3 passed**。
+- Q2473：/system/users 用户总量/角色数/岗位数 **3 passed**。`de09fe406`
+- Q2474：/system/users 用户列表/搜索/空表 **3 passed**。
 
