@@ -24938,6 +24938,34 @@ test.describe('Q2312 桌面工作台资产统计空态', () => {
   });
 });
 
+test.describe('Q2313 桌面工作台资产维修导出空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbench/assets 空态「待处理维修」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await expect(page.getByText('待处理维修').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbench/assets 空态「导出 PDF」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await expect(page.getByText('导出 PDF').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbench/assets 空态「未找到符合条件的资产记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await expect(page.getByText('未找到符合条件的资产记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

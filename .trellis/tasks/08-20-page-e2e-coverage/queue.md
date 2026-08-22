@@ -1500,4 +1500,5 @@
 | Q2310 | done | 桌面空态 **3 passed**（/forbidden 返回上一页/联系管理员/heading 无访问权限。inspection 菜单未切页）。禁 /m。 |
 | Q2311 | done | 桌面空态 **3 passed**（assets 产品页地标、搜索 placeholder）。禁 /m。 |
 | Q2312 | done | 桌面空态 **3 passed**（workbench/assets 总净值/闲置率/累计折旧）。禁 /m。 |
-| Q2313 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2313 | done | 桌面空态 **3 passed**（workbench/assets 待处理维修/导出PDF/未找到记录）。禁 /m。 |
+| Q2314 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
