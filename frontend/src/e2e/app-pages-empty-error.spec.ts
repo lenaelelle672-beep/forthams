@@ -11249,6 +11249,58 @@ test.describe('Q1839 桌面入库资产与待检空态', () => {
   });
 });
 
+test.describe('Q1840 桌面入库结果变体空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake/1 检查项「通过」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', checkItems: [{ id:1, itemName:'外观', result:'PASS' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('通过').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 检查项「不通过」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'DRAFT', checkItems: [{ id:1, itemName:'外观', result:'FAIL' }] } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('不通过').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 详情「驳回原因」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/intake-orders/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, orderNo:'IN-1', status:'REJECTED', rejectReason:'规格不符' } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/intake/1');
+    await expect(page.getByText('驳回原因').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
