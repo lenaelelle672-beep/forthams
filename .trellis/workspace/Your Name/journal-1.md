@@ -567,5 +567,6 @@
 - Q2456：/disposals 空表/新建清退/资产调拨 **3 passed**。`2a14dc9a4`
 - Q2457：/profile 当前套餐/系统管理员 + /retirement 首页 **3 passed**。`35291c919`
 - Q2458：/gis heading/副标题/资产定位管理 **3 passed**。`17e7d4d83`
-- Q2459：/gis 数据来源/关联资产 + /analytics heading **3 passed**。
+- Q2459：/gis 数据来源/关联资产 + /analytics heading **3 passed**。`a1466384a`
+- Q2460：/analytics 副标题/数据范围/近12个月 **3 passed**。
 
