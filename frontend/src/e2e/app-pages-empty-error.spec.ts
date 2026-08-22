@@ -35005,6 +35005,34 @@ test.describe('Q2672 桌面合同管理到期文案空态', () => {
   });
 });
 
+test.describe('Q2673 桌面采购订单操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/purchase-orders 空态 button「新增采购单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByRole('button', { name: '新增采购单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/purchase-orders 空态 heading「采购订单管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByRole('heading', { name: '采购订单管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/purchase-orders 空态 placeholder「搜索采购单号、名称...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByPlaceholder('搜索采购单号、名称...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
