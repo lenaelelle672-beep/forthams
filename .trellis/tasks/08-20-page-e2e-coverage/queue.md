@@ -1530,4 +1530,5 @@
 | Q2340 | done | 桌面空态 **3 passed**（/dashboard heading 运营首页/总资产数/在用资产）。禁 /m。 |
 | Q2341 | done | 桌面空态 **3 passed**（/dashboard 闲置资产/待审批/导出数据）。禁 /m。 |
 | Q2342 | done | 桌面空态 **3 passed**（/dashboard 刷新视图/净值/最近工单）。禁 /m。 |
-| Q2343 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2343 | done | 桌面空态 **3 passed**（/dashboard 维保预警/分类分布/查看全部）。禁 /m。 |
+| Q2344 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
