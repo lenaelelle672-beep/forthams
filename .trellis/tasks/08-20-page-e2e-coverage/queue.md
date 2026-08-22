@@ -1728,4 +1728,5 @@
 | Q2538 | done | 桌面空态 **3 passed**（/intake/new 资产编号/资产分类/填写验收信息）。禁 /m。 |
 | Q2539 | done | 桌面空态 **3 passed**（/intake/new 存放地点/保修期/创建验收单）。禁 /m。 |
 | Q2540 | done | 桌面空态 **3 passed**（/insurances/new 保险公司/保费/保额）。禁 /m。 |
-| Q2541 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2541 | done | 桌面空态 **3 passed**（/insurances/new 免赔额/备注 + /intake/new 购置日期）。禁 /m。 |
+| Q2542 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
