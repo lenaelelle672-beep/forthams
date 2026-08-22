@@ -1926,4 +1926,5 @@
 | Q2736 | done | 桌面空态 **3 passed**（/audit 描述/IP地址/状态表头）。禁 /m。 |
 | Q2737 | done | 桌面空态 **3 passed**（/audit 全部日志/告警/总计）。禁 /m。 |
 | Q2738 | done | 桌面空态 **3 passed**（/audit 筛选/显示/项共）。禁 /m。 |
-| Q2739 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2739 | done | 桌面空态 **3 passed**（/audit 副标题/趋势 heading/类型分布 heading）。禁 /m。 |
+| Q2740 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
