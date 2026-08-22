@@ -1069,4 +1069,5 @@
 | Q1879 | done | 桌面空态 **3 passed**（/borrows/new「新建借用单」「创建借用单」「返回」）。禁 /m。 |
 | Q1880 | done | 桌面空态 **3 passed**（/borrows/new「借用信息」「资产」「预计归还日期」）。禁 /m。 |
 | Q1881 | done | 桌面空态 **3 passed**（/borrows/new「借用用途」「备注」「取消」）。禁 /m。 |
-| Q1882 | in_progress | 桌面空态：读 router 下一未覆盖桌面详情/表单（禁 /m），优先 /inspection-templates 或 /inspection-records。 |
+| Q1882 | done | 桌面空态 **3 passed**（/inspection-templates「检验模板管理」「搜索」「重置」）。禁 /m。 |
+| Q1883 | in_progress | 桌面空态：/inspection-templates 列头 3 条（模板名称/检验类型/检验周期）。禁 /m。 |
