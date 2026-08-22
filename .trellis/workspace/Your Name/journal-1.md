@@ -522,5 +522,6 @@
 - Q2411：/contracts heading/副标题/新增合同 **3 passed**。`f97604513`
 - Q2412：/contracts 全部合同/即将到期/30天内到期 **3 passed**。`50a6693d6`
 - Q2413：/contracts 搜索 placeholder/全部类型/刷新 **3 passed**。`a438360f3`
-- Q2414：/contracts 维保/采购/租赁合同 **3 passed**。
+- Q2414：/contracts 维保/采购/租赁合同 **3 passed**。`de6dfccf8`
+- Q2415：/contracts 服务合同/已到期/时间轴视图 **3 passed**。
 
