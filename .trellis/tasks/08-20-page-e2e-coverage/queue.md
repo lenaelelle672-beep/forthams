@@ -1275,4 +1275,5 @@
 | Q2085 | done | 桌面空态 **3 passed**（/audit「告警」「总计」「导出」）。禁 /m。 |
 | Q2086 | done | 桌面空态 **3 passed**（/audit 列头「时间」「操作人」「操作类型」）。禁 /m。 |
 | Q2087 | done | 桌面空态 **3 passed**（/audit 列头「描述」「IP地址」「状态」）。禁 /m。 |
-| Q2088 | in_progress | 桌面空态：/audit「筛选」或分页「显示」「项，共」。禁 /m。 |
+| Q2088 | done | 桌面空态 **3 passed**（/audit「筛选」「显示」「项，共」）。禁 /m。 |
+| Q2089 | in_progress | 桌面空态：/audit/1 或 /notifications 未覆盖可见文案。禁 /m。 |
