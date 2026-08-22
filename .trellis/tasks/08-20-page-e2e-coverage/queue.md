@@ -1980,4 +1980,5 @@
 | Q2790 | done | 桌面空态 **3 passed**（/inspections/new 证书编号/到期日/检验费用）。禁 /m。 |
 | Q2791 | done | 桌面空态 **3 passed**（/inspections/new 报告附件/编号placeholder/机构placeholder）。禁 /m。 |
 | Q2792 | done | 桌面空态 **3 passed**（/inspections/new 检验人/检查发现/证书编号 placeholder）。禁 /m。 |
-| Q2793 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2793 | done | 桌面空态 **3 passed**（/inspections/new 资产ID/模板/附件 placeholder）。禁 /m。 |
+| Q2794 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
