@@ -909,5 +909,6 @@
 - Q2798：/workorders/new 基本信息/详细信息/人员安排 heading **3 passed**。`4b663b2d3`
 - Q2799：/workorders/new 优先级/资产关联/附件 heading **3 passed**。`fe4f74924`
 - Q2800：/workorders/new 处理提示/标题placeholder/资产搜索 **3 passed**。`88e6f8f39`
-- Q2801：/workorders/new 描述placeholder/添加人员/上传文件 **3 passed**。
+- Q2801：/workorders/new 描述placeholder/添加人员/上传文件 **3 passed**。`76e04922b`
+- Q2802：/assets/new 保存/取消/新增资产 **3 passed**。保存非 button name。
 

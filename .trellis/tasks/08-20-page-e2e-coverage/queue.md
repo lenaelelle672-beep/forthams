@@ -1989,4 +1989,5 @@
 | Q2799 | done | 桌面空态 **3 passed**（/workorders/new 优先级/资产关联/附件 heading）。禁 /m。 |
 | Q2800 | done | 桌面空态 **3 passed**（/workorders/new 处理提示/标题placeholder/资产搜索）。禁 /m。 |
 | Q2801 | done | 桌面空态 **3 passed**（/workorders/new 描述placeholder/添加人员/上传文件）。禁 /m。 |
-| Q2802 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2802 | done | 桌面空态 **3 passed**（/assets/new 保存/取消/新增资产）。禁 /m。 |
+| Q2803 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
