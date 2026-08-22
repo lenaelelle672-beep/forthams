@@ -1122,4 +1122,5 @@
 | Q1932 | done | 桌面空态 **3 passed**（/safety-checklists/history 列头「执行日期」「状态」「总体结果」）。禁 /m。 |
 | Q1933 | done | 桌面空态 **3 passed**（/safety-checklists/history 列头「操作」+ 筛选「全部」「进行中」）。禁 /m。 |
 | Q1934 | done | 桌面空态 **3 passed**（/safety-checklists/execute「开始安全检查」「安全检查」「开始执行检查」）。禁 /m。 |
-| Q1935 | in_progress | 桌面空态：/safety-checklists/execute「包含 0 个检查项」；/risk-assessments 标题与主操作（读页确认）。禁 /m。 |
+| Q1935 | done | 桌面空态 **3 passed**（/safety-checklists/execute「包含 0 个检查项」；execute/1「安全检查执行」+ 按钮「保存」）。禁 /m。 |
+| Q1936 | in_progress | 桌面空态：/safety-checklists/execute/1「完成检查」；/risk-assessments 标题（读页确认 2 文案）。禁 /m。 |
