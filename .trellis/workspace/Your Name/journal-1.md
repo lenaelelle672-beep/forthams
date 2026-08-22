@@ -546,5 +546,6 @@
 - Q2435：/budgets heading/资产预算/新增预算 **3 passed**。`28fbb8d3e`
 - Q2436：/budgets 总预算/已使用/已承诺 **3 passed**。`069ec4c1e`
 - Q2437：/budgets 执行率/预算列表/空表 **3 passed**。`ea1ab1701`
-- Q2438：/budgets 超支告警/合同锁定/运营 **3 passed**。
+- Q2438：/budgets 超支告警/合同锁定/运营 **3 passed**。`dd9c8822e`
+- Q2439：/retirement heading/面包屑/新建申请 **3 passed**。
 
