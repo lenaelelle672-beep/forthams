@@ -847,5 +847,6 @@
 - Q2736：/audit 描述/IP地址/状态表头 **3 passed**。`528232374`
 - Q2737：/audit 全部日志/告警/总计 **3 passed**。`bd9f8e8ff`
 - Q2738：/audit 筛选/显示/项共 **3 passed**。`78727ac51`
-- Q2739：/audit 副标题/趋势 heading/类型分布 heading **3 passed**。
+- Q2739：/audit 副标题/趋势 heading/类型分布 heading **3 passed**。`a87262bf8`
+- Q2740：/audit 最近操作 heading/审计日志/导出 **3 passed**。
 
