@@ -1651,4 +1651,5 @@
 | Q2461 | done | 桌面空态 **3 passed**（/analytics 价值趋势/分类分布/页脚）。禁 /m。 |
 | Q2462 | done | 桌面空态 **3 passed**（/analytics 部门排行/处置统计/暂无趋势）。禁 /m。 |
 | Q2463 | done | 桌面空态 **3 passed**（/analytics/health heading/副标题/平均健康分）。禁 /m。 |
-| Q2464 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2464 | done | 桌面空态 **3 passed**（/analytics/health 健康/警告/危险资产）。禁 /m。 |
+| Q2465 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
