@@ -734,5 +734,6 @@
 - Q2623：/bigscreen KPI 资/率/值 **3 passed**。`4dea54194`
 - Q2624：/bigscreen %/万/件 **3 passed**。`f1cf57d3a`
 - Q2625：/login 2026/©/· **3 passed**。无 seedSession。硬截止仍为 18:00。`d6e68df47`
-- Q2626：/login link 全息版/流星版 + label 用户名 **3 passed**。
+- Q2626：/login link 全息版/流星版 + label 用户名 **3 passed**。`3b95f1ae2`
+- Q2627：/login label 密码/button 登录系统/checkbox 记住用户名 **3 passed**。
 
