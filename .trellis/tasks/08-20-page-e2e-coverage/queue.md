@@ -1409,4 +1409,5 @@
 | Q2219 | done | 桌面空态 **3 passed**（/revaluations/new「类型」「减值」exact、「重估」exact）。禁 /m。 |
 | Q2220 | done | 桌面空态 **3 passed**（/revaluations/new「新值」「原因说明」「证据材料」）。禁 /m。 |
 | Q2221 | done | 桌面空态 **3 passed**（/revaluations/new「提交申请」「取消」、证据 placeholder）。禁 /m。 |
-| Q2222 | in_progress | 桌面空态：/assets/new 未覆盖。禁 /m。 |
+| Q2222 | done | 桌面空态 **3 passed**（/assets/new「新建资产」「基本信息」「位置归属」）。禁 /m。 |
+| Q2223 | in_progress | 桌面空态：/assets/new「财务信息」「关联资产」「附件」。禁 /m。 |

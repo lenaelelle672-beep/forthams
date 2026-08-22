@@ -329,5 +329,6 @@
 - Q2218：新增减值重估/查找/返回列表。资产 exact 撞不到 label。`02f834872`
 - Q2219：类型/减值 exact/重估 exact **3 passed**。`895b571c6`
 - Q2220：新值/原因说明/证据材料 **3 passed**。`01d5e8879`
-- Q2221：提交申请/取消/证据 placeholder **3 passed**。
+- Q2221：提交申请/取消/证据 placeholder **3 passed**。`50ff4a0e4`
+- Q2222：新建资产/基本信息/位置归属 **3 passed**。
 
