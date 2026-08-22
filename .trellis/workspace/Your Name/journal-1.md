@@ -463,5 +463,6 @@
 - Q2352：/assets 闲置/条资产/本页 **3 passed**。`639dcbff7`
 - Q2353：/approvals heading/发起申请/待我审批 **3 passed**。`3bace6256`
 - Q2354：/approvals 我发起的/已通过/待审批 **3 passed**。`ccee8f79b`
-- Q2355：/approvals 已驳回/搜索 placeholder/审批 **3 passed**。
+- Q2355：/approvals 已驳回/搜索 placeholder/审批 **3 passed**。`7b48207af`
+- Q2356：/approvals 全部类型/暂无审批/空表描述 **3 passed**。
 
