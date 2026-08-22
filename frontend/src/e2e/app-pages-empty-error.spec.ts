@@ -36041,6 +36041,34 @@ test.describe('Q2709 桌面减值重估统计空态', () => {
   });
 });
 
+test.describe('Q2710 桌面减值重估其余统计空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/revaluations 空态「减值/重估合计」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations');
+    await expect(page.getByText('减值/重估合计').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations 空态「需及时处理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations');
+    await expect(page.getByText('需及时处理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations 空态「本期已审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations');
+    await expect(page.getByText('本期已审批').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
