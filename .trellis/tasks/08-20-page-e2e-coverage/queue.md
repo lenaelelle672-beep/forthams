@@ -1338,4 +1338,5 @@
 | Q2148 | done | 桌面空态 **3 passed**（/budgets「已使用」「已承诺」「状态」）。禁 /m。 |
 | Q2149 | done | 桌面空态 **3 passed**（/budgets「操作」、/retirement「申请编号」「资产编号」）。禁 /m。 |
 | Q2150 | done | 桌面空态 **3 passed**（/retirement「资产名称」「分类」「原值」）。禁 /m。 |
-| Q2151 | in_progress | 桌面空态：/retirement 列头「残值」「退役原因」「申请人」。禁 /m。 |
+| Q2151 | done | 桌面空态 **3 passed**（/retirement「残值」「退役原因」「申请人」）。禁 /m。 |
+| Q2152 | in_progress | 桌面空态：/retirement 列头「状态」「操作」或标题。禁 /m。 |

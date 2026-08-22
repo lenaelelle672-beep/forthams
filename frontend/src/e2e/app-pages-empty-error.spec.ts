@@ -20407,6 +20407,34 @@ test.describe('Q2150 桌面退役资产名称分类原值列头空态', () => {
   });
 });
 
+test.describe('Q2151 桌面退役残值原因申请人列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement 空态「残值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('残值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement 空态「退役原因」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('退役原因').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement 空态「申请人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('申请人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
