@@ -606,5 +606,6 @@
 - Q2495：/borrows/new 新建借用单/借用信息/归还日期 **3 passed**。`eae663ce7`
 - Q2496：/borrows/new 请选择资产/用途/创建 **3 passed**。`b081104ee`
 - Q2497：/assignments/new 新建领用单/基本信息/领用类型 **3 passed**。`96fdfcb73`
-- Q2498：/assignments/new 长期领用/使用人/创建 **3 passed**。
+- Q2498：/assignments/new 长期领用/使用人/创建 **3 passed**。`5c46b12ec`
+- Q2499：/budgets/new 新增预算/创建记录/预算年度 **3 passed**。
 
