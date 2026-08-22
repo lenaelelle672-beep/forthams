@@ -1182,4 +1182,5 @@
 | Q1992 | done | 桌面空态 **3 passed**（/workflows 清退/报废/赔偿说明）。禁 /m。 |
 | Q1993 | done | 桌面空态 **3 passed**（/workflows 退役说明 +「业务：资产清退」「业务：资产报废转让」）。禁 /m。 |
 | Q1994 | done | 桌面空态 **3 passed**（/workflows「业务：资产赔偿」「业务：资产退役」「ASSET_TRANSFER」）。禁 /m。 |
-| Q1995 | in_progress | 桌面空态：/workflows「ASSET_CLEARANCE」「ASSET_SCRAP」「ASSET_COMPENSATION」。禁 /m。 |
+| Q1995 | done | 桌面空态 **3 passed**（/workflows「ASSET_CLEARANCE」「ASSET_SCRAP」「ASSET_COMPENSATION」）。禁 /m。 |
+| Q1996 | in_progress | 桌面空态：/workflows「RETIREMENT」「当前页」；点「新建流程」见「从模板创建」。禁 /m。 |
