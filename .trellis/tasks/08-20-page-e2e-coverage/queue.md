@@ -1894,4 +1894,5 @@
 | Q2704 | done | 桌面空态 **3 passed**（/depreciation 年数总和/工作量/计划标题）。禁 /m。 |
 | Q2705 | done | 桌面空态 **3 passed**（/depreciation 折旧方法/当期/累计表头）。禁 /m。 |
 | Q2706 | done | 桌面空态 **3 passed**（/depreciation 原值/净值/状态表头）。禁 /m。 |
-| Q2707 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2707 | done | 桌面空态 **3 passed**（/depreciation 折旧率/刷新/折旧计划）。禁 /m。 |
+| Q2708 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
