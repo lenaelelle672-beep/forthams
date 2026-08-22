@@ -25623,6 +25623,34 @@ test.describe('Q2337 桌面供应商门户密码空态', () => {
   });
 });
 
+test.describe('Q2338 桌面403返回空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/403 空态 heading「无访问权限」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/403');
+    await expect(page.getByRole('heading', { name: '无访问权限' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/403 空态「返回上一页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/403');
+    await expect(page.getByText('返回上一页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/403 空态「返回首页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/403');
+    await expect(page.getByText('返回首页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
