@@ -24882,6 +24882,34 @@ test.describe('Q2310 桌面无权限返回上一页空态', () => {
   });
 });
 
+test.describe('Q2311 桌面工作台资产产品页地标空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbench/assets 空态「资产总览真实产品页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await expect(page.getByLabel('资产总览真实产品页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbench/assets 空态「资产总览产品页主体」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await expect(page.getByLabel('资产总览产品页主体').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbench/assets 空态「搜索编号、名称...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench/assets?menu=asset');
+    await expect(page.getByPlaceholder('搜索编号、名称...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
