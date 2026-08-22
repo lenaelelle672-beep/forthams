@@ -510,5 +510,6 @@
 - Q2399：/intake 已验收/草稿/已驳回 **3 passed**。`76025050d`
 - Q2400：/insurances heading/保单/新增保险 **3 passed**。`951ed3b2a`
 - Q2401：/insurances 保单列表/台账管理/重置筛选 **3 passed**。`6f023bf02`
-- Q2402：/insurances 保单总数/生效中/总保费 **3 passed**。
+- Q2402：/insurances 保单总数/生效中/总保费 **3 passed**。`94e56d09d`
+- Q2403：/insurances 财产险/责任险/空表 **3 passed**。
 
