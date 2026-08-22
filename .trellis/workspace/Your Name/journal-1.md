@@ -695,5 +695,6 @@
 - Q2584：/bigscreen 成都-北京/返航/备降 **3 passed**。`8f099f478`
 - Q2585：/bigscreen 飞行/空乘/空保 **3 passed**。`5097f15fd`
 - Q2586：/bigscreen 机长/副驾/西昌成都 **3 passed**。`74b5297a3`
-- Q2587：/bigscreen 三亚成都/预警/1类 **3 passed**。
+- Q2587：/bigscreen 三亚成都/预警/1类 **3 passed**。`97faa57ee`
+- Q2588：/bigscreen 2类/3U8888/时刻 **3 passed**。
 

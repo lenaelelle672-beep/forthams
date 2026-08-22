@@ -1775,4 +1775,5 @@
 | Q2585 | done | 桌面空态 **3 passed**（/bigscreen 飞行/空乘/空保）。禁 /m。 |
 | Q2586 | done | 桌面空态 **3 passed**（/bigscreen 机长/副驾/西昌成都）。禁 /m。 |
 | Q2587 | done | 桌面空态 **3 passed**（/bigscreen 三亚成都/预警/1类）。禁 /m。 |
-| Q2588 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2588 | done | 桌面空态 **3 passed**（/bigscreen 2类/3U8888/时刻）。禁 /m。 |
+| Q2589 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
