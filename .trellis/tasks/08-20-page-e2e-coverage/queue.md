@@ -1048,4 +1048,5 @@
 | Q1858 | done | 桌面空态 **3 passed**（/inspections/1「下次检验日期」「检验结果」「检验机构」）。禁 /m。 |
 | Q1859 | done | 桌面空态 **3 passed**（/inspections/1「检验人」「证书编号」「证书到期日」）。禁 /m。 |
 | Q1860 | done | 桌面空态 **3 passed**（/inspections/1「检验费用」「报告附件」「检验模板」）。禁 /m。 |
-| Q1861 | in_progress | 桌面空态：/inspections/1 未覆盖 3 条（读 InspectionDetailPage：检查发现/待检验/年度检验）。禁 /m。 |
+| Q1861 | done | 桌面空态 **3 passed**（/inspections/1「检查发现」「待检验」「年度检验」）。禁 /m。 |
+| Q1862 | in_progress | 桌面空态：/inspections/new 未覆盖 3 条（读 InspectionFormPage isEdit=false：新增检验记录/创建/取消）。禁 /m。 |
