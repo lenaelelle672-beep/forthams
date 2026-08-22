@@ -697,5 +697,6 @@
 - Q2586：/bigscreen 机长/副驾/西昌成都 **3 passed**。`74b5297a3`
 - Q2587：/bigscreen 三亚成都/预警/1类 **3 passed**。`97faa57ee`
 - Q2588：/bigscreen 2类/3U8888/时刻 **3 passed**。`52c81b87d`
-- Q2589：/bigscreen 重庆/哈尔滨/杭州-北京 **3 passed**。
+- Q2589：/bigscreen 重庆/哈尔滨/杭州-北京 **3 passed**。`72b1a3a93`
+- Q2590：/bigscreen 重点/取消/机长合外 **3 passed**。
 
