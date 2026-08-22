@@ -1092,4 +1092,5 @@
 | Q1902 | done | 桌面空态 **3 passed**（/stocktaking-cycles 列头「开始时间」「结束时间」「操作」）。禁 /m。 |
 | Q1903 | done | 桌面空态 **3 passed**（/stocktaking-cycles/1「返回列表」「周期信息」「统计信息」）。禁 /m。 |
 | Q1904 | done | 桌面空态 **3 passed**（/stocktaking-cycles/1「总任务数」「待盘点」「已盘点」）。禁 /m。 |
-| Q1905 | in_progress | 桌面空态：/stocktaking-cycles/1「已调整」「完成进度」「导出 PDF 报告」。禁 /m。 |
+| Q1905 | done | 桌面空态 **3 passed**（/stocktaking-cycles/1「已调整」「完成进度」「导出 PDF 报告」）。禁 /m。 |
+| Q1906 | in_progress | 桌面空态：/stocktaking-cycles/1「分配任务」「盘点任务列表」「E2E周期」。禁 /m。 |
