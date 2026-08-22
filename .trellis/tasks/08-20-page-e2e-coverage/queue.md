@@ -1743,4 +1743,5 @@
 | Q2553 | done | 桌面空态 **3 passed**（/assets/new 保修期月/折旧率范围/是否重要设备）。禁 /m。 |
 | Q2554 | done | 桌面空态 **3 passed**（/assets/new 资产分类*/资产状态/规格型号）。禁 /m。 |
 | Q2555 | done | 桌面空态 **3 passed**（/assets/new 位置说明/描述备注/字数）。禁 /m。 |
-| Q2556 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2556 | done | 桌面空态 **3 passed**（/assets/new 资产描述/200字/图片文件）。禁 /m。 |
+| Q2557 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
