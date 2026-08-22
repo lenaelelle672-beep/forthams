@@ -712,5 +712,6 @@
 - Q2601：/bigscreen 起站/延误状态/延误原因 **3 passed**。`f0d2dcf49`
 - Q2602：/bigscreen 国际/国内/8 **3 passed**。`bfe32fafb`
 - Q2603：/bigscreen 264人/计划航班/客座率 **3 passed**。`7aaa6903b`
-- Q2604：/bigscreen 承运人数/VIP/特殊旅客 **3 passed**。
+- Q2604：/bigscreen 承运人数/VIP/特殊旅客 **3 passed**。`de262c3f5`
+- Q2605：/bigscreen 座位数/耗油量/节油量 **3 passed**。
 
