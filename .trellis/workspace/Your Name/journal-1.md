@@ -775,5 +775,6 @@
 - Q2664：/equipment 技术员/费用/操作表头 **3 passed**。`65771a89a`
 - Q2665：/fault-codes 新增根节点/标题/空态引导 **3 passed**。`f8d563a97`
 - Q2666：/fault-codes 节点总数/故障现象/故障原因 **3 passed**。`bb5f66d8f`
-- Q2667：/fault-codes 解决措施/故障树/现象原因措施 **3 passed**。
+- Q2667：/fault-codes 解决措施/故障树/现象原因措施 **3 passed**。`6764c5677`
+- Q2668：/contracts 新增合同/合同编号/合同名称 **3 passed**。
 
