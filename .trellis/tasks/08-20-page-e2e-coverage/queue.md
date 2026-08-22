@@ -1734,4 +1734,5 @@
 | Q2544 | done | 桌面空态 **3 passed**（/retirement/new 0.00 + /spare-parts/new 件 + /compensation/new 暂无可选部门）。禁 /m。 |
 | Q2545 | done | 桌面空态 **3 passed**（/intake/new 品牌/型号/序列号标签）。禁 /m。 |
 | Q2546 | done | 桌面空态 **3 passed**（/assets/new 戴尔服务器/Dell/PowerEdge）。禁 /m。 |
-| Q2547 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2547 | done | 桌面空态 **3 passed**（/assets/new SN/供应商/机房）。禁 /m。 |
+| Q2548 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

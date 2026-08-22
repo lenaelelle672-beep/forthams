@@ -654,5 +654,6 @@
 - Q2543：/compensation/new 责任人/发现人/搜索资产 **3 passed**。`7ff7d6dc4`
 - Q2544：/retirement/new 0.00 + /spare-parts/new 件 + /compensation/new 暂无可选部门 **3 passed**。`a0e2f9e4c`
 - Q2545：/intake/new 品牌/型号/序列号标签 **3 passed**。`b4bfe6de7`
-- Q2546：/assets/new 戴尔服务器/Dell/PowerEdge **3 passed**。
+- Q2546：/assets/new 戴尔服务器/Dell/PowerEdge **3 passed**。`82be87f2b`
+- Q2547：/assets/new SN/供应商/机房 **3 passed**。
 
