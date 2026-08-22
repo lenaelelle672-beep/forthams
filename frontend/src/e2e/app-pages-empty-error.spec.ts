@@ -18696,6 +18696,34 @@ test.describe('Q2089 桌面审计详情操作栏空态', () => {
   });
 });
 
+test.describe('Q2090 桌面审计详情时间资产上下文空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/audit/1 空态「操作时间」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('操作时间').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/1 空态「关联资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('关联资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/1 空态「操作上下文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('操作上下文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
