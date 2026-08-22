@@ -1476,4 +1476,5 @@
 | Q2286 | done | 桌面空态 **3 passed**（/fixed-assets/workbench?menu=todo 流程待办/审批中心/待我审批）。禁 /m。 |
 | Q2287 | done | 桌面空态 **3 passed**（workbench 侧栏「设备管理」「工单管理」「巡检管理」。内嵌设备页未露出标题）。禁 /m。 |
 | Q2288 | done | 桌面空态 **3 passed**（workbench 侧栏「备件管理」「数据监控」「报表分析」）。禁 /m。 |
-| Q2289 | in_progress | 桌面空态：工作台侧栏「告警中心」「组织策略」「基础维护」。禁 /m。 |
+| Q2289 | done | 桌面空态 **3 passed**（workbench 侧栏「告警中心」「组织策略」「基础维护」）。禁 /m。 |
+| Q2290 | in_progress | 桌面空态：工作台侧栏「我的资产」「设计稿」。禁 /m。 |
