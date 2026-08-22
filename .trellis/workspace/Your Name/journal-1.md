@@ -875,5 +875,6 @@
 - Q2764：/inspection-records 重置/全部类型/年度检验 **3 passed**。`62d29eb34`
 - Q2765：/inspection-records 定期/专项/全部结果 **3 passed**。`92f084a87`
 - Q2766：/inspection-records 不通过/附条件通过/至 **3 passed**。`b4c7507e3`
-- Q2767：/inspection-templates 新增/标题/暂无模板 **3 passed**。标题非 heading。
+- Q2767：/inspection-templates 新增/标题/暂无模板 **3 passed**。标题非 heading。`50ab117b5`
+- Q2768：/inspection-templates 模板名称/重置/搜索 **3 passed**。「检验类型」非 placeholder。
 
