@@ -18976,6 +18976,34 @@ test.describe('Q2099 桌面通知其他工作台来源空态', () => {
   });
 });
 
+test.describe('Q2100 桌面通知工作台建议后半空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/notifications 空态「影响资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications?source=quick-alert');
+    await expect(page.getByText('影响资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「处置动作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications?source=quick-alert');
+    await expect(page.getByText('处置动作').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications 空态「必要时」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications?source=quick-alert');
+    await expect(page.getByText('必要时').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

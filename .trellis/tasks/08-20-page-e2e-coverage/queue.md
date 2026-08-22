@@ -1287,4 +1287,5 @@
 | Q2097 | done | 桌面空态 **3 passed**（/notifications?source=quick-alert「工作台带入」「工作台告警处理」「核对告警来源」）。禁 /m。 |
 | Q2098 | done | 桌面空态 **3 passed**（/notifications?source=quick-alert「处置建议」「告警处置上下文」「转预测维保工单」）。禁 /m。 |
 | Q2099 | done | 桌面空态 **3 passed**（/notifications source=security-event/data-alert/unknown）。禁 /m。 |
-| Q2100 | in_progress | 桌面空态：/notifications 主界面未覆盖文案。禁 /m。 |
+| Q2100 | done | 桌面空态 **3 passed**（/notifications?source=quick-alert「影响资产」「处置动作」「必要时」）。禁 /m。 |
+| Q2101 | in_progress | 桌面空态：/analytics 或 /profile 未覆盖可见文案。禁 /m。 |
