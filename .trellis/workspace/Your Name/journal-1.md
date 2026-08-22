@@ -774,5 +774,6 @@
 - Q2663：/equipment 设备/日期/类型表头 **3 passed**。`66cf2cf9a`
 - Q2664：/equipment 技术员/费用/操作表头 **3 passed**。`65771a89a`
 - Q2665：/fault-codes 新增根节点/标题/空态引导 **3 passed**。`f8d563a97`
-- Q2666：/fault-codes 节点总数/故障现象/故障原因 **3 passed**。
+- Q2666：/fault-codes 节点总数/故障现象/故障原因 **3 passed**。`bb5f66d8f`
+- Q2667：/fault-codes 解决措施/故障树/现象原因措施 **3 passed**。
 
