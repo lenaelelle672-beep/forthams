@@ -1290,4 +1290,5 @@
 | Q2100 | done | 桌面空态 **3 passed**（/notifications?source=quick-alert「影响资产」「处置动作」「必要时」）。禁 /m。 |
 | Q2101 | done | 桌面空态 **3 passed**（/analytics/tco「TCO 全生命周期成本」「部门ID」「分类ID」）。禁 /m。 |
 | Q2102 | done | 桌面空态 **3 passed**（/analytics/reliability「暂无排名数据」「暂无趋势数据」、select「按 MTBF」）。禁 /m。 |
-| Q2103 | in_progress | 桌面空态：/asset-health 未覆盖可见文案。禁 /m。 |
+| Q2103 | done | 桌面空态 **3 passed**（/asset-health「暂无不健康资产」「最低分:」「刷新」）。禁 /m。 |
+| Q2104 | in_progress | 桌面空态：/asset-health「不健康资产列表」或「所有资产状态良好」。禁 /m。 |
