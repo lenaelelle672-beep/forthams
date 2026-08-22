@@ -1171,4 +1171,5 @@
 | Q1981 | done | 桌面空态 **3 passed**（/workflows「流程信息」「版本历史与回滚」「该流程尚未形成可发布版本，业务入口会被阻断。」）。禁 /m。 |
 | Q1982 | done | 桌面空态 **3 passed**（/workflows「当前版本」「发布快照」「审批/办理」）。禁 /m。 |
 | Q1983 | done | 桌面空态 **3 passed**（/workflows「总节点」「本地草稿」「可发起状态」）。禁 /m。 |
-| Q1984 | in_progress | 桌面空态：/workflows「业务对象」「更新时间」「发布时间」。禁 /m。 |
+| Q1984 | done | 桌面空态 **3 passed**（/workflows「业务对象」「更新时间」「发布时间」）。禁 /m。 |
+| Q1985 | in_progress | 桌面空态：/workflows「创建时间」「更新人」「发布人」。禁 /m。 |
