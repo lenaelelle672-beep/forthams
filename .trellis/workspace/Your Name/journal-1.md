@@ -612,5 +612,6 @@
 - Q2501：/budgets/new 部门ID/分类ID/返回列表 **3 passed**。`7e07ca445`
 - Q2502：/intake/new 新建验收单/填写信息/验收单信息 **3 passed**。`0fa60379f`
 - Q2503：/intake/new 验收日期/供应商/选择供应商 **3 passed**。`e4962e4bf`
-- Q2504：/insurances/new 新增保险/保单号/placeholder **3 passed**。
+- Q2504：/insurances/new 新增保险/保单号/placeholder **3 passed**。`dbfbb3b7f`
+- Q2505：/insurances/new 保险名称/placeholder/类型 **3 passed**。
 
