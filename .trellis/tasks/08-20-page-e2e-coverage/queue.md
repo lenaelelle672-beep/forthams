@@ -1294,4 +1294,5 @@
 | Q2104 | done | 桌面空态 **3 passed**（/asset-health「不健康资产列表」「所有资产状态良好」「共 0 条」）。禁 /m。 |
 | Q2105 | done | 桌面空态 **3 passed**（/asset-health「资产健康评分」「基于年龄」「维修频率」）。禁 /m。 |
 | Q2106 | done | 桌面空态 **3 passed**（/asset-health「故障率」「利用率」「折旧进度」）。禁 /m。 |
-| Q2107 | in_progress | 桌面空态：/system/users 或 /settings/sysconfig 未覆盖。禁 /m。 |
+| Q2107 | done | 桌面空态 **3 passed**（/contracts「到期日期」、tab 即将到期「暂无即将到期合同」「当前没有在30天内到期的合同」）。禁 /m。 |
+| Q2108 | in_progress | 桌面空态：/contracts 点时间轴或 /spare-parts 未覆盖。禁 /m。 |
