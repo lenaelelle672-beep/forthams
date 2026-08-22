@@ -905,5 +905,6 @@
 - Q2794：/stocktaking-cycles/new 返回列表/保存/标题 **3 passed**。`d7faf29aa`
 - Q2795：/stocktaking-cycles/new 周期名称/placeholder/盘点类型 **3 passed**。周期名称无关联 label。`ebd9fb722`
 - Q2796：/stocktaking-cycles/new 标题/保存/返回列表 **3 passed**。全盘点 option 关闭不可见。`c10b3967f`
-- Q2797：/workorders/new 提交工单/取消/标题 **3 passed**。
+- Q2797：/workorders/new 提交工单/取消/标题 **3 passed**。`e33953273`
+- Q2798：/workorders/new 基本信息/详细信息/人员安排 heading **3 passed**。
 

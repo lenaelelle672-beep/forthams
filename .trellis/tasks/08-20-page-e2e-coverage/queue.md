@@ -1985,4 +1985,5 @@
 | Q2795 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 周期名称/placeholder/盘点类型）。禁 /m。 |
 | Q2796 | done | 桌面空态 **3 passed**（/stocktaking-cycles/new 标题/保存/返回列表）。禁 /m。 |
 | Q2797 | done | 桌面空态 **3 passed**（/workorders/new 提交工单/取消/标题）。禁 /m。 |
-| Q2798 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2798 | done | 桌面空态 **3 passed**（/workorders/new 基本信息/详细信息/人员安排 heading）。禁 /m。 |
+| Q2799 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
