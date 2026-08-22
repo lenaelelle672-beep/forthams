@@ -1175,4 +1175,5 @@
 | Q1985 | done | 桌面空态 **3 passed**（/workflows「创建时间」「更新人」「发布人」）。禁 /m。 |
 | Q1986 | done | 桌面空态 **3 passed**（/workflows「发起入口」「契约状态」「阻断原因」）。禁 /m。 |
 | Q1987 | done | 桌面空态 **3 passed**（/workflows「未记录」「未读取」「显示第」）。禁 /m。 |
-| Q1988 | in_progress | 桌面空态：/workflows「资产转移流程」「资产清退流程」「资产报废转让流程」。禁 /m。 |
+| Q1988 | done | 桌面空态 **3 passed**（/workflows「资产转移流程」「资产清退流程」「资产报废转让流程」）。禁 /m。 |
+| Q1989 | in_progress | 桌面空态：/workflows「资产赔偿流程」「资产退役流程」「首页」。禁 /m。 |
