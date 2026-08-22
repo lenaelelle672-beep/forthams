@@ -16863,6 +16863,39 @@ test.describe('Q2030 桌面GIS空间空树与新建定位空态', () => {
   });
 });
 
+test.describe('Q2031 桌面GIS新建经度状态与空间搜索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis 点新建资产定位「经度」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await page.getByRole('button', { name: '新建资产定位' }).click();
+    await expect(page.getByText('经度', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点新建资产定位「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '资产定位管理' }).click();
+    await page.getByRole('button', { name: '新建资产定位' }).click();
+    await expect(page.getByText('状态', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/gis 点选择空间单元 placeholder「搜索位置名称 / 编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await page.getByRole('button', { name: '选择空间单元' }).click();
+    await expect(page.getByPlaceholder('搜索位置名称 / 编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
