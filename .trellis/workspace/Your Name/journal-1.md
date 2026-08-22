@@ -419,5 +419,6 @@
 - Q2308：资产调拨/清退/报废筛选 **3 passed**。`0606a92b5`
 - Q2309：工单申请/待审批/至。空表无表头。优先级 option hidden。`cbc8fb4b6`
 - Q2310：forbidden 返回上一页/联系管理员。inspection 菜单未切内嵌页。`eef23c0f5`
-- Q2311：资产总览产品页地标/搜索 placeholder **3 passed**。
+- Q2311：资产总览产品页地标/搜索 placeholder **3 passed**。`a07ea6821`
+- Q2312：总净值/闲置率/累计折旧 **3 passed**。
 
