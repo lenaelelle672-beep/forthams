@@ -318,5 +318,6 @@
 - Q2207：取消/保存草稿/提交申请 **3 passed**。`1aff88bdd`
 - Q2208：返回/自动保存/必填 **3 passed**。`0e4e2e23e`
 - Q2209：新建/所属部门/目标部门提示 **3 passed**。`650b63e07`
-- Q2210：检验编号/资产ID/检验模板 **3 passed**。idle 已饱和，转 inspections/new。
+- Q2210：检验编号/资产ID/检验模板 **3 passed**。idle 已饱和，转 inspections/new。`473dd6340`
+- Q2211：检验类型/检验日期 exact/下次检验日期 **3 passed**。
 

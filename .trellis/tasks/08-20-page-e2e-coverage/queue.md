@@ -1398,4 +1398,5 @@
 | Q2208 | done | 桌面空态 **3 passed**（/disposals/transfer/new「返回」「自动保存」「必填」）。禁 /m。 |
 | Q2209 | done | 桌面空态 **3 passed**（/disposals/transfer/new「新建」、所属部门/目标部门提示）。禁 /m。 |
 | Q2210 | done | 桌面空态 **3 passed**（/inspections/new「检验编号」「资产ID」「检验模板」）。禁 /m。 |
-| Q2211 | in_progress | 桌面空态：/inspections/new「检验类型」「检验日期」「下次检验日期」。禁 /m。 |
+| Q2211 | done | 桌面空态 **3 passed**（/inspections/new「检验类型」「检验日期」exact、「下次检验日期」）。禁 /m。 |
+| Q2212 | in_progress | 桌面空态：/inspections/new「检验机构」「检验人」「检验结果」。禁 /m。 |
