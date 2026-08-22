@@ -393,5 +393,6 @@
 - Q2282：总价值/Top5/近12个月 **3 passed**。`71a1c3f02`
 - Q2283：workbench?menu=home 总价值/Top5/近12个月。`ef25c0b1c`
 - Q2284：workbench/assets 台账/新建/资产总览 **3 passed**。`05cfea459`
-- Q2285：导出全部/导入/共0条 **3 passed**。
+- Q2285：导出全部/导入/共0条 **3 passed**。`705509777`
+- Q2286：todo 流程待办/审批中心/待我审批 **3 passed**。
 
