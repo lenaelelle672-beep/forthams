@@ -1656,4 +1656,5 @@
 | Q2466 | done | 桌面空态 **3 passed**（/analytics/tco 副标题/构成/部门排行）。禁 /m。 |
 | Q2467 | done | 桌面空态 **3 passed**（/analytics/tco 趋势/分类排行/输入资产ID）。禁 /m。 |
 | Q2468 | done | 桌面空态 **3 passed**（/analytics/tco 资产ID/输入资产ID/输入部门ID）。禁 /m。 |
-| Q2469 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2469 | done | 桌面空态 **3 passed**（/analytics/reliability 标题/描述/排名）。禁 /m。 |
+| Q2470 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

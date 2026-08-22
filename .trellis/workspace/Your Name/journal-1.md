@@ -576,5 +576,6 @@
 - Q2465：/analytics/health 评分分布 + /analytics/tco 标题 **3 passed**。`419b2cafa`
 - Q2466：/analytics/tco 副标题/构成/部门排行 **3 passed**。`8bc0fd03b`
 - Q2467：/analytics/tco 趋势/分类排行/输入资产ID **3 passed**。`66afadd5a`
-- Q2468：/analytics/tco 资产ID/输入资产ID/输入部门ID **3 passed**。
+- Q2468：/analytics/tco 资产ID/输入资产ID/输入部门ID **3 passed**。`ff342bffd`
+- Q2469：/analytics/reliability 标题/描述/排名 **3 passed**。
 
