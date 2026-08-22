@@ -1003,4 +1003,6 @@
 | Q1813 | done | 桌面空态 **3 passed**（/budgets/1 详情「维保」「运营」「已审批」）。禁 /m。 |
 | Q1814 | done | 桌面空态 **3 passed**（/budgets/1「已关闭」、失败态「返回列表」、「2026年 · 采购预算」）。禁 /m。 |
 | Q1815 | done | 桌面空态 **3 passed**（/insurances/1/edit 编辑保险/保存/返回；补路由并对齐 navigate）。禁 /m。 |
-| Q1816 | in_progress | 桌面空态：/insurances/1 详情未覆盖 3 条（读 InsuranceDetailPage：保险详情/理赔记录/新增理赔）。禁 /m。 |
+| Q1816 | done | 桌面空态 **3 passed**（/insurances/1「保险详情」「理赔记录」「新增理赔」）。禁 /m。 |
+| Q1817 | done | 桌面空态 **3 passed**（/insurances/1「理赔编号」「理赔日期」「理赔金额」）。禁 /m。 |
+| Q1818 | in_progress | 桌面空态：/insurances/1 理赔表列未覆盖 3 条（读 InsuranceDetailPage claimColumns：已赔付金额/赔付日期/事故描述）。禁 /m。 |
