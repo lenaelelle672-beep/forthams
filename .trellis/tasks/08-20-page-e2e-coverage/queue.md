@@ -1619,4 +1619,5 @@
 | Q2429 | done | 桌面空态 **3 passed**（/inspection-templates 标题/新增模板/名称 placeholder）。禁 /m。 |
 | Q2430 | done | 桌面空态 **3 passed**（/inspection-templates 搜索/重置/检验类型）。禁 /m。 |
 | Q2431 | done | 桌面空态 **3 passed**（/inspection-templates 空表/检验周期/创建时间）。禁 /m。 |
-| Q2432 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2432 | done | 桌面空态 **3 passed**（/revaluations heading/价值调整/新增）。禁 /m。 |
+| Q2433 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
