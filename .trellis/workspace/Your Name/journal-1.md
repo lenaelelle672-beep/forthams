@@ -670,5 +670,6 @@
 - Q2559：/assets/new 先保存上传/填写进度/资产台账 **3 passed**。`36e6e853a`
 - Q2560：/locations 点新增 取消/位置编码/新增位置 **3 passed**。DialogDescription 不可见。`bf7040ebc`
 - Q2561：/asset-models 点新增 模型描述/内部备注/规格JSON **3 passed**。`eb98ae156`
-- Q2562：/asset-models 点新增 选择字段集/型号/选择制造商 **3 passed**。
+- Q2562：/asset-models 点新增 选择字段集/型号/选择制造商 **3 passed**。`ffaeda0ff`
+- Q2563：/inspection-templates 点新增 年度模板/类别ID/检验周期 **3 passed**。
 

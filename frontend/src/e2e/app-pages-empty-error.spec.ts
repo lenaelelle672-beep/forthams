@@ -31933,6 +31933,37 @@ test.describe('Q2562 桌面资产模型字段集空态', () => {
   });
 });
 
+test.describe('Q2563 桌面检验模板新增弹窗空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspection-templates 点新增模板 placeholder「例如：年度安全检验模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).first().click();
+    await expect(page.getByPlaceholder('例如：年度安全检验模板').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板 placeholder「例如：1,2,3」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).first().click();
+    await expect(page.getByPlaceholder('例如：1,2,3').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板「检验周期（月）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: /新\s*增\s*模\s*板/ }).first().click();
+    await expect(page.getByText('检验周期（月）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

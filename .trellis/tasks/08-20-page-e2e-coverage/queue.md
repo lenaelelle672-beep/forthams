@@ -1750,4 +1750,5 @@
 | Q2560 | done | 桌面空态 **3 passed**（/locations 点新增 取消/位置编码/新增位置）。禁 /m。 |
 | Q2561 | done | 桌面空态 **3 passed**（/asset-models 点新增 模型描述/内部备注/规格JSON）。禁 /m。 |
 | Q2562 | done | 桌面空态 **3 passed**（/asset-models 点新增 选择字段集/型号/选择制造商）。禁 /m。 |
-| Q2563 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2563 | done | 桌面空态 **3 passed**（/inspection-templates 点新增 年度模板/类别ID/检验周期）。禁 /m。 |
+| Q2564 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
