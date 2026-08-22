@@ -13866,6 +13866,34 @@ test.describe('Q1924 桌面安全检查模板列头空态', () => {
   });
 });
 
+test.describe('Q1925 桌面安全检查模板操作筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/config 空态「操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByText('操作').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/config 空态「全部」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByText('全部').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/config 空态「启用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByText('启用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
