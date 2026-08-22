@@ -26183,6 +26183,34 @@ test.describe('Q2357 桌面审批中心类型胶囊空态', () => {
   });
 });
 
+test.describe('Q2358 桌面审批中心工单日期空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/approvals 空态「工单申请」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByText('工单申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态「至」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByText('至', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态「全部状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByRole('combobox').filter({ hasText: '全部状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

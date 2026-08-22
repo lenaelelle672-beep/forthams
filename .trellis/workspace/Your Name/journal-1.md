@@ -465,5 +465,6 @@
 - Q2354：/approvals 我发起的/已通过/待审批 **3 passed**。`ccee8f79b`
 - Q2355：/approvals 已驳回/搜索 placeholder/审批 **3 passed**。`7b48207af`
 - Q2356：/approvals 全部类型/暂无审批/空表描述 **3 passed**。`5b63a266a`
-- Q2357：/approvals 资产调拨/清退/报废 **3 passed**。
+- Q2357：/approvals 资产调拨/清退/报废 **3 passed**。`bd22828cb`
+- Q2358：/approvals 工单申请/至/全部状态 **3 passed**。
 
