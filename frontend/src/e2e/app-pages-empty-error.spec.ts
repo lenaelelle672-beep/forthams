@@ -38869,6 +38869,34 @@ test.describe('Q2810 桌面新建资产字段标签空态', () => {
   });
 });
 
+test.describe('Q2811 桌面新建资产扩展标签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态「品牌/厂商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('品牌/厂商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「纬度 (-90 ~ 90)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('纬度 (-90 ~ 90)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「RFID 标签」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('RFID 标签').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
