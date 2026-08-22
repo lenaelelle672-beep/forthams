@@ -1995,4 +1995,5 @@
 | Q2805 | done | 桌面空态 **3 passed**（/assets/new 名称/品牌/型号 placeholder）。禁 /m。 |
 | Q2806 | done | 桌面空态 **3 passed**（/assets/new 序列号/供应商/位置 placeholder）。禁 /m。 |
 | Q2807 | done | 桌面空态 **3 passed**（/assets/new 纬度/经度/RFID placeholder）。禁 /m。 |
-| Q2808 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2808 | done | 桌面空态 **3 passed**（/assets/new 原值/净值/保修期 placeholder）。禁 /m。 |
+| Q2809 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

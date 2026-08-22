@@ -915,5 +915,6 @@
 - Q2804：/assets/new 新建资产/填写进度/资产台账 **3 passed**。`3a7ea2387`
 - Q2805：/assets/new 名称/品牌/型号 placeholder **3 passed**。`3b071a2d8`
 - Q2806：/assets/new 序列号/供应商/位置 placeholder **3 passed**。`978961d37`
-- Q2807：/assets/new 纬度/经度/RFID placeholder **3 passed**。
+- Q2807：/assets/new 纬度/经度/RFID placeholder **3 passed**。`e5cabb08a`
+- Q2808：/assets/new 原值/净值/保修期 placeholder **3 passed**。
 
