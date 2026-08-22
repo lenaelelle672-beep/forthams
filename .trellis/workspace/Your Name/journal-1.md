@@ -171,5 +171,6 @@
 - Q2060：轴小/大、点单元格关闭 **3 passed**。影响轴是 cell 不是 columnheader。`87bd31a77`
 - Q2061：点单元格详情/可能性/影响 **3 passed**。`4927c6abb`
 - Q2062：创建矩阵较低/较高/轻微 **3 passed**。维标签是 input value，用 input[value=]。`e52349f20`
-- Q2063：严重度一般/非常严重/灾难性 **3 passed**。
+- Q2063：严重度一般/非常严重/灾难性 **3 passed**。`bb6e5dcc0`
+- Q2064：等级映射 CRITICAL/HIGH/最低分数 **3 passed**。
 
