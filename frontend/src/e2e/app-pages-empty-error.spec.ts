@@ -17864,6 +17864,40 @@ test.describe('Q2064 桌面风险矩阵配置等级映射空态', () => {
   });
 });
 
+test.describe('Q2065 桌面风险矩阵配置映射等级值空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-matrix 点等级映射「MEDIUM」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: /创\s*建\s*矩\s*阵/ }).click();
+    await page.getByRole('tab', { name: '等级映射' }).click();
+    await expect(page.locator('input[value="MEDIUM"]')).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/risk-matrix 点等级映射「LOW」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: /创\s*建\s*矩\s*阵/ }).click();
+    await page.getByRole('tab', { name: '等级映射' }).click();
+    await expect(page.locator('input[value="LOW"]')).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/risk-matrix 点等级映射 placeholder「风险等级」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: /创\s*建\s*矩\s*阵/ }).click();
+    await page.getByRole('tab', { name: '等级映射' }).click();
+    await expect(page.getByPlaceholder('风险等级 (LOW/MEDIUM/HIGH/CRITICAL)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
