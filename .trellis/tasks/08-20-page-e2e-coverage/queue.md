@@ -1389,4 +1389,5 @@
 | Q2199 | done | 桌面空态 **3 passed**（/disposals/transfer/new「单据信息」「调拨编号」「申请人」）。禁 /m。 |
 | Q2200 | done | 桌面空态 **3 passed**（/disposals/transfer/new「调拨日期」「调拨类型」「调拨方向」）。禁 /m。 |
 | Q2201 | done | 桌面空态 **3 passed**（/disposals/transfer/new「转出方」「调出部门」「调出位置」）。禁 /m。 |
-| Q2202 | in_progress | 桌面空态：/disposals/transfer/new「转入方」「调入部门」「调入位置」。禁 /m。 |
+| Q2202 | done | 桌面空态 **3 passed**（/disposals/transfer/new「转入方」「调入部门」「调入位置」）。禁 /m。 |
+| Q2203 | in_progress | 桌面空态：/disposals/transfer/new「资产选择」「添加资产」「已选」。禁 /m。 |
