@@ -600,5 +600,6 @@
 - Q2489：/workflows 已发布/已停用 + /compensation/new 赔偿编号 **3 passed**。`8fc13282d`
 - Q2490：/compensation/new 赔偿配置/现金/等价物 **3 passed**。`aa674b452`
 - Q2491：/compensation/new 总金额/方式/预估 **3 passed**。`63e92078c`
-- Q2492：/compensation/new 申请标题/赔偿申请/标准流程 **3 passed**。
+- Q2492：/compensation/new 申请标题/赔偿申请/标准流程 **3 passed**。`5c08b0074`
+- Q2493：/retirement/new 申请标题/新建申请/资产选择 **3 passed**。
 
