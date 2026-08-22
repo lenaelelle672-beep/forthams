@@ -10294,6 +10294,51 @@ test.describe('Q1813 桌面预算详情变体空态', () => {
   });
 });
 
+test.describe('Q1814 桌面预算详情状态与删除', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/1 详情「已关闭」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/budgets/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, budgetYear:2026, budgetType:'PURCHASE', status:'CLOSED', totalAmount:100, usedAmount:0, committedAmount:0 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/budgets/1');
+    await expect(page.getByText('已关闭').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 失败态「返回列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', (apiRoute) => mockApiWithFailure(apiRoute, '/budgets/1'));
+    await page.goto('/budgets/1');
+    await expect(page.getByRole('button', { name: '返回列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/1 详情「2026年 · 采购预算」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/budgets/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, budgetYear:2026, budgetType:'PURCHASE', status:'DRAFT', totalAmount:100, usedAmount:0, committedAmount:0 } }) });
+      }
+      return mockApi(route);
+    });
+    await page.goto('/budgets/1');
+    await expect(page.getByText('2026年 · 采购预算').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
