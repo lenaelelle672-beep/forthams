@@ -13611,6 +13611,36 @@ test.describe('Q1915 桌面循环盘点规则弹窗上限确定空态', () => {
   });
 });
 
+test.describe('Q1916 桌面循环盘点规则弹窗取消标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/cycle-count 点新增规则「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByRole('button', { name: /取\s*消/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 点新增规则弹窗「新增规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await page.getByRole('button', { name: /新\s*增\s*规\s*则/ }).click();
+    await expect(page.getByText('新增规则').nth(1)).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 空态「月度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('月度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
