@@ -1386,4 +1386,5 @@
 | Q2196 | done | 桌面空态 **3 passed**（/disposals/transfer/new「资产转移申请」「基本信息」「选择资产」）。禁 /m。 |
 | Q2197 | done | 桌面空态 **3 passed**（/disposals/transfer/new「审批配置」「完成」「基础信息填写」）。禁 /m。 |
 | Q2198 | done | 桌面空态 **3 passed**（/disposals/transfer/new「选择调拨资产」「流程配置」「提交状态」）。禁 /m。 |
-| Q2199 | in_progress | 桌面空态：/disposals/transfer/new「单据信息」「调拨编号」「申请人」。禁 /m。 |
+| Q2199 | done | 桌面空态 **3 passed**（/disposals/transfer/new「单据信息」「调拨编号」「申请人」）。禁 /m。 |
+| Q2200 | in_progress | 桌面空态：/disposals/transfer/new「调拨日期」「调拨类型」「调拨方向」。禁 /m。 |
