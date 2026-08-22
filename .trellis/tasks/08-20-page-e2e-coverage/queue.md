@@ -1659,4 +1659,5 @@
 | Q2469 | done | 桌面空态 **3 passed**（/analytics/reliability 标题/描述/排名）。禁 /m。 |
 | Q2470 | done | 桌面空态 **3 passed**（/analytics/reliability 趋势/平均故障间隔/月均故障率）。禁 /m。 |
 | Q2471 | done | 桌面空态 **3 passed**（/analytics/reliability 修复时间/可用率/按MTBF）。禁 /m。 |
-| Q2472 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2472 | done | 桌面空态 **3 passed**（/system/users heading/用户/新增用户）。禁 /m。 |
+| Q2473 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

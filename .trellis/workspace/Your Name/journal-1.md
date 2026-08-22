@@ -579,5 +579,6 @@
 - Q2468：/analytics/tco 资产ID/输入资产ID/输入部门ID **3 passed**。`ff342bffd`
 - Q2469：/analytics/reliability 标题/描述/排名 **3 passed**。`b77338bbb`
 - Q2470：/analytics/reliability 趋势/平均故障间隔/月均故障率 **3 passed**。`74c7323a0`
-- Q2471：/analytics/reliability 修复时间/可用率/按MTBF **3 passed**。
+- Q2471：/analytics/reliability 修复时间/可用率/按MTBF **3 passed**。`bae69540a`
+- Q2472：/system/users heading/用户/新增用户 **3 passed**。
 
