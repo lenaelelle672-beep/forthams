@@ -38813,6 +38813,34 @@ test.describe('Q2808 桌面新建资产财务占位空态', () => {
   });
 });
 
+test.describe('Q2809 桌面新建资产描述占位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态 placeholder「例：0.1 = 10%/年」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByPlaceholder('例：0.1 = 10%/年').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态 placeholder「资产用途、主要配置等...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByPlaceholder('资产用途、主要配置等...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态 placeholder「其他需要说明的信息...」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByPlaceholder('其他需要说明的信息...').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
