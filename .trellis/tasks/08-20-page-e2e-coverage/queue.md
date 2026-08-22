@@ -1489,4 +1489,5 @@
 | Q2299 | done | 桌面空态 **3 passed**（v3 no-permission-effect/preview/CUSTOM）。禁 /m。 |
 | Q2300 | done | 桌面空态 **3 passed**（v3 可收紧 dataScope/部门清单/角色数据范围）。禁 /m。 |
 | Q2301 | done | 桌面空态 **3 passed**（v3 风险提示/只读覆盖视图/状态筛选）。禁 /m。 |
-| Q2302 | in_progress | 桌面空态：/fixed-assets/workbenchv3「权限库存」。禁 /m。 |
+| Q2302 | done | 桌面空态 **3 passed**（v3 分组计数 8/8、9/9、6/6）。禁 /m。 |
+| Q2303 | in_progress | 桌面空态：/fixed-assets/workbenchv3「5/5」。禁 /m。 |

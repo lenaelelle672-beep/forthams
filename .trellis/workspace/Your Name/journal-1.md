@@ -409,5 +409,6 @@
 - Q2298：岗位 metadata-only/no-persistence/no-assignment **3 passed**。`0a484fbdb`
 - Q2299：no-permission-effect/preview/CUSTOM **3 passed**。`958f1ac04`
 - Q2300：dataScope/部门清单/角色数据范围 **3 passed**。`3da04345b`
-- Q2301：风险提示/只读覆盖视图/状态筛选 **3 passed**。
+- Q2301：风险提示/只读覆盖视图/状态筛选 **3 passed**。`a7acbb319`
+- Q2302：分组 8/8、9/9、6/6 **3 passed**。
 
