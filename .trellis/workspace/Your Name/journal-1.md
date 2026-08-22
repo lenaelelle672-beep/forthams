@@ -268,5 +268,6 @@
 - Q2157：备注与说明/不可逆/提交退役申请 **3 passed**。`0f23ebb91`
 - Q2158：取消/审批提示/建议残值 **3 passed**。`bdf92eb6e`
 - Q2159：资产/备注 placeholder、2023当前 **3 passed**。`cffdead21`
-- Q2160：原因 placeholder、2020/2025 **3 passed**。
+- Q2160：原因 placeholder、2020/2025 **3 passed**。`1a94c1da2`
+- Q2161：退役申请/申请详情/返回或面包屑 **3 passed**。
 

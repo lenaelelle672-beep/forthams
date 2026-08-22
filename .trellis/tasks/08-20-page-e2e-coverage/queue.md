@@ -1348,4 +1348,5 @@
 | Q2158 | done | 桌面空态 **3 passed**（/retirement/new「取消」、审批提示、建议残值说明）。禁 /m。 |
 | Q2159 | done | 桌面空态 **3 passed**（/retirement/new 资产/备注 placeholder、「2023 (当前)」）。禁 /m。 |
 | Q2160 | done | 桌面空态 **3 passed**（/retirement/new 原因 placeholder、「2020」「2025」）。禁 /m。 |
-| Q2161 | in_progress | 桌面空态：/retirement/1 详情未覆盖。禁 /m。 |
+| Q2161 | done | 桌面空态 **3 passed**（/retirement/1「退役申请」「申请详情」、返回列表或退役管理）。禁 /m。 |
+| Q2162 | in_progress | 桌面空态：/retirement/1 详情分区未覆盖。禁 /m。 |
