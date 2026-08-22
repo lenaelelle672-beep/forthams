@@ -778,5 +778,6 @@
 - Q2667：/fault-codes 解决措施/故障树/现象原因措施 **3 passed**。`6764c5677`
 - Q2668：/contracts 新增合同/合同编号/合同名称 **3 passed**。`3f35e9dc4`
 - Q2669：/contracts 类型/金额/操作表头 **3 passed**。`a2c176e54`
-- Q2670：/contracts 搜索/标题/刷新 **3 passed**。
+- Q2670：/contracts 搜索/标题/刷新 **3 passed**。`3840f8f5b`
+- Q2671：/contracts 全部合同/即将到期/时间轴视图 **3 passed**。页签非 button。
 

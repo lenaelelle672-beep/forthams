@@ -34949,6 +34949,34 @@ test.describe('Q2670 桌面合同管理筛选空态', () => {
   });
 });
 
+test.describe('Q2671 桌面合同管理页签空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/contracts 空态「全部合同」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await expect(page.getByText('全部合同').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/contracts 空态「即将到期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await expect(page.getByText('即将到期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/contracts 空态「时间轴视图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await expect(page.getByText('时间轴视图').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
