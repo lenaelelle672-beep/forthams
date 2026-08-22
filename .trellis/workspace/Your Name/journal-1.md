@@ -645,5 +645,6 @@
 - Q2534：/intake/new 型号/序列号/供应商 **3 passed**。`2a4243c73`
 - Q2535：/intake/new 选择分类/0.00/资产备注 **3 passed**。`bf364e462`
 - Q2536：/intake/new 选择地点/12/入库资产 **3 passed**。`016543b3a`
-- Q2537：/intake/new 资产#1/添加/资产名称* **3 passed**。
+- Q2537：/intake/new 资产#1/添加/资产名称* **3 passed**。`03db236c7`
+- Q2538：/intake/new 资产编号/资产分类/填写验收信息 **3 passed**。
 
