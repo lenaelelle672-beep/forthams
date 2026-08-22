@@ -1116,4 +1116,5 @@
 | Q1926 | done | 桌面空态 **3 passed**（/safety-checklists/config「禁用」+ 点「新增模板」后「模板名称」+ placeholder「如：消防安全检查表」）。禁 /m。 |
 | Q1927 | done | 桌面空态 **3 passed**（/safety-checklists/config 点「新增模板」后「适用资产分类」「确认新增」+ placeholder「JSON数组：[1,2,3] 或留空」）。禁 /m。 |
 | Q1928 | done | 桌面空态 **3 passed**（config 点新增「取消」+ history「安全检查历史」「查看安全检查执行记录与结果明细」）。禁 /m。 |
-| Q1929 | in_progress | 桌面空态：/safety-checklists/history「全部执行」「已完成」「通过」。禁 /m。 |
+| Q1929 | done | 桌面空态 **3 passed**（/safety-checklists/history「全部执行」「已完成」「通过」）。禁 /m。 |
+| Q1930 | in_progress | 桌面空态：/safety-checklists/history 剩余统计与列头（读页确认 3 文案）。禁 /m。 |
