@@ -13434,6 +13434,34 @@ test.describe('Q1909 桌面循环盘点规则标题空态', () => {
   });
 });
 
+test.describe('Q1910 桌面循环盘点规则列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/cycle-count 空态「分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 空态「盘点频率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('盘点频率').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 空态「最小价值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('最小价值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
