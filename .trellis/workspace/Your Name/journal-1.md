@@ -760,5 +760,6 @@
 - Q2649：/login5 组织账号文案/密码/登录系统 **3 passed**。无 seedSession。/login5 默认皮肤非 /login4。`6b39cd2bb`
 - Q2650：/login5 工作台预览/演示账户/快速体验 **3 passed**。无 seedSession。`e32ebd71d`
 - Q2651：/login5 系统管理员/资产管理员/运维人员按钮 **3 passed**。无 seedSession。`7825fd384`
-- Q2652：/login5 部门负责人/全域权限/资源审批 **3 passed**。无 seedSession。「全生命周期」substring 命中隐藏段落。
+- Q2652：/login5 部门负责人/全域权限/资源审批 **3 passed**。无 seedSession。「全生命周期」substring 命中隐藏段落。`a431ce859`
+- Q2653：/login5 巡检维修/系统管理员/资产管理员 **3 passed**。无 seedSession。
 
