@@ -1789,4 +1789,5 @@
 | Q2599 | done | 桌面空态 **3 passed**（/bigscreen 执行航班/异常阈值/2小时内）。禁 /m。 |
 | Q2600 | done | 桌面空态 **3 passed**（/bigscreen 2-4小时/4小时以上/航班）。禁 /m。 |
 | Q2601 | done | 桌面空态 **3 passed**（/bigscreen 起站/延误状态/延误原因）。禁 /m。 |
-| Q2602 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2602 | done | 桌面空态 **3 passed**（/bigscreen 国际/国内/8）。禁 /m。 |
+| Q2603 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
