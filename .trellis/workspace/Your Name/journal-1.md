@@ -267,5 +267,6 @@
 - Q2156：残值评估/资产ID*/返回 **3 passed**。`48be9f9c5`
 - Q2157：备注与说明/不可逆/提交退役申请 **3 passed**。`0f23ebb91`
 - Q2158：取消/审批提示/建议残值 **3 passed**。`bdf92eb6e`
-- Q2159：资产/备注 placeholder、2023当前 **3 passed**。
+- Q2159：资产/备注 placeholder、2023当前 **3 passed**。`cffdead21`
+- Q2160：原因 placeholder、2020/2025 **3 passed**。
 
