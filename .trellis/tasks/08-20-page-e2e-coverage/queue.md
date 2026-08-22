@@ -1968,4 +1968,5 @@
 | Q2778 | done | 桌面空态 **3 passed**（/budgets/new 预算年度/类型/总额）。禁 /m。 |
 | Q2779 | done | 桌面空态 **3 passed**（/budgets/new 部门ID/分类ID/创建预算）。禁 /m。 |
 | Q2780 | done | 桌面空态 **3 passed**（/budgets/new 取消/状态/取消文案）。禁 /m。 |
-| Q2781 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2781 | done | 桌面空态 **3 passed**（/revaluations/new 返回列表/标题/副标题）。禁 /m。 |
+| Q2782 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
