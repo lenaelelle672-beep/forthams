@@ -1472,4 +1472,5 @@
 | Q2282 | done | 桌面空态 **3 passed**（/workspace-preview「总价值」、部门 Top5、近12个月趋势）。禁 /m。 |
 | Q2283 | done | 桌面空态 **3 passed**（/fixed-assets/workbench?menu=home 总价值/Top5/近12个月）。禁 /m。 |
 | Q2284 | done | 桌面空态 **3 passed**（/fixed-assets/workbench/assets 台账/新建/资产总览）。禁 /m。 |
-| Q2285 | in_progress | 桌面空态：/fixed-assets/workbench/assets 导出或搜索。禁 /m。 |
+| Q2285 | done | 桌面空态 **3 passed**（/fixed-assets/workbench/assets 导出全部/导入/共0条）。禁 /m。 |
+| Q2286 | in_progress | 桌面空态：/fixed-assets/workbench 审批菜单。禁 /m。 |
