@@ -1886,4 +1886,5 @@
 | Q2696 | done | 桌面空态 **3 passed**（/profile SUPER_ADMIN/系统管理员/ADMIN）。禁 /m。 |
 | Q2697 | done | 桌面空态 **3 passed**（/notifications 全部已读/标题/暂无通知）。禁 /m。 |
 | Q2698 | done | 桌面空态 **3 passed**（/notifications 审批/预警/系统通知）。禁 /m。 |
-| Q2699 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2699 | done | 桌面空态 **3 passed**（/notifications 共0条/全部/引导文案）。禁 /m。 |
+| Q2700 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
