@@ -16715,6 +16715,34 @@ test.describe('Q2025 桌面部门岗位标题空态', () => {
   });
 });
 
+test.describe('Q2026 桌面能耗管理标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/energy 空态「能耗管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/energy');
+    await expect(page.getByText('能耗管理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/energy 空态「暂无能耗数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/energy');
+    await expect(page.getByText('暂无能耗数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/energy 空态「尚未采集到能耗数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/energy');
+    await expect(page.getByText('尚未采集到能耗数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

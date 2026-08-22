@@ -60,3 +60,4 @@ See `.trellis/spec/dwk/dev-runtime.md`. Probe health, start missing frontend/bac
 - 列表页 `data.records` 必须 `Array.isArray` 后再给表格（许可证/设备/备件/供应商/领用/借用/入库/采购/制造商/检验/折旧/合同/报表/菜单树/部门树）。`records` 为对象时 heading 仍在、无 pageerror。桌面 e2e：`app-pages-smoke` grep `records 非数组`（不含 `/m`）。`/asset-models` 的 `manufacturers/options` 与 `categories/all`、入库详情 `checkItems`/`intakeAssets`、采购详情 `items` 同样先 `Array.isArray`。
 - `/analytics/health` 空态不渲染表头（`unhealthyList` 空只显示「暂无数据」）；饼图三档 value 全 0 时 Pie label 不可靠。Q1978 切 `/analytics/reliability` 测「可靠性分析」「MTBF」「MTTR」。排名表空同样无列头。
 - textarea 的 `aria-label` 对 `getByText` 不可见（Q2015：`/workflow-designer`「业务数据 JSON」）。用 `getByLabel`。
+- `/energy` 默认 mock 对象在 `!effectiveData` 时只渲染 EmptyState「暂无能耗数据／尚未采集到能耗数据」，主界面「能耗监控与数据分析」「总能耗」不可见（Q2026）。
