@@ -1166,4 +1166,5 @@
 | Q1976 | done | 桌面空态 **3 passed**（/analytics/tco「分类 TCO 排行」「请输入部门ID查询」「请输入分类ID查询」）。禁 /m。 |
 | Q1977 | done | 桌面空态 **3 passed**（/analytics/health「平均健康分」「暂无数据」「资产健康评分」）。禁 /m。 |
 | Q1978 | done | 桌面空态 **3 passed**（/analytics/health 表头空态不渲染；切 /analytics/reliability「可靠性分析」「MTBF」「MTTR」）。禁 /m。 |
-| Q1979 | in_progress | 桌面空态：/workflows「业务流程管理」「集中维护审批流程、发布状态、版本快照和业务入口。」「返回资产处置」。禁 /m。 |
+| Q1979 | done | 桌面空态 **3 passed**（/workflows「业务流程管理」「集中维护审批流程、发布状态、版本快照和业务入口。」「返回资产处置」）。禁 /m。 |
+| Q1980 | in_progress | 桌面空态：/workflows「条结果」「当前选中流程」「创建并发布默认流程」。禁 /m。 |
