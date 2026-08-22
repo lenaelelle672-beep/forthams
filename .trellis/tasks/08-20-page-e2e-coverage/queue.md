@@ -1877,4 +1877,5 @@
 | Q2687 | done | 桌面空态 **3 passed**（/maintenance 操作表头/记录标题/空态引导）。禁 /m。 |
 | Q2688 | done | 桌面空态 **3 passed**（/maintenance 计划中/执行中/逾期）。禁 /m。 |
 | Q2689 | done | 桌面空态 **3 passed**（/maintenance 已完成/刷新/设备维护）。禁 /m。 |
-| Q2690 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2690 | done | 桌面空态 **3 passed**（/maintenance/plans 新建计划/标题/暂无计划）。禁 /m。 |
+| Q2691 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

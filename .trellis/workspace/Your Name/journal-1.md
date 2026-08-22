@@ -797,5 +797,6 @@
 - Q2686：/maintenance 执行人/费用/下次维保表头 **3 passed**。`79858f4eb`
 - Q2687：/maintenance 操作表头/记录标题/空态引导 **3 passed**。`3c239b5eb`
 - Q2688：/maintenance 计划中/执行中/逾期 **3 passed**。`d18bd2d68`
-- Q2689：/maintenance 已完成/刷新/设备维护 **3 passed**。
+- Q2689：/maintenance 已完成/刷新/设备维护 **3 passed**。`abcaf78b7`
+- Q2690：/maintenance/plans 新建计划/标题/暂无计划 **3 passed**。
 
