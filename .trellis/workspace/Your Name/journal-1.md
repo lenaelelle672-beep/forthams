@@ -808,5 +808,6 @@
 - Q2697：/notifications 全部已读/标题/暂无通知 **3 passed**。`2798d9d9b`
 - Q2698：/notifications 审批/预警/系统通知 **3 passed**。`e300f26d4`
 - Q2699：/notifications 共0条/全部/引导文案 **3 passed**。`d7953543b`
-- Q2700：/depreciation 批量计算/标题/暂无计划 **3 passed**。
+- Q2700：/depreciation 批量计算/标题/暂无计划 **3 passed**。`71c074ea3`
+- Q2701：/depreciation 搜索/查询/重置 **3 passed**。
 
