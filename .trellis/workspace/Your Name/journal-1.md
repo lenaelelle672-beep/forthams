@@ -636,5 +636,6 @@
 - Q2525：/risk-assessments/new 评估人placeholder/创建/风险等级 **3 passed**。Antd 按钮 accessible name 为「创 建」。`e81d76271`
 - Q2526：/risk-assessments/new 取消/1-极低 + /workorders/new 填写说明 **3 passed**。`6ba907bb6`
 - Q2527：/stocktaking-cycles/new 返回列表/保存 + /risk-assessments/new 1-极小 **3 passed**。`0d093499e`
-- Q2528：/disposals/transfer/new 调拨说明 + /workorders/new 紧急/高 **3 passed**。login2 WebGL 不可用，改走转移申请。
+- Q2528：/disposals/transfer/new 调拨说明 + /workorders/new 紧急/高 **3 passed**。login2 WebGL 不可用，改走转移申请。`850f8eef3`
+- Q2529：/workorders/new 中/低 + /stocktaking-cycles/new * **3 passed**。
 
