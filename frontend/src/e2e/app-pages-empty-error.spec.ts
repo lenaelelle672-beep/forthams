@@ -11734,6 +11734,44 @@ test.describe('Q1853 桌面检验上传已传空态', () => {
   });
 });
 
+test.describe('Q1854 桌面检验上传面包屑空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', async (route) => {
+      const url = new URL(route.request().url());
+      const path = url.pathname.replace(/^\/api/, '');
+      if (path === '/inspections/1') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: { id:1, inspectionNo:'INSP-001', assetId:1, inspectionType:'ANNUAL', result:'PENDING' } }) });
+      }
+      if (path === '/inspections/1/photos') {
+        return route.fulfill({ status:200, contentType:'application/json', body: JSON.stringify({ code:200, message:'OK', data: [] }) });
+      }
+      return mockApi(route);
+    });
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections/1/upload 空态「检验记录列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/upload');
+    await expect(page.getByText('检验记录列表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/upload 空态「检验记录详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/upload');
+    await expect(page.getByText('检验记录详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/upload 空态「照片上传」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/upload');
+    await expect(page.getByText('照片上传').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
