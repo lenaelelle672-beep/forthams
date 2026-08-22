@@ -18808,6 +18808,34 @@ test.describe('Q2093 桌面审计详情变更值表头空态', () => {
   });
 });
 
+test.describe('Q2094 桌面审计详情上下文ID空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/audit/1 空态「用户代理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('用户代理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/1 空态「请求 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('请求 ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit/1 空态「会话 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit/1');
+    await expect(page.getByText('会话 ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
