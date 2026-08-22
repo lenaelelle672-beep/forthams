@@ -1710,4 +1710,5 @@
 | Q2520 | done | 桌面空态 **3 passed**（/workorders/new 上传文件/处理提示/提交工单）。禁 /m。 |
 | Q2521 | done | 桌面空态 **3 passed**（/workorders/new 搜索资产/填写参考/取消）。禁 /m。 |
 | Q2522 | done | 桌面空态 **3 passed**（/risk-assessments/new 新增风险评估/资产ID/placeholder）。禁 /m。 |
-| Q2523 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2523 | done | 桌面空态 **3 passed**（/risk-assessments/new 可能性/影响程度/缓解措施）。禁 /m。 |
+| Q2524 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
