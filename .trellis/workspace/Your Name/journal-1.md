@@ -404,5 +404,6 @@
 - Q2293：运营首页真实产品页/主体/工作台切换 **3 passed**。`89a4e2cd2`
 - Q2294：B端预览/系统管理员/流程待办。orders 内嵌未露出。`36b26a7dd`
 - Q2295：欢迎回来系统管理员/查看全部/近12个月 **3 passed**。`3a166a6f0`
-- Q2296：dashboard 完整趋势/Top5/欢迎回来 **3 passed**。
+- Q2296：dashboard 完整趋势/Top5/欢迎回来 **3 passed**。`245923646`
+- Q2297：profile SUPER_ADMIN/套餐/ADMIN。h1 不是系统管理员。
 
