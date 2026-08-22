@@ -15506,6 +15506,34 @@ test.describe('Q1982 桌面流程中心指标空态', () => {
   });
 });
 
+test.describe('Q1983 桌面流程中心草稿指标空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflows 空态「总节点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('总节点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「本地草稿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('本地草稿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows 空态「可发起状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByText('可发起状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
