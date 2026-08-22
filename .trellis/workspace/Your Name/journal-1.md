@@ -866,5 +866,6 @@
 - Q2755：/inspections 专项检验/全部结果/通过 **3 passed**。`a70f28e34`
 - Q2756：/inspections 不通过/附条件通过/搜索 **3 passed**。`c81919958`
 - Q2757：/inspection-records 新增/标题/暂无记录 **3 passed**。`ee4462b6d`
-- Q2758：/inspection-records 搜索/总记录/待检验 **3 passed**。
+- Q2758：/inspection-records 搜索/总记录/待检验 **3 passed**。`2f11f48a1`
+- Q2759：/inspection-records 检验编号/资产ID/检验类型表头 **3 passed**。
 
