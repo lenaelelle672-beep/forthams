@@ -19791,6 +19791,34 @@ test.describe('Q2128 桌面设备维保记录表头空态', () => {
   });
 });
 
+test.describe('Q2129 桌面维保列表列头空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/maintenance 空态「资产ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await expect(page.getByText('资产ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/maintenance 空态「维保类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await expect(page.getByText('维保类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/maintenance 空态「维保日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await expect(page.getByText('维保日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
