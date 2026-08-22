@@ -768,5 +768,6 @@
 - Q2657：/idle 部门/闲置天数/状态表头 **3 passed**。`4192b12a1`
 - Q2658：/idle 操作表头/标题/暂无数据 **3 passed**。`343223599`
 - Q2659：/equipment 新建维保记录/搜索/标题 **3 passed**。`51261d60d`
-- Q2660：/equipment 暂无设备/最近维保/暂无维保 **3 passed**。
+- Q2660：/equipment 暂无设备/最近维保/暂无维保 **3 passed**。`0efb523c3`
+- Q2661：/equipment 设备名称/设备ID/上次维保表头 **3 passed**。
 
