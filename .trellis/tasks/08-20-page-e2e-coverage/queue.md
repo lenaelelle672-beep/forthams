@@ -1934,4 +1934,5 @@
 | Q2744 | done | 桌面空态 **3 passed**（/disposals 申请日期/状态/操作表头）。禁 /m。 |
 | Q2745 | done | 桌面空态 **3 passed**（/disposals 资产清退/工单管理/全周期）。禁 /m。 |
 | Q2746 | done | 桌面空态 **3 passed**（/disposals 报废转让/资产赔偿/资产调拨）。禁 /m。 |
-| Q2747 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2747 | done | 桌面空态 **3 passed**（/disposals 清退列表/提示/新建文案）。禁 /m。 |
+| Q2748 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
