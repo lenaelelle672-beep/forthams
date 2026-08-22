@@ -1406,4 +1406,5 @@
 | Q2216 | done | 桌面空态 **3 passed**（/inspections/new 检验人/发现/证书 placeholder）。禁 /m。 |
 | Q2217 | done | 桌面空态 **3 passed**（/inspections/new 资产ID/模板/附件 placeholder）。禁 /m。 |
 | Q2218 | done | 桌面空态 **3 passed**（/revaluations/new「新增减值/重估」「查找」「返回列表」）。禁 /m。 |
-| Q2219 | in_progress | 桌面空态：/revaluations/new「类型」「减值」「重估」。禁 /m。 |
+| Q2219 | done | 桌面空态 **3 passed**（/revaluations/new「类型」「减值」exact、「重估」exact）。禁 /m。 |
+| Q2220 | in_progress | 桌面空态：/revaluations/new「新值」「原因说明」「证据材料」。禁 /m。 |

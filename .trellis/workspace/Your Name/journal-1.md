@@ -326,5 +326,6 @@
 - Q2215：扫码/编号占位/机构占位 **3 passed**。`756f4c105`
 - Q2216：检验人/发现/证书 placeholder **3 passed**。`6804c10c7`
 - Q2217：资产ID/模板/附件 placeholder。templates/records 已饱和。`ee8dd21d5`
-- Q2218：新增减值重估/查找/返回列表。资产 exact 撞不到 label。
+- Q2218：新增减值重估/查找/返回列表。资产 exact 撞不到 label。`02f834872`
+- Q2219：类型/减值 exact/重估 exact **3 passed**。
 
