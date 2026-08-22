@@ -1770,4 +1770,5 @@
 | Q2580 | done | 桌面空态 **3 passed**（/bigscreen 昨日取消/盘点/返库）。禁 /m。 |
 | Q2581 | done | 桌面空态 **3 passed**（/bigscreen 定检/故障/备勤飞机）。禁 /m。 |
 | Q2582 | done | 桌面空态 **3 passed**（/bigscreen 天气因素/航空管制/机械故障）。禁 /m。 |
-| Q2583 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2583 | done | 桌面空态 **3 passed**（/bigscreen 飞机调配/机场原因/旅客原因）。禁 /m。 |
+| Q2584 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
