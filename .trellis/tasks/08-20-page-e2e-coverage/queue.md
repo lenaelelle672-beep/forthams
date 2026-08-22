@@ -1411,4 +1411,5 @@
 | Q2221 | done | 桌面空态 **3 passed**（/revaluations/new「提交申请」「取消」、证据 placeholder）。禁 /m。 |
 | Q2222 | done | 桌面空态 **3 passed**（/assets/new「新建资产」「基本信息」「位置归属」）。禁 /m。 |
 | Q2223 | done | 桌面空态 **3 passed**（/assets/new「财务信息」「资产名称」「附件」。关联资产新建不渲染）。禁 /m。 |
-| Q2224 | in_progress | 桌面空态：/assets/new「资产编号」「资产分类」「状态」。禁 /m。 |
+| Q2224 | done | 桌面空态 **3 passed**（/assets/new「品牌」「资产分类」「状态」。编号新建不渲染）。禁 /m。 |
+| Q2225 | in_progress | 桌面空态：/assets/new「型号」「序列号」「供应商」。禁 /m。 |

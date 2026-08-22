@@ -22451,6 +22451,34 @@ test.describe('Q2223 桌面资产新建其余分区空态', () => {
   });
 });
 
+test.describe('Q2224 桌面资产新建编号分类状态空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态「品牌」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('品牌').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「资产分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('资产分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态「状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByText('状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
