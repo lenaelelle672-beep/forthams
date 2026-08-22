@@ -746,5 +746,6 @@
 - Q2635：/dashboard 核心指标/运营首页 heading/总资产数 **3 passed**。`e2557d79c`
 - Q2636：/dashboard 在用/闲置/待审批 **3 passed**。`8658d5249`
 - Q2637：/dashboard 暂无趋势/分类/工单数据 **3 passed**。`153335e02`
-- Q2638：/dashboard 导出数据/刷新视图/分类分布 heading **3 passed**。
+- Q2638：/dashboard 导出数据/刷新视图/分类分布 heading **3 passed**。`08c3ecec9`
+- Q2639：/dashboard 趋势/工单/维保预警 heading **3 passed**。
 
