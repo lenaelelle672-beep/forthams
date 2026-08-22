@@ -513,5 +513,6 @@
 - Q2402：/insurances 保单总数/生效中/总保费 **3 passed**。`94e56d09d`
 - Q2403：/insurances 财产险/责任险/空表 **3 passed**。`e965b3266`
 - Q2404：/insurances 车险/全部状态/搜索 placeholder **3 passed**。`93f965f1b`
-- Q2405：/insurances 全部类型/起始/结束 **3 passed**。
+- Q2405：/insurances 全部类型/起始/结束 **3 passed**。`421a9479f`
+- Q2406：/spare-parts heading/备件/新增备件 **3 passed**。
 
