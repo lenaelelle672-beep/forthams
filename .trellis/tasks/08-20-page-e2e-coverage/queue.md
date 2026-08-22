@@ -1481,4 +1481,5 @@
 | Q2291 | done | 桌面空态 **3 passed**（workbench 顶栏 aria「全屏」「通知」「用户」）。禁 /m。 |
 | Q2292 | done | 桌面空态 **3 passed**（顶栏「文字设置」「快捷操作」、侧栏「工作台菜单」。运行状态 hidden）。禁 /m。 |
 | Q2293 | done | 桌面空态 **3 passed**（workbench「运营首页真实产品页」「产品页主体」「工作台切换」）。禁 /m。 |
-| Q2294 | in_progress | 桌面空态：/fixed-assets/workbench?menu=orders。禁 /m。 |
+| Q2294 | done | 桌面空态 **3 passed**（「B端工作台预览」「系统管理员」「流程待办」。orders 内嵌未露出）。禁 /m。 |
+| Q2295 | in_progress | 桌面空态：/login5 未覆盖。禁 /m。 |
