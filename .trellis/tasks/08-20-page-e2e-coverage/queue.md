@@ -1096,4 +1096,5 @@
 | Q1906 | done | 桌面空态 **3 passed**（/stocktaking-cycles/1「分配任务」「盘点任务列表」「E2E周期」）。禁 /m。 |
 | Q1907 | done | 桌面空态 **3 passed**（/stocktaking-cycles/1「状态」「类型」「开始时间」）。禁 /m。 |
 | Q1908 | done | 桌面空态 **3 passed**（/stocktaking-cycles/1「结束时间」「已计划」「操作」）。禁 /m。 |
-| Q1909 | in_progress | 桌面空态：/inventory/cycle-count「循环盘点规则配置（ABC分类）」「触发A类盘点」+ 说明「A类（关键资产）」。禁 /m。 |
+| Q1909 | done | 桌面空态 **3 passed**（/inventory/cycle-count「循环盘点规则配置（ABC分类）」「触发A类盘点」「A类（关键资产）」）。禁 /m。 |
+| Q1910 | in_progress | 桌面空态：/inventory/cycle-count 列头「分类」「盘点频率」「最小价值」。禁 /m。 |
