@@ -1616,4 +1616,5 @@
 | Q2426 | done | 桌面空态 **3 passed**（/stocktaking-cycles heading/副标题/新建周期）。禁 /m。 |
 | Q2427 | done | 桌面空态 **3 passed**（/stocktaking-cycles 总周期/已计划/空表）。禁 /m。 |
 | Q2428 | done | 桌面空态 **3 passed**（/stocktaking-cycles 已暂停/全部状态/进行中）。禁 /m。 |
-| Q2429 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2429 | done | 桌面空态 **3 passed**（/inspection-templates 标题/新增模板/名称 placeholder）。禁 /m。 |
+| Q2430 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

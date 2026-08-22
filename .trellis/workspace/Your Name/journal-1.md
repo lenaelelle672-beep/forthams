@@ -536,5 +536,6 @@
 - Q2425：/maintenance/plans 刷新/全部状态/暂停 **3 passed**。`f4d4133b1`
 - Q2426：/stocktaking-cycles heading/副标题/新建周期 **3 passed**。`099c765bd`
 - Q2427：/stocktaking-cycles 总周期/已计划/空表 **3 passed**。`02304359a`
-- Q2428：/stocktaking-cycles 已暂停/全部状态/进行中 **3 passed**。
+- Q2428：/stocktaking-cycles 已暂停/全部状态/进行中 **3 passed**。`6775f4384`
+- Q2429：/inspection-templates 标题/新增模板/名称 placeholder **3 passed**。
 
