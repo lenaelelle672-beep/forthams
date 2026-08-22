@@ -1232,4 +1232,6 @@
 | Q2042 | done | 桌面空态 **3 passed**（/depreciation「净值」「状态」、/revaluations「资产减值/重估」）。禁 /m。 |
 | Q2043 | done | 桌面空态 **3 passed**（/revaluations「价值调整」「资产价值调整记录」「条记录」）。禁 /m。 |
 | Q2044 | done | 桌面空态 **3 passed**（/revaluations 表头「类型」「新值」「差额」）。禁 /m。 |
-| Q2045 | in_progress | 桌面空态：/revaluations 表头「查看」或换 /fault-codes。禁 /m。 |
+| Q2045 | done | 桌面空态 **3 passed**（/fault-codes「故障代码管理」「故障代码」、点新增「新增故障代码」）。禁 /m。 |
+| Q2046 | done | 桌面空态 **3 passed**（/fault-codes 点新增「故障编码 *」「故障现象」「排序号」）。禁 /m。 |
+| Q2047 | in_progress | 桌面空态：/fault-codes 点新增 placeholder/创建/取消。禁 /m。 |
