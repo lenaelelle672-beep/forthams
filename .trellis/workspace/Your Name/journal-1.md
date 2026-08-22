@@ -647,5 +647,6 @@
 - Q2536：/intake/new 选择地点/12/入库资产 **3 passed**。`016543b3a`
 - Q2537：/intake/new 资产#1/添加/资产名称* **3 passed**。`03db236c7`
 - Q2538：/intake/new 资产编号/资产分类/填写验收信息 **3 passed**。`7961e3820`
-- Q2539：/intake/new 存放地点/保修期/创建验收单 **3 passed**。
+- Q2539：/intake/new 存放地点/保修期/创建验收单 **3 passed**。`2dcf8b25c`
+- Q2540：/insurances/new 保险公司/保费/保额 **3 passed**。
 
