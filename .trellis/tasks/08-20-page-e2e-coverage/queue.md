@@ -1765,4 +1765,5 @@
 | Q2575 | done | 桌面空态 **3 passed**（/workflow-form RETIREMENT 未配置/编码 + COMPENSATION 直接发起）。禁 /m。 |
 | Q2576 | done | 桌面空态 **3 passed**（/workflow-form/ASSET_RETIREMENT 编码/未配置/直接发起）。禁 /m。 |
 | Q2577 | done | 桌面空态 **3 passed**（/workflow-form ASSET_RETIREMENT 源码提示 + COMPENSATION/TRANSFER 编码）。禁 /m。 |
-| Q2578 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2578 | done | 桌面空态 **3 passed**（/workflow-form 清退/报废 编码 + COMPENSATION 源码提示）。禁 /m。 |
+| Q2579 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

@@ -685,5 +685,6 @@
 - Q2574：/workflow-form 转移/清退/报废 直接发起 **3 passed**。`ea4263317`
 - Q2575：/workflow-form RETIREMENT 未配置/编码 + COMPENSATION 直接发起 **3 passed**。`ee04454fd`
 - Q2576：/workflow-form/ASSET_RETIREMENT 编码/未配置/直接发起 **3 passed**。`ae5566bdb`
-- Q2577：/workflow-form ASSET_RETIREMENT 源码提示 + COMPENSATION/TRANSFER 编码 **3 passed**。
+- Q2577：/workflow-form ASSET_RETIREMENT 源码提示 + COMPENSATION/TRANSFER 编码 **3 passed**。`7b550cf2c`
+- Q2578：/workflow-form 清退/报废 编码 + COMPENSATION 源码提示 **3 passed**。
 
