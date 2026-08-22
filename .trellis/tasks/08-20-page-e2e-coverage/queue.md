@@ -1140,4 +1140,5 @@
 | Q1950 | done | 桌面空态 **3 passed**（/risk-matrix 列头「操作」+「暂无矩阵配置」+ 点创建「创建矩阵配置」）。禁 /m。 |
 | Q1951 | done | 桌面空态 **3 passed**（/risk-matrix 点「创建矩阵」后「矩阵名称」+ placeholder「输入矩阵名称」+「概率维度」）。禁 /m。 |
 | Q1952 | done | 桌面空态 **3 passed**（/risk-matrix 点「创建矩阵」后「严重度维度」「等级映射」「添加维度」）。禁 /m。 |
-| Q1953 | in_progress | 桌面空态：/risk-matrix 点「创建矩阵」后「概率维度配置」「创建」「取消」。禁 /m。 |
+| Q1953 | done | 桌面空态 **3 passed**（/risk-matrix 点「创建矩阵」后「概率维度配置」「创建」「取消」）。禁 /m。 |
+| Q1954 | in_progress | 桌面空态：/risk-assessments/1/edit「编辑风险评估」及相关字段（读页确认）。禁 /m。 |
