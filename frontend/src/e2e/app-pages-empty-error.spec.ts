@@ -17796,6 +17796,40 @@ test.describe('Q2062 桌面风险矩阵配置默认维空态', () => {
   });
 });
 
+test.describe('Q2063 桌面风险矩阵配置严重度维空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-matrix 点创建矩阵「一般」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: /创\s*建\s*矩\s*阵/ }).click();
+    await page.getByRole('tab', { name: '严重度维度' }).click();
+    await expect(page.locator('input[value="一般"]')).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/risk-matrix 点创建矩阵「非常严重」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: /创\s*建\s*矩\s*阵/ }).click();
+    await page.getByRole('tab', { name: '严重度维度' }).click();
+    await expect(page.locator('input[value="非常严重"]')).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/risk-matrix 点创建矩阵「灾难性」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await page.getByRole('button', { name: /创\s*建\s*矩\s*阵/ }).click();
+    await page.getByRole('tab', { name: '严重度维度' }).click();
+    await expect(page.locator('input[value="灾难性"]')).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

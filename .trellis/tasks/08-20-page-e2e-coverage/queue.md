@@ -1250,4 +1250,5 @@
 | Q2060 | done | 桌面空态 **3 passed**（/risk-assessments 轴「小」「大」、点单元格「关闭」）。禁 /m。 |
 | Q2061 | done | 桌面空态 **3 passed**（点单元格「风险评估详情」「可能性：」「影响：」）。禁 /m。 |
 | Q2062 | done | 桌面空态 **3 passed**（/risk-matrix 点创建矩阵 input「较低」「较高」、切严重度「轻微」）。禁 /m。 |
-| Q2063 | in_progress | 桌面空态：/risk-matrix 点创建矩阵严重度「一般」「非常严重」「灾难性」。禁 /m。 |
+| Q2063 | done | 桌面空态 **3 passed**（/risk-matrix 点创建矩阵严重度「一般」「非常严重」「灾难性」）。禁 /m。 |
+| Q2064 | in_progress | 桌面空态：/risk-matrix 点等级映射 input CRITICAL/HIGH 或「最低分数」。禁 /m。 |
