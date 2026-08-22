@@ -1132,4 +1132,5 @@
 | Q1942 | done | 桌面空态 **3 passed**（/risk-assessments 列头「缓解措施」「评审日期」「操作」）。禁 /m。 |
 | Q1943 | done | 桌面空态 **3 passed**（/risk-assessments/new「新增风险评估」「资产ID」「可能性（1-5）」）。禁 /m。 |
 | Q1944 | done | 桌面空态 **3 passed**（/risk-assessments/new「影响程度（1-5）」「缓解措施」「评审日期」）。禁 /m。 |
-| Q1945 | in_progress | 桌面空态：/risk-assessments/new「评估人ID」「创建」+ placeholder「输入资产ID」。禁 /m。 |
+| Q1945 | done | 桌面空态 **3 passed**（/risk-assessments/new「评估人ID」「创建」+ placeholder「输入资产ID」）。禁 /m。 |
+| Q1946 | in_progress | 桌面空态：/risk-assessments/new「取消」+ placeholder「描述风险缓解措施」「评估人ID」。禁 /m。 |
