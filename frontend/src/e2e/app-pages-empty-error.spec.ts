@@ -29655,6 +29655,34 @@ test.describe('Q2481 桌面岗位管理标题空态', () => {
   });
 });
 
+test.describe('Q2482 桌面岗位列表统计空表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/posts 空态「岗位列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByText('岗位列表').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/posts 空态「岗位总量」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByText('岗位总量').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/posts 空态「暂无岗位数据，点击「新增岗位」创建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByText('暂无岗位数据，点击「新增岗位」创建').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
