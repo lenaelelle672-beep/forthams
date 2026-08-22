@@ -23930,6 +23930,34 @@ test.describe('Q2276 桌面3D大屏攀枝花与单位空态', () => {
   });
 });
 
+test.describe('Q2277 桌面工作台预览空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workspace-preview 空态「运营首页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByText('运营首页').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workspace-preview 空态「总资产数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByText('总资产数').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workspace-preview 空态「欢迎回来」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workspace-preview');
+    await expect(page.getByText('欢迎回来').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -384,5 +384,6 @@
 - Q2273：重试/无法验证/联系管理员 **3 passed**。`90bba6c7f`
 - Q2274：SSO 登录/Token 缺失/登录失败拆分 **3 passed**。`0c3ea75f4`
 - Q2275：泸州/德阳/自贡。空资产 TOP5 按原序，绵阳不在。`d93f0b9bb`
-- Q2276：攀枝花/件/% **3 passed**。
+- Q2276：攀枝花/件/% **3 passed**。`b8121cfb4`
+- Q2277：workspace-preview 运营首页/总资产数/欢迎回来。与 workbench 同壳。
 
