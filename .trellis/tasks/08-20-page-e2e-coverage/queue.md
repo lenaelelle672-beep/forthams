@@ -1062,4 +1062,5 @@
 | Q1872 | done | 桌面空态 **3 passed**（/borrows/1「预计归还日期」「投影仪」「B-001」）。禁 /m。 |
 | Q1873 | done | 桌面空态 **3 passed**（/assignments/new「新建领用单」「创建领用单」「返回」）。禁 /m。 |
 | Q1874 | done | 桌面空态 **3 passed**（/assignments/new「基本信息」「领用类型」「资产」）。禁 /m。 |
-| Q1875 | in_progress | 桌面空态：/assignments/new 未覆盖 3 条（读 AssignmentFormPage：使用人/使用部门 ID/预计归还日期）。禁 /m。 |
+| Q1875 | done | 桌面空态 **3 passed**（/assignments/new「使用人」「使用部门 ID」「预计归还日期」）。禁 /m。 |
+| Q1876 | in_progress | 桌面空态：/assignments/new 未覆盖 3 条（读 AssignmentFormPage：备注/取消/请选择资产）。禁 /m。 |

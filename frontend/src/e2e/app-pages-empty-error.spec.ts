@@ -12454,6 +12454,34 @@ test.describe('Q1874 桌面领用新建字段空态', () => {
   });
 });
 
+test.describe('Q1875 桌面领用新建使用人日期空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assignments/new 空态「使用人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/new');
+    await expect(page.getByText('使用人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/new 空态「使用部门 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/new');
+    await expect(page.getByText('使用部门 ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/new 空态「预计归还日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/new');
+    await expect(page.getByText('预计归还日期').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
