@@ -1892,4 +1892,5 @@
 | Q2702 | done | 桌面空态 **3 passed**（/depreciation 本月总额/待计算/已完成）。禁 /m。 |
 | Q2703 | done | 桌面空态 **3 passed**（/depreciation 全部方法/直线法/双倍余额）。禁 /m。 |
 | Q2704 | done | 桌面空态 **3 passed**（/depreciation 年数总和/工作量/计划标题）。禁 /m。 |
-| Q2705 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2705 | done | 桌面空态 **3 passed**（/depreciation 折旧方法/当期/累计表头）。禁 /m。 |
+| Q2706 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
