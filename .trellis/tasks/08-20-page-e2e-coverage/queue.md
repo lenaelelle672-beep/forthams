@@ -1685,4 +1685,5 @@
 | Q2495 | done | 桌面空态 **3 passed**（/borrows/new 新建借用单/借用信息/归还日期）。禁 /m。 |
 | Q2496 | done | 桌面空态 **3 passed**（/borrows/new 请选择资产/用途/创建）。禁 /m。 |
 | Q2497 | done | 桌面空态 **3 passed**（/assignments/new 新建领用单/基本信息/领用类型）。禁 /m。 |
-| Q2498 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2498 | done | 桌面空态 **3 passed**（/assignments/new 长期领用/使用人/创建）。禁 /m。 |
+| Q2499 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
