@@ -16490,6 +16490,34 @@ test.describe('Q2017 桌面流程表单未配置空态', () => {
   });
 });
 
+test.describe('Q2018 桌面流程表单其他类型空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/ASSET_CLEARANCE 空态「ASSET_CLEARANCE」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_CLEARANCE');
+    await expect(page.getByText('ASSET_CLEARANCE').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ASSET_SCRAP 空态「ASSET_SCRAP」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ASSET_SCRAP');
+    await expect(page.getByText('ASSET_SCRAP').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/RETIREMENT 空态「RETIREMENT」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/RETIREMENT');
+    await expect(page.getByText('RETIREMENT').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
