@@ -1784,4 +1784,5 @@
 | Q2594 | done | 桌面空态 **3 passed**（/bigscreen 34.2%/4.8万/10）。禁 /m。 |
 | Q2595 | done | 桌面空态 **3 passed**（/bigscreen 王珂玉/吴菲菲段琪/湿度52%）。禁 /m。 |
 | Q2596 | done | 桌面空态 **3 passed**（/bigscreen 风速/多云/星期四）。禁 /m。 |
-| Q2597 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2597 | done | 桌面空态 **3 passed**（/bigscreen 英文副标题/2/15）。禁 /m。 |
+| Q2598 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
