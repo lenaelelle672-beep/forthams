@@ -1646,4 +1646,5 @@
 | Q2456 | done | 桌面空态 **3 passed**（/disposals 空表/新建清退/资产调拨）。禁 /m。 |
 | Q2457 | done | 桌面空态 **3 passed**（/profile 当前套餐/系统管理员 + /retirement 首页）。禁 /m。 |
 | Q2458 | done | 桌面空态 **3 passed**（/gis heading/副标题/资产定位管理）。禁 /m。 |
-| Q2459 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2459 | done | 桌面空态 **3 passed**（/gis 数据来源/关联资产 + /analytics heading）。禁 /m。 |
+| Q2460 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
