@@ -1066,4 +1066,5 @@
 | Q1876 | done | 桌面空态 **3 passed**（/assignments/new「备注」「取消」「长期领用」）。禁 /m。 |
 | Q1877 | done | 桌面空态 **3 passed**（/assignments/new「短期借用」「归还入库」「调拨转移」）。禁 /m。 |
 | Q1878 | done | 桌面空态 **3 passed**（/assignments/new placeholder「使用人 ID」「使用部门 ID」「备注」）。禁 /m。 |
-| Q1879 | in_progress | 桌面空态：/borrows/new 未覆盖 3 条（读 BorrowFormPage：新建借用单/创建借用单/返回）。禁 /m。 |
+| Q1879 | done | 桌面空态 **3 passed**（/borrows/new「新建借用单」「创建借用单」「返回」）。禁 /m。 |
+| Q1880 | in_progress | 桌面空态：/borrows/new 未覆盖 3 条（读 BorrowFormPage：借用信息/资产/预计归还日期）。禁 /m。 |
