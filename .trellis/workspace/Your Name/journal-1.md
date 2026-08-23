@@ -1204,4 +1204,5 @@
 - Q3747–Q3754：**24 passed**。续 Q3755–Q3762：运行监控 timeout-records/审批实例摘要、审计 stats/trends/meta/GET 族、岗位 posts 端点与 metadata-only 标志。禁 /m。
 - Q3755–Q3762：**24 passed**。续 Q3763–Q3770：运行监控整句、审计 {id}/导出限制、岗位 preview 字段、缓存白名单、流程控制台只读聚合。禁 /m。
 - Q3763–Q3770：**24 passed**。Q3768 须 `mockCacheNamespacesEmpty`。续 Q3771–Q3778：控制台长路径、租户整句、技术支持/导入导出/交接/文档/流程邮件说明余项。禁 /m。
+- Q3771–Q3778：**24 passed**。续 Q3779–Q3786：用户检索整句、基础参数 DEGRADED、资产分类 list/tree、安全策略 no-login-chain、控制台整段与交接写边界。禁 /m。
 

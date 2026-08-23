@@ -66535,6 +66535,238 @@ test.describe('Q3778 桌面流程控制台风险提示闭环组合空态', () =>
 
 });
 
+test.describe('Q3779 桌面用户管理检索说明整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-user-management 「只读展示 /user-management/list 返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-user-management');
+    await expect(page.getByText('只读展示 /user-management/list 返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-user-management 「返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-user-management');
+    await expect(page.getByText('返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-user-management 「用户，搜索调用后端 keyword，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-user-management');
+    await expect(page.getByText('用户，搜索调用后端 keyword，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3780 桌面基础参数接口与覆盖说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「真实调用 /system-config/system 与 /system/configs」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('真实调用 /system-config/system 与 /system/configs').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「也不代表 Workbench V3 全量完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('也不代表 Workbench V3 全量完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3781 桌面基础参数预演与 DEGRADED 说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「预演不会持久化，缓存刷新无真实缓存时必须显示 DEGRADED」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('预演不会持久化，缓存刷新无真实缓存时必须显示 DEGRADED').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「缓存刷新无真实缓存时必须显示 DEGRADED」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('缓存刷新无真实缓存时必须显示 DEGRADED').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「本页展示基础参数目录、保存、影响预演与缓存刷新结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('本页展示基础参数目录、保存、影响预演与缓存刷新结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3782 桌面资产分类 list/tree 检索整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-asset-category 「只读展示分类列表与分类树，搜索仅调用 /categories/list 查询能力」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-asset-category');
+    await expect(page.getByText('只读展示分类列表与分类树，搜索仅调用 /categories/list 查询能力').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-asset-category 「分类列表与分类树，搜索仅调用 /categories/list 查询能力」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-asset-category');
+    await expect(page.getByText('分类列表与分类树，搜索仅调用 /categories/list 查询能力').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-asset-category 「/categories/list 查询能力」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-asset-category');
+    await expect(page.getByText('/categories/list 查询能力').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3783 桌面安全策略 no-login-chain 组合空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「no-login-chain / no-direct-effect」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('no-login-chain / no-direct-effect').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「真实调用 /system-config/security 与 /system-config/security/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('真实调用 /system-config/security 与 /system-config/security/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「不改变会话、MFA 或移动端运行状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('不改变会话、MFA 或移动端运行状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3784 桌面安全策略配置态预览说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「本页只展示配置态、预览态和审计摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('本页只展示配置态、预览态和审计摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「配置态、预览态和审计摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('配置态、预览态和审计摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「本模块不接登录链路、不直接生效」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('本模块不接登录链路、不直接生效').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3785 桌面流程控制台 subtitle 整段余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCommandCenterEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「只读聚合 /workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records，展示流程模板、运行实例、SLA 风险摘要与超时记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('只读聚合 /workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records，展示流程模板、运行实例、SLA 风险摘要与超时记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「与 /sla-config/timeout-records，展示流程模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('与 /sla-config/timeout-records，展示流程模板').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「运行实例、SLA 风险摘要与超时记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('运行实例、SLA 风险摘要与超时记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3786 桌面交接写操作边界长组合空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-handover 「发起、推进、取消交接等写操作不在 V3 只读 catalog 范围内」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('发起、推进、取消交接等写操作不在 V3 只读 catalog 范围内').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-handover 「本页仅展示交接任务摘要与状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('本页仅展示交接任务摘要与状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-handover 「真实资产/工单/审批对象转移未闭环，需后续专项处理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('真实资产/工单/审批对象转移未闭环，需后续专项处理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
