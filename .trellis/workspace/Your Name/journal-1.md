@@ -1056,5 +1056,6 @@
 - Q2945：workbench 个人中心 + /system/users 正常/停用 **3 passed**。`dc7b816ee`
 - Q2946：/approvals 至 + /users 全部 + /insurances 保单号 **3 passed**。`4751e5f81`
 - Q2947：/insurances/new 保险名称/类型/公司 **3 passed**。`65ef91a91`
-- Q2948：/insurances/new 保费/保额/免赔额 **3 passed**。
+- Q2948：/insurances/new 保费/保额/免赔额 **3 passed**。`ec3d2c1a1`
+- Q2949：/insurances/new 开始日期/结束日期/状态 **3 passed**。
 
