@@ -2280,21 +2280,33 @@
 | Q3090 | done | 桌面空态 **3 passed**（位置 textbox 名称/编码 + heading）。禁 /m。 |
 | Q3091 | done | 桌面空态 **3 passed**（供应商 取消/确认新增 + heading）。禁 /m。 |
 | Q3092 | done | 桌面空态 **3 passed**（维保计划切每年/手动 spinbutton）。禁 /m。 |
-| Q3093 | in_progress | 桌面空态：岗位 spinbutton 排序 + 确认新增 + heading。禁 /m。 |
-| Q3094 | pending | 桌面空态：部门 textbox 电话/邮箱 + spinbutton 排序。禁 /m。 |
-| Q3095 | pending | 桌面空态：位置 button 取消/确认新增 + placeholder。禁 /m。 |
-| Q3096 | pending | 桌面空态：故障码 textbox 编码/现象 + spinbutton 排序。禁 /m。 |
-| Q3097 | pending | 桌面空态：分类 textbox 名称/编码 + button 创建。禁 /m。 |
-| Q3098 | pending | 桌面空态：检验模板 textbox/combobox/spinbutton。禁 /m。 |
-| Q3099 | pending | 桌面空态：检验模板 textbox 类别/检查项 + 状态。禁 /m。 |
-| Q3100 | pending | 桌面空态：模型 字段集/状态 + 创建模型。禁 /m。 |
-| Q3101 | pending | 桌面空态：用户 取消/heading + 初始密码。禁 /m。 |
-| Q3102 | pending | 桌面空态：许可证 取消/授权类型 + 版本占位。禁 /m。 |
-| Q3103 | pending | 桌面空态：合同 货币/状态/开始日期。禁 /m。 |
-| Q3104 | pending | 桌面空态：制造商 placeholder 名称/编码/地址。禁 /m。 |
-| Q3105 | pending | 桌面空态：供应商 placeholder 名称/编码/地址。禁 /m。 |
-| Q3106 | pending | 桌面空态：维保切每周 星期几 + 岗位占位 + 部门 heading。禁 /m。 |
-| Q3107 | pending | 桌面空态：角色 placeholder 名称/编码/描述。禁 /m。 |
-| Q3108 | pending | 桌面空态：菜单 placeholder/heading。禁 /m。 |
-| Q3109 | pending | 桌面空态：部门 确认新增/取消 + select 顶级部门。禁 /m。 |
-| Q3110 | pending | 桌面空态：平面图取消 + 用户部门 + 许可证购买日期。禁 /m。 |
+| Q3093 | done | 桌面空态 **3 passed**（岗位 排序/确认新增 + CEO 占位）。禁 /m。 |
+| Q3094 | done | 桌面空态 **3 passed**（部门 textbox 电话/邮箱 + 排序）。禁 /m。 |
+| Q3095 | done | 桌面空态 **3 passed**（位置 取消/确认新增 + 占位）。禁 /m。 |
+| Q3096 | done | 桌面空态 **3 passed**（故障码 textbox 编码/现象 + 排序）。禁 /m。 |
+| Q3097 | done | 桌面空态 **3 passed**（分类 textbox 名称/编码 + 创建）。禁 /m。 |
+| Q3098 | done | 桌面空态 **3 passed**（检验模板 textbox/combobox/spinbutton）。禁 /m。 |
+| Q3099 | done | 桌面空态 **3 passed**（检验模板 类别/检查项 + 状态）。禁 /m。 |
+| Q3100 | done | 桌面空态 **3 passed**（模型 字段集/状态 + 创建模型）。禁 /m。 |
+| Q3101 | done | 桌面空态 **3 passed**（用户 取消/分配角色 + 初始密码）。禁 /m。 |
+| Q3102 | done | 桌面空态 **3 passed**（许可证 取消/授权类型 + 版本占位）。禁 /m。 |
+| Q3103 | done | 桌面空态 **3 passed**（合同 货币/状态/开始日期）。禁 /m。 |
+| Q3104 | done | 桌面空态 **3 passed**（制造商 placeholder 名称/编码/地址）。禁 /m。 |
+| Q3105 | done | 桌面空态 **3 passed**（供应商 placeholder 名称/编码/地址）。禁 /m。 |
+| Q3106 | done | 桌面空态 **3 passed**（维保每周 星期几 + 岗位占位 + 部门类型）。禁 /m。 |
+| Q3107 | done | 桌面空态 **3 passed**（角色 placeholder 名称/编码/描述）。禁 /m。 |
+| Q3108 | done | 桌面空态 **3 passed**（菜单 placeholder 名称/路由/组件）。禁 /m。 |
+| Q3109 | done | 桌面空态 **3 passed**（部门 确认新增/取消 + 顶级部门）。禁 /m。 |
+| Q3110 | done | 桌面空态 **3 passed**（平面图取消 + 所属部门 + 购买日期）。禁 /m。 |
+| Q3111 | in_progress | 桌面空态：风险评估 spinbutton 资产ID + combobox 可能/影响。禁 /m。 |
+| Q3112 | pending | 桌面空态：风险评估 textbox 缓解/评审 + spinbutton 评估人。禁 /m。 |
+| Q3113 | pending | 桌面空态：风险评估 button 创建/取消 + 请选择概率。禁 /m。 |
+| Q3114 | pending | 桌面空态：检验模板 placeholder + button 确定。禁 /m。 |
+| Q3115 | pending | 桌面空态：故障码 placeholder + button 创建。禁 /m。 |
+| Q3116 | pending | 桌面空态：分类 button 取消 + 创建一个新的根分类。禁 /m。 |
+| Q3117 | pending | 桌面空态：岗位 button 取消 + 状态 + 名称占位。禁 /m。 |
+| Q3118 | pending | 桌面空态：部门 领导/秘书/状态。禁 /m。 |
+| Q3119 | pending | 桌面空态：用户 分配岗位/状态 + 制造商联系人占位。禁 /m。 |
+| Q3120 | pending | 桌面空态：制造商 placeholder 电话/邮箱/官网。禁 /m。 |
+| Q3121 | pending | 桌面空态：供应商 placeholder 联系人/电话/邮箱。禁 /m。 |
+| Q3122 | pending | 桌面空态：检验模板 取消 + 合同到期日期 + 许可证到期日期。禁 /m。 |
