@@ -1259,4 +1259,5 @@
 - Q4050–Q4055：**18 passed**。Q4053 勿测「暂无统计数据」（summary 对象 truthy 会出处置图）。续 Q4056–Q4059：检验上传 heading/button、资产趋势分区 exact heading。下一票 Q4060。禁 /m。
 - Q4056–Q4059：**12 passed**。续 Q4060–Q4062：检验上传分区 heading「上传新照片/已上传照片/共 0 张」。下一票 Q4063。禁 /m。
 - Q4060–Q4062：**9 passed**。续 Q4063：报废/调拨空态整句后半段 heading。勿再测已绿「暂无已选资产」。下一票 Q4064。禁 /m。
+- Q4063：**3 passed**。下一票 Q4064：继续桌面真页未用 heading/button。禁 /m。
 
