@@ -69788,6 +69788,238 @@ test.describe('Q3890 桌面通知开关/偏好 coverage 余项空态', () => {
 
 });
 
+test.describe('Q3891 桌面邮件日志 redaction 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「收件人、抄送、密送、发件人、主题、正文、错误、供应商标识、请求标识、头信息与载荷只展示掩码或诊断摘要。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('收件人、抄送、密送、发件人、主题、正文、错误、供应商标识、请求标识、头信息与载荷只展示掩码或诊断摘要。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「发件人、主题、正文、错误、供应商标识、请求标识、头信息与载荷只展示掩码或诊断摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('发件人、主题、正文、错误、供应商标识、请求标识、头信息与载荷只展示掩码或诊断摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「仍非 44/44，不代表 Workbench V3 全量完成；消息与通知组未全组完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('仍非 44/44，不代表 Workbench V3 全量完成；消息与通知组未全组完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3892 桌面自定义字段 preview 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「preview 仅按当前租户字段定义校验 required/type/options/regex，返回 valid、missing、rejected、errors、usedFields、tenantScoped、noPersistence 与 runtimeEffect=false；加密字段只展示安全标记，不回显样例原文。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('preview 仅按当前租户字段定义校验 required/type/options/regex，返回 valid、missing、rejected、errors、usedFields、tenantScoped、noPersistence 与 runtimeEffect=false；加密字段只展示安全标记，不回显样例原文。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「返回 valid、missing、rejected、errors、usedFields、tenantScoped、noPersistence 与 runtimeEffect=false」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('返回 valid、missing、rejected、errors、usedFields、tenantScoped、noPersistence 与 runtimeEffect=false').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不代表字段集完成，不代表资产字段值读写链路完成，不代表基础资料组完成，不代表 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('不代表字段集完成，不代表资产字段值读写链路完成，不代表基础资料组完成，不代表 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3893 桌面邮件模板 previewPolicy 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「preview 只返回 HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true。敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('preview 只返回 HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true。敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「不代表邮件子系统完成，不代表消息与通知全组完成，不代表 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('不代表邮件子系统完成，不代表消息与通知全组完成，不代表 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3894 桌面通知模板 previewPolicy 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates 「preview 只返回 HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true。敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByText('preview 只返回 HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true。敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates 「敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByText('敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates 「不代表消息与通知全组完成，不代表 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByText('不代表消息与通知全组完成，不代表 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3895 桌面邮件日志 redaction 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「供应商标识、请求标识、头信息与载荷只展示掩码或诊断摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('供应商标识、请求标识、头信息与载荷只展示掩码或诊断摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「不代表 Workbench V3 全量完成；消息与通知组未全组完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('不代表 Workbench V3 全量完成；消息与通知组未全组完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「主题、正文、错误、供应商标识、请求标识、头信息与载荷」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('主题、正文、错误、供应商标识、请求标识、头信息与载荷').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3896 桌面自定义字段完成边界余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不代表资产字段值读写链路完成，不代表基础资料组完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('不代表资产字段值读写链路完成，不代表基础资料组完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「usedFields、tenantScoped、noPersistence 与 runtimeEffect=false」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('usedFields、tenantScoped、noPersistence 与 runtimeEffect=false').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「required/type/options/regex，返回 valid、missing、rejected、errors」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('required/type/options/regex，返回 valid、missing、rejected、errors').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3897 桌面邮件模板敏感变量拒绝整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('敏感变量名（password/token/secret/apiKey/clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken）会被拒绝。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「不代表邮件子系统完成，不代表消息与通知全组完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('不代表邮件子系统完成，不代表消息与通知全组完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3898 桌面通知模板敏感变量拒绝余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates 「HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByText('HTML escaped 结果、missingVariables、rejectedVariables、usedVariables 与 nonPersistent=true').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates 「clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByText('clientSecret/privateKey/authorization/cookie/credential/accessKey/refreshToken').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates 「password/token/secret/apiKey/clientSecret/privateKey」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByText('password/token/secret/apiKey/clientSecret/privateKey').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
