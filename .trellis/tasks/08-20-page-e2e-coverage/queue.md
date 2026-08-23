@@ -2153,4 +2153,5 @@
 | Q2963 | done | 桌面空态 **3 passed**（/reports/scheduled 新建/描述 + /reports 近12个月）。禁 /m。 |
 | Q2964 | done | 桌面空态 **3 passed**（/reports/scheduled 标题/暂无配置/开始创建）。禁 /m。 |
 | Q2965 | done | 桌面空态 **3 passed**（/login 运行稳定/宇视科技/智能运维入口）。禁 /m。 |
-| Q2966 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2966 | done | 桌面空态 **3 passed**（/login 欢迎回来/登录系统/记住用户名）。禁 /m。 |
+| Q2967 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
