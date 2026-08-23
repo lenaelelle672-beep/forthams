@@ -2974,11 +2974,19 @@
 | Q3784 | done | 桌面空态 **3 passed**（安全策略配置态预览说明）。禁 /m。 |
 | Q3785 | done | 桌面空态 **3 passed**（流程控制台 subtitle 整段余项）。禁 /m。 |
 | Q3786 | done | 桌面空态 **3 passed**（交接写操作边界长组合）。禁 /m。 |
-| Q3787 | pending | 桌面空态：SLA 配置端点族整句。禁 /m。 |
-| Q3788 | pending | 桌面空态：SLA 运行态安全边界长组合。禁 /m。 |
-| Q3789 | pending | 桌面空态：审批规则表达式白名单整句。禁 /m。 |
-| Q3790 | pending | 桌面空态：文档中心写操作边界长组合。禁 /m。 |
-| Q3791 | pending | 桌面空态：技术支持诊断包脱敏长组合。禁 /m。 |
-| Q3792 | pending | 桌面空态：SLA simulate/runtime-summary 路径余项。禁 /m。 |
-| Q3793 | pending | 桌面空态：审批规则白名单整段余项。禁 /m。 |
-| Q3794 | pending | 桌面空态：流程邮件写操作与零调用风险。禁 /m。 |
+| Q3787 | done | 桌面空态 **3 passed**（SLA 配置端点族整句）。禁 /m。 |
+| Q3788 | done | 桌面空态 **3 passed**（SLA 运行态安全边界长组合）。禁 /m。 |
+| Q3789 | done | 桌面空态 **3 passed**（审批规则表达式白名单整句）。禁 /m。 |
+| Q3790 | done | 桌面空态 **3 passed**（文档中心写操作边界长组合）。禁 /m。 |
+| Q3791 | done | 桌面空态 **3 passed**（技术支持诊断包脱敏长组合）。禁 /m。 |
+| Q3792 | done | 桌面空态 **3 passed**（SLA simulate/runtime-summary 路径余项）。禁 /m。 |
+| Q3793 | done | 桌面空态 **3 passed**（审批规则白名单整段余项）。禁 /m。 |
+| Q3794 | done | 桌面空态 **3 passed**（流程邮件写操作与零调用风险）。禁 /m。 |
+| Q3795 | pending | 桌面空态：通知偏好 category/meta/preview 端点。禁 /m。 |
+| Q3796 | pending | 桌面空态：通知偏好 metadata-only 边界加号。禁 /m。 |
+| Q3797 | pending | 桌面空态：通知渠道 {id}/meta/preview 端点。禁 /m。 |
+| Q3798 | pending | 桌面空态：通知渠道无发送无外联边界。禁 /m。 |
+| Q3799 | pending | 桌面空态：编号规则 ruleKey/meta/preview 端点。禁 /m。 |
+| Q3800 | pending | 桌面空态：编号规则 catalog + dry-run 边界。禁 /m。 |
+| Q3801 | pending | 桌面空态：通知偏好 preview 端点组合。禁 /m。 |
+| Q3802 | pending | 桌面空态：通知渠道 preview 端点组合。禁 /m。 |
