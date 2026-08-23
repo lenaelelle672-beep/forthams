@@ -62738,7 +62738,7 @@ test.describe('Q3647 桌面通知偏好未用 combobox 空态', () => {
 
 test.describe('Q3648 桌面 Webhook 未用签名策略 combobox 空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockWebhookConfigsEmpty);
     await seedSession(page, adminUser);
   });
 
