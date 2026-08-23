@@ -3102,7 +3102,15 @@
 | Q3912 | done | 桌面空态 **3 passed**（转移申请未用 link/heading）。禁 /m。 |
 | Q3913 | done | 桌面空态 **3 passed**（清退申请未用 link/heading）。禁 /m。 |
 | Q3914 | done | 桌面空态 **3 passed**（赔偿/清退未用 heading/link）。禁 /m。 |
-| Q3915 | pending | 桌面空态 借用 heading/退役余句。禁 /m。 |
-| Q3916 | pending | 桌面空态 退役/报废未用余句。禁 /m。 |
-| Q3917 | pending | 桌面空态 报废/清退/转移未用余句。禁 /m。 |
-| Q3918 | pending | 桌面空态 转移/清退/报废未用余句。禁 /m。 |
+| Q3915 | done | 桌面空态 **3 passed**（借用 heading/退役余句）。禁 /m。 |
+| Q3916 | done | 桌面空态 **3 passed**（退役/报废未用余句；默认 sell 为 medium 风险条）。禁 /m。 |
+| Q3917 | done | 桌面空态 **3 passed**（报废/清退/转移未用余句）。禁 /m。 |
+| Q3918 | done | 桌面空态 **3 passed**（转移/清退/报废未用余句）。禁 /m。 |
+| Q3919 | pending | 桌面空态 工单/资产/退役未用角色。禁 /m。 |
+| Q3920 | pending | 桌面空态 新建资产未用 heading。禁 /m。 |
+| Q3921 | pending | 桌面空态 报废/转移未用空资产整句。禁 /m。 |
+| Q3922 | pending | 桌面空态 转移/预算/重估未用余句。禁 /m。 |
+| Q3923 | pending | 桌面空态 报废/赔偿未用金额标签。禁 /m。 |
+| Q3924 | pending | 桌面空态 赔偿/转移未用流程余句。禁 /m。 |
+| Q3925 | pending | 桌面空态 转移未用计数/必填。禁 /m。 |
+| Q3926 | pending | 桌面空态 退役列表未用空态余句。禁 /m。 |

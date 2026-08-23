@@ -1222,4 +1222,5 @@
 - Q3891–Q3898：**24 passed**。续 Q3899–Q3906：审计采集/导出整句与表单配置/流程设计器 fail-closed 整句。禁 /m。
 - Q3899–Q3906：**24 passed**。续 Q3907–Q3914：工单/退役/验收/风险/处置新建未用 textbox/button/link/heading。避开未挂路由的 retirement/new.tsx 与 HistoryView。禁 /m。
 - Q3907–Q3914：**24 passed**。续 Q3915–Q3918：借用 heading 与退役/报废/清退/转移未用余句。禁 /m。
+- Q3915–Q3918：**12 passed**。Q3916 报废默认 sell 为 medium 风险条，已改为可见整句。续 Q3919–Q3926：工单/资产/退役未用角色、报废/转移空资产整句与金额标签。禁 /m。
 
