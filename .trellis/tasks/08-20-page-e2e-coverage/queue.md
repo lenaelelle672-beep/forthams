@@ -2164,4 +2164,5 @@
 | Q2974 | done | 桌面空态 **3 passed**（/login MaxKey/统一认证/UNIVIEW）。禁 /m。 |
 | Q2975 | done | 桌面空态 **3 passed**（/login 固定资产平台/用户名/密码）。禁 /m。 |
 | Q2976 | done | 桌面空态 **3 passed**（/login 平台的/帮助团队/连接台账）。禁 /m。 |
-| Q2977 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2977 | done | 桌面空态 **3 passed**（/login 2026/©/·）。禁 /m。 |
+| Q2978 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
