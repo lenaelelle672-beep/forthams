@@ -1034,5 +1034,6 @@
 - Q2923：/system/posts 岗位编码/名称/创建时间 **3 passed**。`377b84811`
 - Q2924：/system/posts 备注/岗位/搜索 **3 passed**。`61dafdb1d`
 - Q2925：/system/posts 正常/停用 + /system/menus 新增菜单 **3 passed**。`6ba07eff4`
-- Q2926：/system/menus 标题/描述/暂无数据 **3 passed**。
+- Q2926：/system/menus 标题/描述/暂无数据 **3 passed**。`9a52c2260`
+- Q2927：/system/menus 树形/目录/总计 **3 passed**。
 
