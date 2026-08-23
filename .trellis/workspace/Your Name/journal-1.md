@@ -990,5 +990,6 @@
 - Q2879：/disposals/transfer/new 基础信息填写/选择调拨资产/流程配置 **3 passed**。`3abea45e3`
 - Q2880：/disposals/transfer/new 提交状态/完成/说明placeholder **3 passed**。`297a860d6`
 - Q2881：/disposals/transfer/new 备注/新建/描述 **3 passed**。`20aa050ce`
-- Q2882：/depreciation 批量计算/查询/重置 **3 passed**。
+- Q2882：/depreciation 批量计算/查询/重置 **3 passed**。`130d1e663`
+- Q2883：/depreciation 折旧管理/计划管理/暂无数据 **3 passed**。
 
