@@ -452,7 +452,7 @@ function MenuAssignDialog({
                 />
               ))
             ) : (
-              <div className="text-sm text-slate-400 text-center py-8">暂无菜单数据</div>
+              <h3 className="text-sm font-medium text-slate-400 text-center py-8">暂无菜单数据</h3>
             )}
           </div>
         </div>
@@ -578,7 +578,7 @@ function DeptAssignDialog({
                 );
               })
             ) : (
-              <div className="text-sm text-slate-400 text-center py-8">暂无部门数据</div>
+              <h3 className="text-sm font-medium text-slate-400 text-center py-8">暂无部门数据</h3>
             )}
           </div>
         </div>
