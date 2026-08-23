@@ -44676,6 +44676,34 @@ test.describe('Q3024 桌面审计日志分页空态', () => {
   });
 });
 
+test.describe('Q3025 桌面审计日志描述空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/audit 空态「按最近 7 天汇总操作趋势、风险事件和操作人分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit');
+    await expect(page.getByText('按最近 7 天汇总操作趋势、风险事件和操作人分布').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit 空态 heading「操作趋势（近7天）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit');
+    await expect(page.getByRole('heading', { name: '操作趋势（近7天）' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/audit 空态 heading「操作类型分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit');
+    await expect(page.getByRole('heading', { name: '操作类型分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
