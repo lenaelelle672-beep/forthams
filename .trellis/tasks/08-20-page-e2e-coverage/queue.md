@@ -3398,11 +3398,11 @@
 | Q4208 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4209 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4210 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4211 | pending | 桌面空态 邮件网关/日志/通知开关未用副文案 heading。禁 /m。 |
-| Q4212 | pending | 桌面空态 自定义字段/岗位/字段集未用副文案 heading。禁 /m。 |
-| Q4213 | pending | 桌面空态 渠道/偏好/编号规则未用副文案 heading。禁 /m。 |
-| Q4214 | pending | 桌面空态 邮件模板/通知模板/基础参数未用副文案 heading。禁 /m。 |
-| Q4215 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4216 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4217 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4218 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4211 | done | 桌面空态 **3 passed**（邮件网关/日志/通知开关未用副文案 heading）。禁 /m。 |
+| Q4212 | done | 桌面空态 **3 passed**（自定义字段/岗位/字段集未用副文案 heading）。禁 /m。 |
+| Q4213 | done | 桌面空态 **3 passed**（渠道/偏好/编号规则未用副文案 heading）。禁 /m。 |
+| Q4214 | done | 桌面空态 **3 passed**（邮件模板/通知模板/基础参数未用副文案 heading）。禁 /m。 |
+| Q4215 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4216 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4217 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4218 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
