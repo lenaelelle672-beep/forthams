@@ -228,7 +228,7 @@ export default function SystemDeptOrgWorkbenchPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">暂无根部门。</p>
+            <h3 className="text-sm font-medium text-slate-500">暂无根部门。</h3>
           )}
         </div>
       </div>

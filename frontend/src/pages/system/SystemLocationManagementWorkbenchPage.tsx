@@ -194,7 +194,7 @@ export default function SystemLocationManagementWorkbenchPage({
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-slate-500">暂无根位置。</p>
+            <h3 className="text-sm font-medium text-slate-500">暂无根位置。</h3>
           )}
         </div>
       </div>

@@ -365,7 +365,7 @@ export default function LocationsPage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold text-[#0f172a]">位置管理</h1>
-              <p className="mt-0.5 text-sm text-[#64748b]">资产存放位置的层级管理</p>
+              <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">资产存放位置的层级管理</h3>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -393,7 +393,7 @@ export default function LocationsPage() {
                 <MapPin className="h-4.5 w-4.5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">总位置数</p>
+                <h3 className="text-xs font-medium text-slate-500">总位置数</h3>
                 <p className="text-lg font-bold text-slate-900">{totalLocations}</p>
               </div>
             </div>
@@ -402,7 +402,7 @@ export default function LocationsPage() {
                 <Layers className="h-4.5 w-4.5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">顶级位置</p>
+                <h3 className="text-xs font-medium text-slate-500">顶级位置</h3>
                 <p className="text-lg font-bold text-slate-900">{rootCount}</p>
               </div>
             </div>
