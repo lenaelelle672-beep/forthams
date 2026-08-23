@@ -2806,4 +2806,12 @@
 | Q3616 | done | 桌面空态 **3 passed**（页脚 审批规则/SLA/表单存储）。禁 /m。 |
 | Q3617 | done | 桌面空态 **3 passed**（六域导航 9/9 6/6 5/5 已接入）。禁 /m。 |
 | Q3618 | done | 桌面空态 **3 passed**（子项导航 complementary/同步 dry-run 说明）。禁 /m。 |
-| Q3619 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3619 | pending | 桌面空态：表单存储闭环提示/uploads 边界。禁 /m。 |
+| Q3620 | pending | 桌面空态：待办字段闭环提示/0 个/列表保存排序。禁 /m。 |
+| Q3621 | pending | 桌面空态：审批规则闭环提示/短数组/脚本引擎。禁 /m。 |
+| Q3622 | pending | 桌面空态：流程通知开关 region/complementary/note。禁 /m。 |
+| Q3623 | pending | 桌面空态：审计日志 complementary/操作类型分布/排行。禁 /m。 |
+| Q3624 | pending | 桌面空态：通知偏好 note/quietWindowMatched。禁 /m。 |
+| Q3625 | pending | 桌面空态：编号规则 note/missingVariables。禁 /m。 |
+| Q3626 | pending | 桌面空态：岗位管理 note/duplicateRisk。禁 /m。 |
+| Q3627 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
