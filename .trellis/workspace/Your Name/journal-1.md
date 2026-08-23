@@ -929,5 +929,7 @@
 - Q2818：/borrows/new 创建借用单/返回/标题 **3 passed**。`06e382b2a`
 - Q2819：/borrows/new 借用信息/归还日期/用途 **3 passed**。`67fd713a6`
 - Q2820：/borrows/new 归还日期*/备注/取消 **3 passed**。`a9c53fe89`
-- Q2821：/assignments/new 创建领用单/返回/标题 **3 passed**。
+- Q2821：/assignments/new 创建领用单/返回/标题 **3 passed**。`2d12d74c4`
+- Q2822：/assignments/new 基本信息/领用类型/使用人 **3 passed**。`219d3bd26`
+- Q2823：/assignments/new 长期领用/短期借用/取消 **3 passed**。
 
