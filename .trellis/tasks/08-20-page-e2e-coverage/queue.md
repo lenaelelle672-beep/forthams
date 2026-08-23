@@ -3199,16 +3199,22 @@
 | Q4009 | done | 桌面空态 **3 passed**（退役详情未用分区 heading）。禁 /m。 |
 | Q4010 | done | 桌面空态 **3 passed**（退役详情未用审批/编号 heading）。禁 /m。 |
 | Q4011 | done | 桌面空态 **3 passed**（退役详情未用空态 heading）。禁 /m。 |
-| Q4012 | pending | 桌面空态 盘点报告未用 heading。禁 /m。 |
-| Q4013 | pending | 桌面空态 盘点报告/任务未用 heading。禁 /m。 |
-| Q4014 | pending | 桌面空态 盘点任务未用分区 heading。禁 /m。 |
-| Q4015 | pending | 桌面空态 盘点任务未用任务名 heading。禁 /m。 |
-| Q4016 | pending | 桌面空态 RFID 扫描未用 heading。禁 /m。 |
-| Q4017 | pending | 桌面空态 处置详情未用 heading。禁 /m。 |
-| Q4018 | pending | 桌面空态 处置/盘点未用 heading/button。禁 /m。 |
-| Q4019 | pending | 桌面空态 盘点/流程表单未用角色。禁 /m。 |
-| Q4020 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4021 | pending | 桌面空态 流程/领用未用 heading。禁 /m。 |
-| Q4022 | pending | 桌面空态 领用详情未用空态 heading。禁 /m。 |
-| Q4023 | pending | 桌面空态 RFID 扫描未用 button。禁 /m。 |
-| Q4024 | pending | 桌面空态 RFID/流程未用空态 heading/link。禁 /m。 |
+| Q4012 | done | 桌面空态 **3 passed**（盘点报告未用 heading）。禁 /m。 |
+| Q4013 | done | 桌面空态 **3 passed**（盘点报告/任务未用 heading）。禁 /m。 |
+| Q4014 | done | 桌面空态 **3 passed**（盘点任务未用分区 heading）。禁 /m。 |
+| Q4015 | done | 桌面空态 **3 passed**（盘点任务未用任务名 heading）。禁 /m。 |
+| Q4016 | done | 桌面空态 **3 passed**（RFID 扫描未用 heading）。禁 /m。 |
+| Q4017 | done | 桌面空态 **3 passed**（处置详情未用 heading）。禁 /m。 |
+| Q4018 | done | 桌面空态 **3 passed**（处置/盘点未用 heading/button）。禁 /m。 |
+| Q4019 | done | 桌面空态 **3 passed**（盘点/流程表单未用角色）。禁 /m。 |
+| Q4020 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4021 | done | 桌面空态 **3 passed**（流程/领用未用 heading）。禁 /m。 |
+| Q4022 | done | 桌面空态 **3 passed**（领用详情未用空态 heading）。禁 /m。 |
+| Q4023 | done | 桌面空态 **3 passed**（RFID 扫描未用 button）。禁 /m。 |
+| Q4024 | done | 桌面空态 **3 passed**（RFID/流程未用空态 heading/link）。禁 /m。 |
+| Q4025 | pending | 桌面空态 审计详情未用 heading。禁 /m。 |
+| Q4026 | pending | 桌面空态 审计详情未用 heading/button。禁 /m。 |
+| Q4027 | pending | 桌面空态 资产详情未用分区 heading。禁 /m。 |
+| Q4028 | pending | 桌面空态 资产/审计未用 heading/link。禁 /m。 |
+| Q4029 | pending | 桌面空态 资产详情未用空态 heading。禁 /m。 |
+| Q4030 | pending | 桌面空态 资产/流程未用空态 heading。禁 /m。 |

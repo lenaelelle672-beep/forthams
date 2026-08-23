@@ -386,7 +386,7 @@ export default function AssetDetailPage() {
             ) : (
               <div className="flex-1 flex flex-col items-center justify-center text-[#94a3b8] dark:text-gray-500 dark:text-gray-400 text-sm min-h-[240px] gap-2">
                 <TrendingDown className="w-10 h-10 opacity-30" />
-                <span>暂无折旧数据</span>
+                <h3 className="text-sm font-medium">暂无折旧数据</h3>
               </div>
             )}
           </CardContent>
@@ -461,7 +461,7 @@ export default function AssetDetailPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-8 text-[#94a3b8] dark:text-gray-500 dark:text-gray-400 gap-2">
                 <BarChart3 className="w-8 h-8 opacity-30" />
-                <span className="text-sm">暂无 TCO 数据</span>
+                <h3 className="text-sm font-medium">暂无 TCO 数据</h3>
               </div>
             )}
           </CardContent>
@@ -533,7 +533,7 @@ export default function AssetDetailPage() {
                 <svg className="w-8 h-8 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
                 </svg>
-                <span className="text-sm">暂无关联子资产</span>
+                <h3 className="text-sm font-medium">暂无关联子资产</h3>
               </div>
             )}
           </CardContent>
@@ -603,7 +603,7 @@ export default function AssetDetailPage() {
                   <History className="w-8 h-8 opacity-40" />
                 </div>
                 <div className="text-center">
-                  <p className="text-base font-medium">暂无变更记录</p>
+                  <h3 className="text-base font-medium">暂无变更记录</h3>
                   <p className="text-xs mt-1 opacity-70">资产的变更历史将在此处显示</p>
                 </div>
               </div>
