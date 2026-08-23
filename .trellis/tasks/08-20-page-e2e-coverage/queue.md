@@ -2966,11 +2966,19 @@
 | Q3776 | done | 桌面空态 **3 passed**（文档中心标题分类版本整句）。禁 /m。 |
 | Q3777 | done | 桌面空态 **3 passed**（流程邮件节点配置说明余项）。禁 /m。 |
 | Q3778 | done | 桌面空态 **3 passed**（流程控制台风险提示闭环组合）。禁 /m。 |
-| Q3779 | pending | 桌面空态：用户管理检索说明整句。禁 /m。 |
-| Q3780 | pending | 桌面空态：基础参数接口与覆盖说明。禁 /m。 |
-| Q3781 | pending | 桌面空态：基础参数预演与 DEGRADED 说明。禁 /m。 |
-| Q3782 | pending | 桌面空态：资产分类 list/tree 检索整句。禁 /m。 |
-| Q3783 | pending | 桌面空态：安全策略 no-login-chain 组合。禁 /m。 |
-| Q3784 | pending | 桌面空态：安全策略配置态预览说明。禁 /m。 |
-| Q3785 | pending | 桌面空态：流程控制台 subtitle 整段余项。禁 /m。 |
-| Q3786 | pending | 桌面空态：交接写操作边界长组合。禁 /m。 |
+| Q3779 | done | 桌面空态 **3 passed**（用户管理检索说明整句）。禁 /m。 |
+| Q3780 | done | 桌面空态 **3 passed**（基础参数接口与覆盖说明）。禁 /m。 |
+| Q3781 | done | 桌面空态 **3 passed**（基础参数预演与 DEGRADED 说明）。禁 /m。 |
+| Q3782 | done | 桌面空态 **3 passed**（资产分类 list/tree 检索整句）。禁 /m。 |
+| Q3783 | done | 桌面空态 **3 passed**（安全策略 no-login-chain 组合）。禁 /m。 |
+| Q3784 | done | 桌面空态 **3 passed**（安全策略配置态预览说明）。禁 /m。 |
+| Q3785 | done | 桌面空态 **3 passed**（流程控制台 subtitle 整段余项）。禁 /m。 |
+| Q3786 | done | 桌面空态 **3 passed**（交接写操作边界长组合）。禁 /m。 |
+| Q3787 | pending | 桌面空态：SLA 配置端点族整句。禁 /m。 |
+| Q3788 | pending | 桌面空态：SLA 运行态安全边界长组合。禁 /m。 |
+| Q3789 | pending | 桌面空态：审批规则表达式白名单整句。禁 /m。 |
+| Q3790 | pending | 桌面空态：文档中心写操作边界长组合。禁 /m。 |
+| Q3791 | pending | 桌面空态：技术支持诊断包脱敏长组合。禁 /m。 |
+| Q3792 | pending | 桌面空态：SLA simulate/runtime-summary 路径余项。禁 /m。 |
+| Q3793 | pending | 桌面空态：审批规则白名单整段余项。禁 /m。 |
+| Q3794 | pending | 桌面空态：流程邮件写操作与零调用风险。禁 /m。 |
