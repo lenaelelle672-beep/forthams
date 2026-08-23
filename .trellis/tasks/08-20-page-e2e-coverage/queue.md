@@ -2110,4 +2110,5 @@
 | Q2920 | done | 桌面空态 **3 passed**（/system/roles 数据权限/描述/ID）。禁 /m。 |
 | Q2921 | done | 桌面空态 **3 passed**（/system/posts 新增岗位/标题/暂无数据）。禁 /m。 |
 | Q2922 | done | 桌面空态 **3 passed**（/system/posts 岗位信息维护/列表/总量）。禁 /m。 |
-| Q2923 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2923 | done | 桌面空态 **3 passed**（/system/posts 岗位编码/名称/创建时间）。禁 /m。 |
+| Q2924 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
