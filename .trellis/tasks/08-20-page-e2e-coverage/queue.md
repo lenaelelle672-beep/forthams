@@ -3038,11 +3038,19 @@
 | Q3848 | done | 桌面空态 **3 passed**（部门组织 list/tree 检索整句）。禁 /m。 |
 | Q3849 | done | 桌面空态 **3 passed**（位置 list/root 检索整句）。禁 /m。 |
 | Q3850 | done | 桌面空态 **3 passed**（供应商 list 检索整句）。禁 /m。 |
-| Q3851 | pending | 桌面空态：技术支持诊断包安全边界整句。禁 /m。 |
-| Q3852 | pending | 桌面空态：租户写边界整句。禁 /m。 |
-| Q3853 | pending | 桌面空态：导入导出写边界整句。禁 /m。 |
-| Q3854 | pending | 桌面空态：编号规则端点族整句。禁 /m。 |
-| Q3855 | pending | 桌面空态：编号规则 preview 不持久化整句。禁 /m。 |
-| Q3856 | pending | 桌面空态：缓存白名单整句。禁 /m。 |
-| Q3857 | pending | 桌面空态：基础参数 SYSTEM 覆盖整句。禁 /m。 |
-| Q3858 | pending | 桌面空态：基础参数 DEGRADED 预演整句。禁 /m。 |
+| Q3851 | done | 桌面空态 **3 passed**（技术支持诊断包安全边界整句）。禁 /m。 |
+| Q3852 | done | 桌面空态 **3 passed**（租户写边界整句）。禁 /m。 |
+| Q3853 | done | 桌面空态 **3 passed**（导入导出写边界整句）。禁 /m。 |
+| Q3854 | done | 桌面空态 **3 passed**（编号规则端点族整句）。禁 /m。 |
+| Q3855 | done | 桌面空态 **3 passed**（编号规则 preview 不持久化整句）。禁 /m。 |
+| Q3856 | done | 桌面空态 **3 passed**（缓存白名单整句）。禁 /m。 |
+| Q3857 | done | 桌面空态 **3 passed**（基础参数 SYSTEM 覆盖整句）。禁 /m。 |
+| Q3858 | done | 桌面空态 **3 passed**（基础参数 DEGRADED 预演整句）。禁 /m。 |
+| Q3859 | pending | 桌面空态：岗位 posts 端点族整句。禁 /m。 |
+| Q3860 | pending | 桌面空态：岗位 metadata-only 边界整句。禁 /m。 |
+| Q3861 | pending | 桌面空态：邮件模板端点族整句。禁 /m。 |
+| Q3862 | pending | 桌面空态：邮件模板 safe preview 边界整句。禁 /m。 |
+| Q3863 | pending | 桌面空态：通知偏好端点族整句。禁 /m。 |
+| Q3864 | pending | 桌面空态：通知偏好无持久化边界整句。禁 /m。 |
+| Q3865 | pending | 桌面空态：通知渠道端点族整句。禁 /m。 |
+| Q3866 | pending | 桌面空态：流程通知开关端点族整句。禁 /m。 |

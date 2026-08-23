@@ -68859,6 +68859,238 @@ test.describe('Q3858 桌面基础参数 DEGRADED 预演整句空态', () => {
 
 });
 
+test.describe('Q3859 桌面岗位 posts 端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management 「真实调用 /system/posts、/system/posts/all、/system/posts/{id}、/system/posts/meta 与 /system/posts/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('真实调用 /system/posts、/system/posts/all、/system/posts/{id}、/system/posts/meta 与 /system/posts/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management 「/system/posts/all、/system/posts/{id}、/system/posts/meta 与 /system/posts/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('/system/posts/all、/system/posts/{id}、/system/posts/meta 与 /system/posts/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management 「真实调用 /system/posts、/system/posts/all、/system/posts/{id}」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('真实调用 /system/posts、/system/posts/all、/system/posts/{id}').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3860 桌面岗位 metadata-only 边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management 「metadata-only post catalog + dry-run preview；readOnly=true、tenantScoped=true、noPersistence=true、noAssignment=true、noPermissionEffect=true。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('metadata-only post catalog + dry-run preview；readOnly=true、tenantScoped=true、noPersistence=true、noAssignment=true、noPermissionEffect=true。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management 「仅代表 system-post-management 已接入真组件；不代表组织权限组、岗位权限 runtime、用户岗位分配或 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('仅代表 system-post-management 已接入真组件；不代表组织权限组、岗位权限 runtime、用户岗位分配或 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management 「不代表组织权限组、岗位权限 runtime、用户岗位分配或 Workbench V3 全量完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByText('不代表组织权限组、岗位权限 runtime、用户岗位分配或 Workbench V3 全量完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3861 桌面邮件模板端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「真实调用 /mail-templates/list、/mail-templates/{id}、/mail-templates/code/{code}、/mail-templates/meta 与 /mail-templates/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('真实调用 /mail-templates/list、/mail-templates/{id}、/mail-templates/code/{code}、/mail-templates/meta 与 /mail-templates/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「/mail-templates/{id}、/mail-templates/code/{code}、/mail-templates/meta 与 /mail-templates/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('/mail-templates/{id}、/mail-templates/code/{code}、/mail-templates/meta 与 /mail-templates/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「真实调用 /mail-templates/list、/mail-templates/{id}、/mail-templates/code/{code}」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('真实调用 /mail-templates/list、/mail-templates/{id}、/mail-templates/code/{code}').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3862 桌面邮件模板 safe preview 边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「仅邮件模板 catalog + 无持久化 safe preview；不发送邮件、不配置 SMTP/邮件网关、不处理邮件日志/重试/导出、不接入流程邮件。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('仅邮件模板 catalog + 无持久化 safe preview；不发送邮件、不配置 SMTP/邮件网关、不处理邮件日志/重试/导出、不接入流程邮件。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「无持久化 safe preview；不发送邮件、不配置 SMTP/邮件网关、不处理邮件日志/重试/导出、不接入流程邮件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('无持久化 safe preview；不发送邮件、不配置 SMTP/邮件网关、不处理邮件日志/重试/导出、不接入流程邮件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates 「不处理邮件日志/重试/导出、不接入流程邮件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByText('不处理邮件日志/重试/导出、不接入流程邮件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3863 桌面通知偏好端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationPreferencesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「真实调用 /notification-preferences、/notification-preferences/{category}、/notification-preferences/meta 与 /notification-preferences/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('真实调用 /notification-preferences、/notification-preferences/{category}、/notification-preferences/meta 与 /notification-preferences/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「/notification-preferences/{category}、/notification-preferences/meta 与 /notification-preferences/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('/notification-preferences/{category}、/notification-preferences/meta 与 /notification-preferences/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「真实调用 /notification-preferences、/notification-preferences/{category}、/notification-preferences/meta」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('真实调用 /notification-preferences、/notification-preferences/{category}、/notification-preferences/meta').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3864 桌面通知偏好无持久化边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationPreferencesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「只读通知偏好目录 + 无持久化偏好决策预览；不保存偏好、不发送通知、不改变真实通知发送决策。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('只读通知偏好目录 + 无持久化偏好决策预览；不保存偏好、不发送通知、不改变真实通知发送决策。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「无持久化偏好决策预览；不保存偏好、不发送通知、不改变真实通知发送决策」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('无持久化偏好决策预览；不保存偏好、不发送通知、不改变真实通知发送决策').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「只读通知偏好目录 + 无持久化偏好决策预览；不保存偏好」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('只读通知偏好目录 + 无持久化偏好决策预览；不保存偏好').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3865 桌面通知渠道端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels 「真实调用 /system/channel-configs、/system/channel-configs/{id}、/system/channel-configs/meta 与 /system/channel-configs/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('真实调用 /system/channel-configs、/system/channel-configs/{id}、/system/channel-configs/meta 与 /system/channel-configs/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels 「/system/channel-configs/{id}、/system/channel-configs/meta 与 /system/channel-configs/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('/system/channel-configs/{id}、/system/channel-configs/meta 与 /system/channel-configs/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels 「只读通知渠道目录 + 无持久化、无发送、无外联脱敏预览；不保存渠道、不发送测试消息、不调用外部 webhook。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('只读通知渠道目录 + 无持久化、无发送、无外联脱敏预览；不保存渠道、不发送测试消息、不调用外部 webhook。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3866 桌面流程通知开关端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「真实调用 /notification-switches/list、/notification-switches/biz-type/{bizType}、/notification-switches/meta 与 /notification-switches/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('真实调用 /notification-switches/list、/notification-switches/biz-type/{bizType}、/notification-switches/meta 与 /notification-switches/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「/notification-switches/biz-type/{bizType}、/notification-switches/meta 与 /notification-switches/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('/notification-switches/biz-type/{bizType}、/notification-switches/meta 与 /notification-switches/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「read-only notification switch catalog + no-persistence preview + no-send preview；workflowRuntimeEffect=false；不写库、不发送通知、不改变流程运行时。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('read-only notification switch catalog + no-persistence preview + no-send preview；workflowRuntimeEffect=false；不写库、不发送通知、不改变流程运行时。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
