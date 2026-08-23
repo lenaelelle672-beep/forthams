@@ -2199,4 +2199,5 @@
 | Q3009 | done | 桌面空态 **3 passed**（/intake 填写验收 + /approvals 我发起的/已通过）。禁 /m。 |
 | Q3010 | done | 桌面空态 **3 passed**（/approvals 已驳回/待审批/审批）。禁 /m。 |
 | Q3011 | done | 桌面空态 **3 passed**（/approvals 资产调拨/清退/报废）。禁 /m。 |
-| Q3012 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3012 | done | 桌面空态 **3 passed**（/approvals 工单申请/暂无审批/无待处理）。禁 /m。 |
+| Q3013 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
