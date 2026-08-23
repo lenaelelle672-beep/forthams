@@ -1229,4 +1229,5 @@
 - Q3930–Q3937：**24 passed**。续 Q3938–Q3943：ABC/SAM/安全检查/报表构建器/导入导出/循环盘点未用 heading/button/余句。禁 /m。
 - Q3938–Q3943：**18 passed**。续 Q3944–Q3948：设备/分类/TCO/健康评分/安全历史/风险矩阵/报表未用 heading/button。禁 /m。
 - Q3944–Q3948：**15 passed**。Q3944 勿测 `/dashboard` 默认 mock（trends.slice 崩）。续 Q3949：定时报表/可靠性未用 button/heading。禁 /m。
+- Q3949：**3 passed**。续 Q3950：SAM/健康评分未用 heading。禁 /m。
 
