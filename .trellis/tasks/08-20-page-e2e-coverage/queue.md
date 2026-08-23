@@ -2159,4 +2159,5 @@
 | Q2969 | done | 桌面空态 **3 passed**（/login 资源审批/巡检维修/系统管理员）。禁 /m。 |
 | Q2970 | done | 桌面空态 **3 passed**（/login 全生命周期/智能审批/采购到报废）。禁 /m。 |
 | Q2971 | done | 桌面空态 **3 passed**（/login 流程闭环/组织账号/全息版）。禁 /m。 |
-| Q2972 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2972 | done | 桌面空态 **3 passed**（/login 流星版/宇视公司/UNIVIEW）。禁 /m。 |
+| Q2973 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
