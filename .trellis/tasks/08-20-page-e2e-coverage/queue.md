@@ -2203,4 +2203,5 @@
 | Q3013 | done | 桌面空态 **3 passed**（/approvals 审批中心/发起申请/搜索）。禁 /m。 |
 | Q3014 | done | 桌面空态 **3 passed**（/notifications 通知中心/全部已读/暂无通知）。禁 /m。 |
 | Q3015 | done | 桌面空态 **3 passed**（/notifications 审批/预警/系统通知）。禁 /m。 |
-| Q3016 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3016 | done | 桌面空态 **3 passed**（/notifications 共0条/全部/所有通知）。禁 /m。 |
+| Q3017 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

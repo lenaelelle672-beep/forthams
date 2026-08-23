@@ -1123,5 +1123,6 @@
 - Q3012：/approvals 工单申请/暂无审批/无待处理 **3 passed**。`3dff92d1b`
 - Q3013：/approvals 审批中心/发起申请/搜索 **3 passed**。`a69378881`
 - Q3014：/notifications 通知中心/全部已读/暂无通知 **3 passed**。`6e54f5b25`
-- Q3015：/notifications 审批/预警/系统通知 **3 passed**。
+- Q3015：/notifications 审批/预警/系统通知 **3 passed**。`14238555d`
+- Q3016：/notifications 共0条/全部/所有通知 **3 passed**。
 
