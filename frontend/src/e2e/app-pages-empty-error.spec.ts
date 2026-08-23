@@ -39485,6 +39485,34 @@ test.describe('Q2832 桌面新建退役申请提示空态', () => {
   });
 });
 
+test.describe('Q2833 桌面新建预算操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets/new 空态 button「创建预算」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByRole('button', { name: /创\s*建\s*预\s*算/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态 button「返回列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByRole('button', { name: /返\s*回\s*列\s*表/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets/new 空态 button「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets/new');
+    await expect(page.getByRole('button', { name: /取\s*消/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
