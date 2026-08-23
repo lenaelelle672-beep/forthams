@@ -2181,4 +2181,5 @@
 | Q2991 | done | 桌面空态 **3 passed**（/login5 部门负责人/运维人员/全域权限）。禁 /m。 |
 | Q2992 | done | 桌面空态 **3 passed**（/login5 资源审批/巡检维修/记住用户名）。禁 /m。 |
 | Q2993 | done | 桌面空态 **3 passed**（/login5 忘记密码/进入工作台/统一认证）。禁 /m。 |
-| Q2994 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2994 | done | 桌面空态 **3 passed**（/login5 用户名/密码/账号placeholder）。禁 /m。 |
+| Q2995 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
