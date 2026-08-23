@@ -965,5 +965,6 @@
 - Q2854：/disposals/scrap/new 处置方式/暂无资产/预估残值 **3 passed**。`65ced8b33`
 - Q2855：/disposals/scrap/new 审批流程/先选资产/不可逆 **3 passed**。`9279d8ee7`
 - Q2856：/disposals/scrap/new 自动保存/申请日期/新建申请 **3 passed**。`f3773ae72`
-- Q2857：/disposals/scrap/new 风险提示/选填/补充说明 **3 passed**。
+- Q2857：/disposals/scrap/new 风险提示/选填/补充说明 **3 passed**。`790ecbeb6`
+- Q2858：/disposals/scrap/new 变卖/拆解/捐赠 **3 passed**。
 
