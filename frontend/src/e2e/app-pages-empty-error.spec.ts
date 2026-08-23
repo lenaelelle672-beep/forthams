@@ -43618,6 +43618,29 @@ test.describe('Q2983 桌面登录4版本文案空态', () => {
   });
 });
 
+test.describe('Q2984 桌面登录4皮肤切换空态', () => {
+  test('/login4 空态「标准版」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login4');
+    await expect(page.getByText('标准版').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login4 空态「全息版」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login4');
+    await expect(page.getByText('全息版').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login4 空态「流星版」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login4');
+    await expect(page.getByText('流星版').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
