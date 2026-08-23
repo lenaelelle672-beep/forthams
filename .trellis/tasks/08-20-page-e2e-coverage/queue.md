@@ -3125,9 +3125,14 @@
 | Q3935 | done | 桌面空态 **3 passed**（ABC 分类未用 heading）。禁 /m。 |
 | Q3936 | done | 桌面空态 **3 passed**（ABC/循环盘点未用 button）。禁 /m。 |
 | Q3937 | done | 桌面空态 **3 passed**（位置/SAM 未用 button/heading）。禁 /m。 |
-| Q3938 | pending | 桌面空态 ABC/SAM 未用 heading/button。禁 /m。 |
-| Q3939 | pending | 桌面空态 SAM 未用 heading。禁 /m。 |
-| Q3940 | pending | 桌面空态 SAM/ABC/循环盘点未用余句。禁 /m。 |
-| Q3941 | pending | 桌面空态 安全检查/报表构建器未用 heading。禁 /m。 |
-| Q3942 | pending | 桌面空态 报表构建器/导入导出未用 heading。禁 /m。 |
-| Q3943 | pending | 桌面空态 ABC/循环盘点未用余句。禁 /m。 |
+| Q3938 | done | 桌面空态 **3 passed**（ABC/SAM 未用 heading/button）。禁 /m。 |
+| Q3939 | done | 桌面空态 **3 passed**（SAM 未用 heading）。禁 /m。 |
+| Q3940 | done | 桌面空态 **3 passed**（SAM/ABC/循环盘点未用余句）。禁 /m。 |
+| Q3941 | done | 桌面空态 **3 passed**（安全检查/报表构建器未用 heading）。禁 /m。 |
+| Q3942 | done | 桌面空态 **3 passed**（报表构建器/导入导出未用 heading）。禁 /m。 |
+| Q3943 | done | 桌面空态 **3 passed**（ABC/循环盘点未用余句）。禁 /m。 |
+| Q3944 | pending | 桌面空态 仪表板/分类/TCO 未用 heading。禁 /m。 |
+| Q3945 | pending | 桌面空态 TCO 未用 heading。禁 /m。 |
+| Q3946 | pending | 桌面空态 TCO/健康评分未用 heading。禁 /m。 |
+| Q3947 | pending | 桌面空态 安全历史/风险矩阵未用 heading。禁 /m。 |
+| Q3948 | pending | 桌面空态 报表/健康评分未用 button/heading。禁 /m。 |

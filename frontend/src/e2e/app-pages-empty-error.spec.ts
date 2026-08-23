@@ -71325,6 +71325,151 @@ test.describe('Q3943 桌面 ABC/循环盘点未用余句 空态', () => {
 
 });
 
+test.describe('Q3944 桌面仪表板/分类/TCO 未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/dashboard heading「部门资产统计 (Top 5 部门)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/dashboard');
+    await expect(page.getByRole('heading', { name: '部门资产统计 (Top 5 部门)' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories heading「分类结构」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByRole('heading', { name: '分类结构' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco heading「TCO 全生命周期成本」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: 'TCO 全生命周期成本' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3945 桌面 TCO 未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/tco heading「资产 TCO 构成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '资产 TCO 构成' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco heading「TCO 趋势 (近12个月)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: 'TCO 趋势 (近12个月)' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco heading「部门 TCO 排行」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '部门 TCO 排行' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3946 桌面 TCO/健康评分未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/tco heading「分类 TCO 排行」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '分类 TCO 排行' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health heading「评分分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '评分分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health heading「评分区间分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '评分区间分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3947 桌面安全历史/风险矩阵未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/history heading「安全检查历史」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByRole('heading', { name: '安全检查历史' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/history heading「执行记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByRole('heading', { name: '执行记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-matrix heading「风险矩阵配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await expect(page.getByRole('heading', { name: '风险矩阵配置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3948 桌面报表/健康评分未用 button/heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports button「导出 CSV」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('button', { name: '导出 CSV' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports button「导出 PDF」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('button', { name: '导出 PDF' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health heading「不健康资产 Top 20」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '不健康资产 Top 20' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
