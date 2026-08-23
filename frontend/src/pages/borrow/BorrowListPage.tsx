@@ -206,10 +206,10 @@ export default function BorrowListPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">资产借用</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
                 <Handshake className="h-3 w-3" />
                 借用管理
-              </span>
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={() => navigate('/borrows/new')}>
@@ -229,7 +229,7 @@ export default function BorrowListPage() {
                     <Icon className="h-3.5 w-3.5 text-white" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{stat.label}</p>
+                    <h3 className="text-[11px] font-medium text-slate-400">{stat.label}</h3>
                     <p className="text-lg font-bold text-slate-900">
                       {stat.value}
                       {stat.unit && <span className="ml-0.5 text-xs font-medium text-slate-400">{stat.unit}</span>}

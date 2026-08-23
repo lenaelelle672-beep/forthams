@@ -729,10 +729,10 @@ export default function MaintenancePage() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">维保管理</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 设备维护
-              </span>
+              </h3>
             </div>
             <Button variant="primary" onClick={() => { setEditingRecord(null); setDialogOpen(true); }}>
               <Plus className="h-4 w-4" />
@@ -752,7 +752,7 @@ export default function MaintenancePage() {
                     <Icon className="h-3.5 w-3.5 text-white" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{cfg.label}</p>
+                    <h3 className="text-[11px] font-medium text-slate-400">{cfg.label}</h3>
                     <p className="text-lg font-bold text-slate-900">
                       {count}
                       <span className="ml-0.5 text-xs font-medium text-slate-400">条</span>
