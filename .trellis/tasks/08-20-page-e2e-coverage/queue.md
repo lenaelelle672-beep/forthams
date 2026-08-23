@@ -2139,4 +2139,5 @@
 | Q2949 | done | 桌面空态 **3 passed**（/insurances/new 开始日期/结束日期/状态）。禁 /m。 |
 | Q2950 | done | 桌面空态 **3 passed**（/insurances/new 备注/财产险/生效中）。禁 /m。 |
 | Q2951 | done | 桌面空态 **3 passed**（/revaluations/new 减值/重估/标题）。禁 /m。 |
-| Q2952 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2952 | done | 桌面空态 **3 passed**（/disposals/scrap/new 填写信息/确认提交/标题）。禁 /m。 |
+| Q2953 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

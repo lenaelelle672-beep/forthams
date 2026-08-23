@@ -1059,5 +1059,6 @@
 - Q2948：/insurances/new 保费/保额/免赔额 **3 passed**。`ec3d2c1a1`
 - Q2949：/insurances/new 开始日期/结束日期/状态 **3 passed**。`2a5ce6a34`
 - Q2950：/insurances/new 备注/财产险/生效中 **3 passed**。`11832d234`
-- Q2951：/revaluations/new 减值/重估/标题 **3 passed**。
+- Q2951：/revaluations/new 减值/重估/标题 **3 passed**。`e48acfafb`
+- Q2952：/disposals/scrap/new 填写信息/确认提交/标题 **3 passed**。
 
