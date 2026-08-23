@@ -238,7 +238,7 @@ export default function SystemTenantManagementWorkbenchPage({
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <p className="text-xs text-slate-500">只读提示</p>
+        <h3 className="text-xs font-medium text-slate-500">只读提示</h3>
         <p className="mt-1">{meta.readOnlyNotice}</p>
       </div>
     </section>

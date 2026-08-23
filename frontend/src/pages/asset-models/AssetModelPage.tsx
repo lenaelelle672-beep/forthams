@@ -229,7 +229,7 @@ export default function AssetModelPage() {
           <div className="mt-4 flex items-center gap-6 border-t border-[#f1f5f9] pt-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-[#0f172a]">{total}</p>
-              <p className="text-xs text-[#94a3b8]">全部模型</p>
+              <h3 className="text-xs font-medium text-[#94a3b8]">全部模型</h3>
             </div>
             <div className="h-8 w-px bg-[#e5e7eb]" />
             <div className="text-center">

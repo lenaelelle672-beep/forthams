@@ -674,7 +674,7 @@ export default function PurchaseOrderPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-[#0f172a]">{stats.totalOrders}</p>
-                <p className="text-xs font-medium text-slate-500">总采购单</p>
+                <h3 className="text-xs font-medium text-slate-500">总采购单</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-6 py-4">
@@ -692,7 +692,7 @@ export default function PurchaseOrderPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold text-[#0f172a]">{stats.approved}</p>
-                <p className="text-xs font-medium text-slate-500">已审批</p>
+                <h3 className="text-xs font-medium text-slate-500">已审批</h3>
               </div>
             </div>
           </div>

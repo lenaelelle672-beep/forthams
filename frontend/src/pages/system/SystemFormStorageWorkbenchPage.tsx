@@ -295,11 +295,11 @@ export default function SystemFormStorageWorkbenchPage({
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                <p className="text-xs text-slate-500">字段摘要</p>
+                <h3 className="text-xs font-medium text-slate-500">字段摘要</h3>
                 <p className="mt-1">{selectedRecord?.fieldSummary ?? '字段摘要为空'}</p>
               </div>
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                <p className="text-xs text-slate-500">附件摘要</p>
+                <h3 className="text-xs font-medium text-slate-500">附件摘要</h3>
                 <p className="mt-1">{selectedRecord?.attachmentSummary ?? '附件引用为空'}</p>
               </div>
             </div>

@@ -205,15 +205,15 @@ export default function SystemMenuPermissionsWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">权限域数量</p>
+          <h3 className="text-xs font-medium text-slate-500">权限域数量</h3>
           <p className="mt-1 text-2xl font-semibold">{visibleGroups.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">权限编码库存</p>
+          <h3 className="text-xs font-medium text-slate-500">权限编码库存</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.permissionInventoryCount} 项</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">已绑定权限</p>
+          <h3 className="text-xs font-medium text-slate-500">已绑定权限</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.boundPermissionCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">

@@ -460,7 +460,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-[#0f172a]">{d?.totalLicenses ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">总许可数</p>
+                <h3 className="text-xs font-medium text-slate-500">总许可数</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -469,7 +469,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-emerald-600">{d?.compliantCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">合规</p>
+                <h3 className="text-xs font-medium text-slate-500">合规</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -478,7 +478,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-red-600">{d?.overusedCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">超用</p>
+                <h3 className="text-xs font-medium text-slate-500">超用</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -487,7 +487,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-amber-600">{d?.underusedCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">闲置</p>
+                <h3 className="text-xs font-medium text-slate-500">闲置</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -496,7 +496,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-500">{d?.expiredCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">已过期</p>
+                <h3 className="text-xs font-medium text-slate-500">已过期</h3>
               </div>
             </div>
           </div>
