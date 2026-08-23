@@ -628,7 +628,7 @@ export default function ContractPage() {
                   <FileText className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部合同</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部合同</h3>
                   <p className="text-lg font-bold text-slate-900">{total}</p>
                 </div>
               </div>
@@ -637,7 +637,7 @@ export default function ContractPage() {
                   <CheckCircle className="h-4.5 w-4.5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">生效中</p>
+                  <h3 className="text-xs font-medium text-slate-500">生效中</h3>
                   <p className="text-lg font-bold text-slate-900">{activeCount}</p>
                 </div>
               </div>
@@ -646,7 +646,7 @@ export default function ContractPage() {
                   <AlertTriangle className="h-4.5 w-4.5 text-amber-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">即将到期</p>
+                  <h3 className="text-xs font-medium text-slate-500">即将到期</h3>
                   <p className="text-lg font-bold text-slate-900">{expiringList.length}</p>
                 </div>
               </div>
@@ -655,7 +655,7 @@ export default function ContractPage() {
                   <Clock className="h-4.5 w-4.5 text-violet-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">30天内到期</p>
+                  <h3 className="text-xs font-medium text-slate-500">30天内到期</h3>
                   <p className="text-lg font-bold text-slate-900">{expiringList.length}</p>
                 </div>
               </div>

@@ -275,7 +275,7 @@ export default function SystemBaseParamsWorkbenchPage({
             </div>
             {loading ? <div role="status" aria-live="polite" className="mt-4 text-sm text-slate-500">基础参数加载中...</div> : null}
             {!loading && records.length === 0 ? (
-              <div className="mt-4 rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 SYSTEM 基础参数，请通过 V3 新增。</div>
+              <h3 className="mt-4 rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无 SYSTEM 基础参数，请通过 V3 新增。</h3>
             ) : null}
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {records.map((item) => (

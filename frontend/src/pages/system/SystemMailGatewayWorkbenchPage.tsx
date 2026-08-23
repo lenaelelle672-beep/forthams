@@ -206,7 +206,7 @@ export default function SystemMailGatewayWorkbenchPage({
             <h4 className="font-semibold">网关 catalog</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，只读展示</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无可展示的邮件网关元数据；这不代表邮件子系统完成。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无可展示的邮件网关元数据；这不代表邮件子系统完成。</h3> : null}
           <div className="space-y-2">
             {page.records.map((gateway) => (
               <button key={gateway.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openGateway(gateway)}>

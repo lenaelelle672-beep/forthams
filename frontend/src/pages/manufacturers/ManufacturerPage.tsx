@@ -341,7 +341,7 @@ export default function ManufacturerPage() {
                 <Factory className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">全部制造商</p>
+                <h3 className="text-xs font-medium text-slate-500">全部制造商</h3>
                 <p className="text-lg font-bold text-slate-900">{total}</p>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function ManufacturerPage() {
                 <CheckCircle className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">正常</p>
+                <h3 className="text-xs font-medium text-slate-500">正常</h3>
                 <p className="text-lg font-bold text-slate-900">{activeCount}</p>
               </div>
             </div>
@@ -359,7 +359,7 @@ export default function ManufacturerPage() {
                 <XCircle className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">停用</p>
+                <h3 className="text-xs font-medium text-slate-500">停用</h3>
                 <p className="text-lg font-bold text-slate-900">{inactiveCount}</p>
               </div>
             </div>
@@ -368,7 +368,7 @@ export default function ManufacturerPage() {
                 <Globe className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">有官网</p>
+                <h3 className="text-xs font-medium text-slate-500">有官网</h3>
                 <p className="text-lg font-bold text-slate-900">{websiteCount}</p>
               </div>
             </div>

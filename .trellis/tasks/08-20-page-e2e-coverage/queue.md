@@ -3318,4 +3318,11 @@
 | Q4128 | done | 桌面空态 **3 passed**（字段映射未用空态 heading）。禁 /m。 |
 | Q4129 | done | 桌面空态 **3 passed**（缓存管理未用空态 heading）。禁 /m。 |
 | Q4130 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4131 | pending | 桌面空态 下一未用 heading/button。禁 /m。 |
+| Q4131 | pending | 桌面空态 许可证未用统计 heading。禁 /m。 |
+| Q4132 | pending | 桌面空态 许可证/合同未用统计 heading。禁 /m。 |
+| Q4133 | pending | 桌面空态 合同/制造商未用统计 heading。禁 /m。 |
+| Q4134 | pending | 桌面空态 制造商未用统计 heading。禁 /m。 |
+| Q4135 | pending | 桌面空态 自定义字段未用空态 heading。禁 /m。 |
+| Q4136 | pending | 桌面空态 字段集/基础参数/分类未用空态 heading。禁 /m。 |
+| Q4137 | pending | 桌面空态 邮件日志/岗位/网关未用空态 heading。禁 /m。 |
+| Q4138 | pending | 桌面空态 流程通知开关未用空态 heading。禁 /m。 |
