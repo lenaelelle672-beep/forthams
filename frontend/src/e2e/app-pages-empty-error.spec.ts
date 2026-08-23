@@ -53555,7 +53555,7 @@ test.describe('Q3331 桌面流程控制台页码空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「第 1 / 0 页」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「第 n / n 页」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
     await expect(page.getByText(/第 \d+ \/ \d+ 页/).first()).toBeVisible({ timeout: 15_000 });
@@ -53682,6 +53682,383 @@ test.describe('Q3335 桌面安全策略当前配置空态', () => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
     await expect(page.getByText(/runtimeEffect/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3336 桌面 Webhook HMAC 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockWebhookConfigsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config select「HMAC_SHA256」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.locator('select').filter({ hasText: 'HMAC_SHA256' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config textbox「签名密钥」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByRole('textbox', { name: '签名密钥' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config textbox「共享 Secret」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByRole('textbox', { name: '共享 Secret' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3337 桌面字段映射表达式空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSystemFieldMappingsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-field-mapping 「trim(value)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText('trim(value)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-field-mapping 「upper(value)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText('upper(value)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-field-mapping 「lower(value)」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText('lower(value)').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3338 桌面流程通知开关渠道空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch combobox「渠道」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByRole('combobox', { name: '渠道' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch select「启用样例」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.locator('select').filter({ hasText: '启用样例' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「样例启停状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('样例启停状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3339 桌面流程通知开关样例空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch select「停用样例」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.locator('select').filter({ hasText: '停用样例' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch select「站内信」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.locator('select').filter({ hasText: '站内信' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「当前业务类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText(/当前业务类型/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3340 桌面流程设计器节点帮助空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「复用角色或指定用户配置办理人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('复用角色或指定用户配置办理人').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「流程收口与结果归档」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('流程收口与结果归档').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「支持按岗位」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/支持按岗位/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3341 桌面表单配置遮罩预览空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「******」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('******').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「选填」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('选填').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「资产流程表单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('资产流程表单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3342 桌面流程通知开关边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「不执行启停」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText(/不执行启停/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「不发送通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText(/不发送通知/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「不触发流程运行时」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText(/不触发流程运行时/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3343 桌面字段映射预览说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSystemFieldMappingsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-field-mapping 「预览不写库」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText(/预览不写库/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-field-mapping 「不外呼」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText(/不外呼/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-field-mapping 「转换表达式仅允许」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-field-mapping');
+    await expect(page.getByText(/转换表达式仅允许/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3344 桌面 Webhook 签名策略空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockWebhookConfigsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config select「NONE」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.locator('select').filter({ hasText: 'NONE' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「请通过 V3 创建配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText(/请通过 V3 创建配置/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「签名策略」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText('签名策略').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3345 桌面流程设计器节点帮助余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「不计入审批步骤」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/不计入审批步骤/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「支持通过/驳回」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/支持通过\/驳回/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「适合结束审批」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/适合结束审批/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3346 桌面表单配置草稿说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「用于流程节点绑定的安全表单定义」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('用于流程节点绑定的安全表单定义').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「剥离 HTML」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText(/剥离 HTML/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「危险 style」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText(/危险 style/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3347 桌面流程设计器节点帮助再余空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「固定审批人配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/固定审批人配置/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「可挂载到后续处理节点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/可挂载到后续处理节点/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「满足/不满足双向分支」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText(/满足\/不满足双向分支/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3348 桌面流程通知开关业务类型空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch combobox「业务类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByRole('combobox', { name: '业务类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch combobox「样例启停状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByRole('combobox', { name: '样例启停状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「只读，不执行启停」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText(/只读，不执行启停/).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
