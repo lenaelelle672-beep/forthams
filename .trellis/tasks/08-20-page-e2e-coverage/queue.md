@@ -3406,11 +3406,11 @@
 | Q4216 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4217 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4218 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4219 | pending | 桌面空态 保险未用统计 heading。禁 /m。 |
-| Q4220 | pending | 桌面空态 维保未用统计 heading。禁 /m。 |
-| Q4221 | pending | 桌面空态 维保/折旧未用统计 heading。禁 /m。 |
-| Q4222 | pending | 桌面空态 借用/领用未用统计 heading。禁 /m。 |
-| Q4223 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4224 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4225 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4226 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4219 | done | 桌面空态 **3 passed**（保险未用统计 heading）。禁 /m。 |
+| Q4220 | done | 桌面空态 **3 passed**（维保未用统计 heading）。禁 /m。 |
+| Q4221 | done | 桌面空态 **3 passed**（维保/折旧未用统计 heading）。禁 /m。 |
+| Q4222 | done | 桌面空态 **3 passed**（借用/领用未用统计 heading）。禁 /m。 |
+| Q4223 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4224 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4225 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4226 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
