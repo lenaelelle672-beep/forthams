@@ -1246,4 +1246,5 @@
 - Q4002–Q4005：**12 passed**。续 Q4006–Q4007：安全/借用/领用/forbidden/个人未用 heading/button。个人页 CardTitle 补中文 fallback。禁 /m。
 - Q4006–Q4007：**6 passed**。续 Q4008：个人角色权限、流程当前选中、退役详情 heading。流程「当前选中流程」改为 h3。禁 /m。
 - Q4008：**3 passed**。续 Q4009–Q4010：退役详情分区 heading。禁 /m。
+- Q4009–Q4010：**6 passed**。退役详情空态也渲染资产摘要/历史 heading。续 Q4011：暂无关联资产/暂无审批历史。禁 /m。
 

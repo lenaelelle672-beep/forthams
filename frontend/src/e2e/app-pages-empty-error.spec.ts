@@ -73268,6 +73268,35 @@ test.describe('Q4010 桌面退役详情未用审批 heading 空态', () => {
 
 });
 
+test.describe('Q4011 桌面退役详情未用空态 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement/1 heading「暂无关联资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '暂无关联资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/1 heading「暂无审批历史」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '暂无审批历史' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/2 heading「暂无关联资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/2');
+    await expect(page.getByRole('heading', { name: '暂无关联资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
