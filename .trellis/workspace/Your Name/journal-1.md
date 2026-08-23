@@ -1049,5 +1049,6 @@
 - Q2938：/fixed-assets/workbench 总价值/流程待办/Top5部门 **3 passed**。默认运营首页无「审批中心」「待我审批」。`20053fae9`
 - Q2939：/fixed-assets/workbench 设备/工单/巡检管理 **3 passed**。`9e829a349`
 - Q2940：/fixed-assets/workbench 备件/数据监控/报表分析 **3 passed**。`a405a4cce`
-- Q2941：/fixed-assets/workbench 告警中心/组织策略/基础维护 **3 passed**。
+- Q2941：/fixed-assets/workbench 告警中心/组织策略/基础维护 **3 passed**。`d36d6fdc5`
+- Q2942：/fixed-assets/workbench 我的资产/资产总览/系统管理员 **3 passed**。
 
