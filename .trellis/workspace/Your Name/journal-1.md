@@ -1221,4 +1221,5 @@
 - Q3883–Q3890：**24 passed**。续 Q3891–Q3898：邮件日志 redaction、自定义字段 preview、邮件/通知模板 previewPolicy 整句。禁 /m。
 - Q3891–Q3898：**24 passed**。续 Q3899–Q3906：审计采集/导出整句与表单配置/流程设计器 fail-closed 整句。禁 /m。
 - Q3899–Q3906：**24 passed**。续 Q3907–Q3914：工单/退役/验收/风险/处置新建未用 textbox/button/link/heading。避开未挂路由的 retirement/new.tsx 与 HistoryView。禁 /m。
+- Q3907–Q3914：**24 passed**。续 Q3915–Q3918：借用 heading 与退役/报废/清退/转移未用余句。禁 /m。
 

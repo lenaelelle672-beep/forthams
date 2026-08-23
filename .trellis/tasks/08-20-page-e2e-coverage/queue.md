@@ -3094,11 +3094,15 @@
 | Q3904 | done | 桌面空态 **3 passed**（流程设计器回滚预案余项）。禁 /m。 |
 | Q3905 | done | 桌面空态 **3 passed**（审计 SIEM 边界余项）。禁 /m。 |
 | Q3906 | done | 桌面空态 **3 passed**（表单配置遮罩预览余项）。禁 /m。 |
-| Q3907 | pending | 桌面空态 工单新建未用角色。禁 /m。 |
-| Q3908 | pending | 桌面空态 退役新建未用角色。禁 /m。 |
-| Q3909 | pending | 桌面空态 验收/风险未用角色。禁 /m。 |
-| Q3910 | pending | 桌面空态 风险/赔偿未用 heading。禁 /m。 |
-| Q3911 | pending | 桌面空态 报废申请未用 link/heading。禁 /m。 |
-| Q3912 | pending | 桌面空态 转移申请未用 link/heading。禁 /m。 |
-| Q3913 | pending | 桌面空态 清退申请未用 link/heading。禁 /m。 |
-| Q3914 | pending | 桌面空态 赔偿/清退未用 heading/link。禁 /m。 |
+| Q3907 | done | 桌面空态 **3 passed**（工单新建未用角色）。禁 /m。 |
+| Q3908 | done | 桌面空态 **3 passed**（退役新建未用角色）。禁 /m。 |
+| Q3909 | done | 桌面空态 **3 passed**（验收/风险未用角色）。禁 /m。 |
+| Q3910 | done | 桌面空态 **3 passed**（风险/赔偿未用 heading）。禁 /m。 |
+| Q3911 | done | 桌面空态 **3 passed**（报废申请未用 link/heading）。禁 /m。 |
+| Q3912 | done | 桌面空态 **3 passed**（转移申请未用 link/heading）。禁 /m。 |
+| Q3913 | done | 桌面空态 **3 passed**（清退申请未用 link/heading）。禁 /m。 |
+| Q3914 | done | 桌面空态 **3 passed**（赔偿/清退未用 heading/link）。禁 /m。 |
+| Q3915 | pending | 桌面空态 借用 heading/退役余句。禁 /m。 |
+| Q3916 | pending | 桌面空态 退役/报废未用余句。禁 /m。 |
+| Q3917 | pending | 桌面空态 报废/清退/转移未用余句。禁 /m。 |
+| Q3918 | pending | 桌面空态 转移/清退/报废未用余句。禁 /m。 |

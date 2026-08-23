@@ -70484,6 +70484,122 @@ test.describe('Q3914 桌面赔偿/清退未用 heading/link 空态', () => {
 
 });
 
+test.describe('Q3915 桌面借用 heading/退役余句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/borrows/new heading「新建借用单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/new');
+    await expect(page.getByRole('heading', { name: '新建借用单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/new 「请确认退役原因和残值信息无误」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('请确认退役原因和残值信息无误').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/new 「部门负责人 → 财务总监」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('部门负责人 → 财务总监').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3916 桌面退役/报废未用余句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement/new 「提交后将启动多级审批流程（部门负责人 → 财务总监）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/new');
+    await expect(page.getByText('提交后将启动多级审批流程（部门负责人 → 财务总监）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/scrap/new 「请如实填写报废原因和残值评估，提交后将进入审批环节。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByText('请如实填写报废原因和残值评估，提交后将进入审批环节。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/scrap/new 「残值评估将影响审批路径，高价值资产需走专项审批。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByText('残值评估将影响审批路径，高价值资产需走专项审批。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3917 桌面报废/清退/转移未用余句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/scrap/new 「变卖处理后资产将从台账中永久移除，此操作不可撤销」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByText('变卖处理后资产将从台账中永久移除，此操作不可撤销').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/clearance/new 「提交前请确认资产范围和清退原因无误，避免误操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('提交前请确认资产范围和清退原因无误，避免误操作').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 「必填 · 资产当前所属部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('必填 · 资产当前所属部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3918 桌面转移/清退/报废未用余句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/transfer/new 「必填 · 资产调拨目标部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('必填 · 资产调拨目标部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/scrap/new heading「确认提交」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByRole('heading', { name: '确认提交' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/clearance/new 「所选资产将进入处置流程。提交前请确认资产范围和清退原因无误，避免误操作。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('所选资产将进入处置流程。提交前请确认资产范围和清退原因无误，避免误操作。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
