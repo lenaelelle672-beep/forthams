@@ -2131,4 +2131,5 @@
 | Q2941 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 告警中心/组织策略/基础维护）。禁 /m。 |
 | Q2942 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 我的资产/资产总览/系统管理员）。禁 /m。 |
 | Q2943 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 欢迎管理员/12个月趋势）。禁 /m。 |
-| Q2944 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2944 | done | 桌面空态 **3 passed**（/fixed-assets/workbench title 全屏/密度/通知）。禁 /m。 |
+| Q2945 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
