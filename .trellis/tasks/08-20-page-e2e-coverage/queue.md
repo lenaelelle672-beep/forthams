@@ -2098,4 +2098,5 @@
 | Q2908 | done | 桌面空态 **3 passed**（/system/depts 正常部门/顶级部门/个部门）。禁 /m。 |
 | Q2909 | done | 桌面空态 **3 passed**（/system/depts 搜索过滤/展开收起/搜索placeholder）。禁 /m。 |
 | Q2910 | done | 桌面空态 **3 passed**（/system/depts 创建提示/选树 + /retirement/new 残值提示）。禁 /m。 |
-| Q2911 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2911 | done | 桌面空态 **3 passed**（/system/users 新增用户/标题/描述）。禁 /m。 |
+| Q2912 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

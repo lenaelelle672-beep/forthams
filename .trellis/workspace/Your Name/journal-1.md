@@ -1018,5 +1018,6 @@
 - Q2907：/system/depts 部门管理/组织架构/部门总数 **3 passed**。`3c72e1fc1`
 - Q2908：/system/depts 正常部门/顶级部门/个部门 **3 passed**。`de170b74a`
 - Q2909：/system/depts 搜索过滤/展开收起/搜索placeholder **3 passed**。`4024f5daf`
-- Q2910：/system/depts 创建提示/选树 + /retirement/new 残值提示 **3 passed**。
+- Q2910：/system/depts 创建提示/选树 + /retirement/new 残值提示 **3 passed**。`4cc003e97`
+- Q2911：/system/users 新增用户/标题/描述 **3 passed**。
 
