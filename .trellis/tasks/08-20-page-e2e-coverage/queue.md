@@ -2033,4 +2033,5 @@
 | Q2843 | done | 桌面空态 **3 passed**（/risk-assessments/new 资产ID/可能性/影响程度）。禁 /m。 |
 | Q2844 | done | 桌面空态 **3 passed**（/risk-assessments/new 缓解措施/评审日期/评估人）。禁 /m。 |
 | Q2845 | done | 桌面空态 **3 passed**（/risk-assessments/new 风险等级/LOW/资产ID placeholder）。禁 /m。 |
-| Q2846 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2846 | done | 桌面空态 **3 passed**（risk placeholders + /compensation/new 标题）。禁 /m。 |
+| Q2847 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
