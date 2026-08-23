@@ -3086,11 +3086,19 @@
 | Q3896 | done | 桌面空态 **3 passed**（自定义字段完成边界余项）。禁 /m。 |
 | Q3897 | done | 桌面空态 **3 passed**（邮件模板敏感变量拒绝整句）。禁 /m。 |
 | Q3898 | done | 桌面空态 **3 passed**（通知模板敏感变量拒绝余项）。禁 /m。 |
-| Q3899 | pending | 桌面空态 审计采集闭环整句。禁 /m。 |
-| Q3900 | pending | 桌面空态 审计导出限制整句。禁 /m。 |
-| Q3901 | pending | 桌面空态 表单配置 fail-closed 整句。禁 /m。 |
-| Q3902 | pending | 桌面空态 流程设计器 fail-closed 整句。禁 /m。 |
-| Q3903 | pending | 桌面空态 表单配置 fail-closed 余项。禁 /m。 |
-| Q3904 | pending | 桌面空态 流程设计器回滚预案余项。禁 /m。 |
-| Q3905 | pending | 桌面空态 审计 SIEM 边界余项。禁 /m。 |
-| Q3906 | pending | 桌面空态 表单配置遮罩预览余项。禁 /m。 |
+| Q3899 | done | 桌面空态 **3 passed**（审计采集闭环整句）。禁 /m。 |
+| Q3900 | done | 桌面空态 **3 passed**（审计导出限制整句）。禁 /m。 |
+| Q3901 | done | 桌面空态 **3 passed**（表单配置 fail-closed 整句）。禁 /m。 |
+| Q3902 | done | 桌面空态 **3 passed**（流程设计器 fail-closed 整句）。禁 /m。 |
+| Q3903 | done | 桌面空态 **3 passed**（表单配置 fail-closed 余项）。禁 /m。 |
+| Q3904 | done | 桌面空态 **3 passed**（流程设计器回滚预案余项）。禁 /m。 |
+| Q3905 | done | 桌面空态 **3 passed**（审计 SIEM 边界余项）。禁 /m。 |
+| Q3906 | done | 桌面空态 **3 passed**（表单配置遮罩预览余项）。禁 /m。 |
+| Q3907 | pending | 桌面空态 工单新建未用角色。禁 /m。 |
+| Q3908 | pending | 桌面空态 退役新建未用角色。禁 /m。 |
+| Q3909 | pending | 桌面空态 验收/风险未用角色。禁 /m。 |
+| Q3910 | pending | 桌面空态 风险/赔偿未用 heading。禁 /m。 |
+| Q3911 | pending | 桌面空态 报废申请未用 link/heading。禁 /m。 |
+| Q3912 | pending | 桌面空态 转移申请未用 link/heading。禁 /m。 |
+| Q3913 | pending | 桌面空态 清退申请未用 link/heading。禁 /m。 |
+| Q3914 | pending | 桌面空态 赔偿/清退未用 heading/link。禁 /m。 |
