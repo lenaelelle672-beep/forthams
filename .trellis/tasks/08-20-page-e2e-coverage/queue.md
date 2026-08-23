@@ -2752,12 +2752,24 @@
 | Q3562 | done | 桌面空态 **3 passed**（安全策略审计要求 reason/保存必须携带/服务端只记录）。禁 /m。 |
 | Q3563 | done | 桌面空态 **3 passed**（安全策略链路边界 不接登录/MFA 移动端/preview）。禁 /m。 |
 | Q3564 | done | 桌面空态 **3 passed**（安全策略预览边界 本页只展示/移动端运行/runtimeEffect false）。禁 /m。 |
-| Q3565 | pending | 桌面空态（文件存储边界 note/不访问文件系统/生命周期）。禁 /m。 |
-| Q3566 | pending | 桌面空态（文件存储覆盖 导入导出/catalog 路径/统计摘要）。禁 /m。 |
-| Q3567 | pending | 桌面空态（文件存储计数 下载预览/共 0 页/当前仅为）。禁 /m。 |
-| Q3568 | pending | 桌面空态（基础参数默认键 systemName/预演刷新说明）。禁 /m。 |
-| Q3569 | pending | 桌面空态（邮件网关覆盖 消息组/rejectedInputs/noPersistence）。禁 /m。 |
-| Q3570 | pending | 桌面空态（邮件网关预览字段 note/邮件子系统/acceptedFields）。禁 /m。 |
-| Q3571 | pending | 桌面空态（邮件网关旗标 noSend/noNetwork/tenantScoped）。禁 /m。 |
-| Q3572 | pending | 桌面空态（资产分类查询 /categories/list）。禁 /m。 |
-| Q3573 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3565 | done | 桌面空态 **3 passed**（文件存储边界 note/不访问文件系统/生命周期）。禁 /m。 |
+| Q3566 | done | 桌面空态 **3 passed**（文件存储覆盖 导入导出/catalog 路径/统计摘要）。禁 /m。 |
+| Q3567 | done | 桌面空态 **3 passed**（文件存储计数 下载预览/共 0 页/当前仅为）。禁 /m。 |
+| Q3568 | done | 桌面空态 **3 passed**（基础参数默认键 systemName/预演刷新说明）。禁 /m。 |
+| Q3569 | done | 桌面空态 **3 passed**（邮件网关覆盖 消息组/rejectedInputs/noPersistence）。禁 /m。 |
+| Q3570 | done | 桌面空态 **3 passed**（邮件网关预览字段 note/邮件子系统/acceptedFields）。禁 /m。 |
+| Q3571 | done | 桌面空态 **3 passed**（邮件网关旗标 noSend/noNetwork/tenantScoped）。禁 /m。 |
+| Q3572 | done | 桌面空态 **3 passed**（资产分类查询 /categories/list）。禁 /m。 |
+| Q3573 | pending | 桌面空态（审批规则表达式 禁止 SpEL/AND-OR-NOT/动态类加载）。禁 /m。 |
+| Q3574 | pending | 桌面空态（审批规则审计字段 启停审计/接口闭环）。禁 /m。 |
+| Q3575 | pending | 桌面空态（审批规则解释器 OGNL/任意方法/命中规则）。禁 /m。 |
+| Q3576 | pending | 桌面空态（流程平台侧栏 规则白名单/字段可见性/schema）。禁 /m。 |
+| Q3577 | pending | 桌面空态（流程平台侧栏 图结构/归档留痕/健康摘要）。禁 /m。 |
+| Q3578 | pending | 桌面空态（流程平台侧栏 预览脱敏/提醒阈值/模板目录）。禁 /m。 |
+| Q3579 | pending | 桌面空态（系统参数侧栏 no-direct-effect/降级/趋势导出）。禁 /m。 |
+| Q3580 | pending | 桌面空态（系统参数侧栏 行数上限/可观测空态/文档计数）。禁 /m。 |
+| Q3581 | pending | 桌面空态（组织权限侧栏 权限库存/菜单覆盖/套餐摘要）。禁 /m。 |
+| Q3582 | pending | 桌面空态（集成配置侧栏 转换白名单/租户隔离/认证掩码）。禁 /m。 |
+| Q3583 | pending | 桌面空态（消息通知侧栏 变量白名单/邮件日志/免打扰）。禁 /m。 |
+| Q3584 | pending | 桌面空态（集成配置侧栏 源目标字段/dry-run/接口目录）。禁 /m。 |
+| Q3585 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
