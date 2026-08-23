@@ -2046,4 +2046,5 @@
 | Q2856 | done | 桌面空态 **3 passed**（/disposals/scrap/new 自动保存/申请日期/新建申请）。禁 /m。 |
 | Q2857 | done | 桌面空态 **3 passed**（/disposals/scrap/new 风险提示/选填/补充说明）。禁 /m。 |
 | Q2858 | done | 桌面空态 **3 passed**（/disposals/scrap/new 变卖/拆解/捐赠）。禁 /m。 |
-| Q2859 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2859 | done | 桌面空态 **3 passed**（/disposals/clearance/new 取消/添加资产/保存草稿）。禁 /m。 |
+| Q2860 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
