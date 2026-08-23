@@ -72766,10 +72766,10 @@ test.describe('Q3993 桌面盘点/健康/维保未用 button 空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/maintenance/plans button「今天」', async ({ page }) => {
+  test('/maintenance/plans heading「暂无维保计划」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/maintenance/plans');
-    await expect(page.getByRole('button', { name: '今天' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: '暂无维保计划' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -72868,10 +72868,10 @@ test.describe('Q3997 桌面流程/审批未用 button 空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/workflows button「查看业务表单」', async ({ page }) => {
+  test('/workflows heading「资产退役流程」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/workflows');
-    await expect(page.getByRole('button', { name: '查看业务表单' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: '资产退役流程' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 

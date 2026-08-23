@@ -69,8 +69,16 @@ export default function UserProfilePage() {
     );
   }
 
-  // Fallback to AuthContext data if API fails
-  const profile = detail ?? {
+  const hasProfileIdentity = Boolean(
+    detail
+    && typeof detail === 'object'
+    && (typeof (detail as UserDetail).id === 'number'
+      || typeof (detail as UserDetail).realName === 'string'
+      || typeof (detail as UserDetail).username === 'string'),
+  );
+
+  // Fallback to AuthContext data if API fails or returns a non-user payload
+  const profile = hasProfileIdentity ? detail as UserDetail : {
     id: user?.userId ?? 0,
     username: user?.username ?? '',
     realName: user?.realName ?? '',
