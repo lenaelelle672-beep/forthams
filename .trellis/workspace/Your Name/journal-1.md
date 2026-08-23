@@ -1233,4 +1233,5 @@
 - Q3950：**3 passed**。续 Q3951：GIS/能耗 EmptyState 与预算年度未用 heading。禁 /m。
 - Q3951：**3 passed**。续 Q3952–Q3953：平面图/SAM/导入导出/分类未用 heading/button。禁 /m。
 - Q3952–Q3953：**6 passed**。Q3953 勿测分类 EmptyState JSX action「添加分类」。续 Q3954–Q3955：资产列表/报表中心未用 heading/button。禁 /m。
+- Q3954–Q3955：**6 passed**。续 Q3956：报表中心未用 heading/button。禁 /m。
 

@@ -3141,5 +3141,6 @@
 | Q3951 | done | 桌面空态 **3 passed**（GIS/能耗 EmptyState 与预算年度未用 heading）。禁 /m。 |
 | Q3952 | done | 桌面空态 **3 passed**（平面图/SAM EmptyState heading 与导入导出未用 button）。禁 /m。 |
 | Q3953 | done | 桌面空态 **3 passed**（分类 EmptyState heading 与平面图未用 button；勿测 JSX action「添加分类」）。禁 /m。 |
-| Q3954 | pending | 桌面空态 资产列表/报表中心未用 heading/button。禁 /m。 |
-| Q3955 | pending | 桌面空态 报表中心未用卡片 heading。禁 /m。 |
+| Q3954 | done | 桌面空态 **3 passed**（资产列表 EmptyState heading/button 与报表卡片 heading）。禁 /m。 |
+| Q3955 | done | 桌面空态 **3 passed**（报表中心未用卡片 heading）。禁 /m。 |
+| Q3956 | pending | 桌面空态 报表中心未用 heading/button。禁 /m。 |
