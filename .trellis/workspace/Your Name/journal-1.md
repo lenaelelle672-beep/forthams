@@ -1041,5 +1041,6 @@
 - Q2930：/system/menus 类型/排序/状态 **3 passed**。`08c682c93`
 - Q2931：/system/menus 操作 + /retirement 资产ID + /assignments 归还日期 **3 passed**。`a4cac4310`
 - Q2932：/assignments 资产 + /transfer 普通 + /depts 新增 **3 passed**。`dc929f102`
-- Q2933：/fixed-assets/workbench 导出数据/刷新视图/运营首页 **3 passed**。
+- Q2933：/fixed-assets/workbench 导出数据/刷新视图/运营首页 **3 passed**。`58bfb98b4`
+- Q2934：/fixed-assets/workbench 欢迎回来/总资产数/查看全部 **3 passed**。
 
