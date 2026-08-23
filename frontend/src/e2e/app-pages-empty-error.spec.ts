@@ -41361,6 +41361,34 @@ test.describe('Q2899 桌面位置管理操作空态', () => {
   });
 });
 
+test.describe('Q2900 桌面位置管理统计空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/locations 空态「资产存放位置的层级管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await expect(page.getByText('资产存放位置的层级管理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/locations 空态「总位置数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await expect(page.getByText('总位置数').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/locations 空态「顶级位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await expect(page.getByText('顶级位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

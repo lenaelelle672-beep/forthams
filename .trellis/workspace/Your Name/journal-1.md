@@ -1007,5 +1007,6 @@
 - Q2896：/vendors 新增供应商/标题/搜索 **3 passed**。`69697d4a1`
 - Q2897：/vendors 描述/全部供应商/暂无数据 **3 passed**。`3cf991720`
 - Q2898：/vendors 合作中/已停用/刷新 **3 passed**。`5cecaf1f7`
-- Q2899：/locations 新增顶级位置/标题/暂无数据 **3 passed**。
+- Q2899：/locations 新增顶级位置/标题/暂无数据 **3 passed**。`1ed8decf1`
+- Q2900：/locations 描述/总位置数/顶级位置 **3 passed**。
 
