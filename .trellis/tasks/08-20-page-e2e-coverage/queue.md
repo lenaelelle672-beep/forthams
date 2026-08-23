@@ -2008,4 +2008,5 @@
 | Q2818 | done | 桌面空态 **3 passed**（/borrows/new 创建借用单/返回/标题）。禁 /m。 |
 | Q2819 | done | 桌面空态 **3 passed**（/borrows/new 借用信息/归还日期/用途）。禁 /m。 |
 | Q2820 | done | 桌面空态 **3 passed**（/borrows/new 归还日期*/备注/取消）。禁 /m。 |
-| Q2821 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2821 | done | 桌面空态 **3 passed**（/assignments/new 创建领用单/返回/标题）。禁 /m。 |
+| Q2822 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
