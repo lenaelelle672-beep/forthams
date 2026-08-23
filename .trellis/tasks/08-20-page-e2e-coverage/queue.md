@@ -2051,4 +2051,5 @@
 | Q2861 | done | 桌面空态 **3 passed**（/disposals/clearance/new 申请日期/清退原因/资产选择）。禁 /m。 |
 | Q2862 | done | 桌面空态 **3 passed**（/disposals/clearance/new 清退配置/处理方式/暂未选择）。禁 /m。 |
 | Q2863 | done | 桌面空态 **3 passed**（/disposals/clearance/new 入库保管/预估残值/紧急程度）。禁 /m。 |
-| Q2864 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2864 | done | 桌面空态 **3 passed**（/disposals/clearance/new 标题/风险提示/不可逆）。禁 /m。 |
+| Q2865 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

@@ -971,5 +971,6 @@
 - Q2860：/disposals/clearance/new 基本信息/清退编号/申请人 **3 passed**。`d58bcb293`
 - Q2861：/disposals/clearance/new 申请日期/清退原因/资产选择 **3 passed**。`57b55bcf6`
 - Q2862：/disposals/clearance/new 清退配置/处理方式/暂未选择 **3 passed**。`eac754c28`
-- Q2863：/disposals/clearance/new 入库保管/预估残值/紧急程度 **3 passed**。
+- Q2863：/disposals/clearance/new 入库保管/预估残值/紧急程度 **3 passed**。`eedaaf90c`
+- Q2864：/disposals/clearance/new 标题/风险提示/不可逆 **3 passed**。
 
