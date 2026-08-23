@@ -1127,5 +1127,6 @@
 - Q3016：/notifications 共0条/全部/所有通知 **3 passed**。`2d85dfa1a`
 - Q3017：/audit 审计日志/搜索/导出 **3 passed**。`917ca473b`
 - Q3018：/audit 总操作数/今日操作/活跃用户 **3 passed**。`2fefdf633`
-- Q3019：/audit 风险事件/最近7天/操作趋势 **3 passed**。
+- Q3019：/audit 风险事件/最近7天/操作趋势 **3 passed**。`a6f6ad099`
+- Q3020：/audit 操作类型分布/最近操作/系统日志 **3 passed**。
 
