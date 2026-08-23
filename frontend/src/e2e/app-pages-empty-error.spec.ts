@@ -43894,6 +43894,29 @@ test.describe('Q2995 桌面登录5说明文案空态', () => {
   });
 });
 
+test.describe('Q2996 桌面登录5角色按钮空态', () => {
+  test('/login5 空态 button「系统管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('button', { name: /系\s*统\s*管\s*理\s*员/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态 button「资产管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('button', { name: /资\s*产\s*管\s*理\s*员/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态 button「运维人员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('button', { name: /运\s*维\s*人\s*员/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
