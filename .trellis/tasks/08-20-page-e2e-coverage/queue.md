@@ -2380,9 +2380,33 @@
 | Q3190 | done | 桌面空态 **3 passed**（通知渠道空表 通知渠道/渠道 catalog/暂无通知渠道）。禁 /m。 |
 | Q3191 | done | 桌面空态 **3 passed**（通知渠道详情 渠道详情/通知渠道配置/读取详情）。禁 /m。 |
 | Q3192 | done | 桌面空态 **3 passed**（通知渠道预览 配置名称/样例相对路径/无持久化预览）。禁 /m。 |
-| Q3193 | in_progress | 桌面空态：通知渠道其余（请选择配置/地址已配置/预览渠道类型）。禁 /m。 |
-| Q3194 | pending | 桌面空态：字段集边界文案（详情预览 heading/真实调用/read-only 徽标）。禁 /m。 |
-| Q3195 | pending | 桌面空态：Webhook 空表（Webhook 配置/新增 heading/暂无配置）。禁 /m。 |
-| Q3196 | pending | 桌面空态：Webhook 表单（资产 Webhook/ASSET_SYNC/目标 URL）。禁 /m。 |
-| Q3197 | pending | 桌面空态：岗位管理空表（岗位管理/岗位 catalog/暂无可展示岗位）。禁 /m。 |
-| Q3198 | pending | 桌面空态：岗位管理检索预览（筛选占位/postCode/postName）。禁 /m。 |
+| Q3193 | done | 桌面空态 **3 passed**（通知渠道其余 请选择配置/地址已配置/预览渠道类型）。禁 /m。 |
+| Q3194 | done | 桌面空态 **3 passed**（字段集边界 详情预览 heading/真实调用/read-only 徽标）。禁 /m。 |
+| Q3195 | done | 桌面空态 **3 passed**（Webhook 空表 Webhook 配置/新增 heading/暂无配置）。禁 /m。 |
+| Q3196 | done | 桌面空态 **3 passed**（Webhook 表单 资产 Webhook/ASSET_SYNC/目标 URL）。禁 /m。 |
+| Q3197 | done | 桌面空态 **3 passed**（岗位管理空表 岗位管理/岗位 catalog/暂无可展示岗位）。禁 /m。 |
+| Q3198 | done | 桌面空态 **3 passed**（岗位管理检索预览 筛选占位/postCode/postName）。禁 /m。 |
+| Q3199 | in_progress | 桌面空态：Webhook 其余表单（配置名称/事件类型/目标 URL 占位）。禁 /m。 |
+| Q3200 | pending | 桌面空态：Webhook 签名启用（签名策略/仅提交不回显/启用配置）。禁 /m。 |
+| Q3201 | pending | 桌面空态：Webhook 操作边界（新增配置/只加载 webhook-configs/config-only）。禁 /m。 |
+| Q3202 | pending | 桌面空态：岗位 preview heading（metadata 详情/请选择岗位/dry-run preview）。禁 /m。 |
+| Q3203 | pending | 桌面空态：岗位 preview 字段（sortOrder/remark/启用）。禁 /m。 |
+| Q3204 | pending | 桌面空态：岗位检索操作（岗位关键词/只读刷新/全部状态）。禁 /m。 |
+| Q3205 | pending | 桌面空态：安全策略 heading（安全策略/SECURITY 配置态/审计摘要）。禁 /m。 |
+| Q3206 | pending | 桌面空态：安全策略表单（配置键/配置值/审计原因）。禁 /m。 |
+| Q3207 | pending | 桌面空态：安全策略操作（保存安全策略/影响预演/口令长度下限）。禁 /m。 |
+| Q3208 | pending | 桌面空态：邮件网关空表（邮件网关配置/网关 catalog/暂无网关）。禁 /m。 |
+| Q3209 | pending | 桌面空态：邮件网关检索（脱敏筛选占位/网关关键词/只读刷新）。禁 /m。 |
+| Q3210 | pending | 桌面空态：邮件网关预览（脱敏详情 heading/hostMasked/请选择网关）。禁 /m。 |
+| Q3211 | pending | 桌面空态：流程通知开关空表（流程通知开关/catalog/暂无开关）。禁 /m。 |
+| Q3212 | pending | 桌面空态：流程通知开关查询（业务类型 heading/请选择业务类型/读取业务类型）。禁 /m。 |
+| Q3213 | pending | 桌面空态：流程通知开关预览（事件/无持久化预览按钮/真实调用）。禁 /m。 |
+| Q3214 | pending | 桌面空态：接口管理空表（接口管理/暂无接口/只加载接口）。禁 /m。 |
+| Q3215 | pending | 桌面空态：字段映射空表（字段映射/暂无字段映射/预览转换）。禁 /m。 |
+| Q3216 | pending | 桌面空态：同步规则空表（同步规则/暂无同步规则/单条日志重试）。禁 /m。 |
+| Q3217 | pending | 桌面空态：缓存管理空表（缓存管理/暂无可管理缓存/刷新全部）。禁 /m。 |
+| Q3218 | pending | 桌面空态：文件存储空表（文件存储/附件元数据目录/暂无附件）。禁 /m。 |
+| Q3219 | pending | 桌面空态：文件存储检索（文件名占位/附件关键词/全部业务类型）。禁 /m。 |
+| Q3220 | pending | 桌面空态：安全策略边界（no-login-chain/真实调用/配置类型）。禁 /m。 |
+| Q3221 | pending | 桌面空态：岗位边界（真实调用 /system/posts/岗位只读列表/显示 0）。禁 /m。 |
+| Q3222 | pending | 桌面空态：邮件网关余项（senderMasked/dry-run preview/全部 TLS）。禁 /m。 |
