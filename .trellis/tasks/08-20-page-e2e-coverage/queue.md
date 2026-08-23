@@ -3161,3 +3161,11 @@
 | Q3971 | pending | 桌面空态 保险/设备未用筛选 button。禁 /m。 |
 | Q3972 | pending | 桌面空态 设备未用状态筛选 button。禁 /m。 |
 | Q3973 | pending | 桌面空态 合同/处置/审批未用 heading/button。禁 /m。 |
+| Q3974 | pending | 桌面空态 审批/盘点周期未用筛选 button。禁 /m。 |
+| Q3975 | pending | 桌面空态 检验未用类型筛选 button。禁 /m。 |
+| Q3976 | pending | 桌面空态 检验未用结果筛选 button。禁 /m。 |
+| Q3977 | pending | 桌面空态 备件/盘点周期未用筛选 button。禁 /m。 |
+| Q3978 | pending | 桌面空态 预算未用类型筛选 button。禁 /m。 |
+| Q3979 | pending | 桌面空态 预算/验收未用 heading/button。禁 /m。 |
+| Q3980 | pending | 桌面空态 验收/保险未用状态筛选 button。禁 /m。 |
+| Q3981 | pending | 桌面空态 审批未用类型筛选 button。禁 /m。 |

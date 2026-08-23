@@ -72085,23 +72085,23 @@ test.describe('Q3970 桌面保险未用状态/类型筛选 button 空态', () =>
     await seedSession(page, adminUser);
   });
 
-  test('/insurance button「已过期」', async ({ page }) => {
+  test('/insurances button「已过期」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/insurance');
+    await page.goto('/insurances');
     await expect(page.getByRole('button', { name: '已过期' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/insurance button「财产险」', async ({ page }) => {
+  test('/insurances button「财产险」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/insurance');
+    await page.goto('/insurances');
     await expect(page.getByRole('button', { name: '财产险' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/insurance button「责任险」', async ({ page }) => {
+  test('/insurances button「责任险」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/insurance');
+    await page.goto('/insurances');
     await expect(page.getByRole('button', { name: '责任险' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
@@ -72114,9 +72114,9 @@ test.describe('Q3971 桌面保险/设备未用筛选 button 空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/insurance button「车险」', async ({ page }) => {
+  test('/insurances button「车险」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/insurance');
+    await page.goto('/insurances');
     await expect(page.getByRole('button', { name: '车险' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
@@ -72190,6 +72190,238 @@ test.describe('Q3973 桌面合同/处置/审批未用 heading/button 空态', ()
     const errors = collectBrowserErrors(page);
     await page.goto('/approvals');
     await expect(page.getByRole('button', { name: '资产报废' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3974 桌面审批/盘点周期未用筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/approvals button「工单申请」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByRole('button', { name: '工单申请' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles button「已计划」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('button', { name: '已计划' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles button「已暂停」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('button', { name: '已暂停' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3975 桌面检验未用类型筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections button「年度检验」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '年度检验' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections button「定期检验」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '定期检验' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections button「专项检验」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '专项检验' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3976 桌面检验未用结果筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections button「全部结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '全部结果' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections button「不通过」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '不通过' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections button「附条件通过」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('button', { name: '附条件通过' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3977 桌面备件/盘点周期未用筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/spare-parts button「启用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts');
+    await expect(page.getByRole('button', { name: '启用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts button「停用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts');
+    await expect(page.getByRole('button', { name: '停用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/stocktaking-cycles button「进行中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('button', { name: '进行中' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3978 桌面预算未用类型筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets button「采购」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('button', { name: '采购' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets button「维保」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('button', { name: '维保' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets button「运营」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('button', { name: '运营' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3979 桌面预算/验收未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/budgets button「预算列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('button', { name: '预算列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake button「待质检」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('button', { name: '待质检' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake button「质检中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('button', { name: '质检中' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3980 桌面验收未用状态筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake button「部分验收」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('button', { name: '部分验收' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake button「已验收」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('button', { name: '已验收' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances button「已取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances');
+    await expect(page.getByRole('button', { name: '已取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3981 桌面审批未用类型筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/approvals button「资产调拨」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByRole('button', { name: '资产调拨' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals button「资产清退」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByRole('button', { name: '资产清退' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals button「全部类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByRole('button', { name: '全部类型' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
