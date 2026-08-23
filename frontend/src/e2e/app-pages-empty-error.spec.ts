@@ -68393,6 +68393,238 @@ test.describe('Q3842 桌面交接写边界与未闭环整句空态', () => {
 
 });
 
+test.describe('Q3843 桌面安全策略 no-login-chain 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「no-login-chain / no-direct-effect：本模块不接登录链路、不直接生效、不改变会话、MFA 或移动端运行状态；runtimeEffect 必须为 false。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('no-login-chain / no-direct-effect：本模块不接登录链路、不直接生效、不改变会话、MFA 或移动端运行状态；runtimeEffect 必须为 false。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「不接登录链路、不直接生效、不改变会话、MFA 或移动端运行状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('不接登录链路、不直接生效、不改变会话、MFA 或移动端运行状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「不改变会话、MFA 或移动端运行状态；runtimeEffect 必须为 false」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('不改变会话、MFA 或移动端运行状态；runtimeEffect 必须为 false').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3844 桌面安全策略配置态/审计摘要整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「真实调用 /system-config/security 与 /system-config/security/preview；本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖，也不是 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('真实调用 /system-config/security 与 /system-config/security/preview；本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖，也不是 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy 「/system-config/security/preview；本页只展示配置态、预览态和审计摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByText('/system-config/security/preview；本页只展示配置态、预览态和审计摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3845 桌面流程邮件写边界与零调用风险整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-mail 「只读边界：本页仅展示流程节点邮件配置；新增、编辑、删除、测试发送等写操作不在 V3 只读 catalog 范围内。真实邮件发送未接入流程平台，存在零业务调用风险。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-mail');
+    await expect(page.getByText('只读边界：本页仅展示流程节点邮件配置；新增、编辑、删除、测试发送等写操作不在 V3 只读 catalog 范围内。真实邮件发送未接入流程平台，存在零业务调用风险。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-mail 「本页仅展示流程节点邮件配置；新增、编辑、删除、测试发送等写操作不在 V3 只读 catalog 范围内」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-mail');
+    await expect(page.getByText('本页仅展示流程节点邮件配置；新增、编辑、删除、测试发送等写操作不在 V3 只读 catalog 范围内').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-mail 「写操作不在 V3 只读 catalog 范围内。真实邮件发送未接入流程平台」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-mail');
+    await expect(page.getByText('写操作不在 V3 只读 catalog 范围内。真实邮件发送未接入流程平台').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3846 桌面文档中心写边界与附件留痕整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-doc-center 「只读边界：本页仅展示文档目录；编辑、发布、归档、删除、附件上传等写操作不在 V3 只读 catalog 范围内。附件安全与删除留痕需后续专项处理。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-doc-center');
+    await expect(page.getByText('只读边界：本页仅展示文档目录；编辑、发布、归档、删除、附件上传等写操作不在 V3 只读 catalog 范围内。附件安全与删除留痕需后续专项处理。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-doc-center 「写操作不在 V3 只读 catalog 范围内。附件安全与删除留痕需后续专项处理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-doc-center');
+    await expect(page.getByText('写操作不在 V3 只读 catalog 范围内。附件安全与删除留痕需后续专项处理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-doc-center 「本页仅展示文档目录；编辑、发布、归档、删除、附件上传等写操作不在 V3 只读 catalog 范围内。附件安全」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-doc-center');
+    await expect(page.getByText('本页仅展示文档目录；编辑、发布、归档、删除、附件上传等写操作不在 V3 只读 catalog 范围内。附件安全').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3847 桌面控制台 SLA 联动 9/9 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCommandCenterEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「SLA 只读联动已纳入流程平台 9/9；不支持发起/审批/重试/终止/发布/编辑；仍非 44 项全量覆盖，不代表 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('SLA 只读联动已纳入流程平台 9/9；不支持发起/审批/重试/终止/发布/编辑；仍非 44 项全量覆盖，不代表 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「SLA 只读联动已纳入流程平台 9/9」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('SLA 只读联动已纳入流程平台 9/9').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「仍非 44 项全量覆盖，不代表 Workbench V3 全量完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('仍非 44 项全量覆盖，不代表 Workbench V3 全量完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3848 桌面部门组织 list/tree 检索整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「/depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('/depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3849 桌面位置 list/root 检索整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「只读展示 /locations/list 与 /locations/root 返回的位置，搜索与状态筛选在前端结果内完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('只读展示 /locations/list 与 /locations/root 返回的位置，搜索与状态筛选在前端结果内完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「只读展示 /locations/list 与 /locations/root 返回的位置，搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('只读展示 /locations/list 与 /locations/root 返回的位置，搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「/locations/root 返回的位置，搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('/locations/root 返回的位置，搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3850 桌面供应商 list 检索整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockVendorsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「只读展示 /vendors/list 返回的供应商，搜索与状态筛选在前端结果内完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('只读展示 /vendors/list 返回的供应商，搜索与状态筛选在前端结果内完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「只读展示 /vendors/list 返回的供应商，搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('只读展示 /vendors/list 返回的供应商，搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「/vendors/list 返回的供应商，搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('/vendors/list 返回的供应商，搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
