@@ -976,5 +976,7 @@
 - Q2865：/disposals/clearance/new 确认提交/先选资产/审批流程 **3 passed**。`45525a638`
 - Q2866：/disposals/clearance/new 备注/说明/提交审批文案 **3 passed**。`27e1a8d30`
 - Q2867：/disposals/clearance/new 变卖/捐赠/普通 **3 passed**。`d1dca47f0`
-- Q2868：/disposals/transfer/new 提交申请/保存草稿/取消 **3 passed**。
+- Q2868：/disposals/transfer/new 提交申请/保存草稿/取消 **3 passed**。`58b9f13ff`
+- Q2869：/disposals/transfer/new 返回/添加资产/计算处理人 **3 passed**。`a53de727d`
+- Q2870：/disposals/transfer/new 基本信息/单据信息/资产选择 heading **3 passed**。
 

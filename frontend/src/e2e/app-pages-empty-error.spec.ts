@@ -40521,6 +40521,34 @@ test.describe('Q2869 桌面新建转移申请其余按钮空态', () => {
   });
 });
 
+test.describe('Q2870 桌面新建转移申请分区空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/transfer/new 空态 heading「基本信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByRole('heading', { name: '基本信息' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 空态 heading「单据信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByRole('heading', { name: '单据信息' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 空态 heading「资产选择」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByRole('heading', { name: '资产选择' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

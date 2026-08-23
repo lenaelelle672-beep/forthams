@@ -2057,4 +2057,5 @@
 | Q2867 | done | 桌面空态 **3 passed**（/disposals/clearance/new 变卖/捐赠/普通）。禁 /m。 |
 | Q2868 | done | 桌面空态 **3 passed**（/disposals/transfer/new 提交申请/保存草稿/取消）。禁 /m。 |
 | Q2869 | done | 桌面空态 **3 passed**（/disposals/transfer/new 返回/添加资产/计算处理人）。禁 /m。 |
-| Q2870 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2870 | done | 桌面空态 **3 passed**（/disposals/transfer/new 基本信息/单据信息/资产选择 heading）。禁 /m。 |
+| Q2871 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
