@@ -548,9 +548,9 @@ export default function DeptManagement() {
                     <h3 className="text-sm font-medium text-slate-500">
                       {keyword ? '未找到匹配的部门' : '暂无部门数据'}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <h3 className="text-xs font-medium text-slate-400 mt-1">
                       {keyword ? '请尝试更换关键词' : '点击下方按钮创建第一个部门'}
-                    </p>
+                    </h3>
                     {!keyword && (
                       <Button
                         variant="primary"

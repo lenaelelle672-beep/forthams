@@ -81419,6 +81419,239 @@ test.describe('Q4290 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4291 桌面自定义字段资产平面图空态描述 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/custom-fields heading「没有找到匹配的字段」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByRole('heading', { name: '没有找到匹配的字段' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets heading「未找到符合条件的资产记录，请调整筛选条件或新建资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: '未找到符合条件的资产记录，请调整筛选条件或新建资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans heading「请新建平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByRole('heading', { name: '请新建平面图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4292 桌面SAM空态描述 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam heading「执行合规扫描后显示许可类型分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '执行合规扫描后显示许可类型分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam heading「执行合规扫描后显示席位使用率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '执行合规扫描后显示席位使用率' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam heading「所有许可合规运行」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '所有许可合规运行' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4293 桌面分类与默认空态描述 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/idle heading「当前没有可显示的数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/idle');
+    await expect(page.getByRole('heading', { name: '当前没有可显示的数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories heading「点击上方按钮添加根分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByRole('heading', { name: '点击上方按钮添加根分类' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories heading「请在左侧树中选择一个分类查看详情，或点击上方按钮添加新分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByRole('heading', { name: '请在左侧树中选择一个分类查看详情，或点击上方按钮添加新分类' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4294 桌面部门空态提示与流程表单 heading', () => {
+  test('/system/depts heading「点击下方按钮创建第一个部门」', async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await expect(page.getByRole('heading', { name: '点击下方按钮创建第一个部门' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTIETH heading「TWOHUNDREDEIGHTIETH」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTIETH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYFIRST heading「TWOHUNDREDEIGHTYFIRST」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYFIRST');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4295 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYSECOND heading「TWOHUNDREDEIGHTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYSECOND');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYTHIRD heading「TWOHUNDREDEIGHTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYFOURTH heading「TWOHUNDREDEIGHTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4296 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYFIFTH heading「TWOHUNDREDEIGHTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYSIXTH heading「TWOHUNDREDEIGHTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYSEVENTH heading「TWOHUNDREDEIGHTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4297 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYEIGHTH heading「TWOHUNDREDEIGHTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDEIGHTYNINTH heading「TWOHUNDREDEIGHTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDEIGHTYNINTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDEIGHTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDNINETIETH heading「TWOHUNDREDNINETIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDNINETIETH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDNINETIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4298 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/TWOHUNDREDNINETYFIRST heading「TWOHUNDREDNINETYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDNINETYFIRST');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDNINETYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDNINETYSECOND heading「TWOHUNDREDNINETYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDNINETYSECOND');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDNINETYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDNINETYTHIRD heading「TWOHUNDREDNINETYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDNINETYTHIRD');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDNINETYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
