@@ -952,5 +952,6 @@
 - Q2841：/spare-parts/new 单价/描述/编码placeholder **3 passed**。`b19ad0eb8`
 - Q2842：/risk-assessments/new 创建/取消/标题 **3 passed**。 heading 新增风险评估不存在。`ad230c302`
 - Q2843：/risk-assessments/new 资产ID/可能性/影响程度 **3 passed**。`0f6732265`
-- Q2844：/risk-assessments/new 缓解措施/评审日期/评估人 **3 passed**。
+- Q2844：/risk-assessments/new 缓解措施/评审日期/评估人 **3 passed**。`086762470`
+- Q2845：/risk-assessments/new 风险等级/LOW/资产ID placeholder **3 passed**。
 

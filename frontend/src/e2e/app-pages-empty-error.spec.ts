@@ -39821,6 +39821,34 @@ test.describe('Q2844 桌面新建风险评估其余字段空态', () => {
   });
 });
 
+test.describe('Q2845 桌面新建风险评估等级空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/risk-assessments/new 空态「自动计算的风险等级」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByText('自动计算的风险等级').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/new 空态「LOW（低危）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByText('LOW（低危）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments/new 空态 placeholder「输入资产ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments/new');
+    await expect(page.getByPlaceholder('输入资产ID').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
