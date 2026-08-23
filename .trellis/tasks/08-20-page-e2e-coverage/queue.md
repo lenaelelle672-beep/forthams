@@ -2135,4 +2135,5 @@
 | Q2945 | done | 桌面空态 **3 passed**（workbench 个人中心 + /system/users 正常/停用）。禁 /m。 |
 | Q2946 | done | 桌面空态 **3 passed**（/approvals 至 + /users 全部 + /insurances 保单号）。禁 /m。 |
 | Q2947 | done | 桌面空态 **3 passed**（/insurances/new 保险名称/类型/公司）。禁 /m。 |
-| Q2948 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2948 | done | 桌面空态 **3 passed**（/insurances/new 保费/保额/免赔额）。禁 /m。 |
+| Q2949 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
