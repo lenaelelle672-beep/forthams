@@ -80484,12 +80484,12 @@ test.describe('Q4258 桌面流程表单未用业务编码 heading', () => {
 });
 
 test.describe('Q4259 桌面预算重估菜单未用列表 heading', () => {
-  test('/budgets heading「占比 0%」', async ({ page }) => {
+  test('/budgets heading「占比 0.0%」', async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, adminUser);
     const errors = collectBrowserErrors(page);
     await page.goto('/budgets');
-    await expect(page.getByRole('heading', { name: '占比 0%' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: '占比 0.0%' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
