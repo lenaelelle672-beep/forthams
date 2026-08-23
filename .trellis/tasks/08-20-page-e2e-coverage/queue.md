@@ -2123,4 +2123,5 @@
 | Q2933 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 导出数据/刷新视图/运营首页）。禁 /m。 |
 | Q2934 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 欢迎回来/总资产数/查看全部）。禁 /m。 |
 | Q2935 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 在用/闲置/待审批）。禁 /m。 |
-| Q2936 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2936 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 价值趋势/分类分布/维保预警）。禁 /m。 |
+| Q2937 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
