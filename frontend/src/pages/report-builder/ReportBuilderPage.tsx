@@ -566,9 +566,9 @@ export default function ReportBuilderPage() {
             <CardContent className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
+                  <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
                     报表名称
-                  </label>
+                  </h3>
                   <input
                     value={reportName}
                     onChange={(e) => setReportName(e.target.value)}
@@ -577,9 +577,9 @@ export default function ReportBuilderPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
+                  <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
                     报表类型
-                  </label>
+                  </h3>
                   <select
                     value={reportType}
                     onChange={(e) => setReportType(e.target.value)}
@@ -591,9 +591,9 @@ export default function ReportBuilderPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
+                  <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
                     图表类型
-                  </label>
+                  </h3>
                   <div className="flex gap-1">
                     {CHART_TYPES.map((ct) => {
                       const Icon = ct.icon;

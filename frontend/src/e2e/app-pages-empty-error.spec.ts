@@ -75124,6 +75124,238 @@ test.describe('Q4074 桌面报表构建器未用角色', () => {
 
 });
 
+test.describe('Q4075 桌面报表构建器未用配置 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder heading「报表名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '报表名称' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder heading「报表类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '报表类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder heading「图表类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '图表类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4076 桌面报表构建器未用图表类型 button', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「柱状图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '柱状图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「折线图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '折线图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「饼图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '饼图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4077 桌面报表构建器未用字段 button', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「表格」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '表格' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「资产编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '资产编码' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「资产名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '资产名称' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4078 桌面报表构建器未用资产字段 button', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「原值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '原值' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「净值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '净值' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「购入日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '购入日期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4079 桌面报表构建器未用运维字段 button', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「工单数量」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '工单数量' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「保养次数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '保养次数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「故障次数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '故障次数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4080 桌面报表构建器未用财务字段 button', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「折旧金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '折旧金额' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「维保费用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '维保费用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder button「能耗费用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '能耗费用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4081 桌面导入导出未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「总成本」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '总成本' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export heading「将 .xlsx 文件拖到此处，或点击选择文件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByRole('heading', { name: '将 .xlsx 文件拖到此处，或点击选择文件' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export heading「支持 .xlsx 格式，文件大小不超过 10MB」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByRole('heading', { name: '支持 .xlsx 格式，文件大小不超过 10MB' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4082 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/NINETEENTH heading「NINETEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/NINETEENTH');
+    await expect(page.getByRole('heading', { name: 'NINETEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWENTIETH heading「TWENTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWENTIETH');
+    await expect(page.getByRole('heading', { name: 'TWENTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWENTYFIRST heading「TWENTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWENTYFIRST');
+    await expect(page.getByRole('heading', { name: 'TWENTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
