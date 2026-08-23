@@ -2175,4 +2175,5 @@
 | Q2985 | done | 桌面空态 **3 passed**（/login4 系统管理员/资产管理员/运维人员）。禁 /m。 |
 | Q2986 | done | 桌面空态 **3 passed**（/login4 部门负责人/全域权限/全生命周期）。禁 /m。 |
 | Q2987 | done | 桌面空态 **3 passed**（/login4 资源审批/巡检维修/账号placeholder）。禁 /m。 |
-| Q2988 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2988 | done | 桌面空态 **3 passed**（/login4 密码placeholder/显示密码/固定资产平台）。禁 /m。 |
+| Q2989 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
