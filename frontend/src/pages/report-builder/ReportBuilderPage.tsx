@@ -618,9 +618,9 @@ export default function ReportBuilderPage() {
 
               {/* 已选字段（拖拽放置区） */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-[var(--surface-heading)] mb-2">
+                <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-2">
                   已选字段 ({selectedFields.length})
-                </label>
+                </h3>
                 <FieldDropZone
                   selectedFields={selectedFields}
                   onAddField={handleAddField}

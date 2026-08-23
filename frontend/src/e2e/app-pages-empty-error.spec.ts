@@ -75066,6 +75066,64 @@ test.describe('Q4072 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4073 桌面分析页未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics heading「处置统计」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByRole('heading', { name: '处置统计' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics heading「多维资产趋势、分类结构与运营指标分析」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByRole('heading', { name: '多维资产趋势、分类结构与运营指标分析' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics heading「数据范围」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByRole('heading', { name: '数据范围' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4074 桌面报表构建器未用角色', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder button「保存报表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('button', { name: '保存报表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder heading「已选字段」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '已选字段' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTH heading「EIGHTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

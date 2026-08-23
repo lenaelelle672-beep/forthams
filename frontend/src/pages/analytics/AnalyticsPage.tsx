@@ -292,14 +292,14 @@ export default function AnalyticsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
             <div>
               <h1 className="text-xl font-bold text-slate-900">{t('analytics:module.title')}</h1>
-              <p className="mt-1 text-sm text-slate-500">{t('analytics:module.subtitle')}</p>
+              <h3 className="mt-1 text-sm font-medium text-slate-500">{t('analytics:module.subtitle')}</h3>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2">
                 <Calendar className="w-4 h-4 text-slate-400" />
-                <span className="text-xs font-medium text-slate-500 hidden sm:inline">
+                <h3 className="text-xs font-medium text-slate-500 hidden sm:inline">
                   {t('analytics:period.label')}
-                </span>
+                </h3>
                 <Select value={period} onValueChange={setPeriod}>
                   <SelectItem value="6">{t('analytics:period.6months')}</SelectItem>
                   <SelectItem value="12">{t('analytics:period.12months')}</SelectItem>

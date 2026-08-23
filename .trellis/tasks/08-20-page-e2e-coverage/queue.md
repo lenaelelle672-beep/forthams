@@ -3256,7 +3256,9 @@
 | Q4066 | done | 桌面空态 **3 passed**（调拨/清退未用空态 heading）。禁 /m。 |
 | Q4067 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4068 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4069 | pending | 桌面空态 报表构建器/分析 KPI 未用角色。禁 /m。 |
-| Q4070 | pending | 桌面空态 分析 KPI 未用 heading。禁 /m。 |
-| Q4071 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4072 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4069 | done | 桌面空态 **3 passed**（报表构建器/分析 KPI 未用角色）。禁 /m。 |
+| Q4070 | done | 桌面空态 **3 passed**（分析 KPI 未用 heading）。禁 /m。 |
+| Q4071 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4072 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4073 | pending | 桌面空态 分析页未用 heading。禁 /m。 |
+| Q4074 | pending | 桌面空态 报表构建器未用角色。禁 /m。 |
