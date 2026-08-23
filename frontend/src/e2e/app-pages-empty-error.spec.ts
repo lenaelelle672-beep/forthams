@@ -62591,6 +62591,238 @@ test.describe('Q3642 桌面字段集预览字段余项空态', () => {
 
 });
 
+test.describe('Q3643 桌面同步规则队列失败计数空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSystemSyncRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules 「失败 0」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('失败 0').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules 「待处理 0」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('待处理 0').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules 「运行中 0」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('运行中 0').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3644 桌面 SLA 脱敏边界余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「通知目标、联系方式、变量值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('通知目标、联系方式、变量值').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「附件引用与导出内容」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('附件引用与导出内容').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「masked/summary」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('masked/summary').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3645 桌面通知渠道未用 combobox/checkbox 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels combobox「通知渠道配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByRole('combobox', { name: '通知渠道配置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels combobox「预览渠道类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByRole('combobox', { name: '预览渠道类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels checkbox「签名已配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByRole('checkbox', { name: '签名已配置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3646 桌面通知渠道未用 checkbox 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels checkbox「地址已配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByRole('checkbox', { name: '地址已配置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels checkbox「启用状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByRole('checkbox', { name: '启用状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels 「noPersistence」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('noPersistence').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3647 桌面通知偏好未用 combobox 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationPreferencesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences combobox「通知偏好分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByRole('combobox', { name: '通知偏好分类' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「站内信=」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('站内信=').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「邮件=」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('邮件=').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3648 桌面 Webhook 未用签名策略 combobox 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config combobox「签名策略」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByRole('combobox', { name: '签名策略' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「只加载 /system/webhook-configs 配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText('只加载 /system/webhook-configs 配置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「配置校验仅做 config-only 验证」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText('配置校验仅做 config-only 验证').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3649 桌面 SLA 导出字段余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「表单实例」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('表单实例').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「变量原文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('变量原文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「storage key」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('storage key').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3650 桌面 SLA 导出遮罩余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「附件路径」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('附件路径').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「附件路径或 storage key」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('附件路径或 storage key').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「只展示 masked/summary」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('只展示 masked/summary').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

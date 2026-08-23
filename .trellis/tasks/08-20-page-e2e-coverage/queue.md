@@ -2822,12 +2822,20 @@
 | Q3632 | done | 桌面空态 **3 passed**（字段集 note/wouldBindCategory）。禁 /m。 |
 | Q3633 | done | 桌面空态 **3 passed**（角色权限 note/catalog 说明）。禁 /m。 |
 | Q3634 | done | 桌面空态 **3 passed**（菜单权限 note/覆盖视图）。禁 /m。 |
-| Q3635 | pending | 桌面空态：审计日志 note/GET 族端点。禁 /m。 |
-| Q3636 | pending | 桌面空态：编号规则预览旗标余项。禁 /m。 |
-| Q3637 | pending | 桌面空态：通知渠道预览字段余项。禁 /m。 |
-| Q3638 | pending | 桌面空态：岗位管理预览旗标余项。禁 /m。 |
-| Q3639 | pending | 桌面空态：SLA 运行态边界余项。禁 /m。 |
-| Q3640 | pending | 桌面空态：邮件日志脱敏余项。禁 /m。 |
-| Q3641 | pending | 桌面空态：自定义字段预览字段余项。禁 /m。 |
-| Q3642 | pending | 桌面空态：字段集预览字段余项。禁 /m。 |
-| Q3643 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
+| Q3635 | done | 桌面空态 **3 passed**（审计日志 note/GET 族端点）。禁 /m。 |
+| Q3636 | done | 桌面空态 **3 passed**（编号规则预览旗标余项）。禁 /m。 |
+| Q3637 | done | 桌面空态 **3 passed**（通知渠道预览字段余项）。禁 /m。 |
+| Q3638 | done | 桌面空态 **3 passed**（岗位管理预览旗标余项）。禁 /m。 |
+| Q3639 | done | 桌面空态 **3 passed**（SLA 运行态边界余项）。禁 /m。 |
+| Q3640 | done | 桌面空态 **3 passed**（邮件日志脱敏余项）。禁 /m。 |
+| Q3641 | done | 桌面空态 **3 passed**（自定义字段预览字段余项）。禁 /m。 |
+| Q3642 | done | 桌面空态 **3 passed**（字段集预览字段余项）。禁 /m。 |
+| Q3643 | pending | 桌面空态：同步规则失败 0/待处理 0/运行中 0。禁 /m。 |
+| Q3644 | pending | 桌面空态：SLA 脱敏边界余项。禁 /m。 |
+| Q3645 | pending | 桌面空态：通知渠道未用 combobox/checkbox。禁 /m。 |
+| Q3646 | pending | 桌面空态：通知渠道 checkbox 余项/noPersistence。禁 /m。 |
+| Q3647 | pending | 桌面空态：通知偏好未用 combobox。禁 /m。 |
+| Q3648 | pending | 桌面空态：Webhook 未用签名策略 combobox。禁 /m。 |
+| Q3649 | pending | 桌面空态：SLA 导出字段余项。禁 /m。 |
+| Q3650 | pending | 桌面空态：SLA 导出遮罩余项。禁 /m。 |
+| Q3651 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
