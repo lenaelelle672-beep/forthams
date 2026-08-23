@@ -1025,5 +1025,6 @@
 - Q2914：/system/users 搜索/重置/邮箱手机号 **3 passed**。`51803bf60`
 - Q2915：/system/users 部门/创建时间/操作 **3 passed**。`7b4a6fc6c`
 - Q2916：/system/users 状态/用户 + /system/roles 新增角色 **3 passed**。`2b03d09a5`
-- Q2917：/system/roles 标题/描述/暂无数据 **3 passed**。
+- Q2917：/system/roles 标题/描述/暂无数据 **3 passed**。`aeeddb845`
+- Q2918：/system/roles 角色列表/总数/RBAC **3 passed**。
 
