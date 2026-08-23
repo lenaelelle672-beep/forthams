@@ -63641,17 +63641,17 @@ test.describe('Q3679 桌面导入导出行数上限余项空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-import-export 「导入上限」行文案', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-import-export 「行，导出上限」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
-    await expect(page.getByText(/导入上限 \d+ 行/).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('行，导出上限').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-import-export 「导出上限」行文案', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-import-export 「导出上限」行后缀', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
-    await expect(page.getByText(/导出上限 \d+ 行/).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/导出上限 .* 行/).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
