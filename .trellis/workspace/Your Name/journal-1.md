@@ -936,5 +936,6 @@
 - Q2825：/assignments/new 使用人ID/部门ID/备注placeholder **3 passed**。`9d50f3cc3`
 - Q2826：/intake/new 创建验收单/标题/验收单信息 **3 passed**。`4a31c5ebb`
 - Q2827：/intake/new 返回/取消/添加按钮 **3 passed**。`277c2ba89`
-- Q2828：/intake/new 验收检查项heading/总金额/检查项 **3 passed**。
+- Q2828：/intake/new 验收检查项heading/总金额/检查项 **3 passed**。`58371fdc6`
+- Q2829：/retirement/new 提交申请/返回/标题 **3 passed**。
 
