@@ -2236,4 +2236,15 @@
 | Q3046 | done | 桌面空态 **3 passed**（/insurances/new button 返回 + 开始/结束日期）。禁 /m。 |
 | Q3047 | done | 桌面空态 **3 passed**（备件 安全库存(件)/优先本仓调拨/到货日期）。禁 /m。 |
 | Q3048 | done | 桌面空态 **3 passed**（/assets/new 购置日期/折旧率/部门select）。禁 /m。 |
-| Q3049 | in_progress | 桌面空态：继续桌面未用角色/空态票。禁 /m。 |
+| Q3049 | in_progress | 桌面空态：/compensation/new textbox 申请/损坏日期 + 损坏类型。禁 /m。 |
+| Q3050 | pending | 桌面空态：采购弹窗 textbox 单号/名称/备注。禁 /m。 |
+| Q3051 | pending | 桌面空态：采购弹窗 textbox 日期/到货 + button 确认新增。禁 /m。 |
+| Q3052 | pending | 桌面空态：采购弹窗 button 添加行/取消 + placeholder 资产名称。禁 /m。 |
+| Q3053 | pending | 桌面空态：维保计划弹窗 textbox 名称/执行人/备注。禁 /m。 |
+| Q3054 | pending | 桌面空态：维保计划弹窗 起止日期 + spinbutton 每月第几天。禁 /m。 |
+| Q3055 | pending | 桌面空态：维保计划弹窗 费用 + button 确认新建/取消。禁 /m。 |
+| Q3056 | pending | 桌面空态：资产模型弹窗 textbox 名称/型号 + heading。禁 /m。 |
+| Q3057 | pending | 桌面空态：角色弹窗 textbox 名称/编码/描述。禁 /m。 |
+| Q3058 | pending | 桌面空态：菜单弹窗 textbox 名称/路由/组件。禁 /m。 |
+| Q3059 | pending | 桌面空态：菜单弹窗 spinbutton 排序 + button 保存 + 类型。禁 /m。 |
+| Q3060 | pending | 桌面空态：退役 spinbutton 资产ID + 预算 heading/返回。禁 /m。 |

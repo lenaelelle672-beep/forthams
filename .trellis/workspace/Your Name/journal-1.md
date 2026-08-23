@@ -1139,4 +1139,5 @@
 - Q3028：续桌面空态。/intake/new role 已尽；改测 /spare-parts/new 未用 textbox/spinbutton 与工作台预填、/insurances/new 未用 textbox/combobox。禁 /m。
 - Q3028–Q3039：**36 passed**。Linux 路由大小写修 WorkOrder/Approval。续 Q3040：/assets/new textbox/spinbutton + 赔偿/调拨角色。
 - Q3040–Q3048：**27 passed**。下一票 Q3049：继续桌面未用角色/空态。禁 /m。
+- Q3049：续桌面未用角色。赔偿日期、采购/维保/模型/角色/菜单弹窗 textbox/spinbutton、退役资产ID、预算 heading。禁 /m。
 
