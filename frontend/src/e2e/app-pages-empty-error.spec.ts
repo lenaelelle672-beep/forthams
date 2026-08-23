@@ -63983,6 +63983,238 @@ test.describe('Q3690 桌面供应商 list 余项空态', () => {
 
 });
 
+test.describe('Q3691 桌面部门组织返回的组织部门余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「返回的组织部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('返回的组织部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「与 /depts/tree」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('与 /depts/tree').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「/depts/list 与 /depts/tree」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('/depts/list 与 /depts/tree').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3692 桌面部门组织接口路径余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「只读展示 /depts/list 与 /depts/tree」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('只读展示 /depts/list 与 /depts/tree').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「/depts/tree 返回的组织部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('/depts/tree 返回的组织部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「组织部门，搜索调用列表接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('组织部门，搜索调用列表接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3693 桌面部门组织检索说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「返回的组织部门，搜索调用列表接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('返回的组织部门，搜索调用列表接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「搜索调用列表接口，状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('搜索调用列表接口，状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「只读展示 /depts/list 与 /depts/tree 返回的组织部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('只读展示 /depts/list 与 /depts/tree 返回的组织部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3694 桌面部门组织 tree 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「与 /depts/tree 返回的组织部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('与 /depts/tree 返回的组织部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「/depts/list 与 /depts/tree 返回的组织部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('/depts/list 与 /depts/tree 返回的组织部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「列表接口，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('列表接口，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3695 桌面部门组织筛选说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「搜索调用列表接口，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('搜索调用列表接口，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「组织部门，搜索调用列表接口，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('组织部门，搜索调用列表接口，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「tree 返回的组织部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('tree 返回的组织部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3696 桌面部门组织只读说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「返回的组织部门，搜索调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('返回的组织部门，搜索调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3697 桌面部门组织列表接口余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「调用列表接口，状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('调用列表接口，状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「/depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('/depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「组织部门，搜索调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('组织部门，搜索调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3698 桌面部门组织 list/tree 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「与 /depts/tree 返回的组织部门，搜索调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('与 /depts/tree 返回的组织部门，搜索调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org 「列表接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByText('列表接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
