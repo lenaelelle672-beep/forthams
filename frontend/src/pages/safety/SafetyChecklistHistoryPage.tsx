@@ -258,9 +258,9 @@ const SafetyChecklistHistoryPage: React.FC = () => {
                 <h1 className="text-xl font-bold tracking-tight text-[var(--surface-heading)]">
                   安全检查历史
                 </h1>
-                <p className="mt-1 text-sm text-[var(--surface-muted-text)]">
+                <h3 className="mt-1 text-sm font-medium text-[var(--surface-muted-text)]">
                   查看安全检查执行记录与结果明细
-                </p>
+                </h3>
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-slate-100 border-t border-slate-100">

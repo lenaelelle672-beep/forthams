@@ -659,7 +659,7 @@ export default function PurchaseOrderPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">采购订单管理</h1>
-                <p className="text-sm text-[#64748b]">采购订单创建、审批与收货全流程管理</p>
+                <h3 className="text-sm font-medium text-[#64748b]">采购订单创建、审批与收货全流程管理</h3>
               </div>
             </div>
             <Button variant="primary" onClick={() => { setEditingOrder(null); setDialogOpen(true); }}>

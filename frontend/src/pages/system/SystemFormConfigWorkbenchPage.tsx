@@ -644,7 +644,7 @@ export default function SystemFormConfigWorkbenchPage({
             <div className="flex items-center justify-between gap-3">
               <div>
                 <h5 className="font-semibold text-slate-800">桌面预览</h5>
-                <p className="text-xs text-slate-500">双列布局模拟 PC 工作台表单。</p>
+                <h3 className="text-xs font-medium text-slate-500">双列布局模拟 PC 工作台表单。</h3>
               </div>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-500">{countSections(schema)} 分组 / {countFields(schema)} 字段</span>
             </div>
@@ -666,7 +666,7 @@ export default function SystemFormConfigWorkbenchPage({
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div>
                   <h5 className="font-semibold">钉钉 H5 预览</h5>
-                  <p className="text-xs text-slate-500">单列移动端布局，敏感字段默认遮罩。</p>
+                  <h3 className="text-xs font-medium text-slate-500">单列移动端布局，敏感字段默认遮罩。</h3>
                 </div>
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs">H5</span>
               </div>

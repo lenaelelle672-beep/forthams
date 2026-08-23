@@ -469,9 +469,9 @@ const SafetyChecklistTemplatePage: React.FC = () => {
                 <h1 className="text-xl font-bold tracking-tight text-[var(--surface-heading)]">
                   安全检查表模板
                 </h1>
-                <p className="mt-1 text-sm text-[var(--surface-muted-text)]">
+                <h3 className="mt-1 text-sm font-medium text-[var(--surface-muted-text)]">
                   配置检查表模板与检查项清单
-                </p>
+                </h3>
               </div>
               <Button variant="primary" onClick={() => handleOpen()}>
                 <Plus className="w-4 h-4" />

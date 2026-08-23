@@ -428,14 +428,12 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">SAM 合规管理</h1>
-                <p className="text-sm text-[#64748b]">
-                  软件许可合规扫描与审计仪表盘
-                  {d?.scanDate && (
-                    <span className="ml-2 text-slate-400">
-                      | 上次扫描: {new Date(d.scanDate).toLocaleString()}
-                    </span>
-                  )}
-                </p>
+                <h3 className="text-sm font-medium text-[#64748b]">软件许可合规扫描与审计仪表盘</h3>
+                {d?.scanDate ? (
+                  <p className="mt-0.5 text-sm text-slate-400">
+                    | 上次扫描: {new Date(d.scanDate).toLocaleString()}
+                  </p>
+                ) : null}
               </div>
             </div>
             <Button onClick={handleScan} disabled={scanning}>

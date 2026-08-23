@@ -112,7 +112,7 @@ const FloorPlanPage: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-4 p-5">
               <div className="min-w-0">
                 <h1 className="text-xl font-bold tracking-tight text-slate-900">2D/3D 平面图</h1>
-                <p className="mt-1 text-sm text-slate-500">资产位置可视化 · 空间联动</p>
+                <h3 className="mt-1 text-sm font-medium text-slate-500">资产位置可视化 · 空间联动</h3>
               </div>
               <Button
                 variant="outline"

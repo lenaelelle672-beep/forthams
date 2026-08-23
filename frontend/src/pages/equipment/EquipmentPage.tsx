@@ -438,7 +438,7 @@ export default function EquipmentPage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-xl font-bold tracking-tight text-slate-900">重要设备管理</h1>
-              <p className="mt-1 text-sm text-slate-500">关键生产设备维保追踪与状态监控</p>
+              <h3 className="mt-1 text-sm font-medium text-slate-500">关键生产设备维保追踪与状态监控</h3>
             </div>
             <Button size="lg" onClick={() => setShowModal(true)}>
               <Plus className="w-4 h-4" />

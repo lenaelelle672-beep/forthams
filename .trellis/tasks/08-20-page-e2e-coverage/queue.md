@@ -3366,3 +3366,11 @@
 | Q4176 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4177 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4178 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4179 | pending | 桌面空态 闲置资产未用统计 heading。禁 /m。 |
+| Q4180 | pending | 桌面空态 闲置/安全检查未用 heading。禁 /m。 |
+| Q4181 | pending | 桌面空态 安全历史/风险/设备未用副文案 heading。禁 /m。 |
+| Q4182 | pending | 桌面空态 SAM/采购/GIS 未用副文案 heading。禁 /m。 |
+| Q4183 | pending | 桌面空态 平面图/表单配置未用 heading。禁 /m。 |
+| Q4184 | pending | 桌面空态 通知中心未用 heading。禁 /m。 |
+| Q4185 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4186 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

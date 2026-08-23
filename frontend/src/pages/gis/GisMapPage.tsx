@@ -375,7 +375,7 @@ const GisMapPage: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-4 p-5">
               <div className="min-w-0">
                 <h1 className="text-xl font-bold tracking-tight text-slate-900">GIS 资产地图</h1>
-                <p className="mt-1 text-sm text-slate-500">资产地理位置分布可视化</p>
+                <h3 className="mt-1 text-sm font-medium text-slate-500">资产地理位置分布可视化</h3>
               </div>
               <Button variant="primary" size="md" onClick={() => setCreateDialogOpen(true)}>
                 <MapPinned className="w-4 h-4" />

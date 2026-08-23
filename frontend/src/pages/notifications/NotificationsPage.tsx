@@ -292,9 +292,9 @@ export default function NotificationsPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">通知中心</h1>
-                <p className="text-sm text-[#64748b]">
+                <h3 className="text-sm font-medium text-[#64748b]">
                   共 {total} 条通知
-                </p>
+                </h3>
               </div>
             </div>
             <div className="flex items-center gap-2 flex-wrap">

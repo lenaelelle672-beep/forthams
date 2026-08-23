@@ -354,9 +354,9 @@ const RiskMatrixPage: React.FC = () => {
                 <h1 className="text-xl font-bold tracking-tight text-[var(--surface-heading)]">
                   风险矩阵
                 </h1>
-                <p className="mt-1 text-sm text-[var(--surface-muted-text)]">
+                <h3 className="mt-1 text-sm font-medium text-[var(--surface-muted-text)]">
                   5x5 风险评估热力图与评估记录管理
-                </p>
+                </h3>
               </div>
               <Button variant="primary" onClick={() => navigate('/risk-assessments/new')}>
                 <Plus className="w-4 h-4" />
