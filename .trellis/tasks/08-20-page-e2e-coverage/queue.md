@@ -3131,8 +3131,9 @@
 | Q3941 | done | 桌面空态 **3 passed**（安全检查/报表构建器未用 heading）。禁 /m。 |
 | Q3942 | done | 桌面空态 **3 passed**（报表构建器/导入导出未用 heading）。禁 /m。 |
 | Q3943 | done | 桌面空态 **3 passed**（ABC/循环盘点未用余句）。禁 /m。 |
-| Q3944 | pending | 桌面空态 设备/分类/TCO 未用 heading。禁 /m。 |
-| Q3945 | pending | 桌面空态 TCO 未用 heading。禁 /m。 |
-| Q3946 | pending | 桌面空态 TCO/健康评分未用 heading。禁 /m。 |
-| Q3947 | pending | 桌面空态 安全历史/风险矩阵未用 heading。禁 /m。 |
-| Q3948 | pending | 桌面空态 报表/健康评分未用 button/heading。禁 /m。 |
+| Q3944 | done | 桌面空态 **3 passed**（设备/分类/TCO 未用 heading；勿测 /dashboard 默认 mock）。禁 /m。 |
+| Q3945 | done | 桌面空态 **3 passed**（TCO 未用 heading）。禁 /m。 |
+| Q3946 | done | 桌面空态 **3 passed**（TCO/健康评分未用 heading）。禁 /m。 |
+| Q3947 | done | 桌面空态 **3 passed**（安全历史/风险矩阵未用 heading）。禁 /m。 |
+| Q3948 | done | 桌面空态 **3 passed**（报表/健康评分未用 button/heading）。禁 /m。 |
+| Q3949 | pending | 桌面空态 定时报表/可靠性未用 button/heading。禁 /m。 |
