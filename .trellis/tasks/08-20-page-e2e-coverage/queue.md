@@ -2160,4 +2160,5 @@
 | Q2970 | done | 桌面空态 **3 passed**（/login 全生命周期/智能审批/采购到报废）。禁 /m。 |
 | Q2971 | done | 桌面空态 **3 passed**（/login 流程闭环/组织账号/全息版）。禁 /m。 |
 | Q2972 | done | 桌面空态 **3 passed**（/login 流星版/宇视公司/UNIVIEW）。禁 /m。 |
-| Q2973 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2973 | done | 桌面空态 **3 passed**（/login 账号/密码 placeholder + 忘记密码）。禁 /m。 |
+| Q2974 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

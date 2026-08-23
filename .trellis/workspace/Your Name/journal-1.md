@@ -1080,5 +1080,6 @@
 - Q2969：/login 资源审批/巡检维修/系统管理员 **3 passed**。`1ddf9a4d6`
 - Q2970：/login 全生命周期/智能审批/采购到报废 **3 passed**。`d9d431286`
 - Q2971：/login 流程闭环/组织账号/全息版 **3 passed**。`fb54d3fde`
-- Q2972：/login 流星版/宇视公司/UNIVIEW **3 passed**。
+- Q2972：/login 流星版/宇视公司/UNIVIEW **3 passed**。`64b6147da`
+- Q2973：/login 账号/密码 placeholder + 忘记密码 **3 passed**。
 
