@@ -1102,5 +1102,6 @@
 - Q2991：/login5 部门负责人/运维人员/全域权限 **3 passed**。`87143e130`
 - Q2992：/login5 资源审批/巡检维修/记住用户名 **3 passed**。`eb442df79`
 - Q2993：/login5 忘记密码/进入工作台/统一认证 **3 passed**。`62b9db5af`
-- Q2994：/login5 用户名/密码/账号placeholder **3 passed**。
+- Q2994：/login5 用户名/密码/账号placeholder **3 passed**。`a8824d0d8`
+- Q2995：/login5 密码placeholder/组织账号/显示密码 **3 passed**。
 

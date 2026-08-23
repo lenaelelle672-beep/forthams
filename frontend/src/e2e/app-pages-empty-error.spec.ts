@@ -43871,6 +43871,29 @@ test.describe('Q2994 桌面登录5字段文案空态', () => {
   });
 });
 
+test.describe('Q2995 桌面登录5说明文案空态', () => {
+  test('/login5 空态 placeholder「请输入密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByPlaceholder('请输入密码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态「使用组织账号进入固定资产平台」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByText('使用组织账号进入固定资产平台').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login5 空态 button「显示密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login5');
+    await expect(page.getByRole('button', { name: /显\s*示\s*密\s*码/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
