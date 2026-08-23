@@ -2187,4 +2187,5 @@
 | Q2997 | done | 桌面空态 **3 passed**（/login5 button 部门负责人/进入工作台/忘记密码）。禁 /m。 |
 | Q2998 | done | 桌面空态 **3 passed**（/login5 checkbox/统一认证/工作台预览 link）。禁 /m。 |
 | Q2999 | done | 桌面空态 **3 passed**（/login5 label 用户名/密码 + /vendor-portal 标题）。禁 /m。 |
-| Q3000 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3000 | done | 桌面空态 **3 passed**（/vendor-portal 编码/密码 placeholder + 登录）。禁 /m。 |
+| Q3001 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

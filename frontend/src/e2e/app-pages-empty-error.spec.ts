@@ -43986,6 +43986,29 @@ test.describe('Q2999 桌面登录5标签空态', () => {
   });
 });
 
+test.describe('Q3000 桌面供应商门户操作空态', () => {
+  test('/vendor-portal 空态 placeholder「供应商编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByPlaceholder('供应商编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 空态 placeholder「密码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByPlaceholder('密码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendor-portal 空态 button「登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByRole('button', { name: /登\s*录/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
