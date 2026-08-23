@@ -1038,5 +1038,6 @@
 - Q2927：/system/menus 树形/目录/总计 **3 passed**。`0861fc29a`
 - Q2928：/system/menus 菜单列表/名称/权限标识 **3 passed**。`093305a5a`
 - Q2929：/system/menus 路由/按钮/菜单 **3 passed**。`2d3ea67f1`
-- Q2930：/system/menus 类型/排序/状态 **3 passed**。
+- Q2930：/system/menus 类型/排序/状态 **3 passed**。`08c682c93`
+- Q2931：/system/menus 操作 + /retirement 资产ID + /assignments 归还日期 **3 passed**。
 
