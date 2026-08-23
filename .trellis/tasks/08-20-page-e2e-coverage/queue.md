@@ -3078,11 +3078,19 @@
 | Q3888 | done | 桌面空态 **3 passed**（编号规则 coverage 整句）。禁 /m。 |
 | Q3889 | done | 桌面空态 **3 passed**（邮件网关 coverage 整句）。禁 /m。 |
 | Q3890 | done | 桌面空态 **3 passed**（通知开关/偏好 coverage 余项）。禁 /m。 |
-| Q3891 | pending | 桌面空态 邮件日志 redaction 整句。禁 /m。 |
-| Q3892 | pending | 桌面空态 自定义字段 preview 整句。禁 /m。 |
-| Q3893 | pending | 桌面空态 邮件模板 previewPolicy 整句。禁 /m。 |
-| Q3894 | pending | 桌面空态 通知模板 previewPolicy 整句。禁 /m。 |
-| Q3895 | pending | 桌面空态 邮件日志 redaction 余项。禁 /m。 |
-| Q3896 | pending | 桌面空态 自定义字段完成边界余项。禁 /m。 |
-| Q3897 | pending | 桌面空态 邮件模板敏感变量拒绝整句。禁 /m。 |
-| Q3898 | pending | 桌面空态 通知模板敏感变量拒绝余项。禁 /m。 |
+| Q3891 | done | 桌面空态 **3 passed**（邮件日志 redaction 整句）。禁 /m。 |
+| Q3892 | done | 桌面空态 **3 passed**（自定义字段 preview 整句）。禁 /m。 |
+| Q3893 | done | 桌面空态 **3 passed**（邮件模板 previewPolicy 整句）。禁 /m。 |
+| Q3894 | done | 桌面空态 **3 passed**（通知模板 previewPolicy 整句）。禁 /m。 |
+| Q3895 | done | 桌面空态 **3 passed**（邮件日志 redaction 余项）。禁 /m。 |
+| Q3896 | done | 桌面空态 **3 passed**（自定义字段完成边界余项）。禁 /m。 |
+| Q3897 | done | 桌面空态 **3 passed**（邮件模板敏感变量拒绝整句）。禁 /m。 |
+| Q3898 | done | 桌面空态 **3 passed**（通知模板敏感变量拒绝余项）。禁 /m。 |
+| Q3899 | pending | 桌面空态 审计采集闭环整句。禁 /m。 |
+| Q3900 | pending | 桌面空态 审计导出限制整句。禁 /m。 |
+| Q3901 | pending | 桌面空态 表单配置 fail-closed 整句。禁 /m。 |
+| Q3902 | pending | 桌面空态 流程设计器 fail-closed 整句。禁 /m。 |
+| Q3903 | pending | 桌面空态 表单配置 fail-closed 余项。禁 /m。 |
+| Q3904 | pending | 桌面空态 流程设计器回滚预案余项。禁 /m。 |
+| Q3905 | pending | 桌面空态 审计 SIEM 边界余项。禁 /m。 |
+| Q3906 | pending | 桌面空态 表单配置遮罩预览余项。禁 /m。 |
