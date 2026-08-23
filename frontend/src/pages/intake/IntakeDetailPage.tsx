@@ -266,7 +266,7 @@ export default function IntakeDetailPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-[#94a3b8]">
-              <p className="text-sm">暂无检查项</p>
+              <h3 className="text-sm font-medium">暂无检查项</h3>
             </div>
           )}
         </CardContent>
@@ -307,7 +307,7 @@ export default function IntakeDetailPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-8 text-[#94a3b8]">
-              <p className="text-sm">暂无入库资产</p>
+              <h3 className="text-sm font-medium">暂无入库资产</h3>
             </div>
           )}
         </CardContent>

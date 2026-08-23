@@ -424,7 +424,7 @@ export default function ReportBuilderPage() {
       return (
         <div className="flex flex-col items-center justify-center h-64 text-sm text-[var(--surface-muted-text)]">
           <Eye className="w-10 h-10 mb-2 opacity-40" />
-          <span>点击"生成预览"查看数据</span>
+          <h3 className="font-medium">点击"生成预览"查看数据</h3>
         </div>
       );
     }
@@ -525,7 +525,7 @@ export default function ReportBuilderPage() {
       {/* 页面标题 */}
       <div>
         <h1 className="text-xl font-bold text-[var(--surface-heading)]">自定义报表构建器</h1>
-        <p className="text-sm text-[var(--surface-muted-text)]">通过拖拽选择字段，快速创建自定义报表</p>
+        <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">通过拖拽选择字段，快速创建自定义报表</h3>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -536,9 +536,9 @@ export default function ReportBuilderPage() {
               <h3 className="text-sm font-semibold text-[var(--surface-heading)] mb-3">可用字段</h3>
               {Object.entries(AVAILABLE_FIELDS).map(([group, fields]) => (
                 <div key={group} className="mb-3">
-                  <p className="text-xs font-medium text-[var(--surface-muted-text)] uppercase mb-1.5">
+                  <h3 className="text-xs font-medium text-[var(--surface-muted-text)] uppercase mb-1.5">
                     {group}
-                  </p>
+                  </h3>
                   <div className="space-y-1">
                     {fields.map((field) => {
                       const isSelected = selectedFields.some((f) => f.name === field.name);
@@ -566,9 +566,9 @@ export default function ReportBuilderPage() {
             <CardContent className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
+                  <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
                     报表名称
-                  </label>
+                  </h3>
                   <input
                     value={reportName}
                     onChange={(e) => setReportName(e.target.value)}
@@ -577,9 +577,9 @@ export default function ReportBuilderPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
+                  <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
                     报表类型
-                  </label>
+                  </h3>
                   <select
                     value={reportType}
                     onChange={(e) => setReportType(e.target.value)}
@@ -591,9 +591,9 @@ export default function ReportBuilderPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
+                  <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-1">
                     图表类型
-                  </label>
+                  </h3>
                   <div className="flex gap-1">
                     {CHART_TYPES.map((ct) => {
                       const Icon = ct.icon;
@@ -618,9 +618,9 @@ export default function ReportBuilderPage() {
 
               {/* 已选字段（拖拽放置区） */}
               <div className="mt-4">
-                <label className="block text-sm font-medium text-[var(--surface-heading)] mb-2">
+                <h3 className="block text-sm font-medium text-[var(--surface-heading)] mb-2">
                   已选字段 ({selectedFields.length})
-                </label>
+                </h3>
                 <FieldDropZone
                   selectedFields={selectedFields}
                   onAddField={handleAddField}

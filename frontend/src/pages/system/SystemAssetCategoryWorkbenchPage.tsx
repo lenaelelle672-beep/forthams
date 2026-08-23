@@ -106,7 +106,7 @@ export default function SystemAssetCategoryWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">资产分类</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示分类列表与分类树，搜索仅调用 /categories/list 查询能力。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示分类列表与分类树，搜索仅调用 /categories/list 查询能力。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -139,7 +139,7 @@ export default function SystemAssetCategoryWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">资产分类加载中...</div> : null}
       {!loading && !error && !hasRecords && !hasTree ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无资产分类数据。</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无资产分类数据。</h3>
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(280px,0.75fr)]">
@@ -174,7 +174,7 @@ export default function SystemAssetCategoryWorkbenchPage({
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <h4 className="mb-3 font-semibold">分类树</h4>
-          {hasTree ? renderTree(tree) : <p className="text-sm text-slate-500">暂无分类树节点。</p>}
+          {hasTree ? renderTree(tree) : <h3 className="text-sm font-medium text-slate-500">暂无分类树节点。</h3>}
         </div>
       </div>
     </section>

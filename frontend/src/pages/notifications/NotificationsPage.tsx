@@ -292,9 +292,9 @@ export default function NotificationsPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">通知中心</h1>
-                <p className="text-sm text-[#64748b]">
+                <h3 className="text-sm font-medium text-[#64748b]">
                   共 {total} 条通知
-                </p>
+                </h3>
               </div>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -418,10 +418,10 @@ export default function NotificationsPage() {
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100/50 flex items-center justify-center mb-4">
                 <Inbox className="w-8 h-8 text-blue-400" />
               </div>
-              <p className="text-base font-medium mb-1 text-[#0f172a]">暂无通知</p>
-              <p className="text-sm text-slate-400">
+              <h3 className="text-base font-medium mb-1 text-[#0f172a]">暂无通知</h3>
+              <h3 className="text-sm font-medium text-slate-400">
                 {activeTab === 'all' ? '所有通知都会显示在这里' : '当前筛选条件下没有通知'}
-              </p>
+              </h3>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">

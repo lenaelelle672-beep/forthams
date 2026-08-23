@@ -237,9 +237,9 @@ export default function AssetHealthPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[var(--surface-heading)]">资产健康评分</h1>
-          <p className="text-sm text-[var(--surface-muted-text)]">
+          <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">
             基于年龄、维修频率、故障率、利用率、折旧进度的多维度评估
-          </p>
+          </h3>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -363,7 +363,7 @@ export default function AssetHealthPage() {
           ) : sortedList.length === 0 ? (
             <div className="text-center py-16 text-[var(--surface-muted-text)]">
               <Heart className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">暂无不健康资产，所有资产状态良好</p>
+              <h3 className="text-sm font-medium">暂无不健康资产，所有资产状态良好</h3>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -417,6 +417,15 @@ export default function AssetHealthPage() {
           )}
         </CardContent>
       </Card>
+
+      {sortedList.length === 0 && !isLoading && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-sm font-semibold text-[var(--surface-heading)]">维度评分明细</h3>
+            <h3 className="text-sm font-medium text-gray-400 text-center py-6">暂无维度评分明细</h3>
+          </CardContent>
+        </Card>
+      )}
 
       {/* 详情弹窗 */}
       {detailAssetId !== null && (

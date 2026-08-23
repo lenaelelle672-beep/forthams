@@ -428,14 +428,12 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">SAM 合规管理</h1>
-                <p className="text-sm text-[#64748b]">
-                  软件许可合规扫描与审计仪表盘
-                  {d?.scanDate && (
-                    <span className="ml-2 text-slate-400">
-                      | 上次扫描: {new Date(d.scanDate).toLocaleString()}
-                    </span>
-                  )}
-                </p>
+                <h3 className="text-sm font-medium text-[#64748b]">软件许可合规扫描与审计仪表盘</h3>
+                {d?.scanDate ? (
+                  <p className="mt-0.5 text-sm text-slate-400">
+                    | 上次扫描: {new Date(d.scanDate).toLocaleString()}
+                  </p>
+                ) : null}
               </div>
             </div>
             <Button onClick={handleScan} disabled={scanning}>
@@ -460,7 +458,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-[#0f172a]">{d?.totalLicenses ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">总许可数</p>
+                <h3 className="text-xs font-medium text-slate-500">总许可数</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -469,7 +467,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-emerald-600">{d?.compliantCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">合规</p>
+                <h3 className="text-xs font-medium text-slate-500">合规</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -478,7 +476,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-red-600">{d?.overusedCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">超用</p>
+                <h3 className="text-xs font-medium text-slate-500">超用</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -487,7 +485,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-amber-600">{d?.underusedCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">闲置</p>
+                <h3 className="text-xs font-medium text-slate-500">闲置</h3>
               </div>
             </div>
             <div className="flex items-center gap-3 px-5 py-4">
@@ -496,7 +494,7 @@ const SamDashboardPage: React.FC = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-slate-500">{d?.expiredCount ?? 0}</p>
-                <p className="text-xs font-medium text-slate-500">已过期</p>
+                <h3 className="text-xs font-medium text-slate-500">已过期</h3>
               </div>
             </div>
           </div>

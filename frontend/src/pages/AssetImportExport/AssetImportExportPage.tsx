@@ -723,12 +723,12 @@ const AssetImportExportPage: React.FC = () => {
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined style={{ fontSize: 48, color: '#1890ff' }} />
                 </p>
-                <p className="ant-upload-text" style={{ fontSize: 16 }}>
+                <h3 className="ant-upload-text" style={{ fontSize: 16 }}>
                   将 .xlsx 文件拖到此处，或点击选择文件
-                </p>
-                <p className="ant-upload-hint" style={{ color: '#999' }}>
+                </h3>
+                <h3 className="ant-upload-hint" style={{ color: '#999' }}>
                   支持 .xlsx 格式，文件大小不超过 10MB
-                </p>
+                </h3>
               </>
             )}
 

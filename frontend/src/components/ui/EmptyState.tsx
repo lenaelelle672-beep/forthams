@@ -94,7 +94,7 @@ export function EmptyState({
       </div>
       <h3 className="text-base font-medium text-[#374151] mb-1">{title}</h3>
       {description && (
-        <p className="text-sm text-[#94a3b8] max-w-sm mb-4">{description}</p>
+        <h3 className="text-sm font-medium text-[#94a3b8] max-w-sm mb-4">{description}</h3>
       )}
       {action && (
         <Button onClick={action.onClick} size="md">

@@ -452,7 +452,7 @@ function MenuAssignDialog({
                 />
               ))
             ) : (
-              <div className="text-sm text-slate-400 text-center py-8">暂无菜单数据</div>
+              <h3 className="text-sm font-medium text-slate-400 text-center py-8">暂无菜单数据</h3>
             )}
           </div>
         </div>
@@ -578,7 +578,7 @@ function DeptAssignDialog({
                 );
               })
             ) : (
-              <div className="text-sm text-slate-400 text-center py-8">暂无部门数据</div>
+              <h3 className="text-sm font-medium text-slate-400 text-center py-8">暂无部门数据</h3>
             )}
           </div>
         </div>
@@ -764,10 +764,10 @@ export default function RoleManagement() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">{t('user:role.title')}</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-violet-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-violet-200 bg-violet-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-violet-700">
                 <Shield className="h-3 w-3" />
                 RBAC
-              </span>
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={handleNew}>
@@ -787,7 +787,7 @@ export default function RoleManagement() {
                     <Icon className="h-3.5 w-3.5 text-white" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{stat.label}</p>
+                    <h3 className="text-[11px] font-medium text-slate-400">{stat.label}</h3>
                     <p className="text-lg font-bold text-slate-900">{stat.value}</p>
                   </div>
                 </div>
@@ -802,10 +802,10 @@ export default function RoleManagement() {
           <div className="border-b border-slate-100 bg-gradient-to-r from-white via-[#fbfdff] to-[#f8fbff] px-5 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                   <Shield className="h-3.5 w-3.5" />
                   角色列表
-                </div>
+                </h3>
                 <h2 className="mt-1 text-lg font-bold text-slate-900">
                   角色与权限管理
                 </h2>

@@ -137,7 +137,7 @@ export default function SystemNumberingRulesWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">编号规则</h3>
-          <p className="mt-1 text-sm text-slate-500">{endpointCopy}</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">{endpointCopy}</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">read-only / tenantScoped=true / sequenceAllocated=false</span>
       </div>
@@ -157,7 +157,7 @@ export default function SystemNumberingRulesWorkbenchPage({
             <h4 className="font-semibold">编号规则 catalog</h4>
             <span className="text-xs text-slate-500">显示 {rules.length} 条，只读展示</span>
           </div>
-          {rules.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无编号规则；空态不代表序列分配、并发唯一或创建链路闭环。</div> : null}
+          {rules.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无编号规则；空态不代表序列分配、并发唯一或创建链路闭环。</h3> : null}
           <div className="space-y-2">
             {rules.map((item) => (
               <button

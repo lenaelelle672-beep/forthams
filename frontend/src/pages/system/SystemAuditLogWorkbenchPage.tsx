@@ -151,7 +151,7 @@ export default function SystemAuditLogWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">审计日志</h3>
-          <p className="mt-1 text-sm text-slate-500">真实调用 /audit-logs、/audit-logs/&#123;id&#125;、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">真实调用 /audit-logs、/audit-logs/&#123;id&#125;、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">GET-only / tenant-scoped / masked</span>
       </div>
@@ -188,9 +188,9 @@ export default function SystemAuditLogWorkbenchPage({
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">审计日志加载中...</div> : null}
 
       <div className="grid gap-3 md:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">命中日志</p><p className="mt-1 text-2xl font-semibold">{page.total}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">统计总数</p><p className="mt-1 text-2xl font-semibold">{stats?.totalCount ?? 0}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">操作类型</p><p className="mt-1 text-2xl font-semibold">{distribution?.distribution.length ?? 0}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><h3 className="text-xs font-medium text-slate-500">命中日志</h3><p className="mt-1 text-2xl font-semibold">{page.total}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><h3 className="text-xs font-medium text-slate-500">统计总数</h3><p className="mt-1 text-2xl font-semibold">{stats?.totalCount ?? 0}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><h3 className="text-xs font-medium text-slate-500">操作类型</h3><p className="mt-1 text-2xl font-semibold">{distribution?.distribution.length ?? 0}</p></div>
         <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">操作人排行</p><p className="mt-1 text-2xl font-semibold">{ranking.length}</p></div>
       </div>
 
@@ -200,7 +200,7 @@ export default function SystemAuditLogWorkbenchPage({
             <h4 className="font-semibold">只读审计事件</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，before/after/raw 均为脱敏摘要</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无审计日志。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无审计日志。</h3> : null}
           <div className="space-y-2">
             {page.records.map((log) => (
               <button key={log.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openDetail(log)}>
@@ -228,7 +228,7 @@ export default function SystemAuditLogWorkbenchPage({
               <p>raw payload 摘要：{detail.rawPayloadSummary ?? '无'}</p>
               <p>错误摘要：{detail.errorSummary ?? '无'}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条审计日志查看脱敏详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条审计日志查看脱敏详情。</h3>}
           <button type="button" disabled className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-500">
             导出脱敏快照（禁用，不生成文件）
           </button>

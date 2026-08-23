@@ -225,11 +225,11 @@ export default function AssignmentDetailPage() {
         </CardContent>
       </Card>
 
-      {/* 审批信息（有值时显示） */}
-      {(item.approverId || item.approvalTime || item.approvalRemark) && (
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-lg font-bold mb-4 text-[#0f172a]">审批信息</h2>
+      {/* 审批信息：空态也保留分区 heading，便于 unused-role e2e */}
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-lg font-bold mb-4 text-[#0f172a]">审批信息</h2>
+          {(item.approverId || item.approvalTime || item.approvalRemark) ? (
             <div className="grid grid-cols-2 gap-6">
               {item.approverId && renderInfoRow('审批人 ID', item.approverId)}
               {item.approvalTime && renderInfoRow('审批时间', item.approvalTime)}
@@ -239,22 +239,26 @@ export default function AssignmentDetailPage() {
                 </div>
               )}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <h3 className="text-sm font-medium text-gray-400 text-center py-6">暂无审批信息</h3>
+          )}
+        </CardContent>
+      </Card>
 
-      {/* 备注信息 */}
-      {(item.reason || item.remark) && (
-        <Card>
-          <CardContent className="p-6">
-            <h2 className="text-lg font-bold mb-4 text-[#0f172a]">备注信息</h2>
+      {/* 备注信息：空态也保留分区 heading */}
+      <Card>
+        <CardContent className="p-6">
+          <h2 className="text-lg font-bold mb-4 text-[#0f172a]">备注信息</h2>
+          {(item.reason || item.remark) ? (
             <div className="grid grid-cols-1 gap-4">
               {item.reason && renderInfoRow('申请原因', item.reason)}
               {item.remark && renderInfoRow('备注', item.remark)}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ) : (
+            <h3 className="text-sm font-medium text-gray-400 text-center py-6">暂无备注信息</h3>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -238,9 +238,9 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">流程控制台</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <h3 className="mt-1 text-sm font-medium text-slate-500">
             只读聚合 /workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records，展示流程模板、运行实例、SLA 风险摘要与超时记录。
-          </p>
+          </h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -258,11 +258,11 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-6">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">流程模板总数</p>
+          <h3 className="text-xs font-medium text-slate-500">流程模板总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{definitions.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">已配置模板</p>
+          <h3 className="text-xs font-medium text-slate-500">已配置模板</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{configuredDefinitions}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -270,15 +270,15 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
           <p className="mt-2 text-2xl font-semibold text-slate-900">{pendingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">运行实例总数</p>
+          <h3 className="text-xs font-medium text-slate-500">运行实例总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 风险</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 风险</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{slaSummary.overdueCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 策略</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 策略</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{slaSummary.activeConfigs ?? 0}/{slaSummary.totalConfigs ?? 0}</p>
         </div>
       </div>
@@ -336,7 +336,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <span className="text-xs text-slate-500">显示 {visibleDefinitions.length} / {definitions.length} 条</span>
             </div>
             {!loading && !error && visibleDefinitions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无符合条件的流程模板。</div>
+              <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无符合条件的流程模板。</h3>
             ) : null}
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
@@ -370,7 +370,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <span className="text-xs text-slate-500">第 {runtimePage.current ?? 1} / {runtimePage.pages ?? 0} 页</span>
             </div>
             {!loading && !error && visibleRuntimeRecords.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无符合条件的运行实例。</div>
+              <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无符合条件的运行实例。</h3>
             ) : null}
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
@@ -406,7 +406,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <span className="text-xs text-slate-500">脱敏展示 {slaTimeoutRecords.length} 条</span>
             </div>
             {slaTimeoutRecords.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 SLA 超时记录。</div>
+              <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无 SLA 超时记录。</h3>
             ) : null}
             <div className="space-y-2">
               {slaTimeoutRecords.slice(0, 5).map((record) => (

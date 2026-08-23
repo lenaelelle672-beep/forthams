@@ -154,7 +154,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">运行监控</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records 返回的审批实例、SLA 风险摘要和超时记录。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示 /approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records 返回的审批实例、SLA 风险摘要和超时记录。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -168,27 +168,27 @@ export default function SystemRuntimeMonitorWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">待处理数量</p>
+          <h3 className="text-xs font-medium text-slate-500">待处理数量</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{pendingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">当前页实例</p>
+          <h3 className="text-xs font-medium text-slate-500">当前页实例</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{records.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">总实例</p>
+          <h3 className="text-xs font-medium text-slate-500">总实例</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 超时</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 超时</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{slaSummary.overdueCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 预警</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 预警</h3>
           <p className="mt-2 text-2xl font-semibold text-amber-600">{slaSummary.warningCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">高风险轨迹</p>
+          <h3 className="text-xs font-medium text-slate-500">高风险轨迹</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{slaSummary.criticalCount ?? 0}</p>
         </div>
       </div>
@@ -230,7 +230,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">运行监控加载中...</div> : null}
       {!loading && !error && records.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无审批实例。</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无审批实例。</h3>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 p-4">
@@ -271,14 +271,14 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       <div className="grid gap-4 xl:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
           <h4 className="mb-3 font-semibold">SLA 节点耗时</h4>
-          {nodeDurationSummary.length === 0 ? <p className="text-sm text-slate-500">暂无节点耗时异常。</p> : null}
+          {nodeDurationSummary.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无节点耗时异常。</h3> : null}
           <ul className="space-y-2 text-sm text-slate-600">
             {nodeDurationSummary.map((item) => <li key={item} className="rounded-xl bg-slate-50 px-3 py-2">{item}</li>)}
           </ul>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
           <h4 className="mb-3 font-semibold">SLA 异常轨迹</h4>
-          {abnormalTraceSummary.length === 0 ? <p className="text-sm text-slate-500">暂无异常轨迹。</p> : null}
+          {abnormalTraceSummary.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无异常轨迹。</h3> : null}
           <ul className="space-y-2 text-sm text-slate-600">
             {abnormalTraceSummary.map((item) => <li key={item} className="rounded-xl bg-slate-50 px-3 py-2">{item}</li>)}
           </ul>
@@ -287,7 +287,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <h4 className="mb-3 font-semibold">超时记录与脱敏导出提示</h4>
           <p className="text-sm text-slate-500">{slaSummary.exportMaskingNotice ?? '导出仅返回 masked/summary 字段。'}</p>
           <div className="mt-3 space-y-2">
-            {slaTimeoutRecords.length === 0 ? <p className="text-sm text-slate-500">暂无超时记录。</p> : null}
+            {slaTimeoutRecords.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无超时记录。</h3> : null}
             {slaTimeoutRecords.slice(0, 3).map((record) => (
               <div key={record.id} className="rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-600">
                 <p className="font-medium">{record.processKey ?? '-'} / {record.nodeKey ?? '-'}</p>

@@ -252,9 +252,9 @@ export default function SystemBaseParamsWorkbenchPage({
     <section className="space-y-4" data-embedded={embeddedInWorkbench} data-system-base-params="workbench-v3">
       <div>
         <h3 className="text-lg font-semibold">基础参数</h3>
-        <p className="mt-1 text-sm text-slate-500">
+        <h3 className="mt-1 text-sm font-medium text-slate-500">
           真实调用 /system-config/system 与 /system/configs；仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成。
-        </p>
+        </h3>
       </div>
 
       <div className="rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-700">
@@ -275,7 +275,7 @@ export default function SystemBaseParamsWorkbenchPage({
             </div>
             {loading ? <div role="status" aria-live="polite" className="mt-4 text-sm text-slate-500">基础参数加载中...</div> : null}
             {!loading && records.length === 0 ? (
-              <div className="mt-4 rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 SYSTEM 基础参数，请通过 V3 新增。</div>
+              <h3 className="mt-4 rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无 SYSTEM 基础参数，请通过 V3 新增。</h3>
             ) : null}
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {records.map((item) => (

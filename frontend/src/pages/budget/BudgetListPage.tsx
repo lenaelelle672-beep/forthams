@@ -297,10 +297,10 @@ export default function BudgetListPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">预算管理</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
                 <BarChart3 className="h-3 w-3" />
                 资产预算
-              </span>
+              </h3>
               {alertCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-[11px] font-medium text-red-700">
                   <AlertTriangle className="h-3 w-3" />
@@ -329,9 +329,9 @@ export default function BudgetListPage() {
                     <Icon className="h-3.5 w-3.5 text-white" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{stat.label}</p>
+                    <h3 className="text-[11px] font-medium text-slate-400">{stat.label}</h3>
                     <p className="text-lg font-bold text-slate-900">{stat.value}</p>
-                    <p className="text-[10px] text-slate-400">{stat.sub}</p>
+                    <h3 className="text-[10px] text-slate-400">{stat.sub}</h3>
                   </div>
                 </div>
               );
@@ -386,10 +386,10 @@ export default function BudgetListPage() {
               {/* Title row */}
               <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
+                  <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                     <Search className="h-3.5 w-3.5" />
                     预算列表
-                  </div>
+                  </h3>
                   <h2 className="mt-1 text-xl font-bold text-slate-900">
                     {yearFilter} 年度预算
                   </h2>

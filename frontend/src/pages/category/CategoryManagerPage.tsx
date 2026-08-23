@@ -349,7 +349,7 @@ export default function CategoryManagerPage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold text-[#0f172a]">资产分类管理</h1>
-              <p className="mt-0.5 text-sm text-[#64748b]">管理资产分类层级结构</p>
+              <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">管理资产分类层级结构</h3>
             </div>
             <Button size="sm" onClick={() => openCreateDialog(null)}>
               <Plus className="w-4 h-4" />
@@ -363,7 +363,7 @@ export default function CategoryManagerPage() {
                 <Layers className="h-4.5 w-4.5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">总分类数</p>
+                <h3 className="text-xs font-medium text-slate-500">总分类数</h3>
                 <p className="text-lg font-bold text-slate-900">{totalCategories}</p>
               </div>
             </div>
@@ -372,7 +372,7 @@ export default function CategoryManagerPage() {
                 <FolderTree className="h-4.5 w-4.5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">根分类</p>
+                <h3 className="text-xs font-medium text-slate-500">根分类</h3>
                 <p className="text-lg font-bold text-slate-900">{rootCount}</p>
               </div>
             </div>
@@ -381,7 +381,7 @@ export default function CategoryManagerPage() {
                 <FolderOpen className="h-4.5 w-4.5 text-violet-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">当前选中</p>
+                <h3 className="text-xs font-medium text-slate-500">当前选中</h3>
                 <p className="text-lg font-bold text-slate-900">{selectedNode?.categoryName ?? '—'}</p>
               </div>
             </div>
@@ -390,7 +390,7 @@ export default function CategoryManagerPage() {
                 <Folder className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">子分类数</p>
+                <h3 className="text-xs font-medium text-slate-500">子分类数</h3>
                 <p className="text-lg font-bold text-slate-900">{selectedNode?.children?.length ?? 0}</p>
               </div>
             </div>

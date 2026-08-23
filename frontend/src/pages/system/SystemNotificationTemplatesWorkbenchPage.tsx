@@ -173,7 +173,7 @@ export default function SystemNotificationTemplatesWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">通知模板</h3>
-          <p className="mt-1 text-sm text-slate-500">{endpointCopy}</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">{endpointCopy}</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">catalog / tenant-scoped / safe preview</span>
       </div>
@@ -215,7 +215,7 @@ export default function SystemNotificationTemplatesWorkbenchPage({
             <h4 className="font-semibold">模板 catalog</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，只读展示</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无通知模板。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无通知模板。</h3> : null}
           <div className="space-y-2">
             {page.records.map((template) => (
               <button key={template.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openTemplate(template)}>
@@ -250,7 +250,7 @@ export default function SystemNotificationTemplatesWorkbenchPage({
               <p>标题模板：{selectedTemplate.titleTemplate}</p>
               <p>正文模板：{selectedTemplate.contentTemplate}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一个模板查看详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一个模板查看详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="notification-template-preview-variables">预览变量（key=value，每行一组）</label>

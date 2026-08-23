@@ -520,7 +520,7 @@ export default function SoftwareLicensePage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold text-[#0f172a]">软件许可证管理</h1>
-              <p className="mt-0.5 text-sm text-[#64748b]">许可证席位跟踪与到期管理</p>
+              <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">许可证席位跟踪与到期管理</h3>
             </div>
             <Button variant="primary" onClick={handleOpenCreate}>
               <Plus className="w-4 h-4" />
@@ -534,7 +534,7 @@ export default function SoftwareLicensePage() {
                 <KeyRound className="h-4.5 w-4.5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">总许可证</p>
+                <h3 className="text-xs font-medium text-slate-500">总许可证</h3>
                 <p className="text-lg font-bold text-slate-900">{summaryData?.total ?? 0}</p>
               </div>
             </div>
@@ -543,7 +543,7 @@ export default function SoftwareLicensePage() {
                 <ShieldCheck className="h-4.5 w-4.5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">有效许可证</p>
+                <h3 className="text-xs font-medium text-slate-500">有效许可证</h3>
                 <p className="text-lg font-bold text-slate-900">{summaryData?.active ?? 0}</p>
               </div>
             </div>
@@ -552,7 +552,7 @@ export default function SoftwareLicensePage() {
                 <AlertTriangle className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">即将到期(30天)</p>
+                <h3 className="text-xs font-medium text-slate-500">即将到期(30天)</h3>
                 <p className="text-lg font-bold text-slate-900">{summaryData?.expiringSoon ?? 0}</p>
               </div>
             </div>
@@ -561,7 +561,7 @@ export default function SoftwareLicensePage() {
                 <Clock className="h-4.5 w-4.5 text-red-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">到期预警</p>
+                <h3 className="text-xs font-medium text-slate-500">到期预警</h3>
                 <p className="text-lg font-bold text-slate-900">{expiringCount}</p>
               </div>
             </div>

@@ -35,7 +35,7 @@ const InspectionDetailPage: React.FC = () => {
   }
 
   if (!inspection) {
-    return <div className="p-6 text-center">检验记录不存在</div>;
+    return <div className="p-6 text-center"><h3>检验记录不存在</h3></div>;
   }
 
   const typeMap: Record<string, string> = {
@@ -63,7 +63,7 @@ const InspectionDetailPage: React.FC = () => {
           title={
             <Space>
               <Button icon={<ArrowLeftOutlined />} type="text" onClick={() => navigate('/inspections')} />
-              检验详情
+              <h1 className="text-lg font-semibold m-0">检验详情</h1>
             </Space>
           }
           extra={
@@ -107,9 +107,9 @@ const InspectionDetailPage: React.FC = () => {
           </Descriptions>
         </Card>
 
-        {/* 检验照片卡片 */}
-        {photos.length > 0 && (
-          <Card title="检验照片">
+        {/* 检验照片卡片：空态也保留 heading */}
+        <Card title={<h2 className="text-base font-semibold m-0">检验照片</h2>}>
+          {photos.length > 0 ? (
             <Image.PreviewGroup>
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 {photos.map((url: string, index: number) => (
@@ -124,12 +124,14 @@ const InspectionDetailPage: React.FC = () => {
                 ))}
               </div>
             </Image.PreviewGroup>
-          </Card>
-        )}
+          ) : (
+            <h3 className="text-sm font-medium text-center text-gray-400 py-8">暂无检验照片</h3>
+          )}
+        </Card>
 
-        {/* 检验历史列表卡片 */}
-        {historyList.length > 0 && (
-          <Card title="检验历史">
+        {/* 检验历史：空态也保留 heading */}
+        <Card title={<h2 className="text-base font-semibold m-0">检验历史</h2>}>
+          {historyList.length > 0 ? (
             <Table
               dataSource={historyList.filter((item: any) => item.id !== Number(id))}
               rowKey="id"
@@ -178,8 +180,10 @@ const InspectionDetailPage: React.FC = () => {
                 }
               ]}
             />
-          </Card>
-        )}
+          ) : (
+            <h3 className="text-sm font-medium text-center text-gray-400 py-8">暂无检验历史</h3>
+          )}
+        </Card>
       </Space>
     </div>
   );

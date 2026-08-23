@@ -228,7 +228,7 @@ export default function StocktakingCycleListPage() {
           <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-bold tracking-tight text-slate-900">循环盘点周期</h1>
-              <p className="mt-0.5 text-sm text-slate-500">管理库存盘点计划与执行周期</p>
+              <h3 className="mt-0.5 text-sm font-medium text-slate-500">管理库存盘点计划与执行周期</h3>
             </div>
             <button
               onClick={() => navigate('/stocktaking-cycles/new')}
@@ -247,9 +247,9 @@ export default function StocktakingCycleListPage() {
                   <Icon className="h-4.5 w-4.5 text-white" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  <h3 className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
                     {label}
-                  </p>
+                  </h3>
                   <p className="text-lg font-bold text-slate-800">{value}</p>
                 </div>
               </div>

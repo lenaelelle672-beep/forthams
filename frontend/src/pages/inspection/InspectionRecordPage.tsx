@@ -496,7 +496,7 @@ const InspectionRecordPage: React.FC = () => {
           <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-bold tracking-tight text-slate-900">检验记录管理</h1>
-              <p className="mt-0.5 text-sm text-slate-500">创建、编辑和追踪设备检验记录</p>
+              <h3 className="mt-0.5 text-sm font-medium text-slate-500">创建、编辑和追踪设备检验记录</h3>
             </div>
             <div className="flex items-center gap-2">
               <button
@@ -523,9 +523,9 @@ const InspectionRecordPage: React.FC = () => {
                   <Icon className="h-4.5 w-4.5 text-white" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  <h3 className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
                     {label}
-                  </p>
+                  </h3>
                   <p className="text-lg font-bold text-slate-800">{value}</p>
                 </div>
               </div>

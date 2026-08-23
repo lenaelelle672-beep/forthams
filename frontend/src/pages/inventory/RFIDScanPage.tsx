@@ -649,7 +649,7 @@ export default function RFIDScanPage() {
                   </div>
                 ))}
                 {recentScans.length === 0 && (
-                  <div className="px-5 py-8 text-center text-sm text-[#94a3b8]">暂无扫描记录</div>
+                  <h3 className="px-5 py-8 text-center text-sm font-medium text-[#94a3b8]">暂无扫描记录</h3>
                 )}
               </div>
             </div>
@@ -695,7 +695,7 @@ export default function RFIDScanPage() {
                   </div>
                 ))}
                 {discrepancies.length === 0 && (
-                  <div className="px-5 py-8 text-center text-sm text-[#94a3b8]">暂无差异</div>
+                  <h3 className="px-5 py-8 text-center text-sm font-medium text-[#94a3b8]">暂无差异</h3>
                 )}
               </div>
             </div>

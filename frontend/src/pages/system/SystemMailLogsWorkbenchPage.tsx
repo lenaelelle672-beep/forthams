@@ -130,7 +130,7 @@ export default function SystemMailLogsWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">邮件日志</h3>
-          <p className="mt-1 text-sm text-slate-500">{endpointCopy}</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">{endpointCopy}</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">read-only / redacted / tenantScoped</span>
       </div>
@@ -183,7 +183,7 @@ export default function SystemMailLogsWorkbenchPage({
             <h4 className="font-semibold">日志 catalog</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，只读展示</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无可展示的邮件日志；这不代表日志采集链路已完成。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无可展示的邮件日志；这不代表日志采集链路已完成。</h3> : null}
           <div className="space-y-2">
             {page.records.map((log) => (
               <button key={log.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openLog(log)}>
@@ -211,7 +211,7 @@ export default function SystemMailLogsWorkbenchPage({
               <p>诊断摘要：{display(selectedLog.diagnosticSummary)}</p>
               <p>只读边界：{selectedLog.readonlyBoundary ?? boundaryCopy}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条日志查看脱敏详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条日志查看脱敏详情。</h3>}
 
           <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700" aria-label="邮件日志业务查询结果">
             <p className="font-medium">biz lookup 结果</p>

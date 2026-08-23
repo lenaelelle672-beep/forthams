@@ -544,7 +544,7 @@ export default function VendorsPage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold text-[#0f172a]">供应商管理</h1>
-              <p className="mt-0.5 text-sm text-[#64748b]">合作供应商信息维护</p>
+              <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">合作供应商信息维护</h3>
             </div>
             <Button variant="primary" onClick={handleOpenCreate}>
               <Plus className="w-4 h-4" />
@@ -558,7 +558,7 @@ export default function VendorsPage() {
                 <Building2 className="h-4.5 w-4.5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">全部供应商</p>
+                <h3 className="text-xs font-medium text-slate-500">全部供应商</h3>
                 <p className="text-lg font-bold text-slate-900">{total}</p>
               </div>
             </div>
@@ -567,7 +567,7 @@ export default function VendorsPage() {
                 <CheckCircle className="h-4.5 w-4.5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">合作中</p>
+                <h3 className="text-xs font-medium text-slate-500">合作中</h3>
                 <p className="text-lg font-bold text-slate-900">{activeCount}</p>
               </div>
             </div>
@@ -576,7 +576,7 @@ export default function VendorsPage() {
                 <XCircle className="h-4.5 w-4.5 text-slate-500" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">已停用</p>
+                <h3 className="text-xs font-medium text-slate-500">已停用</h3>
                 <p className="text-lg font-bold text-slate-900">{inactiveCount}</p>
               </div>
             </div>
@@ -655,9 +655,9 @@ export default function VendorsPage() {
                 {vendors.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-[#94a3b8]">
                     <Building2 className="w-12 h-12 mb-3 opacity-30" />
-                    <p className="text-sm">
+                    <h3 className="text-sm font-medium">
                       {searchTerm ? `未找到包含"${searchTerm}"的供应商` : '暂无供应商数据'}
-                    </p>
+                    </h3>
                     {!searchTerm && (
                       <Button variant="primary" size="sm" className="mt-4" onClick={handleOpenCreate}>
                         <Plus className="w-4 h-4" />

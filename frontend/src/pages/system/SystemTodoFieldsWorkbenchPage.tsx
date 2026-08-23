@@ -170,7 +170,7 @@ export default function SystemTodoFieldsWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">待办字段配置</h3>
-          <p className="mt-1 text-sm text-slate-500">真实调用 /todo-fields 列表、保存、排序、角色覆盖、默认恢复与预览接口。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">真实调用 /todo-fields 列表、保存、排序、角色覆盖、默认恢复与预览接口。</h3>
         </div>
         <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:bg-slate-100" disabled={loading || saving} type="button" onClick={() => void loadFields()}>
           重新加载
@@ -188,7 +188,7 @@ export default function SystemTodoFieldsWorkbenchPage({
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{visibleCount}/{fields.length} 可见</span>
           </div>
           {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">待办字段加载中...</p> : null}
-          {!loading && fields.length === 0 ? <p className="text-sm text-slate-500">暂无待办字段配置。</p> : null}
+          {!loading && fields.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无待办字段配置。</h3> : null}
           <div className="space-y-2">
             {fields.map((field) => (
               <div key={field.fieldKey} className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-600">

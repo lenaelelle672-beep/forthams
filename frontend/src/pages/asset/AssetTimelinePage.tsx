@@ -271,7 +271,7 @@ const AssetTimelinePage: React.FC = () => {
               <div className="flex flex-col items-center justify-center py-12">
                 <Activity className="h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">暂无履历记录</h3>
-                <p className="text-sm text-gray-500">该资产暂无任何履历事件</p>
+                <h3 className="text-sm font-medium text-gray-500">该资产暂无任何履历事件</h3>
               </div>
             </div>
           </div>
@@ -308,7 +308,7 @@ const AssetTimelinePage: React.FC = () => {
                   <Activity className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部事件</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部事件</h3>
                   <p className="text-lg font-bold text-slate-900">{stats.total}</p>
                 </div>
               </div>
@@ -317,7 +317,7 @@ const AssetTimelinePage: React.FC = () => {
                   <AlertCircle className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">错误事件</p>
+                  <h3 className="text-xs font-medium text-slate-500">错误事件</h3>
                   <p className="text-lg font-bold text-red-600">{stats.errorCount}</p>
                 </div>
               </div>
@@ -326,7 +326,7 @@ const AssetTimelinePage: React.FC = () => {
                   <AlertTriangle className="h-4.5 w-4.5 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">警告事件</p>
+                  <h3 className="text-xs font-medium text-slate-500">警告事件</h3>
                   <p className="text-lg font-bold text-yellow-600">{stats.warningCount}</p>
                 </div>
               </div>
@@ -335,7 +335,7 @@ const AssetTimelinePage: React.FC = () => {
                   <Info className="h-4.5 w-4.5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">信息事件</p>
+                  <h3 className="text-xs font-medium text-slate-500">信息事件</h3>
                   <p className="text-lg font-bold text-slate-900">{stats.infoCount}</p>
                 </div>
               </div>

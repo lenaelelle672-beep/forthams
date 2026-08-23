@@ -221,7 +221,7 @@ export default function AssetModelPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-[#0f172a]">资产模型管理</h1>
-                <p className="mt-0.5 text-sm text-[#64748b]">管理资产品类的标准模板与规格定义</p>
+                <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">管理资产品类的标准模板与规格定义</h3>
               </div>
             </div>
             <Button onClick={openAdd}><Plus className="w-4 h-4" />新增模型</Button>
@@ -229,7 +229,7 @@ export default function AssetModelPage() {
           <div className="mt-4 flex items-center gap-6 border-t border-[#f1f5f9] pt-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-[#0f172a]">{total}</p>
-              <p className="text-xs text-[#94a3b8]">全部模型</p>
+              <h3 className="text-xs font-medium text-[#94a3b8]">全部模型</h3>
             </div>
             <div className="h-8 w-px bg-[#e5e7eb]" />
             <div className="text-center">

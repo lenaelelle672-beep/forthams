@@ -446,10 +446,10 @@ export default function DeptManagement() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">{t('user:dept.title')}</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-cyan-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-cyan-700">
                 <Building2 className="h-3 w-3" />
                 组织架构
-              </span>
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={() => openCreate()}>
@@ -469,7 +469,7 @@ export default function DeptManagement() {
                     <Icon className="h-3.5 w-3.5 text-white" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{stat.label}</p>
+                    <h3 className="text-[11px] font-medium text-slate-400">{stat.label}</h3>
                     <p className="text-lg font-bold text-slate-900">{stat.value}</p>
                   </div>
                 </div>
@@ -545,12 +545,12 @@ export default function DeptManagement() {
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
                       <Building2 className="h-6 w-6 text-slate-300" />
                     </div>
-                    <p className="text-sm font-medium text-slate-500">
+                    <h3 className="text-sm font-medium text-slate-500">
                       {keyword ? '未找到匹配的部门' : '暂无部门数据'}
-                    </p>
-                    <p className="text-xs text-slate-400 mt-1">
+                    </h3>
+                    <h3 className="text-xs font-medium text-slate-400 mt-1">
                       {keyword ? '请尝试更换关键词' : '点击下方按钮创建第一个部门'}
-                    </p>
+                    </h3>
                     {!keyword && (
                       <Button
                         variant="primary"
@@ -705,14 +705,14 @@ export default function DeptManagement() {
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 border border-slate-100">
                     <Building2 className="h-8 w-8 text-slate-200" />
                   </div>
-                  <p className="text-sm font-medium text-slate-500">请选择一个部门查看详情</p>
-                  <p className="text-xs text-slate-400 mt-1">点击左侧组织架构树中的节点即可查看</p>
+                  <h3 className="text-sm font-medium text-slate-500">请选择一个部门查看详情</h3>
+                  <h3 className="text-xs font-medium text-slate-400 mt-1">点击左侧组织架构树中的节点即可查看</h3>
                   <div className="flex items-center gap-2 mt-4 text-xs text-slate-400">
                     <ChevronRight className="w-3 h-3" />
-                    <span>支持展开/收起子级</span>
+                    <h3 className="text-xs font-medium">支持展开/收起子级</h3>
                     <span className="text-slate-300">·</span>
                     <Search className="w-3 h-3" />
-                    <span>支持搜索过滤</span>
+                    <h3 className="text-xs font-medium">支持搜索过滤</h3>
                   </div>
                 </div>
               )}

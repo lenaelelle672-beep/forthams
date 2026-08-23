@@ -162,7 +162,7 @@ export default function SystemCustomFieldsWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">自定义字段</h3>
-          <p className="mt-1 text-sm text-slate-500">{endpointCopy}</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">{endpointCopy}</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">definition catalog / tenant-scoped / no-persistence preview</span>
       </div>
@@ -194,7 +194,7 @@ export default function SystemCustomFieldsWorkbenchPage({
             <h4 className="font-semibold">字段定义 catalog</h4>
             <span className="text-xs text-slate-500">分页 {page.records.length} / {page.total} 条；全集 {allFields.length} 条，只读展示</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无自定义字段定义。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无自定义字段定义。</h3> : null}
           <div className="space-y-2">
             {page.records.map((field) => (
               <button key={field.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openField(field)}>
@@ -220,7 +220,7 @@ export default function SystemCustomFieldsWorkbenchPage({
               <p>正则摘要：{selectedField.validationPattern || '未配置'}</p>
               <p>加密字段：{selectedField.encrypted === 1 ? '仅展示标记，不回显样例原文' : '否'}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一个字段定义查看详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一个字段定义查看详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="custom-field-preview-values">预览样例（fieldName=value，每行一组）</label>

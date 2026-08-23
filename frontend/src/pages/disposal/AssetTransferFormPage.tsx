@@ -494,7 +494,7 @@ export default function AssetTransferFormPage() {
               <Button type="button" size="sm" onClick={() => setShowAssetPicker(true)}>
                 <Plus className="w-4 h-4" /> 添加资产
               </Button>
-              <span className="text-sm text-gray-500 whitespace-nowrap">已选 {selectedAssets.length} 项</span>
+              <h3 className="text-sm font-medium text-gray-500 whitespace-nowrap">已选 {selectedAssets.length} 项</h3>
             </div>
           </CardHeader>
           {selectedAssets.length > 0 ? (
@@ -557,9 +557,9 @@ export default function AssetTransferFormPage() {
             </div>
           ) : (
             <div className="px-6 pb-6">
-              <div className="text-center text-sm text-[#94a3b8] py-8 border-2 border-dashed border-[#e5e7eb] rounded-xl">
+              <h3 className="text-center text-sm font-medium text-[#94a3b8] py-8 border-2 border-dashed border-[#e5e7eb] rounded-xl">
                 暂无已选资产，点击上方「添加资产」按钮选择需要调拨的资产。
-              </div>
+              </h3>
             </div>
           )}
         </Card>

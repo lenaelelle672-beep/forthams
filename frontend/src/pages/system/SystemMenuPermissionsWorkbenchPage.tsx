@@ -179,7 +179,7 @@ export default function SystemMenuPermissionsWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">菜单权限</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /system/role-permissions/catalog 的权限编码库存，按权限域聚合为菜单权限覆盖视图。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示 /system/role-permissions/catalog 的权限编码库存，按权限域聚合为菜单权限覆盖视图。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -205,15 +205,15 @@ export default function SystemMenuPermissionsWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">权限域数量</p>
+          <h3 className="text-xs font-medium text-slate-500">权限域数量</h3>
           <p className="mt-1 text-2xl font-semibold">{visibleGroups.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">权限编码库存</p>
+          <h3 className="text-xs font-medium text-slate-500">权限编码库存</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.permissionInventoryCount} 项</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">已绑定权限</p>
+          <h3 className="text-xs font-medium text-slate-500">已绑定权限</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.boundPermissionCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -254,7 +254,7 @@ export default function SystemMenuPermissionsWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">菜单权限目录加载中...</div> : null}
       {!loading && !error && visibleGroups.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">{emptyMessage}</h3>
       ) : null}
 
       <div className="space-y-4">

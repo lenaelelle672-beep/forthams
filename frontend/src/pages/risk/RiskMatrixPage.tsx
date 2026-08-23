@@ -354,9 +354,9 @@ const RiskMatrixPage: React.FC = () => {
                 <h1 className="text-xl font-bold tracking-tight text-[var(--surface-heading)]">
                   风险矩阵
                 </h1>
-                <p className="mt-1 text-sm text-[var(--surface-muted-text)]">
+                <h3 className="mt-1 text-sm font-medium text-[var(--surface-muted-text)]">
                   5x5 风险评估热力图与评估记录管理
-                </p>
+                </h3>
               </div>
               <Button variant="primary" onClick={() => navigate('/risk-assessments/new')}>
                 <Plus className="w-4 h-4" />
@@ -369,7 +369,7 @@ const RiskMatrixPage: React.FC = () => {
                   <Grid3X3 className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部评估</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部评估</h3>
                   <p className="text-lg font-bold text-slate-900">{totalCount}</p>
                 </div>
               </div>
@@ -378,7 +378,7 @@ const RiskMatrixPage: React.FC = () => {
                   <ShieldAlert className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">重大风险</p>
+                  <h3 className="text-xs font-medium text-slate-500">重大风险</h3>
                   <p className="text-lg font-bold text-red-600">{criticalCount}</p>
                 </div>
               </div>
@@ -387,7 +387,7 @@ const RiskMatrixPage: React.FC = () => {
                   <AlertTriangle className="h-4.5 w-4.5 text-orange-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">高危风险</p>
+                  <h3 className="text-xs font-medium text-slate-500">高危风险</h3>
                   <p className="text-lg font-bold text-orange-600">{highCount}</p>
                 </div>
               </div>
@@ -396,7 +396,7 @@ const RiskMatrixPage: React.FC = () => {
                   <CheckCircle className="h-4.5 w-4.5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">中/低危</p>
+                  <h3 className="text-xs font-medium text-slate-500">中/低危</h3>
                   <p className="text-lg font-bold text-slate-900">{medLowCount}</p>
                 </div>
               </div>

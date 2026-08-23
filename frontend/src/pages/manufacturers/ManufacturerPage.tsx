@@ -327,7 +327,7 @@ export default function ManufacturerPage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold text-[#0f172a]">制造商管理</h1>
-              <p className="mt-0.5 text-sm text-[#64748b]">设备制造商信息维护</p>
+              <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">设备制造商信息维护</h3>
             </div>
             <Button variant="primary" onClick={handleAdd}>
               <Plus className="w-4 h-4" />
@@ -341,7 +341,7 @@ export default function ManufacturerPage() {
                 <Factory className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">全部制造商</p>
+                <h3 className="text-xs font-medium text-slate-500">全部制造商</h3>
                 <p className="text-lg font-bold text-slate-900">{total}</p>
               </div>
             </div>
@@ -350,7 +350,7 @@ export default function ManufacturerPage() {
                 <CheckCircle className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">正常</p>
+                <h3 className="text-xs font-medium text-slate-500">正常</h3>
                 <p className="text-lg font-bold text-slate-900">{activeCount}</p>
               </div>
             </div>
@@ -359,7 +359,7 @@ export default function ManufacturerPage() {
                 <XCircle className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">停用</p>
+                <h3 className="text-xs font-medium text-slate-500">停用</h3>
                 <p className="text-lg font-bold text-slate-900">{inactiveCount}</p>
               </div>
             </div>
@@ -368,7 +368,7 @@ export default function ManufacturerPage() {
                 <Globe className="h-4.5 w-4.5 text-white" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">有官网</p>
+                <h3 className="text-xs font-medium text-slate-500">有官网</h3>
                 <p className="text-lg font-bold text-slate-900">{websiteCount}</p>
               </div>
             </div>

@@ -182,7 +182,7 @@ export default function SystemWebhookConfigWorkbenchPage({
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>
       <div>
         <h3 className="text-lg font-semibold">Webhook 配置</h3>
-        <p className="mt-1 text-sm text-slate-500">只加载 /system/webhook-configs 配置，配置校验仅做 config-only 验证，未触发真实外部调用。</p>
+        <h3 className="mt-1 text-sm font-medium text-slate-500">只加载 /system/webhook-configs 配置，配置校验仅做 config-only 验证，未触发真实外部调用。</h3>
       </div>
       {notice ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">{notice}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
@@ -275,7 +275,7 @@ export default function SystemWebhookConfigWorkbenchPage({
       </form>
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">Webhook 配置加载中...</div> : null}
       {!loading && !error && items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 Webhook 配置，请通过 V3 创建配置。</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无 Webhook 配置，请通过 V3 创建配置。</h3>
       ) : null}
       <div className="grid gap-3">
         {items.map((item) => (

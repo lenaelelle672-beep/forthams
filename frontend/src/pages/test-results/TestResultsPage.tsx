@@ -108,8 +108,9 @@ const TestResultsPage: React.FC = () => {
       <PageTransition>
         <div className="p-6">
           <Card>
-            <CardContent className="flex items-center justify-center py-12 text-gray-500">
-              加载测试结果失败：{error || '未知错误'}
+            <CardContent className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <h3 className="text-sm font-medium">加载测试结果失败</h3>
+              <p className="mt-2 text-xs">{error || '未知错误'}</p>
             </CardContent>
           </Card>
         </div>

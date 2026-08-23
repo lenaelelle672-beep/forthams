@@ -369,7 +369,7 @@ export default function AssetClearanceFormPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-[#94a3b8] py-2">暂未选择资产，点击"添加资产"按钮选择</p>
+              <h3 className="text-sm font-medium text-[#94a3b8] py-2">暂未选择资产，点击"添加资产"按钮选择</h3>
             )}
           </CardContent>
         </Card>

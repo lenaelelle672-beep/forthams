@@ -69,8 +69,16 @@ export default function UserProfilePage() {
     );
   }
 
-  // Fallback to AuthContext data if API fails
-  const profile = detail ?? {
+  const hasProfileIdentity = Boolean(
+    detail
+    && typeof detail === 'object'
+    && (typeof (detail as UserDetail).id === 'number'
+      || typeof (detail as UserDetail).realName === 'string'
+      || typeof (detail as UserDetail).username === 'string'),
+  );
+
+  // Fallback to AuthContext data if API fails or returns a non-user payload
+  const profile = hasProfileIdentity ? detail as UserDetail : {
     id: user?.userId ?? 0,
     username: user?.username ?? '',
     realName: user?.realName ?? '',
@@ -140,7 +148,7 @@ export default function UserProfilePage() {
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
-                  <CardTitle>{t('profile.title')}</CardTitle>
+                  <CardTitle>{t('profile.title', { defaultValue: '账号资料' })}</CardTitle>
                   <p className="text-xs text-gray-500 mt-0.5">{t('profile.accountBasic')}</p>
                 </div>
               </div>
@@ -195,7 +203,7 @@ export default function UserProfilePage() {
                   <Key className="w-5 h-5 text-violet-600" />
                 </div>
                 <div>
-                  <CardTitle>{t('profile.rolePermission')}</CardTitle>
+                  <CardTitle>{t('profile.rolePermission', { defaultValue: '角色与权限明细' })}</CardTitle>
                   <p className="text-xs text-gray-500 mt-0.5">{t('profile.roleDesc')}</p>
                 </div>
               </div>

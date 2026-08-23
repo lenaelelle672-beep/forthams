@@ -167,7 +167,7 @@ export default function SystemFlowDefinitionWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">流程定义</h3>
-          <p className="mt-1 text-sm text-slate-500">{'只读展示 /workflows 与 /workflows/{businessType} 返回的流程模板、版本状态和节点摘要。'}</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">{'只读展示 /workflows 与 /workflows/{businessType} 返回的流程模板、版本状态和节点摘要。'}</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -212,7 +212,7 @@ export default function SystemFlowDefinitionWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">流程定义加载中...</div> : null}
       {!loading && !error && visibleDefinitions.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">{emptyMessage}</h3>
       ) : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
@@ -290,7 +290,7 @@ export default function SystemFlowDefinitionWorkbenchPage({
               </div>
             </dl>
           ) : null}
-          {!detailLoading && !selectedDefinition ? <p className="text-sm text-slate-500">暂无可展示的流程摘要。</p> : null}
+          {!detailLoading && !selectedDefinition ? <h3 className="text-sm font-medium text-slate-500">暂无可展示的流程摘要。</h3> : null}
         </aside>
       </div>
     </section>

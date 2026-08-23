@@ -92,7 +92,7 @@ function ChartEmptyState({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-60 text-slate-400">
       <BarChart3 className="w-10 h-10 mb-3 text-slate-200" />
-      <span className="text-sm font-medium">{message}</span>
+      <h3 className="text-sm font-medium">{message}</h3>
     </div>
   );
 }
@@ -292,14 +292,14 @@ export default function AnalyticsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
             <div>
               <h1 className="text-xl font-bold text-slate-900">{t('analytics:module.title')}</h1>
-              <p className="mt-1 text-sm text-slate-500">{t('analytics:module.subtitle')}</p>
+              <h3 className="mt-1 text-sm font-medium text-slate-500">{t('analytics:module.subtitle')}</h3>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2">
                 <Calendar className="w-4 h-4 text-slate-400" />
-                <span className="text-xs font-medium text-slate-500 hidden sm:inline">
+                <h3 className="text-xs font-medium text-slate-500 hidden sm:inline">
                   {t('analytics:period.label')}
-                </span>
+                </h3>
                 <Select value={period} onValueChange={setPeriod}>
                   <SelectItem value="6">{t('analytics:period.6months')}</SelectItem>
                   <SelectItem value="12">{t('analytics:period.12months')}</SelectItem>
@@ -336,9 +336,9 @@ export default function AnalyticsPage() {
                       <Icon className="w-5 h-5 text-white" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-500 truncate">{kpi.title}</p>
-                      <p className="text-lg font-bold text-slate-900 tabular-nums">{kpi.value}</p>
-                      <p className="text-xs text-slate-400 truncate">{kpi.subtitle}</p>
+                      <h3 className="text-xs font-medium text-slate-500 truncate">{kpi.title}</h3>
+                      <h3 className="text-lg font-bold text-slate-900 tabular-nums">{kpi.value}</h3>
+                      <h3 className="text-xs font-medium text-slate-400 truncate">{kpi.subtitle}</h3>
                     </div>
                   </div>
                 );
@@ -632,7 +632,7 @@ export default function AnalyticsPage() {
         <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/80 to-indigo-50/50 px-5 py-4 text-sm leading-6 text-blue-700 shadow-sm">
           <div className="flex items-start gap-2">
             <Activity className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
-            <span>{t('analytics:footer')}</span>
+            <h3 className="font-medium">{t('analytics:footer')}</h3>
           </div>
         </div>
       </div>

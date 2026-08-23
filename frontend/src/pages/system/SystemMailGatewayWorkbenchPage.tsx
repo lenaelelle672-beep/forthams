@@ -169,7 +169,7 @@ export default function SystemMailGatewayWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">邮件网关配置</h3>
-          <p className="mt-1 text-sm text-slate-500">{endpointCopy}</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">{endpointCopy}</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">read-only / no-send / no-network / no-secret</span>
       </div>
@@ -206,7 +206,7 @@ export default function SystemMailGatewayWorkbenchPage({
             <h4 className="font-semibold">网关 catalog</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，只读展示</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无可展示的邮件网关元数据；这不代表邮件子系统完成。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无可展示的邮件网关元数据；这不代表邮件子系统完成。</h3> : null}
           <div className="space-y-2">
             {page.records.map((gateway) => (
               <button key={gateway.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openGateway(gateway)}>
@@ -230,7 +230,7 @@ export default function SystemMailGatewayWorkbenchPage({
               <p>port={display(selectedGateway.port)} · tlsMode={display(selectedGateway.tlsMode)} · authConfigured={display(selectedGateway.authConfigured)}</p>
               <p>tenantScoped={display(selectedGateway.tenantScoped ?? true)} · readOnly={display(selectedGateway.readOnly ?? true)}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条邮件网关元数据查看脱敏详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条邮件网关元数据查看脱敏详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="mail-gateway-host-masked">hostMasked</label>

@@ -523,10 +523,10 @@ export default function DepreciationListPage() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">折旧管理</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-blue-700">
                 <TrendingDown className="h-3 w-3" />
                 折旧
-              </span>
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -562,7 +562,7 @@ export default function DepreciationListPage() {
                     <Icon className="h-3.5 w-3.5 text-white" />
                   </span>
                   <div>
-                    <p className="text-[11px] font-medium text-slate-400">{stat.label}</p>
+                    <h3 className="text-[11px] font-medium text-slate-400">{stat.label}</h3>
                     <p className="text-lg font-bold text-slate-900">
                       {stat.value}
                       {stat.unit && <span className="ml-0.5 text-xs font-medium text-slate-400">{stat.unit}</span>}
@@ -581,10 +581,10 @@ export default function DepreciationListPage() {
           <div className="border-b border-slate-100 bg-gradient-to-r from-white via-[#fbfdff] to-[#f8fbff] px-5 py-4">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                   <Search className="h-3.5 w-3.5" />
                   折旧计划
-                </div>
+                </h3>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">
                   资产折旧计划管理
                 </h2>

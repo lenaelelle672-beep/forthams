@@ -52,7 +52,7 @@ export default function ScheduledReportConfigPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[var(--surface-heading)]">定时报表配置</h1>
-          <p className="text-sm text-[var(--surface-muted-text)]">管理定时报表调度和邮件推送</p>
+          <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">管理定时报表调度和邮件推送</h3>
         </div>
         <Button
           onClick={() => toast.info('新建报表功能即将开放')}
@@ -72,8 +72,8 @@ export default function ScheduledReportConfigPage() {
           ) : reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-sm text-[var(--surface-muted-text)]">
               <Clock className="w-12 h-12 mb-3 opacity-40" />
-              <span>暂无定时报表配置</span>
-              <span className="mt-1">点击"新建定时报表"开始创建</span>
+              <h3 className="font-medium">暂无定时报表配置</h3>
+              <h3 className="mt-1 font-medium">点击"新建定时报表"开始创建</h3>
             </div>
           ) : (
             <div className="overflow-x-auto">

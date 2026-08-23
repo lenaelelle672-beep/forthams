@@ -245,9 +245,9 @@ export default function SystemFormStorageWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">表单存储</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <h3 className="mt-1 text-sm font-medium text-slate-500">
             真实调用 /form-storage 列表、详情、创建、更新、归档、删除留痕、附件引用与导出脱敏接口。
-          </p>
+          </h3>
         </div>
         <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:bg-slate-100" disabled={loading || saving} type="button" onClick={() => void loadRecords()}>
           重新加载
@@ -265,7 +265,7 @@ export default function SystemFormStorageWorkbenchPage({
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{records.length} 条</span>
           </div>
           {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">表单存储加载中...</p> : null}
-          {!loading && records.length === 0 ? <p className="text-sm text-slate-500">暂无表单实例。</p> : null}
+          {!loading && records.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无表单实例。</h3> : null}
           <div className="space-y-2">
             {records.map((record) => (
               <button
@@ -295,11 +295,11 @@ export default function SystemFormStorageWorkbenchPage({
             </div>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                <p className="text-xs text-slate-500">字段摘要</p>
+                <h3 className="text-xs font-medium text-slate-500">字段摘要</h3>
                 <p className="mt-1">{selectedRecord?.fieldSummary ?? '字段摘要为空'}</p>
               </div>
               <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
-                <p className="text-xs text-slate-500">附件摘要</p>
+                <h3 className="text-xs font-medium text-slate-500">附件摘要</h3>
                 <p className="mt-1">{selectedRecord?.attachmentSummary ?? '附件引用为空'}</p>
               </div>
             </div>
@@ -307,7 +307,7 @@ export default function SystemFormStorageWorkbenchPage({
               <div>
                 <h5 className="mb-2 text-sm font-semibold">字段 maskedValue</h5>
                 <div className="space-y-2 text-sm text-slate-600">
-                  {selectedFields.length === 0 ? <p>暂无字段摘要。</p> : null}
+                  {selectedFields.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无字段摘要。</h3> : null}
                   {selectedFields.map((field) => (
                     <div key={field.id ?? field.fieldKey} className="rounded-xl border border-slate-100 px-3 py-2">
                       {field.fieldLabel ?? field.fieldKey}：{field.maskedValue}
@@ -318,7 +318,7 @@ export default function SystemFormStorageWorkbenchPage({
               <div>
                 <h5 className="mb-2 text-sm font-semibold">附件脱敏引用</h5>
                 <div className="space-y-2 text-sm text-slate-600">
-                  {visibleAttachments.length === 0 ? <p>暂无附件引用。</p> : null}
+                  {visibleAttachments.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无附件引用。</h3> : null}
                   {visibleAttachments.map((attachment) => (
                     <div key={attachment.id ?? attachment.referenceKey} className="rounded-xl border border-slate-100 px-3 py-2">
                       <p>{attachment.fileName} · {attachment.contentType ?? '未知类型'} · {attachment.fileSize ?? 0} bytes</p>

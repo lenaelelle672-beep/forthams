@@ -714,7 +714,7 @@ export default function InventoryDetailPage() {
                   )}
                 </ul>
               ) : (
-                <p className="text-[10px] text-amber-500/70 mt-2">暂无盘盈记录</p>
+                <h3 className="text-[10px] font-medium text-amber-500/70 mt-2">暂无盘盈记录</h3>
               )}
             </div>
 
@@ -742,7 +742,7 @@ export default function InventoryDetailPage() {
                   )}
                 </ul>
               ) : (
-                <p className="text-[10px] text-red-500/70 mt-2">暂无盘亏记录</p>
+                <h3 className="text-[10px] font-medium text-red-500/70 mt-2">暂无盘亏记录</h3>
               )}
             </div>
 

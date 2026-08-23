@@ -172,12 +172,12 @@ const InspectionUploadPage: React.FC = () => {
         )}
       </Title>
 
-      <Card title="上传新照片" className="mb-6">
+      <Card title={<h3 className="text-base font-semibold m-0">上传新照片</h3>} className="mb-6">
         <Space direction="vertical" style={{ width: '100%' }}>
           <Upload {...uploadProps}>
             <div>
               <UploadOutlined />
-              <div style={{ marginTop: 8 }}>选择照片</div>
+              <button type="button" style={{ marginTop: 8 }}>选择照片</button>
             </div>
           </Upload>
 
@@ -215,11 +215,11 @@ const InspectionUploadPage: React.FC = () => {
         </Space>
       </Card>
 
-      <Card title="已上传照片" extra={<span className="text-gray-500">共 {(photos as Photo[])?.length || 0} 张</span>}>
+      <Card title={<h3 className="text-base font-semibold m-0">已上传照片</h3>} extra={<h3 className="text-gray-500 text-sm font-medium m-0">共 {(photos as Photo[])?.length || 0} 张</h3>}>
         {!(photos as Photo[]) || (photos as Photo[]).length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <CheckCircleOutlined className="text-4xl mb-2" />
-            <p>暂无已上传的照片</p>
+            <h3 className="text-sm font-medium">暂无已上传的照片</h3>
           </div>
         ) : (
           <Row gutter={[16, 16]}>

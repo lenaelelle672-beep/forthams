@@ -388,7 +388,7 @@ export default function IdleAssetsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
             <div>
               <h1 className="text-lg font-bold tracking-tight text-gray-900">闲置资产管理</h1>
-              <p className="mt-0.5 text-sm text-gray-500">闲置资产公告发布与认领流程管理</p>
+              <h3 className="mt-0.5 text-sm font-medium text-gray-500">闲置资产公告发布与认领流程管理</h3>
             </div>
             <Button
               variant="primary"
@@ -411,7 +411,7 @@ export default function IdleAssetsPage() {
                   <Icon className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="text-xs font-medium text-gray-500">{label}</p>
+                  <h3 className="text-xs font-medium text-gray-500">{label}</h3>
                   <p className="text-xl font-bold tracking-tight text-gray-900">{value}</p>
                 </div>
               </div>

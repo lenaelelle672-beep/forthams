@@ -112,7 +112,7 @@ const FloorPlanPage: React.FC = () => {
             <div className="flex flex-wrap items-center justify-between gap-4 p-5">
               <div className="min-w-0">
                 <h1 className="text-xl font-bold tracking-tight text-slate-900">2D/3D 平面图</h1>
-                <p className="mt-1 text-sm text-slate-500">资产位置可视化 · 空间联动</p>
+                <h3 className="mt-1 text-sm font-medium text-slate-500">资产位置可视化 · 空间联动</h3>
               </div>
               <Button
                 variant="outline"
@@ -187,9 +187,9 @@ const FloorPlanPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 {!selectedPlan ? (
-                  <div className="flex items-center justify-center h-96 text-slate-400">
+                  <h3 className="flex items-center justify-center h-96 text-slate-400 font-medium">
                     请从左侧选择一个平面图
-                  </div>
+                  </h3>
                 ) : (
                   <FloorPlanCanvas plan={selectedPlan} assets={planAssets} onAssetAdded={() => fetchPlanAssets(selectedPlan.id)} />
                 )}

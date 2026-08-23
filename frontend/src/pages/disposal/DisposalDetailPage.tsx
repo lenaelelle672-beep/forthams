@@ -172,6 +172,9 @@ function RiskNotice({ type }: { type: DisposalType }) {
     },
   };
   const risk = riskMap[type];
+  if (!risk) {
+    return <h3 className="text-sm font-medium text-gray-400 text-center py-4">暂无风险说明</h3>;
+  }
   return (
     <div className="flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3">
       <ShieldAlert className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />

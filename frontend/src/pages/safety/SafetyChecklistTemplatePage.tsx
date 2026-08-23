@@ -469,9 +469,9 @@ const SafetyChecklistTemplatePage: React.FC = () => {
                 <h1 className="text-xl font-bold tracking-tight text-[var(--surface-heading)]">
                   安全检查表模板
                 </h1>
-                <p className="mt-1 text-sm text-[var(--surface-muted-text)]">
+                <h3 className="mt-1 text-sm font-medium text-[var(--surface-muted-text)]">
                   配置检查表模板与检查项清单
-                </p>
+                </h3>
               </div>
               <Button variant="primary" onClick={() => handleOpen()}>
                 <Plus className="w-4 h-4" />
@@ -484,7 +484,7 @@ const SafetyChecklistTemplatePage: React.FC = () => {
                   <FileText className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部模板</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部模板</h3>
                   <p className="text-lg font-bold text-slate-900">{totalCount}</p>
                 </div>
               </div>
@@ -493,7 +493,7 @@ const SafetyChecklistTemplatePage: React.FC = () => {
                   <CheckCircle className="h-4.5 w-4.5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">已启用</p>
+                  <h3 className="text-xs font-medium text-slate-500">已启用</h3>
                   <p className="text-lg font-bold text-green-600">{activeCount}</p>
                 </div>
               </div>
@@ -502,7 +502,7 @@ const SafetyChecklistTemplatePage: React.FC = () => {
                   <Archive className="h-4.5 w-4.5 text-slate-500" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">已禁用</p>
+                  <h3 className="text-xs font-medium text-slate-500">已禁用</h3>
                   <p className="text-lg font-bold text-slate-600">{disabledCount}</p>
                 </div>
               </div>

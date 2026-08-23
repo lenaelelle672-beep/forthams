@@ -131,7 +131,7 @@ export default function SystemImportExportWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">导入导出</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示导入导出任务历史、错误报告摘要与只读边界。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示导入导出任务历史、错误报告摘要与只读边界。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
@@ -149,11 +149,11 @@ export default function SystemImportExportWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">任务总数</p>
+          <h3 className="text-xs font-medium text-slate-500">任务总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">失败任务</p>
+          <h3 className="text-xs font-medium text-slate-500">失败任务</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{failedCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -208,7 +208,7 @@ export default function SystemImportExportWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">任务加载中...</div> : null}
       {!loading && !error && visibleTasks.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">{emptyMessage}</h3>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 p-4">

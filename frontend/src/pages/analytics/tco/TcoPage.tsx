@@ -109,7 +109,7 @@ export default function TcoPage() {
           <CardContent className="p-6">
             <h3 className="text-base font-bold mb-4">资产 TCO 构成</h3>
             {assetLoading && <p className="text-gray-400 text-sm">加载中...</p>}
-            {!assetId && <p className="text-gray-400 text-sm">请输入资产ID查询</p>}
+            {!assetId && <h3 className="text-gray-400 text-sm font-medium">请输入资产ID查询</h3>}
             {assetTco && !assetLoading && (
               <div className="space-y-4">
                 <div className="text-center">
@@ -156,9 +156,9 @@ export default function TcoPage() {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[280px] text-gray-400 text-sm">
+              <h3 className="flex items-center justify-center h-[280px] text-gray-400 text-sm font-medium">
                 {assetId ? '暂无趋势数据' : '请先查询资产'}
-              </div>
+              </h3>
             )}
           </CardContent>
         </Card>
@@ -177,9 +177,9 @@ export default function TcoPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[250px] text-gray-400 text-sm">
+              <h3 className="flex items-center justify-center h-[250px] text-gray-400 text-sm font-medium">
                 {deptId ? '暂无数据' : '请输入部门ID查询'}
-              </div>
+              </h3>
             )}
           </CardContent>
         </Card>
@@ -198,9 +198,9 @@ export default function TcoPage() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center h-[250px] text-gray-400 text-sm">
+              <h3 className="flex items-center justify-center h-[250px] text-gray-400 text-sm font-medium">
                 {categoryId ? '暂无数据' : '请输入分类ID查询'}
-              </div>
+              </h3>
             )}
           </CardContent>
         </Card>

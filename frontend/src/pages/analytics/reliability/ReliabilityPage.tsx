@@ -88,13 +88,13 @@ export default function ReliabilityPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-2xl font-bold text-gray-900">{card.value}</div>
-                  <div className="text-xs text-gray-400 mt-1">{card.subtitle}</div>
+                  <h3 className="text-xs font-medium text-gray-400 mt-1">{card.subtitle}</h3>
                 </div>
                 <div className={`p-3 rounded-xl ${card.bg}`}>
                   <card.icon className={`w-5 h-5 ${card.color}`} />
                 </div>
               </div>
-              <div className="mt-2 text-sm font-medium text-gray-700">{card.title}</div>
+              <h3 className="mt-2 text-sm font-medium text-gray-700">{card.title}</h3>
             </CardContent>
           </Card>
         ))}

@@ -182,10 +182,10 @@ const AssetListPage         = React.lazy(() => import('@/pages/asset/AssetListPa
 const AssetDetailPage       = React.lazy(() => import('@/pages/asset/AssetDetailPage'));
 const AssetFormPage         = React.lazy(() => import('@/pages/asset/AssetFormPage'));
 // 工单管理已合并到资产处置（WorkOrderDetailPage 仍被审批流程详情引用，WorkOrderFormPage 供新建按钮使用）
-const WorkOrderDetailPage   = React.lazy(() => import('@/pages/workorder/WorkOrderDetailPage'));
-const WorkOrderFormPage     = React.lazy(() => import('@/pages/workorder/WorkOrderFormPage'));
-const ApprovalListPage      = React.lazy(() => import('@/pages/approval/ApprovalListPage'));
-const ApprovalDetailPage    = React.lazy(() => import('@/pages/approval/ApprovalDetailPage'));
+const WorkOrderDetailPage   = React.lazy(() => import('@/pages/WorkOrder/WorkOrderDetailPage'));
+const WorkOrderFormPage     = React.lazy(() => import('@/pages/WorkOrder/WorkOrderFormPage'));
+const ApprovalListPage      = React.lazy(() => import('@/pages/Approval/ApprovalListPage'));
+const ApprovalDetailPage    = React.lazy(() => import('@/pages/Approval/ApprovalDetailPage'));
 const NotificationsPage     = React.lazy(() => import('@/pages/notifications/NotificationsPage'));
 const InventoryTasksPage    = React.lazy(() => import('@/pages/inventory/InventoryTasksPage'));
 const InventoryDetailPage   = React.lazy(() => import('@/pages/inventory/InventoryDetailPage'));
@@ -227,7 +227,7 @@ const TestResultsPage         = React.lazy(() => import('@/pages/test-results/Te
 const FaultCodePage           = React.lazy(() => import('@/pages/fault-codes/FaultCodePage'));
 const SparePartListPage       = React.lazy(() => import('@/pages/spare-parts/SparePartListPage'));
 const SparePartDetailPage     = React.lazy(() => import('@/pages/spare-parts/SparePartDetailPage'));
-const WorkOrderAcceptancePage = React.lazy(() => import('@/pages/workorder/WorkOrderAcceptancePage'));
+const WorkOrderAcceptancePage = React.lazy(() => import('@/pages/WorkOrder/WorkOrderAcceptancePage'));
 const ReliabilityPage         = React.lazy(() => import('@/pages/analytics/reliability/ReliabilityPage'));
 
 // ── 重构完成的新页面 ──────────────────────────────────────────────────────────

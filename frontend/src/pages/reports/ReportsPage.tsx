@@ -340,7 +340,7 @@ export default function ReportsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
             <div>
               <h1 className="text-xl font-bold text-slate-900">报表中心</h1>
-              <p className="mt-1 text-sm text-slate-500">预定义报表查看与数据可视化</p>
+              <h3 className="mt-1 text-sm font-medium text-slate-500">预定义报表查看与数据可视化</h3>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 py-2">
