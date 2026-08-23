@@ -2726,5 +2726,5 @@
 | Q3536 | pending | 桌面空态：自定义字段列表（region/complementary/分页 0）。禁 /m。 |
 | Q3537 | pending | 桌面空态：自定义字段边界（definition catalog/只读目录/preview）。禁 /m。 |
 | Q3538 | pending | 桌面空态：自定义字段覆盖说明（字段值链路/基础资料/全集 0）。禁 /m。 |
-| Q3539 | pending | 桌面空态：自定义字段元数据（边界/不写字段值/runtime schema）。禁 /m。 |
+| Q3539 | pending | 桌面空态：自定义字段元数据（边界/CRUD runtime/加密标记）。禁 /m。 |
 | Q3540 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |

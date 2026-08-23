@@ -59587,17 +59587,17 @@ test.describe('Q3539 桌面自定义字段元数据空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不写资产字段值」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不提供字段定义 CRUD runtime」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
-    await expect(page.getByText('不写资产字段值').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('不提供字段定义 CRUD runtime').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不接入运行时 schema」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「加密字段只展示安全标记」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
-    await expect(page.getByText('不接入运行时 schema').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('加密字段只展示安全标记').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
