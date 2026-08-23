@@ -2167,4 +2167,5 @@
 | Q2977 | done | 桌面空态 **3 passed**（/login 2026/©/·）。禁 /m。 |
 | Q2978 | done | 桌面空态 **3 passed**（/login4 设备健康/连接MES/安全SSO）。禁 /m。 |
 | Q2979 | done | 桌面空态 **3 passed**（/login4 运维闭环/开发体验/UNIVIEW）。禁 /m。 |
-| Q2980 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2980 | done | 桌面空态 **3 passed**（/login4 登录系统/组织账号/固定资产平台）。禁 /m。 |
+| Q2981 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
