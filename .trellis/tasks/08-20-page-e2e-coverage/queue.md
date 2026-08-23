@@ -3014,11 +3014,19 @@
 | Q3824 | done | 桌面空态 **3 passed**（自定义字段运行时 schema 边界）。禁 /m。 |
 | Q3825 | done | 桌面空态 **3 passed**（字段集 by-category 长路径组合）。禁 /m。 |
 | Q3826 | done | 桌面空态 **3 passed**（自定义字段 secret handling 边界）。禁 /m。 |
-| Q3827 | pending | 桌面空态：表单配置 form-definitions 端点族。禁 /m。 |
-| Q3828 | pending | 桌面空态：表单配置 schema 白名单剥离边界。禁 /m。 |
-| Q3829 | pending | 桌面空态：流程设计器 designer/draft 端点族。禁 /m。 |
-| Q3830 | pending | 桌面空态：流程设计器发布 fail-closed 边界。禁 /m。 |
-| Q3831 | pending | 桌面空态：Webhook config-only 整句。禁 /m。 |
-| Q3832 | pending | 桌面空态：同步规则队列摘要组合。禁 /m。 |
-| Q3833 | pending | 桌面空态：流程定义 /workflows 只读目录。禁 /m。 |
-| Q3834 | pending | 桌面空态：文件存储 catalog 生命周期闭环整句。禁 /m。 |
+| Q3827 | done | 桌面空态 **3 passed**（表单配置 form-definitions 端点族）。禁 /m。 |
+| Q3828 | done | 桌面空态 **3 passed**（表单配置 schema 白名单剥离边界）。禁 /m。 |
+| Q3829 | done | 桌面空态 **3 passed**（流程设计器 designer/draft 端点族）。禁 /m。 |
+| Q3830 | done | 桌面空态 **3 passed**（流程设计器发布 fail-closed 边界）。禁 /m。 |
+| Q3831 | done | 桌面空态 **3 passed**（Webhook config-only 整句）。禁 /m。 |
+| Q3832 | done | 桌面空态 **3 passed**（同步规则队列摘要组合）。禁 /m。 |
+| Q3833 | done | 桌面空态 **3 passed**（流程定义 /workflows 只读目录）。禁 /m。 |
+| Q3834 | done | 桌面空态 **3 passed**（文件存储 catalog 生命周期闭环整句）。禁 /m。 |
+| Q3835 | pending | 桌面空态：表单配置同屏联动整句。禁 /m。 |
+| Q3836 | pending | 桌面空态：表单配置字段同步与 PC 预览。禁 /m。 |
+| Q3837 | pending | 桌面空态：流程设计器画布节点库说明。禁 /m。 |
+| Q3838 | pending | 桌面空态：表单配置 H5 遮罩预览说明。禁 /m。 |
+| Q3839 | pending | 桌面空态：流程设计器拖拽保存草稿说明。禁 /m。 |
+| Q3840 | pending | 桌面空态：流程控制台只读风险整句。禁 /m。 |
+| Q3841 | pending | 桌面空态：SLA 运行态安全边界整句。禁 /m。 |
+| Q3842 | pending | 桌面空态：交接写边界与未闭环整句。禁 /m。 |

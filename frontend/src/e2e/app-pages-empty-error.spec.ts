@@ -68161,6 +68161,238 @@ test.describe('Q3834 桌面文件存储 catalog 生命周期闭环整句空态',
 
 });
 
+test.describe('Q3835 桌面表单配置同屏联动整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「表单对象、字段列表、桌面预览、钉钉 H5 预览和字段属性同屏联动。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('表单对象、字段列表、桌面预览、钉钉 H5 预览和字段属性同屏联动。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「桌面预览、钉钉 H5 预览和字段属性同屏联动」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('桌面预览、钉钉 H5 预览和字段属性同屏联动').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「钉钉 H5 预览和字段属性同屏联动」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('钉钉 H5 预览和字段属性同屏联动').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3836 桌面表单配置字段同步与 PC 预览空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「修改字段后会同步桌面预览与钉钉 H5 预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('修改字段后会同步桌面预览与钉钉 H5 预览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「同步桌面预览与钉钉 H5 预览，保存草稿前不影响已发布版本」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('同步桌面预览与钉钉 H5 预览，保存草稿前不影响已发布版本').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「双列布局模拟 PC 工作台表单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('双列布局模拟 PC 工作台表单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3837 桌面流程设计器画布节点库说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「左侧节点库、可视化流程画布、右侧节点属性同屏」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('左侧节点库、可视化流程画布、右侧节点属性同屏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「可视化流程画布、右侧节点属性同屏」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('可视化流程画布、右侧节点属性同屏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「左侧节点库、可视化流程画布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('左侧节点库、可视化流程画布').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3838 桌面表单配置 H5 遮罩预览说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「单列移动端布局，敏感字段默认遮罩。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('单列移动端布局，敏感字段默认遮罩。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「修改字段后会同步桌面预览与钉钉 H5 预览，保存草稿前不影响已发布版本。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('修改字段后会同步桌面预览与钉钉 H5 预览，保存草稿前不影响已发布版本。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「字段列表、桌面预览、钉钉 H5 预览和字段属性同屏联动」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('字段列表、桌面预览、钉钉 H5 预览和字段属性同屏联动').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3839 桌面流程设计器拖拽保存草稿说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「拖拽左侧节点到画布，移动节点后保存草稿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('拖拽左侧节点到画布，移动节点后保存草稿').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「左侧节点库、可视化流程画布、右侧节点属性同屏；拖拽左侧节点到画布，移动节点后保存草稿。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('左侧节点库、可视化流程画布、右侧节点属性同屏；拖拽左侧节点到画布，移动节点后保存草稿。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「右侧节点属性同屏；拖拽左侧节点到画布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('右侧节点属性同屏；拖拽左侧节点到画布').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3840 桌面流程控制台只读风险整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCommandCenterEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「只读风险提示：不支持发起/审批/重试/终止/发布/编辑，不代表流程控制闭环；本页仅复用既有只读查询结果。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('只读风险提示：不支持发起/审批/重试/终止/发布/编辑，不代表流程控制闭环；本页仅复用既有只读查询结果。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「不代表流程控制闭环；本页仅复用既有只读查询结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('不代表流程控制闭环；本页仅复用既有只读查询结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「不支持发起/审批/重试/终止/发布/编辑，不代表流程控制闭环；本页仅复用既有只读查询结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByText('不支持发起/审批/重试/终止/发布/编辑，不代表流程控制闭环；本页仅复用既有只读查询结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3841 桌面 SLA 运行态安全边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「SLA 运行态安全边界：模拟、摘要、超时记录和脱敏导出不修改审批、工作流定义、表单实例、业务单据或任务状态；不发送真实通知，通知目标、联系方式、变量值、附件引用与导出内容只展示 masked/summary。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('SLA 运行态安全边界：模拟、摘要、超时记录和脱敏导出不修改审批、工作流定义、表单实例、业务单据或任务状态；不发送真实通知，通知目标、联系方式、变量值、附件引用与导出内容只展示 masked/summary。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「不发送真实通知，通知目标、联系方式、变量值、附件引用与导出内容只展示 masked/summary」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('不发送真实通知，通知目标、联系方式、变量值、附件引用与导出内容只展示 masked/summary').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「模拟、摘要、超时记录和脱敏导出不修改审批、工作流定义、表单实例、业务单据或任务状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('模拟、摘要、超时记录和脱敏导出不修改审批、工作流定义、表单实例、业务单据或任务状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3842 桌面交接写边界与未闭环整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-handover 「只读边界：本页仅展示交接任务摘要与状态；发起、推进、取消交接等写操作不在 V3 只读 catalog 范围内。真实资产/工单/审批对象转移未闭环，需后续专项处理。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('只读边界：本页仅展示交接任务摘要与状态；发起、推进、取消交接等写操作不在 V3 只读 catalog 范围内。真实资产/工单/审批对象转移未闭环，需后续专项处理。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-handover 「写操作不在 V3 只读 catalog 范围内。真实资产/工单/审批对象转移未闭环」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('写操作不在 V3 只读 catalog 范围内。真实资产/工单/审批对象转移未闭环').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-handover 「本页仅展示交接任务摘要与状态；发起、推进、取消交接等写操作不在 V3 只读 catalog 范围内」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-handover');
+    await expect(page.getByText('本页仅展示交接任务摘要与状态；发起、推进、取消交接等写操作不在 V3 只读 catalog 范围内').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
