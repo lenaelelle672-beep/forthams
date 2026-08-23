@@ -40829,6 +40829,34 @@ test.describe('Q2880 桌面新建转移申请完成步骤空态', () => {
   });
 });
 
+test.describe('Q2881 桌面新建转移申请其余空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/transfer/new 空态「备注」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('备注').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 空态「新建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('新建').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new 空态「发起部门或位置之间的正式资产转移申请。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByText('发起部门或位置之间的正式资产转移申请。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
