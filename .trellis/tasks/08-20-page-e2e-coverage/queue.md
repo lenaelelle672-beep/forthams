@@ -2185,4 +2185,5 @@
 | Q2995 | done | 桌面空态 **3 passed**（/login5 密码placeholder/组织账号/显示密码）。禁 /m。 |
 | Q2996 | done | 桌面空态 **3 passed**（/login5 button 系统/资产/运维）。禁 /m。 |
 | Q2997 | done | 桌面空态 **3 passed**（/login5 button 部门负责人/进入工作台/忘记密码）。禁 /m。 |
-| Q2998 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2998 | done | 桌面空态 **3 passed**（/login5 checkbox/统一认证/工作台预览 link）。禁 /m。 |
+| Q2999 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
