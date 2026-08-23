@@ -1015,5 +1015,7 @@
 - Q2904：/categories 当前选中/子分类数/选择分类 **3 passed**。`5e8bdc0af`
 - Q2905：/categories 选树提示/添加根分类 + /retirement/new 审批提示 **3 passed**。`067c16a49`
 - Q2906：/system/depts 新增部门/暂无数据/选部门 **3 passed**。`6b3c05176`
-- Q2907：/system/depts 部门管理/组织架构/部门总数 **3 passed**。
+- Q2907：/system/depts 部门管理/组织架构/部门总数 **3 passed**。`3c72e1fc1`
+- Q2908：/system/depts 正常部门/顶级部门/个部门 **3 passed**。`de170b74a`
+- Q2909：/system/depts 搜索过滤/展开收起/搜索placeholder **3 passed**。
 
