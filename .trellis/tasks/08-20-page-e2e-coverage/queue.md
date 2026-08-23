@@ -2107,4 +2107,5 @@
 | Q2917 | done | 桌面空态 **3 passed**（/system/roles 标题/描述/暂无数据）。禁 /m。 |
 | Q2918 | done | 桌面空态 **3 passed**（/system/roles 角色列表/总数/RBAC）。禁 /m。 |
 | Q2919 | done | 桌面空态 **3 passed**（/system/roles 当前页/角色名称/角色编码）。禁 /m。 |
-| Q2920 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2920 | done | 桌面空态 **3 passed**（/system/roles 数据权限/描述/ID）。禁 /m。 |
+| Q2921 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
