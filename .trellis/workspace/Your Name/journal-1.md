@@ -942,5 +942,6 @@
 - Q2831：/retirement/new 残值评估/备注说明/折旧时间线 **3 passed**。`bf0cd153f`
 - Q2832：/retirement/new 新建申请/退役管理/不可逆 **3 passed**。`0c38c16f3`
 - Q2833：/budgets/new 创建预算/返回列表/取消 **3 passed**。`5ca2919be`
-- Q2834：/budgets/new 预算年度/类型/总额 **3 passed**。
+- Q2834：/budgets/new 预算年度/类型/总额 **3 passed**。`5884dd75b`
+- Q2835：/budgets/new 部门ID/分类ID/创建记录 **3 passed**。
 
