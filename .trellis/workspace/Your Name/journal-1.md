@@ -1013,5 +1013,6 @@
 - Q2902：/categories 添加根分类/描述/暂无分类 **3 passed**。`42adbaf06`
 - Q2903：/categories 总分类数/根分类/分类结构 **3 passed**。`9ef6c7d71`
 - Q2904：/categories 当前选中/子分类数/选择分类 **3 passed**。`5e8bdc0af`
-- Q2905：/categories 选树提示/添加根分类 + /retirement/new 审批提示 **3 passed**。
+- Q2905：/categories 选树提示/添加根分类 + /retirement/new 审批提示 **3 passed**。`067c16a49`
+- Q2906：/system/depts 新增部门/暂无数据/选部门 **3 passed**。
 
