@@ -2197,4 +2197,5 @@
 | Q3007 | done | 桌面空态 **3 passed**（/dashboard 查看全部/12个月趋势/导出数据）。禁 /m。 |
 | Q3008 | done | 桌面空态 **3 passed**（/dashboard 刷新视图 + /approvals 待我审批 + /intake 验收日期）。禁 /m。 |
 | Q3009 | done | 桌面空态 **3 passed**（/intake 填写验收 + /approvals 我发起的/已通过）。禁 /m。 |
-| Q3010 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3010 | done | 桌面空态 **3 passed**（/approvals 已驳回/待审批/审批）。禁 /m。 |
+| Q3011 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
