@@ -2021,4 +2021,5 @@
 | Q2831 | done | 桌面空态 **3 passed**（/retirement/new 残值评估/备注说明/折旧时间线）。禁 /m。 |
 | Q2832 | done | 桌面空态 **3 passed**（/retirement/new 新建申请/退役管理/不可逆）。禁 /m。 |
 | Q2833 | done | 桌面空态 **3 passed**（/budgets/new 创建预算/返回列表/取消）。禁 /m。 |
-| Q2834 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2834 | done | 桌面空态 **3 passed**（/budgets/new 预算年度/类型/总额）。禁 /m。 |
+| Q2835 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
