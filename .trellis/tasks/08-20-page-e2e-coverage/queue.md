@@ -2690,25 +2690,41 @@
 | Q3500 | done | 桌面空态 **3 passed**（基础参数预演说明（不持久化/DEGRADED/目录））。禁 /m。 |
 | Q3501 | done | 桌面空态 **3 passed**（基础参数默认键编码（companyName/timezone/currency））。禁 /m。 |
 | Q3502 | done | 桌面空态 **3 passed**（基础参数默认键余项（预警天数/备份频率/configs））。禁 /m。 |
-| Q3503 | pending | 桌面空态：邮件模板筛选（分类/内容类型/全部类型）。禁 /m。 |
-| Q3504 | pending | 桌面空态：邮件模板操作（查询/列表 region/详情 complementary）。禁 /m。 |
-| Q3505 | pending | 桌面空态：邮件模板计数（按编码查询/0 条/tenant-scoped）。禁 /m。 |
-| Q3506 | pending | 桌面空态：邮件模板边界（catalog/不发送/mail-templates list）。禁 /m。 |
-| Q3507 | pending | 桌面空态：邮件模板预览说明（HTML escaped/子系统/通知组）。禁 /m。 |
-| Q3508 | pending | 桌面空态：邮件模板元数据（边界/SMTP/敏感变量）。禁 /m。 |
-| Q3509 | pending | 桌面空态：邮件日志状态筛（状态 combobox/全部状态/查询）。禁 /m。 |
-| Q3510 | pending | 桌面空态：邮件日志检索（模板编码/业务类型/业务 ID）。禁 /m。 |
-| Q3511 | pending | 桌面空态：邮件日志列表（region/脱敏 complementary/0 条）。禁 /m。 |
-| Q3512 | pending | 桌面空态：邮件日志边界（redacted/mail-logs list/redacted=true）。禁 /m。 |
-| Q3513 | pending | 桌面空态：邮件日志脱敏说明（收件人抄送/采集链路）。禁 /m。 |
-| Q3514 | pending | 桌面空态：邮件日志业务查询（biz lookup/mail-logs biz/no retry）。禁 /m。 |
-| Q3515 | pending | 桌面空态：邮件日志覆盖说明（44/44/通知组/不重试）。禁 /m。 |
-| Q3516 | pending | 桌面空态：通知模板筛选（分类/渠道/全部分类）。禁 /m。 |
-| Q3517 | pending | 桌面空态：通知模板操作（全部渠道/查询/列表 region）。禁 /m。 |
-| Q3518 | pending | 桌面空态：通知模板详情（complementary/按编码/0 条）。禁 /m。 |
-| Q3519 | pending | 桌面空态：通知模板边界（catalog/不发送/list）。禁 /m。 |
-| Q3520 | pending | 桌面空态：通知模板非目标（不配置渠道/不修改偏好/开关）。禁 /m。 |
-| Q3521 | pending | 桌面空态：通知模板覆盖说明（通知组/元数据/不保存偏好）。禁 /m。 |
-| Q3522 | pending | 桌面空态：通知模板 heading 余项（catalog/safe preview/搜索）。禁 /m。 |
-| Q3523 | pending | 桌面空态：通知模板预览余项（预览变量/邮件网关/tenant-scoped）。禁 /m。 |
-| Q3524 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3503 | done | 桌面空态 **3 passed**（邮件模板筛选（分类/内容类型/全部类型））。禁 /m。 |
+| Q3504 | done | 桌面空态 **3 passed**（邮件模板操作（查询/列表 region/详情 complementary））。禁 /m。 |
+| Q3505 | done | 桌面空态 **3 passed**（邮件模板计数（按编码查询/0 条/tenant-scoped））。禁 /m。 |
+| Q3506 | done | 桌面空态 **3 passed**（邮件模板边界（catalog/不发送/mail-templates list））。禁 /m。 |
+| Q3507 | done | 桌面空态 **3 passed**（邮件模板预览说明（HTML escaped/子系统/通知组））。禁 /m。 |
+| Q3508 | done | 桌面空态 **3 passed**（邮件模板元数据（边界/SMTP/敏感变量））。禁 /m。 |
+| Q3509 | done | 桌面空态 **3 passed**（邮件日志状态筛（状态 combobox/全部状态/查询））。禁 /m。 |
+| Q3510 | done | 桌面空态 **3 passed**（邮件日志检索（模板编码/业务类型/业务 ID））。禁 /m。 |
+| Q3511 | done | 桌面空态 **3 passed**（邮件日志列表（region/脱敏 complementary/0 条））。禁 /m。 |
+| Q3512 | done | 桌面空态 **3 passed**（邮件日志边界（redacted/mail-logs list/redacted=true））。禁 /m。 |
+| Q3513 | done | 桌面空态 **3 passed**（邮件日志脱敏说明（收件人抄送/采集链路））。禁 /m。 |
+| Q3514 | done | 桌面空态 **3 passed**（邮件日志业务查询（biz lookup/mail-logs biz/no retry））。禁 /m。 |
+| Q3515 | done | 桌面空态 **3 passed**（邮件日志覆盖说明（44/44/通知组/不重试））。禁 /m。 |
+| Q3516 | done | 桌面空态 **3 passed**（通知模板筛选（分类/渠道/全部分类））。禁 /m。 |
+| Q3517 | done | 桌面空态 **3 passed**（通知模板操作（全部渠道/查询/列表 region））。禁 /m。 |
+| Q3518 | done | 桌面空态 **3 passed**（通知模板详情（complementary/按编码/0 条））。禁 /m。 |
+| Q3519 | done | 桌面空态 **3 passed**（通知模板边界（catalog/不发送/list））。禁 /m。 |
+| Q3520 | done | 桌面空态 **3 passed**（通知模板非目标（不配置渠道/不修改偏好/开关））。禁 /m。 |
+| Q3521 | done | 桌面空态 **3 passed**（通知模板覆盖说明（通知组/元数据/不保存偏好））。禁 /m。 |
+| Q3522 | done | 桌面空态 **3 passed**（通知模板 heading 余项（catalog/safe preview/搜索））。禁 /m。 |
+| Q3523 | done | 桌面空态 **3 passed**（通知模板预览余项（预览变量/邮件网关/tenant-scoped））。禁 /m。 |
+| Q3524 | pending | 桌面空态：通知偏好列表（region/complementary/0 条）。禁 /m。 |
+| Q3525 | pending | 桌面空态：通知偏好边界（read-only/只读目录/不保存）。禁 /m。 |
+| Q3526 | pending | 桌面空态：通知偏好预览说明（preferences/wouldReceive/单模块）。禁 /m。 |
+| Q3527 | pending | 桌面空态：通知偏好覆盖余项（通知组/44/44/预览渠道）。禁 /m。 |
+| Q3528 | pending | 桌面空态：通知偏好元数据（边界/保留分类词/不改决策）。禁 /m。 |
+| Q3529 | pending | 桌面空态：通知偏好详情余项（当前分类/无运行时/runtimeEffect）。禁 /m。 |
+| Q3530 | pending | 桌面空态：通知渠道列表（region/complementary/0 条）。禁 /m。 |
+| Q3531 | pending | 桌面空态：通知渠道边界（noSend/只读目录/不保存）。禁 /m。 |
+| Q3532 | pending | 桌面空态：通知渠道接口（channel-configs/不发测试/不外联）。禁 /m。 |
+| Q3533 | pending | 桌面空态：通知渠道覆盖说明（单模块/发送链/configured）。禁 /m。 |
+| Q3534 | pending | 桌面空态：通知渠道元数据（边界/不创建/不显示原始地址）。禁 /m。 |
+| Q3535 | pending | 桌面空态：通知渠道表单余项（签名/启用/当前渠道）。禁 /m。 |
+| Q3536 | pending | 桌面空态：自定义字段列表（region/complementary/分页 0）。禁 /m。 |
+| Q3537 | pending | 桌面空态：自定义字段边界（definition catalog/只读目录/preview）。禁 /m。 |
+| Q3538 | pending | 桌面空态：自定义字段覆盖说明（字段值链路/基础资料/全集 0）。禁 /m。 |
+| Q3539 | pending | 桌面空态：自定义字段元数据（边界/不写字段值/runtime schema）。禁 /m。 |
+| Q3540 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
