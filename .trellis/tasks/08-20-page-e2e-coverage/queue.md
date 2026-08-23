@@ -3430,3 +3430,11 @@
 | Q4240 | done | 桌面空态 **3 passed**（处置总量/回收价值/领用 heading）。禁 /m。 |
 | Q4241 | done | 桌面空态 **3 passed**（已盘资产/盘亏预警/解决措施 heading）。禁 /m。 |
 | Q4242 | done | 桌面空态 **3 passed**（已承诺/执行率/资产总净值 heading）。禁 /m。 |
+| Q4243 | pending | 桌面空态 待处理维修/闲置率/累计折旧 heading。禁 /m。 |
+| Q4244 | pending | 桌面空态 资产管理/待处理/已归还 heading。禁 /m。 |
+| Q4245 | pending | 桌面空态 部门总数/正常部门/顶级部门 heading。禁 /m。 |
+| Q4246 | pending | 桌面空态 岗位总量/用户总量/角色数 heading。禁 /m。 |
+| Q4247 | pending | 桌面空态 当前页/总页数/岗位数 heading。禁 /m。 |
+| Q4248 | pending | 桌面空态 总检验数/待检验/已过期不通过 heading。禁 /m。 |
+| Q4249 | pending | 桌面空态 菜单目录/菜单/按钮 heading。禁 /m。 |
+| Q4250 | pending | 桌面空态 盘点周期总周期/进行中/已计划 heading。禁 /m。 |

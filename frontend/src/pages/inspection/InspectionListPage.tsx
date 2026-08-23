@@ -404,9 +404,9 @@ const InspectionListPage: React.FC = () => {
                   <Icon className="h-4.5 w-4.5 text-white" />
                 </div>
                 <div>
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
+                  <h3 className="text-[11px] font-medium uppercase tracking-wider text-slate-400">
                     {label}
-                  </p>
+                  </h3>
                   <p className="text-lg font-bold text-slate-800">{value}</p>
                 </div>
               </div>
