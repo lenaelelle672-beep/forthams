@@ -51924,10 +51924,10 @@ test.describe('Q3275 桌面流程控制台 SLA 空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「SLA 导出仅返回脱敏摘要。」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「导出仅返回脱敏摘要。」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
-    await expect(page.getByText('SLA 导出仅返回脱敏摘要。').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('导出仅返回脱敏摘要。').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
