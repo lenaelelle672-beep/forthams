@@ -1186,4 +1186,6 @@
 - Q3627–Q3634：**24 passed**。续 Q3635–Q3642：审计 note 与编号规则/渠道/岗位/SLA/邮件日志/自定义字段/字段集预览字段余项。禁 /m。
 - Q3635–Q3642：已写待跑。Q3637 第三项避开已测 noSend=true，改测渠道 note 的 rejectedInputs。下一票 Q3643。禁 /m。
 - Q3635–Q3642：**24 passed**。续 Q3643–Q3650：同步规则失败 0、SLA 脱敏余项、渠道/偏好/Webhook 未用 combobox/checkbox。禁 /m。
+- Q3648：Webhook 须 `mockWebhookConfigsEmpty`（默认 mockApi paged 会崩进 V3 error boundary）。禁 /m。
+- Q3643–Q3650：**24 passed**。续 Q3651–Q3658：运行监控只读边界/未用状态筛选、表单存储脱敏、待办字段审计、审批规则表达式、同步规则计数余项。禁 /m。
 

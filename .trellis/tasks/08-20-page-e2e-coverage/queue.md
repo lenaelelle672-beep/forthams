@@ -2830,12 +2830,20 @@
 | Q3640 | done | 桌面空态 **3 passed**（邮件日志脱敏余项）。禁 /m。 |
 | Q3641 | done | 桌面空态 **3 passed**（自定义字段预览字段余项）。禁 /m。 |
 | Q3642 | done | 桌面空态 **3 passed**（字段集预览字段余项）。禁 /m。 |
-| Q3643 | pending | 桌面空态：同步规则失败 0/待处理 0/运行中 0。禁 /m。 |
-| Q3644 | pending | 桌面空态：SLA 脱敏边界余项。禁 /m。 |
-| Q3645 | pending | 桌面空态：通知渠道未用 combobox/checkbox。禁 /m。 |
-| Q3646 | pending | 桌面空态：通知渠道 checkbox 余项/noPersistence。禁 /m。 |
-| Q3647 | pending | 桌面空态：通知偏好未用 combobox。禁 /m。 |
-| Q3648 | pending | 桌面空态：Webhook 未用签名策略 combobox。禁 /m。 |
-| Q3649 | pending | 桌面空态：SLA 导出字段余项。禁 /m。 |
-| Q3650 | pending | 桌面空态：SLA 导出遮罩余项。禁 /m。 |
-| Q3651 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
+| Q3643 | done | 桌面空态 **3 passed**（同步规则失败 0/待处理 0/运行中 0）。禁 /m。 |
+| Q3644 | done | 桌面空态 **3 passed**（SLA 脱敏边界余项）。禁 /m。 |
+| Q3645 | done | 桌面空态 **3 passed**（通知渠道未用 combobox/checkbox）。禁 /m。 |
+| Q3646 | done | 桌面空态 **3 passed**（通知渠道 checkbox 余项/noPersistence）。禁 /m。 |
+| Q3647 | done | 桌面空态 **3 passed**（通知偏好未用 combobox）。禁 /m。 |
+| Q3648 | done | 桌面空态 **3 passed**（Webhook 未用签名策略 combobox）。禁 /m。 |
+| Q3649 | done | 桌面空态 **3 passed**（SLA 导出字段余项）。禁 /m。 |
+| Q3650 | done | 桌面空态 **3 passed**（SLA 导出遮罩余项）。禁 /m。 |
+| Q3651 | pending | 桌面空态：运行监控只读边界余项。禁 /m。 |
+| Q3652 | pending | 桌面空态：运行监控未用状态筛选 combobox。禁 /m。 |
+| Q3653 | pending | 桌面空态：表单存储脱敏边界余项。禁 /m。 |
+| Q3654 | pending | 桌面空态：待办字段审计边界余项。禁 /m。 |
+| Q3655 | pending | 桌面空态：待办字段确认留痕余项。禁 /m。 |
+| Q3656 | pending | 桌面空态：审批规则表达式余项。禁 /m。 |
+| Q3657 | pending | 桌面空态：同步规则队列计数余项。禁 /m。 |
+| Q3658 | pending | 桌面空态：表单存储接口说明余项。禁 /m。 |
+| Q3659 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
