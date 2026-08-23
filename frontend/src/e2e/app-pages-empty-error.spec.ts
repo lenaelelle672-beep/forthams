@@ -71528,6 +71528,35 @@ test.describe('Q3950 桌面 SAM/健康评分未用 heading 空态', () => {
 
 });
 
+test.describe('Q3951 桌面 GIS/能耗/预算未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/gis heading「暂无资产定位数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/gis');
+    await expect(page.getByRole('heading', { name: '暂无资产定位数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/energy heading「暂无能耗数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/energy');
+    await expect(page.getByRole('heading', { name: '暂无能耗数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/budgets heading「2026 年度预算」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('heading', { name: '2026 年度预算' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

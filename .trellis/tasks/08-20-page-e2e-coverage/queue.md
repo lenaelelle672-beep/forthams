@@ -3137,4 +3137,5 @@
 | Q3947 | done | 桌面空态 **3 passed**（安全历史/风险矩阵未用 heading）。禁 /m。 |
 | Q3948 | done | 桌面空态 **3 passed**（报表/健康评分未用 button/heading）。禁 /m。 |
 | Q3949 | done | 桌面空态 **3 passed**（定时报表/可靠性未用 button/heading）。禁 /m。 |
-| Q3950 | pending | 桌面空态 SAM/健康评分未用 heading。禁 /m。 |
+| Q3950 | done | 桌面空态 **3 passed**（SAM/健康评分未用 heading）。禁 /m。 |
+| Q3951 | pending | 桌面空态 GIS/能耗/预算未用 heading。禁 /m。 |
