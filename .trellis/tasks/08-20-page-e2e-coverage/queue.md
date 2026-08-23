@@ -2662,9 +2662,32 @@
 | Q3472 | done | 桌面空态 **3 passed**（流程邮件发送边界（真实邮件未接入/测试发送/只读展示））。禁 /m。 |
 | Q3473 | done | 桌面空态 **3 passed**（流程定义版本说明（版本状态/流程模板版本状态/businessType））。禁 /m。 |
 | Q3474 | done | 桌面空态 **3 passed**（待办字段可见计数（0/0 可见/来源解释/preview 脱敏））。禁 /m。 |
-| Q3475 | in_progress | 桌面空态：用户管理操作（重新加载/状态筛选/只读展示 list）。禁 /m。 |
-| Q3476 | in_progress | 桌面空态：用户管理状态筛（全部状态/启用/停用）。禁 /m。 |
-| Q3477 | in_progress | 桌面空态：用户管理表头（账号/姓名/电话）。禁 /m。 |
-| Q3478 | in_progress | 桌面空态：用户管理表头余项（邮箱/部门 ID/状态）。禁 /m。 |
-| Q3479 | in_progress | 桌面空态：用户管理计数（显示 0 条/后端总数/前端状态筛选）。禁 /m。 |
-| Q3480 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3475 | done | 桌面空态 **3 passed**（用户管理操作（重新加载/状态筛选/只读展示 list））。禁 /m。 |
+| Q3476 | done | 桌面空态 **3 passed**（用户管理状态筛（全部状态/启用/停用））。禁 /m。 |
+| Q3477 | done | 桌面空态 **3 passed**（用户管理表头（账号/姓名/电话））。禁 /m。 |
+| Q3478 | done | 桌面空态 **3 passed**（用户管理表头余项（邮箱/部门 ID/状态））。禁 /m。 |
+| Q3479 | done | 桌面空态 **3 passed**（用户管理计数（显示 0 条/后端总数/前端状态筛选））。禁 /m。 |
+| Q3480 | pending | 桌面空态：部门组织状态筛（combobox/全部状态/正常）。禁 /m。 |
+| Q3481 | pending | 桌面空态：部门组织状态筛余项（停用/depts list/前端筛选）。禁 /m。 |
+| Q3482 | pending | 桌面空态：部门组织表头（名称/编码/父级 ID）。禁 /m。 |
+| Q3483 | pending | 桌面空态：部门组织表头余项（排序/负责人/状态）。禁 /m。 |
+| Q3484 | pending | 桌面空态：部门组织计数（0 条/搜索列表/depts tree）。禁 /m。 |
+| Q3485 | pending | 桌面空态：位置管理状态筛（combobox/全部状态/启用）。禁 /m。 |
+| Q3486 | pending | 桌面空态：位置管理状态筛余项（停用/locations list/root）。禁 /m。 |
+| Q3487 | pending | 桌面空态：位置管理表头（名称/编码/父级 ID）。禁 /m。 |
+| Q3488 | pending | 桌面空态：位置管理表头余项（排序/状态/显示 0 条）。禁 /m。 |
+| Q3489 | pending | 桌面空态：供应商管理状态筛（combobox/启用/停用）。禁 /m。 |
+| Q3490 | pending | 桌面空态：供应商管理表头（名称/编码/联系人）。禁 /m。 |
+| Q3491 | pending | 桌面空态：供应商管理表头余项（联系电话/状态/vendors list）。禁 /m。 |
+| Q3492 | pending | 桌面空态：岗位管理状态筛（岗位状态/metadata-only/no-assignment）。禁 /m。 |
+| Q3493 | pending | 桌面空态：岗位管理边界（元数据边界/不分配用户/真组件）。禁 /m。 |
+| Q3494 | pending | 桌面空态：岗位管理说明（previewAccepted/complementary/组织权限组）。禁 /m。 |
+| Q3495 | pending | 桌面空态：岗位管理计数余项（0 条只读/停用/runtime）。禁 /m。 |
+| Q3496 | pending | 桌面空态：基础参数操作余项（重新加载/保存/参数类型）。禁 /m。 |
+| Q3497 | pending | 桌面空态：基础参数类型筛（STRING/NUMBER/BOOLEAN）。禁 /m。 |
+| Q3498 | pending | 桌面空态：基础参数类型筛余项（SELECT/JSON/system-config）。禁 /m。 |
+| Q3499 | pending | 桌面空态：基础参数边界（SYSTEM 分组/44 项/V3 全量）。禁 /m。 |
+| Q3500 | pending | 桌面空态：基础参数预演说明（不持久化/DEGRADED/目录）。禁 /m。 |
+| Q3501 | pending | 桌面空态：基础参数默认键编码（companyName/timezone/currency）。禁 /m。 |
+| Q3502 | pending | 桌面空态：基础参数默认键余项（预警天数/备份频率/configs）。禁 /m。 |
+| Q3503 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
