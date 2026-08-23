@@ -71325,16 +71325,16 @@ test.describe('Q3943 桌面 ABC/循环盘点未用余句 空态', () => {
 
 });
 
-test.describe('Q3944 桌面仪表板/分类/TCO 未用 heading 空态', () => {
+test.describe('Q3944 桌面设备/分类/TCO 未用 heading 空态', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/**', mockApi);
     await seedSession(page, adminUser);
   });
 
-  test('/dashboard heading「部门资产统计 (Top 5 部门)」', async ({ page }) => {
+  test('/equipment heading「设备列表」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { name: '部门资产统计 (Top 5 部门)' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/equipment');
+    await expect(page.getByRole('heading', { name: '设备列表' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
