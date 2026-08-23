@@ -72079,6 +72079,122 @@ test.describe('Q3969 桌面处置未用类型/筛选 button 空态', () => {
 
 });
 
+test.describe('Q3970 桌面保险未用状态/类型筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurance button「已过期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurance');
+    await expect(page.getByRole('button', { name: '已过期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurance button「财产险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurance');
+    await expect(page.getByRole('button', { name: '财产险' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurance button「责任险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurance');
+    await expect(page.getByRole('button', { name: '责任险' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3971 桌面保险/设备未用筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurance button「车险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurance');
+    await expect(page.getByRole('button', { name: '车险' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment button「正常运行」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('button', { name: '正常运行' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment button「维修中」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('button', { name: '维修中' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3972 桌面设备未用状态筛选 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/equipment button「闲置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('button', { name: '闲置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment button「正常」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('button', { name: '正常' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/equipment button「即将到期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/equipment');
+    await expect(page.getByRole('button', { name: '即将到期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3973 桌面合同/处置/审批未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/contracts heading「暂无数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await expect(page.getByRole('heading', { name: '暂无数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals button「工单管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals');
+    await expect(page.getByRole('button', { name: '工单管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals button「资产报废」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByRole('button', { name: '资产报废' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

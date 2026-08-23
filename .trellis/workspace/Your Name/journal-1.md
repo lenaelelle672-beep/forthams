@@ -1238,4 +1238,5 @@
 - Q3957：**3 passed**。合同未用类型筛选 button。Radix tab 不是 button。下一票 Q3958。禁 /m。
 - Q3958–Q3960：**9 passed**。续 Q3961–Q3965：采购/领用/借用/维保未用筛选 button。禁 /m。
 - Q3961–Q3965：**15 passed**。续 Q3966–Q3969：退役/重估/折旧/处置未用 heading/button。禁 /m。
+- Q3966–Q3969：**12 passed**。续 Q3970–Q3973：保险/设备/合同/处置/审批未用 heading/button。禁 /m。
 
