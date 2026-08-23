@@ -117,9 +117,9 @@ export default function WorkflowFormPage() {
           </button>
           <h1 className="text-lg font-semibold text-gray-900">{flowName || businessType}</h1>
         </div>
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+        <h3 className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-700">
           该流程尚未配置表单源码。请在工作流设计器的「表单源码」标签页中添加表单 HTML。
-        </div>
+        </h3>
         {/* 即使没有表单也允许空表单发起 */}
         <button
           type="button"

@@ -3198,4 +3198,17 @@
 | Q4008 | done | 桌面空态 **3 passed**（个人/流程/退役未用 heading）。禁 /m。 |
 | Q4009 | done | 桌面空态 **3 passed**（退役详情未用分区 heading）。禁 /m。 |
 | Q4010 | done | 桌面空态 **3 passed**（退役详情未用审批/编号 heading）。禁 /m。 |
-| Q4011 | pending | 桌面空态 退役详情未用空态 heading。禁 /m。 |
+| Q4011 | done | 桌面空态 **3 passed**（退役详情未用空态 heading）。禁 /m。 |
+| Q4012 | pending | 桌面空态 盘点报告未用 heading。禁 /m。 |
+| Q4013 | pending | 桌面空态 盘点报告/任务未用 heading。禁 /m。 |
+| Q4014 | pending | 桌面空态 盘点任务未用分区 heading。禁 /m。 |
+| Q4015 | pending | 桌面空态 盘点任务未用任务名 heading。禁 /m。 |
+| Q4016 | pending | 桌面空态 RFID 扫描未用 heading。禁 /m。 |
+| Q4017 | pending | 桌面空态 处置详情未用 heading。禁 /m。 |
+| Q4018 | pending | 桌面空态 处置/盘点未用 heading/button。禁 /m。 |
+| Q4019 | pending | 桌面空态 盘点/流程表单未用角色。禁 /m。 |
+| Q4020 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4021 | pending | 桌面空态 流程/领用未用 heading。禁 /m。 |
+| Q4022 | pending | 桌面空态 领用详情未用空态 heading。禁 /m。 |
+| Q4023 | pending | 桌面空态 RFID 扫描未用 button。禁 /m。 |
+| Q4024 | pending | 桌面空态 RFID/流程未用空态 heading/link。禁 /m。 |
