@@ -1052,5 +1052,6 @@
 - Q2941：/fixed-assets/workbench 告警中心/组织策略/基础维护 **3 passed**。`d36d6fdc5`
 - Q2942：/fixed-assets/workbench 我的资产/资产总览/系统管理员 **3 passed**。`cf635d140`
 - Q2943：/fixed-assets/workbench 欢迎管理员/12个月趋势 **3 passed**。「快捷操作」「工作台菜单」非可见文本。`4e919bf1c`
-- Q2944：/fixed-assets/workbench title 全屏/密度/通知 **3 passed**。
+- Q2944：/fixed-assets/workbench title 全屏/密度/通知 **3 passed**。`6628313c7`
+- Q2945：workbench 个人中心 + /system/users 正常/停用 **3 passed**。
 

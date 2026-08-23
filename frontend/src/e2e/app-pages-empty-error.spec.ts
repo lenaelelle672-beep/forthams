@@ -42621,6 +42621,34 @@ test.describe('Q2944 桌面运营首页工具标题空态', () => {
   });
 });
 
+test.describe('Q2945 桌面运营首页个人中心与用户筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbench 空态 title「个人中心」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbench');
+    await expect(page.getByTitle('个人中心').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users 空态「正常」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByText('正常').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users 空态「停用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByText('停用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
