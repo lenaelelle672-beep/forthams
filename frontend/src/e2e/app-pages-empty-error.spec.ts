@@ -43434,6 +43434,29 @@ test.describe('Q2975 桌面登录页字段文案空态', () => {
   });
 });
 
+test.describe('Q2976 桌面登录页说明文案空态', () => {
+  test('/login 空态「固定资产平台的」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('固定资产平台的').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「帮助团队高效进入固定资产工作台」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('帮助团队高效进入固定资产工作台').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「UNIVIEW 固定资产连接资产台账、流程审批、盘点巡检和运营分析」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('UNIVIEW 固定资产连接资产台账、流程审批、盘点巡检和运营分析').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

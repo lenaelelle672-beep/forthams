@@ -1083,5 +1083,6 @@
 - Q2972：/login 流星版/宇视公司/UNIVIEW **3 passed**。`64b6147da`
 - Q2973：/login 账号/密码 placeholder + 忘记密码 **3 passed**。`d1bbfac85`
 - Q2974：/login MaxKey/统一认证/UNIVIEW **3 passed**。MaxKey 非 button name。`ccc3ec8ae`
-- Q2975：/login 固定资产平台/用户名/密码 **3 passed**。
+- Q2975：/login 固定资产平台/用户名/密码 **3 passed**。`a3fd2d858`
+- Q2976：/login 平台的/帮助团队/连接台账 **3 passed**。
 
