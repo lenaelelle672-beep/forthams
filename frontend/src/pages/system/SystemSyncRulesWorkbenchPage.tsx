@@ -75,7 +75,7 @@ export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = fal
         </div>
       ) : null}
       <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm" type="button" onClick={handleRetryLog}>单条日志重试</button>
-      {!loading && items.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无同步规则。</div> : null}
+      {!loading && items.length === 0 ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无同步规则。</h3> : null}
       <div className="grid gap-3">
         {items.map((item) => (
           <article key={item.id} className="rounded-2xl border border-slate-200 p-4">

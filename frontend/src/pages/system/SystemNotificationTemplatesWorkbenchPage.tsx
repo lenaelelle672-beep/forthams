@@ -215,7 +215,7 @@ export default function SystemNotificationTemplatesWorkbenchPage({
             <h4 className="font-semibold">模板 catalog</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，只读展示</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无通知模板。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无通知模板。</h3> : null}
           <div className="space-y-2">
             {page.records.map((template) => (
               <button key={template.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openTemplate(template)}>
