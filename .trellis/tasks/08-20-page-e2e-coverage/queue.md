@@ -2067,4 +2067,5 @@
 | Q2877 | done | 桌面空态 **3 passed**（/disposals/transfer/new 所属部门/目标部门/自动保存）。禁 /m。 |
 | Q2878 | done | 桌面空态 **3 passed**（/disposals/transfer/new 标题/选填/必填）。禁 /m。 |
 | Q2879 | done | 桌面空态 **3 passed**（/disposals/transfer/new 基础信息填写/选择调拨资产/流程配置）。禁 /m。 |
-| Q2880 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2880 | done | 桌面空态 **3 passed**（/disposals/transfer/new 提交状态/完成/说明placeholder）。禁 /m。 |
+| Q2881 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
