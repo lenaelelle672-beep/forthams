@@ -1235,5 +1235,5 @@
 - Q3952–Q3953：**6 passed**。Q3953 勿测分类 EmptyState JSX action「添加分类」。续 Q3954–Q3955：资产列表/报表中心未用 heading/button。禁 /m。
 - Q3954–Q3955：**6 passed**。续 Q3956：报表中心未用 heading/button。禁 /m。
 - Q3956：**3 passed**。下一票 Q3957：继续桌面真页未用 heading/button。禁 /m。勿测 EmptyState JSX action、交互后 region、/dashboard 默认 mock。
-- Q3957：合同页未用类型筛选 button「维保合同 / 采购合同 / 租赁合同」（待跑；Radix tab 不是 button）。禁 /m。
+- Q3957：**3 passed**。合同未用类型筛选 button。Radix tab 不是 button。下一票 Q3958。禁 /m。
 
