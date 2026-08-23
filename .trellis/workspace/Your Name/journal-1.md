@@ -1096,5 +1096,6 @@
 - Q2985：/login4 系统管理员/资产管理员/运维人员 **3 passed**。`7c837f41d`
 - Q2986：/login4 部门负责人/全域权限/全生命周期 **3 passed**。`7dd557567`
 - Q2987：/login4 资源审批/巡检维修/账号placeholder **3 passed**。`b37c5e411`
-- Q2988：/login4 密码placeholder/显示密码/固定资产平台 **3 passed**。「登录表单」不可见。
+- Q2988：/login4 密码placeholder/显示密码/固定资产平台 **3 passed**。「登录表单」不可见。`f6c99eb9f`
+- Q2989：/login5 开发体验/工作台预览/登录系统 **3 passed**。「全生命周期」在默认皮肤为隐藏子串。
 
