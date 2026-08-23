@@ -73210,6 +73210,64 @@ test.describe('Q4008 桌面个人/流程/退役未用 heading 空态', () => {
 
 });
 
+test.describe('Q4009 桌面退役详情未用分区 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement/1 heading「关联资产摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '关联资产摘要' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/1 heading「退役原因 & 申请信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '退役原因 & 申请信息' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/1 heading「历史记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '历史记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4010 桌面退役详情未用审批 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement/1 heading「审批状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '审批状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/2 heading「退役申请 #2」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/2');
+    await expect(page.getByRole('heading', { name: '退役申请 #2' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/2 heading「审批状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/2');
+    await expect(page.getByRole('heading', { name: '审批状态' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -3195,4 +3195,6 @@
 | Q4005 | done | 桌面空态 **3 passed**（工单验收/详情未用 heading）。禁 /m。 |
 | Q4006 | done | 桌面空态 **3 passed**（安全/借用/领用未用 heading/button）。禁 /m。 |
 | Q4007 | done | 桌面空态 **3 passed**（权限/个人未用 heading/button）。禁 /m。 |
-| Q4008 | pending | 桌面空态 个人/流程/退役未用 heading。禁 /m。 |
+| Q4008 | done | 桌面空态 **3 passed**（个人/流程/退役未用 heading）。禁 /m。 |
+| Q4009 | pending | 桌面空态 退役详情未用分区 heading。禁 /m。 |
+| Q4010 | pending | 桌面空态 退役详情未用审批/编号 heading。禁 /m。 |
