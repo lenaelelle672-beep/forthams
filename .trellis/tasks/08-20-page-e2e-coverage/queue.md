@@ -2523,16 +2523,22 @@
 | Q3333 | done | 桌面空态 **3 passed**（表单配置工作台说明（字段列表/不影响已发布版本/form-definitions））。禁 /m。 |
 | Q3334 | done | 桌面空态 **3 passed**（文件存储页脚（0/0 条元数据/0 B/业务类型列））。禁 /m。 |
 | Q3335 | done | 桌面空态 **3 passed**（安全策略当前配置（当前配置/未返回或已脱敏/runtimeEffect））。禁 /m。 |
-| Q3336 | in_progress | 桌面空态：Webhook HMAC（HMAC_SHA256/签名密钥/共享 Secret）。禁 /m。 |
-| Q3337 | pending | 桌面空态：字段映射表达式（trim/upper/lower）。禁 /m。 |
-| Q3338 | pending | 桌面空态：流程通知开关渠道（渠道/启用样例/样例启停状态）。禁 /m。 |
-| Q3339 | pending | 桌面空态：流程通知开关样例（停用样例/站内信/当前业务类型）。禁 /m。 |
-| Q3340 | pending | 桌面空态：流程设计器节点帮助（办理人/流程收口/支持按岗位）。禁 /m。 |
-| Q3341 | pending | 桌面空态：表单配置遮罩预览（******/选填/资产流程表单）。禁 /m。 |
-| Q3342 | pending | 桌面空态：流程通知开关边界（不执行启停/不发送通知/不触发运行时）。禁 /m。 |
-| Q3343 | pending | 桌面空态：字段映射预览说明（预览不写库/不外呼/转换表达式仅允许）。禁 /m。 |
-| Q3344 | pending | 桌面空态：Webhook 签名策略（NONE/请通过 V3 创建/签名策略）。禁 /m。 |
-| Q3345 | pending | 桌面空态：流程设计器节点帮助余项（不计入审批步骤/通过驳回/适合结束审批）。禁 /m。 |
-| Q3346 | pending | 桌面空态：表单配置草稿说明（安全表单定义/剥离 HTML/危险 style）。禁 /m。 |
-| Q3347 | pending | 桌面空态：流程设计器节点帮助再余（固定审批人/挂载后续节点/双向分支）。禁 /m。 |
-| Q3348 | pending | 桌面空态：流程通知开关业务类型（业务类型/样例启停 combobox/只读不执行启停）。禁 /m。 |
+| Q3336 | done | 桌面空态 **3 passed**（Webhook HMAC（HMAC_SHA256/签名密钥/共享 Secret））。禁 /m。 |
+| Q3337 | done | 桌面空态 **3 passed**（字段映射表达式（trim/upper/lower））。禁 /m。 |
+| Q3338 | done | 桌面空态 **3 passed**（流程通知开关渠道（渠道/启用样例/样例启停状态））。禁 /m。 |
+| Q3339 | done | 桌面空态 **3 passed**（流程通知开关样例（停用样例/站内信/当前业务类型））。禁 /m。 |
+| Q3340 | done | 桌面空态 **3 passed**（流程设计器节点帮助（办理人/流程收口/支持按岗位））。禁 /m。 |
+| Q3341 | done | 桌面空态 **3 passed**（表单配置遮罩预览（******/选填/资产流程表单））。禁 /m。 |
+| Q3342 | done | 桌面空态 **3 passed**（流程通知开关边界（不执行启停/不发送通知/不触发运行时））。禁 /m。 |
+| Q3343 | done | 桌面空态 **3 passed**（字段映射预览说明（预览不写库/不外呼/转换表达式仅允许））。禁 /m。 |
+| Q3344 | done | 桌面空态 **3 passed**（Webhook 签名策略（NONE/请通过 V3 创建/签名策略））。禁 /m。 |
+| Q3345 | done | 桌面空态 **3 passed**（流程设计器节点帮助余项（不计入审批步骤/通过驳回/适合结束审批））。禁 /m。 |
+| Q3346 | done | 桌面空态 **3 passed**（表单配置草稿说明（安全表单定义/剥离 HTML/危险 style））。禁 /m。 |
+| Q3347 | done | 桌面空态 **3 passed**（流程设计器节点帮助再余（固定审批人/挂载后续节点/双向分支））。禁 /m。 |
+| Q3348 | done | 桌面空态 **3 passed**（流程通知开关业务类型（业务类型/样例启停 combobox/只读不执行启停））。禁 /m。 |
+| Q3349 | in_progress | 桌面空态：接口管理余项（配置校验仅验证元数据/未触发真实外部调用/请通过 V3 接口创建）。禁 /m。 |
+| Q3350 | pending | 桌面空态：邮件网关只读边界（no-send/no-network/no-secret）。禁 /m。 |
+| Q3351 | pending | 桌面空态：邮件网关 preview 字段（previewAccepted/runtimeEffect=false/cacheRefreshed=false）。禁 /m。 |
+| Q3352 | pending | 桌面空态：邮件网关连接边界（credentialExposed/smtpConnect/javaMailSenderUsed）。禁 /m。 |
+| Q3353 | pending | 桌面空态：邮件网关勾选（authConfigured/enabled/mailSenderProviderUsed）。禁 /m。 |
+| Q3354 | pending | 桌面空态：邮件网关其余（不代表邮件子系统完成/readonlyBoundary/acceptedFields）。禁 /m。 |
