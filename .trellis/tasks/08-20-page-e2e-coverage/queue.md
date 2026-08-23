@@ -2102,4 +2102,5 @@
 | Q2912 | done | 桌面空态 **3 passed**（/system/users 用户总量/角色数/岗位数）。禁 /m。 |
 | Q2913 | done | 桌面空态 **3 passed**（/system/users 总页数/用户列表/暂无数据）。禁 /m。 |
 | Q2914 | done | 桌面空态 **3 passed**（/system/users 搜索/重置/邮箱手机号）。禁 /m。 |
-| Q2915 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2915 | done | 桌面空态 **3 passed**（/system/users 部门/创建时间/操作）。禁 /m。 |
+| Q2916 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
