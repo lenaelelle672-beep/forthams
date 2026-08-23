@@ -960,5 +960,6 @@
 - Q2849：/compensation/new 现金/等价物/标准流程 **3 passed**。`42b655882`
 - Q2850：/compensation/new 责任人/发现人/资产搜索 placeholder **3 passed**。`98c1b1a00`
 - Q2851：/disposals/scrap/new 取消/返回/添加资产 **3 passed**。`e448cce80`
-- Q2852：/disposals/scrap/new 基本信息/选择资产/报废配置 **3 passed**。选择资产非 heading。
+- Q2852：/disposals/scrap/new 基本信息/选择资产/报废配置 **3 passed**。选择资产非 heading。`3b65a1d95`
+- Q2853：/disposals/scrap/new 报废编号/申请人/报废原因 **3 passed**。
 

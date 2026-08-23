@@ -2040,4 +2040,5 @@
 | Q2850 | done | 桌面空态 **3 passed**（/compensation/new 责任人/发现人/资产搜索 placeholder）。禁 /m。 |
 | Q2851 | done | 桌面空态 **3 passed**（/disposals/scrap/new 取消/返回/添加资产）。禁 /m。 |
 | Q2852 | done | 桌面空态 **3 passed**（/disposals/scrap/new 基本信息/选择资产/报废配置）。禁 /m。 |
-| Q2853 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2853 | done | 桌面空态 **3 passed**（/disposals/scrap/new 报废编号/申请人/报废原因）。禁 /m。 |
+| Q2854 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
