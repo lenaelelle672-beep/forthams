@@ -1118,5 +1118,6 @@
 - Q3007：/dashboard 查看全部/12个月趋势/导出数据 **3 passed**。`43942c121`
 - Q3008：/dashboard 刷新视图 + /approvals 待我审批 + /intake 验收日期 **3 passed**。`9199e0481`
 - Q3009：/intake 填写验收 + /approvals 我发起的/已通过 **3 passed**。`b221ec299`
-- Q3010：/approvals 已驳回/待审批/审批 **3 passed**。
+- Q3010：/approvals 已驳回/待审批/审批 **3 passed**。`baca6e835`
+- Q3011：/approvals 资产调拨/清退/报废 **3 passed**。
 
