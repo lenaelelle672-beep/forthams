@@ -2211,4 +2211,5 @@
 | Q3021 | done | 桌面空态 **3 passed**（/audit 时间/操作人/操作类型表头）。禁 /m。 |
 | Q3022 | done | 桌面空态 **3 passed**（/audit 描述/IP地址/状态表头）。禁 /m。 |
 | Q3023 | done | 桌面空态 **3 passed**（/audit 全部日志/告警/总计）。禁 /m。 |
-| Q3024 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3024 | done | 桌面空态 **3 passed**（/audit 筛选/显示/项共）。禁 /m。 |
+| Q3025 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
