@@ -1197,5 +1197,6 @@
 - Q3699–Q3706：**24 passed**。续 Q3707–Q3714：文件存储 catalog/上传下载边界余项。须 `mockFileStorageCatalogEmpty`。禁 /m。
 - Q3707–Q3714：**24 passed**。续 Q3715–Q3722：审批规则表达式白名单/禁止引擎余项。须 `mockApprovalRulesEmpty`。禁 /m。
 - Q3715–Q3722：**24 passed**。Q3715/Q3722 曾误用非连续「禁止 JS」子串，已改为连续文案。续 Q3723–Q3730：表单存储 uploads/脱敏/归档余项。须 `mockFormStorageEmpty`。禁 /m。
-- Q3723–Q3730：续写表单存储 uploads 边界与整句说明余项。禁 /m。
+- Q3723–Q3730：**24 passed**。续 Q3731–Q3738：待办字段预览/审计/租户隔离余项。须 `mockTodoFieldsEmpty`。禁 /m。
+- Q3731–Q3738：续写待办字段保存排序与 preview 只读余项。禁 /m。
 

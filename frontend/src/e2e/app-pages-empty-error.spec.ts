@@ -65143,6 +65143,238 @@ test.describe('Q3730 桌面表单存储列表归档余项空态', () => {
 
 });
 
+test.describe('Q3731 桌面待办字段预览接口余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「保存、排序、角色覆盖、默认恢复与预览接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('保存、排序、角色覆盖、默认恢复与预览接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「列表、保存、排序、角色覆盖」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('列表、保存、排序、角色覆盖').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「真实调用 /todo-fields 列表、保存、排序」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('真实调用 /todo-fields 列表、保存、排序').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3732 桌面待办字段审计字段余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「都需要 confirmed、operatorId、reason/auditEvidence」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('都需要 confirmed、operatorId、reason/auditEvidence').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「角色覆盖和默认恢复都需要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('角色覆盖和默认恢复都需要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「保存、排序、角色覆盖和默认恢复」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('保存、排序、角色覆盖和默认恢复').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3733 桌面待办字段租户隔离余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「强制租户隔离；保存、排序」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('强制租户隔离；保存、排序').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「真实调用 /todo-fields 列表、保存、排序、角色覆盖、默认恢复与预览接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('真实调用 /todo-fields 列表、保存、排序、角色覆盖、默认恢复与预览接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「preview 只读」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('preview 只读').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3734 桌面待办字段默认恢复余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「默认恢复与预览接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('默认恢复与预览接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「confirmed、operatorId、reason/auditEvidence」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('confirmed、operatorId、reason/auditEvidence').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「默认恢复都需要 confirmed、operatorId」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('默认恢复都需要 confirmed、operatorId').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3735 桌面待办字段保存排序余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「字段配置强制租户隔离；保存、排序、角色覆盖」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('字段配置强制租户隔离；保存、排序、角色覆盖').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「保存、排序、角色覆盖和默认恢复都需要 confirmed、operatorId、reason/auditEvidence」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('保存、排序、角色覆盖和默认恢复都需要 confirmed、operatorId、reason/auditEvidence').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「列表、保存、排序、角色覆盖、默认恢复」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('列表、保存、排序、角色覆盖、默认恢复').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3736 桌面待办字段路径排序余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「/todo-fields 列表、保存、排序」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('/todo-fields 列表、保存、排序').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「排序、角色覆盖、默认恢复与预览接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('排序、角色覆盖、默认恢复与预览接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「只读且默认脱敏」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('只读且默认脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3737 桌面待办字段角色覆盖审计余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「角色覆盖和默认恢复都需要 confirmed、operatorId、reason/auditEvidence」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('角色覆盖和默认恢复都需要 confirmed、operatorId、reason/auditEvidence').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「保存、排序、角色覆盖」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('保存、排序、角色覆盖').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「默认恢复与预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('默认恢复与预览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3738 桌面待办字段整句说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「真实调用 /todo-fields 列表、保存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('真实调用 /todo-fields 列表、保存').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「预览接口」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('预览接口').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields 「字段配置强制租户隔离；保存、排序、角色覆盖和默认恢复都需要 confirmed、operatorId、reason/auditEvidence；preview 只读且默认脱敏」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByText('字段配置强制租户隔离；保存、排序、角色覆盖和默认恢复都需要 confirmed、operatorId、reason/auditEvidence；preview 只读且默认脱敏').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
