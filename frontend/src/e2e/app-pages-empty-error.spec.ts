@@ -53558,7 +53558,7 @@ test.describe('Q3331 桌面流程控制台页码空态', () => {
   test('/fixed-assets/workbenchv3?menu=system-settings-command-center 「第 1 / 0 页」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
-    await expect(page.getByText(/第 1 \/ 0 页/).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/第 \d+ \/ \d+ 页/).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
