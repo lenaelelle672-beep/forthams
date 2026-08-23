@@ -230,7 +230,7 @@ export default function SystemMailGatewayWorkbenchPage({
               <p>port={display(selectedGateway.port)} · tlsMode={display(selectedGateway.tlsMode)} · authConfigured={display(selectedGateway.authConfigured)}</p>
               <p>tenantScoped={display(selectedGateway.tenantScoped ?? true)} · readOnly={display(selectedGateway.readOnly ?? true)}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条邮件网关元数据查看脱敏详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条邮件网关元数据查看脱敏详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="mail-gateway-host-masked">hostMasked</label>

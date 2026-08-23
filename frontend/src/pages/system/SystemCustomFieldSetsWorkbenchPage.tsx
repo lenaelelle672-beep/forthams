@@ -241,7 +241,7 @@ export default function SystemCustomFieldSetsWorkbenchPage({
               <p>分类 ID：{selectedFieldset.categoryId ?? '未绑定'}</p>
               <p>只读字段：{fieldsetFields.map((field) => `${field.fieldLabel}/${field.fieldType}`).join('、') || '未配置'}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一个字段集查看详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一个字段集查看详情。</h3>}
 
           <form className="space-y-3" onSubmit={queryCategory}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="custom-fieldset-category-id">分类 ID 只读诊断</label>

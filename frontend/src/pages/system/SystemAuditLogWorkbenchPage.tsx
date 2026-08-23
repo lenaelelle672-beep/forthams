@@ -228,7 +228,7 @@ export default function SystemAuditLogWorkbenchPage({
               <p>raw payload 摘要：{detail.rawPayloadSummary ?? '无'}</p>
               <p>错误摘要：{detail.errorSummary ?? '无'}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条审计日志查看脱敏详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条审计日志查看脱敏详情。</h3>}
           <button type="button" disabled className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-500">
             导出脱敏快照（禁用，不生成文件）
           </button>

@@ -250,7 +250,7 @@ export default function SystemMailTemplatesWorkbenchPage({
               <p>主题模板：{selectedTemplate.subjectTemplate}</p>
               <p>正文模板：{selectedTemplate.contentTemplate}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一个模板查看详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一个模板查看详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="mail-template-preview-variables">预览变量（key=value，每行一组）</label>

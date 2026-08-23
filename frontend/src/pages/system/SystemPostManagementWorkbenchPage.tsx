@@ -220,7 +220,7 @@ export default function SystemPostManagementWorkbenchPage({
               <p>remark={display(selectedPost.remark)}</p>
               <p>tenantScoped={display(selectedPost.tenantScoped ?? true)} · readOnly={display(selectedPost.readOnly ?? true)}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条岗位元数据查看详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条岗位元数据查看详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="system-post-preview-code">postCode</label>

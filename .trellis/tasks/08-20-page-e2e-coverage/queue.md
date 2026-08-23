@@ -3278,11 +3278,19 @@
 | Q4088 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4089 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4090 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4091 | pending | 桌面空态 位置管理未用 heading。禁 /m。 |
-| Q4092 | pending | 桌面空态 供应商未用 heading。禁 /m。 |
-| Q4093 | pending | 桌面空态 供应商/报表构建器未用角色。禁 /m。 |
-| Q4094 | pending | 桌面空态 位置工作台未用空态 heading。禁 /m。 |
-| Q4095 | pending | 桌面空态 部门工作台未用空态 heading。禁 /m。 |
-| Q4096 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4097 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4098 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4091 | done | 桌面空态 **3 passed**（位置管理未用 heading）。禁 /m。 |
+| Q4092 | done | 桌面空态 **3 passed**（供应商未用 heading）。禁 /m。 |
+| Q4093 | done | 桌面空态 **3 passed**（供应商/报表构建器未用角色）。禁 /m。 |
+| Q4094 | done | 桌面空态 **3 passed**（位置工作台未用空态 heading）。禁 /m。 |
+| Q4095 | done | 桌面空态 **3 passed**（部门工作台未用空态 heading）。禁 /m。 |
+| Q4096 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4097 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4098 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4099 | pending | 桌面空态 制造商/许可证/合同未用 heading。禁 /m。 |
+| Q4100 | pending | 桌面空态 分类/型号/邮件模板未用 heading。禁 /m。 |
+| Q4101 | pending | 桌面空态 字段集/邮件日志/岗位未用 heading。禁 /m。 |
+| Q4102 | pending | 桌面空态 邮件网关未用 heading。禁 /m。 |
+| Q4103 | pending | 桌面空态 自定义字段未用 heading。禁 /m。 |
+| Q4104 | pending | 桌面空态 审计日志未用 heading。禁 /m。 |
+| Q4105 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4106 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

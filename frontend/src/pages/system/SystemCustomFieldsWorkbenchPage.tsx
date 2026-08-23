@@ -220,7 +220,7 @@ export default function SystemCustomFieldsWorkbenchPage({
               <p>正则摘要：{selectedField.validationPattern || '未配置'}</p>
               <p>加密字段：{selectedField.encrypted === 1 ? '仅展示标记，不回显样例原文' : '否'}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一个字段定义查看详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一个字段定义查看详情。</h3>}
 
           <form className="space-y-3" onSubmit={runPreview}>
             <label className="block text-sm font-medium text-slate-700" htmlFor="custom-field-preview-values">预览样例（fieldName=value，每行一组）</label>

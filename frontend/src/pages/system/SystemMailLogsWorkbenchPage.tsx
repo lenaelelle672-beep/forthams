@@ -211,7 +211,7 @@ export default function SystemMailLogsWorkbenchPage({
               <p>诊断摘要：{display(selectedLog.diagnosticSummary)}</p>
               <p>只读边界：{selectedLog.readonlyBoundary ?? boundaryCopy}</p>
             </div>
-          ) : <p className="text-sm text-slate-500">请选择一条日志查看脱敏详情。</p>}
+          ) : <h3 className="text-sm font-medium text-slate-500">请选择一条日志查看脱敏详情。</h3>}
 
           <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700" aria-label="邮件日志业务查询结果">
             <p className="font-medium">biz lookup 结果</p>

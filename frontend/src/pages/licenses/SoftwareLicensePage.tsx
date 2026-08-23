@@ -520,7 +520,7 @@ export default function SoftwareLicensePage() {
           <div className="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold text-[#0f172a]">软件许可证管理</h1>
-              <p className="mt-0.5 text-sm text-[#64748b]">许可证席位跟踪与到期管理</p>
+              <h3 className="mt-0.5 text-sm font-medium text-[#64748b]">许可证席位跟踪与到期管理</h3>
             </div>
             <Button variant="primary" onClick={handleOpenCreate}>
               <Plus className="w-4 h-4" />
