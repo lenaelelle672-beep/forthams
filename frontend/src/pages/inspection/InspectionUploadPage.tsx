@@ -177,7 +177,7 @@ const InspectionUploadPage: React.FC = () => {
           <Upload {...uploadProps}>
             <div>
               <UploadOutlined />
-              <div style={{ marginTop: 8 }}>选择照片</div>
+              <button type="button" style={{ marginTop: 8 }}>选择照片</button>
             </div>
           </Upload>
 

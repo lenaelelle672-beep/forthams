@@ -187,9 +187,9 @@ const FloorPlanPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 {!selectedPlan ? (
-                  <div className="flex items-center justify-center h-96 text-slate-400">
+                  <h3 className="flex items-center justify-center h-96 text-slate-400 font-medium">
                     请从左侧选择一个平面图
-                  </div>
+                  </h3>
                 ) : (
                   <FloorPlanCanvas plan={selectedPlan} assets={planAssets} onAssetAdded={() => fetchPlanAssets(selectedPlan.id)} />
                 )}

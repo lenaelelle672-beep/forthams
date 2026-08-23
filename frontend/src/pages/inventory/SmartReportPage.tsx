@@ -493,7 +493,7 @@ export default function SmartReportPage() {
               <div className="flex items-center justify-center py-12 text-sm text-[#94a3b8]">
                 <div className="flex flex-col items-center gap-2">
                   <CheckCircle2 className="w-8 h-8 text-[#10b981]/60" />
-                  <span>暂无差异资产，盘点结果正常</span>
+                  <h3 className="font-medium">暂无差异资产，盘点结果正常</h3>
                 </div>
               </div>
             ) : (

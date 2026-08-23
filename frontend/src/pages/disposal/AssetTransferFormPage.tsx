@@ -494,7 +494,7 @@ export default function AssetTransferFormPage() {
               <Button type="button" size="sm" onClick={() => setShowAssetPicker(true)}>
                 <Plus className="w-4 h-4" /> 添加资产
               </Button>
-              <span className="text-sm text-gray-500 whitespace-nowrap">已选 {selectedAssets.length} 项</span>
+              <h3 className="text-sm font-medium text-gray-500 whitespace-nowrap">已选 {selectedAssets.length} 项</h3>
             </div>
           </CardHeader>
           {selectedAssets.length > 0 ? (

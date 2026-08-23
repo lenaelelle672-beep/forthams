@@ -3251,4 +3251,8 @@
 | Q4061 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4062 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4063 | done | 桌面空态 **3 passed**（报废/调拨未用空态 heading）。禁 /m。 |
-| Q4064 | pending | 桌面空态 下一未用 heading/button。禁 /m。 |
+| Q4064 | pending | 桌面空态 盘点报告/故障代码未用空态 heading。禁 /m。 |
+| Q4065 | pending | 桌面空态 平面图/检验上传未用角色。禁 /m。 |
+| Q4066 | pending | 桌面空态 调拨/清退未用空态 heading。禁 /m。 |
+| Q4067 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4068 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

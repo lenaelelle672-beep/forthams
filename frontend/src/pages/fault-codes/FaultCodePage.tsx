@@ -302,7 +302,7 @@ export default function FaultCodePage() {
             <h2 className="mt-1 text-xl font-bold text-slate-900">
               三级故障编码体系
             </h2>
-            <p className="mt-0.5 text-xs text-slate-400">现象 → 原因 → 措施</p>
+            <h3 className="mt-0.5 text-xs font-medium text-slate-400">现象 → 原因 → 措施</h3>
           </div>
 
           {/* Tree content */}
@@ -320,7 +320,7 @@ export default function FaultCodePage() {
                   <AlertTriangle className="h-7 w-7 text-slate-400" />
                 </div>
                 <h3 className="text-base font-medium text-slate-700 mb-1">暂无故障代码</h3>
-                <p className="text-sm text-slate-400 mb-4">点击「新增根节点」创建第一级故障现象</p>
+                <h3 className="text-sm font-medium text-slate-400 mb-4">点击「新增根节点」创建第一级故障现象</h3>
                 <Button variant="outline" size="md" onClick={() => openCreate()}>
                   <Plus className="w-4 h-4" />
                   新增根节点
