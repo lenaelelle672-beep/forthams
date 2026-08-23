@@ -2069,4 +2069,5 @@
 | Q2879 | done | 桌面空态 **3 passed**（/disposals/transfer/new 基础信息填写/选择调拨资产/流程配置）。禁 /m。 |
 | Q2880 | done | 桌面空态 **3 passed**（/disposals/transfer/new 提交状态/完成/说明placeholder）。禁 /m。 |
 | Q2881 | done | 桌面空态 **3 passed**（/disposals/transfer/new 备注/新建/描述）。禁 /m。 |
-| Q2882 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2882 | done | 桌面空态 **3 passed**（/depreciation 批量计算/查询/重置）。禁 /m。 |
+| Q2883 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
