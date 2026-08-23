@@ -47332,10 +47332,10 @@ test.describe('Q3113 桌面新建风险评估操作空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/risk-assessments/new 空态「请选择概率和影响程度」', async ({ page }) => {
+  test('/risk-assessments/new 空态「自动计算的风险等级」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/risk-assessments/new');
-    await expect(page.getByText('请选择概率和影响程度').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('自动计算的风险等级').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 });
