@@ -69323,6 +69323,238 @@ test.describe('Q3874 桌面邮件网关 credentialExposed 组合空态', () => {
 
 });
 
+test.describe('Q3875 桌面邮件日志端点+管线整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「真实调用 /mail-logs/list、/mail-logs/{id}、/mail-logs/biz 与 /mail-logs/meta；页面不触发重试、导出、发送、SMTP/mail gateway、workflow mail 或 notification pipeline。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('真实调用 /mail-logs/list、/mail-logs/{id}、/mail-logs/biz 与 /mail-logs/meta；页面不触发重试、导出、发送、SMTP/mail gateway、workflow mail 或 notification pipeline。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「/mail-logs/meta；页面不触发重试、导出、发送」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('/mail-logs/meta；页面不触发重试、导出、发送').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「与 /mail-logs/meta；页面不触发重试」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('与 /mail-logs/meta；页面不触发重试').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3876 桌面自定义字段 CRUD/schema 边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「只读自定义字段定义目录 + 无持久化校验预览；不提供字段定义 CRUD runtime，不完成字段集、分类绑定、资产字段值链路、运行时表单 schema、加密值存储或 secret handling。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('只读自定义字段定义目录 + 无持久化校验预览；不提供字段定义 CRUD runtime，不完成字段集、分类绑定、资产字段值链路、运行时表单 schema、加密值存储或 secret handling。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不提供字段定义 CRUD runtime，不完成字段集、分类绑定、资产字段值链路」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('不提供字段定义 CRUD runtime，不完成字段集、分类绑定、资产字段值链路').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「分类绑定、资产字段值链路、运行时表单 schema、加密值存储或 secret handling」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('分类绑定、资产字段值链路、运行时表单 schema、加密值存储或 secret handling').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3877 桌面自定义字段端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「真实调用 /system/custom-fields、/system/custom-fields/all、/system/custom-fields/{id}、/system/custom-fields/meta 与 /system/custom-fields/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('真实调用 /system/custom-fields、/system/custom-fields/all、/system/custom-fields/{id}、/system/custom-fields/meta 与 /system/custom-fields/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「/system/custom-fields/all、/system/custom-fields/{id}、/system/custom-fields/meta 与 /system/custom-fields/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('/system/custom-fields/all、/system/custom-fields/{id}、/system/custom-fields/meta 与 /system/custom-fields/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「真实调用 /system/custom-fields、/system/custom-fields/all、/system/custom-fields/{id}」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('真实调用 /system/custom-fields、/system/custom-fields/all、/system/custom-fields/{id}').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3878 桌面字段集分配/绑定预览边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「只读字段集目录 + 无持久化字段分配/分类绑定预览；不提供字段集新增、编辑、删除，不保存字段分配或分类绑定，不影响资产模型、资产字段值或运行时表单 schema。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('只读字段集目录 + 无持久化字段分配/分类绑定预览；不提供字段集新增、编辑、删除，不保存字段分配或分类绑定，不影响资产模型、资产字段值或运行时表单 schema。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「不提供字段集新增、编辑、删除，不保存字段分配或分类绑定」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('不提供字段集新增、编辑、删除，不保存字段分配或分类绑定').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「不保存字段分配或分类绑定，不影响资产模型、资产字段值或运行时表单 schema」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('不保存字段分配或分类绑定，不影响资产模型、资产字段值或运行时表单 schema').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3879 桌面字段集端点族整句余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「真实调用 /system/custom-fieldsets、/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('真实调用 /system/custom-fieldsets、/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「无持久化字段分配/分类绑定预览；不提供字段集新增、编辑、删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('无持久化字段分配/分类绑定预览；不提供字段集新增、编辑、删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「不影响资产模型、资产字段值或运行时表单 schema」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('不影响资产模型、资产字段值或运行时表单 schema').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3880 桌面审计 GET 族端点整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockAuditLogsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「真实调用 /audit-logs、/audit-logs/{id}、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('真实调用 /audit-logs、/audit-logs/{id}、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「/audit-logs/{id}、/audit-logs/stats、/audit-logs/trends」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('/audit-logs/{id}、/audit-logs/stats、/audit-logs/trends').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3881 桌面审计只读写入/导出边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockAuditLogsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「只读审计日志：真实调用 /audit-logs GET 族端点；不提供 POST/PUT/PATCH/DELETE，不采集审计写入，不生成真实导出文件。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('只读审计日志：真实调用 /audit-logs GET 族端点；不提供 POST/PUT/PATCH/DELETE，不采集审计写入，不生成真实导出文件。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「不提供 POST/PUT/PATCH/DELETE，不采集审计写入，不生成真实导出文件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('不提供 POST/PUT/PATCH/DELETE，不采集审计写入，不生成真实导出文件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「真实调用 /audit-logs GET 族端点；不提供 POST/PUT/PATCH/DELETE」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('真实调用 /audit-logs GET 族端点；不提供 POST/PUT/PATCH/DELETE').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3882 桌面审计 trends/ranking 端点组合空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockAuditLogsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「不采集审计写入，不生成真实导出文件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('不采集审计写入，不生成真实导出文件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

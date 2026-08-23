@@ -3054,11 +3054,19 @@
 | Q3864 | done | 桌面空态 **3 passed**（通知偏好无持久化边界整句）。禁 /m。 |
 | Q3865 | done | 桌面空态 **3 passed**（通知渠道端点族整句）。禁 /m。 |
 | Q3866 | done | 桌面空态 **3 passed**（流程通知开关端点族整句）。禁 /m。 |
-| Q3867 | pending | 桌面空态：邮件网关端点族整句。禁 /m。 |
-| Q3868 | pending | 桌面空态：邮件网关 metadata-only 边界整句。禁 /m。 |
-| Q3869 | pending | 桌面空态：邮件日志端点族整句。禁 /m。 |
-| Q3870 | pending | 桌面空态：邮件日志 redacted 边界整句。禁 /m。 |
-| Q3871 | pending | 桌面空态：通知模板端点族整句。禁 /m。 |
-| Q3872 | pending | 桌面空态：通知模板 safe preview 边界整句。禁 /m。 |
-| Q3873 | pending | 桌面空态：邮件日志不触发管线整句。禁 /m。 |
-| Q3874 | pending | 桌面空态：邮件网关 credentialExposed 组合。禁 /m。 |
+| Q3867 | done | 桌面空态 **3 passed**（邮件网关端点族整句）。禁 /m。 |
+| Q3868 | done | 桌面空态 **3 passed**（邮件网关 metadata-only 边界整句）。禁 /m。 |
+| Q3869 | done | 桌面空态 **3 passed**（邮件日志端点族整句）。禁 /m。 |
+| Q3870 | done | 桌面空态 **3 passed**（邮件日志 redacted 边界整句）。禁 /m。 |
+| Q3871 | done | 桌面空态 **3 passed**（通知模板端点族整句）。禁 /m。 |
+| Q3872 | done | 桌面空态 **3 passed**（通知模板 safe preview 边界整句）。禁 /m。 |
+| Q3873 | done | 桌面空态 **3 passed**（邮件日志不触发管线整句）。禁 /m。 |
+| Q3874 | done | 桌面空态 **3 passed**（邮件网关 credentialExposed 组合）。禁 /m。 |
+| Q3875 | pending | 桌面空态：邮件日志端点+管线整句。禁 /m。 |
+| Q3876 | pending | 桌面空态：自定义字段 CRUD/schema 边界整句。禁 /m。 |
+| Q3877 | pending | 桌面空态：自定义字段端点族整句。禁 /m。 |
+| Q3878 | pending | 桌面空态：字段集分配/绑定预览边界整句。禁 /m。 |
+| Q3879 | pending | 桌面空态：字段集端点族整句余项。禁 /m。 |
+| Q3880 | pending | 桌面空态：审计 GET 族端点整句。禁 /m。 |
+| Q3881 | pending | 桌面空态：审计只读写入/导出边界整句。禁 /m。 |
+| Q3882 | pending | 桌面空态：审计 trends/ranking 端点组合。禁 /m。 |
