@@ -931,5 +931,7 @@
 - Q2820：/borrows/new 归还日期*/备注/取消 **3 passed**。`a9c53fe89`
 - Q2821：/assignments/new 创建领用单/返回/标题 **3 passed**。`2d12d74c4`
 - Q2822：/assignments/new 基本信息/领用类型/使用人 **3 passed**。`219d3bd26`
-- Q2823：/assignments/new 长期领用/短期借用/取消 **3 passed**。
+- Q2823：/assignments/new 长期领用/短期借用/取消 **3 passed**。`65206a7fc`
+- Q2824：/assignments/new 归还入库/调拨转移/部门ID **3 passed**。`514543a2f`
+- Q2825：/assignments/new 使用人ID/部门ID/备注placeholder **3 passed**。
 

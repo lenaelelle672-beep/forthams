@@ -2012,4 +2012,5 @@
 | Q2822 | done | 桌面空态 **3 passed**（/assignments/new 基本信息/领用类型/使用人）。禁 /m。 |
 | Q2823 | done | 桌面空态 **3 passed**（/assignments/new 长期领用/短期借用/取消）。禁 /m。 |
 | Q2824 | done | 桌面空态 **3 passed**（/assignments/new 归还入库/调拨转移/部门ID）。禁 /m。 |
-| Q2825 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2825 | done | 桌面空态 **3 passed**（/assignments/new 使用人ID/部门ID/备注placeholder）。禁 /m。 |
+| Q2826 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
