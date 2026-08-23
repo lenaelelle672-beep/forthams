@@ -47723,11 +47723,11 @@ test.describe('Q3126 桌面新增部门备注搜索空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/system/depts 点新增部门 placeholder「搜索用户...」', async ({ page }) => {
+  test('/system/depts 点新增部门「搜索用户...」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/system/depts');
     await page.getByRole('button', { name: '新增部门' }).first().click();
-    await expect(page.getByPlaceholder('搜索用户...').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('搜索用户...').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
@@ -47798,6 +47798,99 @@ test.describe('Q3128 桌面新增用户未分配空态', () => {
     await page.goto('/system/users');
     await page.getByRole('button', { name: '新增用户' }).first().click();
     await expect(page.getByText('暂无岗位').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3129 桌面弹窗创建说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/vendors 点新增供应商「填写以下信息以创建新供应商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).first().click();
+    await expect(page.getByText('填写以下信息以创建新供应商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商「填写以下信息以创建新制造商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).first().click();
+    await expect(page.getByText('填写以下信息以创建新制造商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/contracts 点新增合同「填写以下信息以创建新合同」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).first().click();
+    await expect(page.getByText('填写以下信息以创建新合同').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3130 桌面许可证岗位部门说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/licenses 点新增许可证「填写以下信息以创建新许可证」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await page.getByRole('button', { name: '新增许可证' }).first().click();
+    await expect(page.getByText('填写以下信息以创建新许可证').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/posts 点新增岗位 placeholder「岗位描述（可选）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await page.getByRole('button', { name: '新增岗位' }).first().click();
+    await expect(page.getByPlaceholder('岗位描述（可选）').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/depts 点新增部门 placeholder「部门描述、职责说明等」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/depts');
+    await page.getByRole('button', { name: '新增部门' }).first().click();
+    await expect(page.getByPlaceholder('部门描述、职责说明等').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3131 桌面制造商备注与模型说明空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/manufacturers 点新增制造商 placeholder「请输入备注信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).first().click();
+    await expect(page.getByPlaceholder('请输入备注信息').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/asset-models 点新增模型「定义一个新的资产模型模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).first().click();
+    await expect(page.getByText('定义一个新的资产模型模板').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/locations 点新增顶级位置「创建一个新的顶级位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/locations');
+    await page.getByRole('button', { name: '新增顶级位置' }).first().click();
+    await expect(page.getByText('创建一个新的顶级位置').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 });

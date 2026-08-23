@@ -2310,9 +2310,12 @@
 | Q3120 | done | 桌面空态 **3 passed**（制造商 placeholder 电话/邮箱/官网）。禁 /m。 |
 | Q3121 | done | 桌面空态 **3 passed**（供应商 placeholder 联系人/电话/邮箱）。禁 /m。 |
 | Q3122 | done | 桌面空态 **3 passed**（模板取消 + 合同/许可证到期日期）。禁 /m。 |
-| Q3123 | in_progress | 桌面空态：风险评估 heading/缓解占位 + LOW 低危。禁 /m。 |
-| Q3124 | pending | 桌面空态：故障码 取消/heading + 故障编码文案。禁 /m。 |
-| Q3125 | pending | 桌面空态：分类编码占位 + 位置编码占位。禁 /m。 |
-| Q3126 | pending | 桌面空态：部门 备注/搜索用户 + select 正常。禁 /m。 |
-| Q3127 | pending | 桌面空态：模型 placeholder 名称/型号 + 选择字段集。禁 /m。 |
-| Q3128 | pending | 桌面空态：用户 未分配/暂无角色/暂无岗位。禁 /m。 |
+| Q3123 | done | 桌面空态 **3 passed**（风险评估 标题/缓解占位 + LOW 低危）。禁 /m。 |
+| Q3124 | done | 桌面空态 **3 passed**（故障码 取消/heading + 故障编码文案）。禁 /m。 |
+| Q3125 | done | 桌面空态 **3 passed**（分类编码占位 + 位置编码占位）。禁 /m。 |
+| Q3126 | done | 桌面空态 **3 passed**（部门 备注/搜索用户 + select 正常）。禁 /m。 |
+| Q3127 | done | 桌面空态 **3 passed**（模型 placeholder 名称/型号 + 选择字段集）。禁 /m。 |
+| Q3128 | done | 桌面空态 **3 passed**（用户 未分配/暂无角色/暂无岗位）。禁 /m。 |
+| Q3129 | in_progress | 桌面空态：供应商/制造商/合同弹窗创建说明。禁 /m。 |
+| Q3130 | pending | 桌面空态：许可证说明 + 岗位/部门备注占位。禁 /m。 |
+| Q3131 | pending | 桌面空态：制造商备注 + 模型/位置创建说明。禁 /m。 |
