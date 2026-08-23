@@ -60564,7 +60564,7 @@ test.describe('Q3572 桌面资产分类查询余项空态', () => {
 });
 test.describe('Q3573 桌面审批规则表达式边界空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockApprovalRulesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60593,7 +60593,7 @@ test.describe('Q3573 桌面审批规则表达式边界空态', () => {
 
 test.describe('Q3574 桌面审批规则审计字段空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockApprovalRulesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60622,7 +60622,7 @@ test.describe('Q3574 桌面审批规则审计字段空态', () => {
 
 test.describe('Q3575 桌面审批规则解释器边界空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockApprovalRulesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60651,7 +60651,7 @@ test.describe('Q3575 桌面审批规则解释器边界空态', () => {
 
 test.describe('Q3576 桌面流程平台侧栏描述空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockApprovalRulesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60680,7 +60680,7 @@ test.describe('Q3576 桌面流程平台侧栏描述空态', () => {
 
 test.describe('Q3577 桌面流程平台侧栏余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockApprovalRulesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60709,7 +60709,7 @@ test.describe('Q3577 桌面流程平台侧栏余项空态', () => {
 
 test.describe('Q3578 桌面流程平台侧栏覆盖空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockApprovalRulesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60825,7 +60825,7 @@ test.describe('Q3581 桌面组织权限侧栏描述空态', () => {
 
 test.describe('Q3582 桌面集成配置侧栏描述空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockSystemInterfacesEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -60883,7 +60883,7 @@ test.describe('Q3583 桌面消息通知侧栏描述空态', () => {
 
 test.describe('Q3584 桌面集成配置侧栏余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockSystemInterfacesEmpty);
     await seedSession(page, adminUser);
   });
 
