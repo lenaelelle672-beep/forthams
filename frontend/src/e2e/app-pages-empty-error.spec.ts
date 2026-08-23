@@ -43388,6 +43388,29 @@ test.describe('Q2973 桌面登录页输入文案空态', () => {
   });
 });
 
+test.describe('Q2974 桌面登录页SSO文案空态', () => {
+  test('/login 空态「MaxKey 单点登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('MaxKey 单点登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「使用组织统一身份认证登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('使用组织统一身份认证登录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「UNIVIEW 固定资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('UNIVIEW 固定资产').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
