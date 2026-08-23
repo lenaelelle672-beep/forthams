@@ -2090,4 +2090,5 @@
 | Q2900 | done | 桌面空态 **3 passed**（/locations 描述/总位置数/顶级位置）。禁 /m。 |
 | Q2901 | done | 桌面空态 **3 passed**（/locations 折叠/展开 + /categories 标题）。禁 /m。 |
 | Q2902 | done | 桌面空态 **3 passed**（/categories 添加根分类/描述/暂无分类）。禁 /m。 |
-| Q2903 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2903 | done | 桌面空态 **3 passed**（/categories 总分类数/根分类/分类结构）。禁 /m。 |
+| Q2904 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
