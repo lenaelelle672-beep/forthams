@@ -290,7 +290,7 @@ export default function SystemFlowDefinitionWorkbenchPage({
               </div>
             </dl>
           ) : null}
-          {!detailLoading && !selectedDefinition ? <p className="text-sm text-slate-500">暂无可展示的流程摘要。</p> : null}
+          {!detailLoading && !selectedDefinition ? <h3 className="text-sm font-medium text-slate-500">暂无可展示的流程摘要。</h3> : null}
         </aside>
       </div>
     </section>

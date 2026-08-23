@@ -249,7 +249,7 @@ export default function SystemSlaConfigWorkbenchPage({
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{configs.length} 条</span>
           </div>
           {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">SLA 配置加载中...</p> : null}
-          {!loading && configs.length === 0 ? <p className="text-sm text-slate-500">暂无 SLA 策略。</p> : null}
+          {!loading && configs.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无 SLA 策略。</h3> : null}
           <div className="space-y-2">
             {configs.map((config) => (
               <button key={config.id} type="button" className={`w-full rounded-xl border px-3 py-2 text-left text-sm ${selectedConfig?.id === config.id ? 'border-blue-500 bg-blue-50 text-blue-800' : 'border-slate-200 text-slate-600'}`} onClick={() => setSelectedConfig(config)}>
@@ -306,7 +306,7 @@ export default function SystemSlaConfigWorkbenchPage({
 
       <div className="rounded-2xl border border-slate-200 p-4">
         <h4 className="mb-3 font-semibold">超时记录</h4>
-        {timeoutRecords.length === 0 ? <p className="text-sm text-slate-500">暂无超时记录。</p> : null}
+        {timeoutRecords.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无超时记录。</h3> : null}
         <div className="grid gap-2 md:grid-cols-2">
           {timeoutRecords.map((record) => (
             <div key={record.id} className="rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-600">

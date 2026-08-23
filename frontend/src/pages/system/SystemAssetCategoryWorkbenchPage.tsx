@@ -174,7 +174,7 @@ export default function SystemAssetCategoryWorkbenchPage({
 
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
           <h4 className="mb-3 font-semibold">分类树</h4>
-          {hasTree ? renderTree(tree) : <p className="text-sm text-slate-500">暂无分类树节点。</p>}
+          {hasTree ? renderTree(tree) : <h3 className="text-sm font-medium text-slate-500">暂无分类树节点。</h3>}
         </div>
       </div>
     </section>

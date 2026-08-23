@@ -788,7 +788,7 @@ export default function SystemFormConfigWorkbenchPage({
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
           <h4 className="mb-3 font-semibold">版本历史</h4>
-          {versions.length === 0 ? <p className="text-sm text-slate-500">暂无发布/停用/回滚审计版本。</p> : null}
+          {versions.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无发布/停用/回滚审计版本。</h3> : null}
           <div className="space-y-2 text-sm text-slate-600">
             {versions.slice(0, 5).map((version) => (
               <div key={version.id ?? `${version.version}-${version.actionType}`} className="rounded-xl bg-slate-50 px-3 py-2">

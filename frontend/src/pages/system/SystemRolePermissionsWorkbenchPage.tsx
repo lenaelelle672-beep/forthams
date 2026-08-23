@@ -256,7 +256,7 @@ export default function SystemRolePermissionsWorkbenchPage({
                 <p className="text-xs text-slate-500">{permission.permissionName}</p>
               </div>
             ))}
-            {catalog.permissions.length === 0 ? <p className="text-sm text-slate-500">暂无权限库存。</p> : null}
+            {catalog.permissions.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无权限库存。</h3> : null}
           </div>
         </aside>
       </div>

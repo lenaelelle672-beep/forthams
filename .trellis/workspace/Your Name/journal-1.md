@@ -1268,4 +1268,5 @@
 - Q4075–Q4082：**24 passed**。续 Q4083–Q4090：报表构建器说明/字段分组、分析 KPI 副文案与值、部门管理空态 heading。可用默认 `mockApi`。待跑 `-g 'Q4083|...|Q4090'`。下一票 Q4091。禁 /m。
 - Q4083–Q4090：**24 passed**。续 Q4091–Q4098：位置/供应商 heading、报表字段 button、位置/部门工作台根空态。位置须 `mockLocationsListEmpty`，部门工作台须 `mockDeptsListEmpty`。待跑 `-g 'Q4091|...|Q4098'`。下一票 Q4099。禁 /m。
 - Q4091–Q4098：**24 passed**。续 Q4099–Q4106：制造商/许可证/合同/分类/型号副文案与工作台请选择空态。自定义字段须 `mockCustomFieldsEmptyCatalog`，审计须 `mockAuditLogsEmpty`。待跑 `-g 'Q4099|...|Q4106'`。下一票 Q4107。禁 /m。
+- Q4099–Q4106：**24 passed**。续 Q4107–Q4114：工作台暂无空态 heading（SLA/审批/流程定义/待办/表单存储/角色/运行监控/分类）。须对应专用 mock。待跑 `-g 'Q4107|...|Q4114'`。下一票 Q4115。禁 /m。
 

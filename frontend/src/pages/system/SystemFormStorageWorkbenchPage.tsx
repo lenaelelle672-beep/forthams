@@ -265,7 +265,7 @@ export default function SystemFormStorageWorkbenchPage({
             <span className="rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-500">{records.length} 条</span>
           </div>
           {loading ? <p role="status" aria-live="polite" className="text-sm text-slate-500">表单存储加载中...</p> : null}
-          {!loading && records.length === 0 ? <p className="text-sm text-slate-500">暂无表单实例。</p> : null}
+          {!loading && records.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无表单实例。</h3> : null}
           <div className="space-y-2">
             {records.map((record) => (
               <button

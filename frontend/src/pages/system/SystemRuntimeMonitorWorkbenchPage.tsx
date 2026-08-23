@@ -271,14 +271,14 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       <div className="grid gap-4 xl:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
           <h4 className="mb-3 font-semibold">SLA 节点耗时</h4>
-          {nodeDurationSummary.length === 0 ? <p className="text-sm text-slate-500">暂无节点耗时异常。</p> : null}
+          {nodeDurationSummary.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无节点耗时异常。</h3> : null}
           <ul className="space-y-2 text-sm text-slate-600">
             {nodeDurationSummary.map((item) => <li key={item} className="rounded-xl bg-slate-50 px-3 py-2">{item}</li>)}
           </ul>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
           <h4 className="mb-3 font-semibold">SLA 异常轨迹</h4>
-          {abnormalTraceSummary.length === 0 ? <p className="text-sm text-slate-500">暂无异常轨迹。</p> : null}
+          {abnormalTraceSummary.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无异常轨迹。</h3> : null}
           <ul className="space-y-2 text-sm text-slate-600">
             {abnormalTraceSummary.map((item) => <li key={item} className="rounded-xl bg-slate-50 px-3 py-2">{item}</li>)}
           </ul>
@@ -287,7 +287,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <h4 className="mb-3 font-semibold">超时记录与脱敏导出提示</h4>
           <p className="text-sm text-slate-500">{slaSummary.exportMaskingNotice ?? '导出仅返回 masked/summary 字段。'}</p>
           <div className="mt-3 space-y-2">
-            {slaTimeoutRecords.length === 0 ? <p className="text-sm text-slate-500">暂无超时记录。</p> : null}
+            {slaTimeoutRecords.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无超时记录。</h3> : null}
             {slaTimeoutRecords.slice(0, 3).map((record) => (
               <div key={record.id} className="rounded-xl border border-slate-100 px-3 py-2 text-sm text-slate-600">
                 <p className="font-medium">{record.processKey ?? '-'} / {record.nodeKey ?? '-'}</p>
