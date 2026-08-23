@@ -54238,6 +54238,122 @@ test.describe('Q3354 桌面邮件网关其余空态', () => {
 
 });
 
+test.describe('Q3355 桌面外部系统表单余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems textbox「系统名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('textbox', { name: '系统名称' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems combobox「系统类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('combobox', { name: '系统类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems combobox「认证方式」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('combobox', { name: '认证方式' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3356 桌面外部系统认证余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems select「BEARER_TOKEN」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.locator('select').filter({ hasText: 'BEARER_TOKEN' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems select「OAUTH_CLIENT」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.locator('select').filter({ hasText: 'OAUTH_CLIENT' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems textbox「一次性认证材料」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('textbox', { name: '一次性认证材料' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3357 桌面外部系统操作余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems spinbutton「操作人 ID」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('spinbutton', { name: '操作人 ID' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems textbox「基础地址」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('textbox', { name: '基础地址' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems checkbox「启用外部系统」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByRole('checkbox', { name: '启用外部系统' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3358 桌面外部系统说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「请通过 V3 创建目录项」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText(/请通过 V3 创建目录项/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「未触发真实外部调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText(/未触发真实外部调用/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「config-only」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText(/config-only/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

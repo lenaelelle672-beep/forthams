@@ -2536,9 +2536,13 @@
 | Q3346 | done | 桌面空态 **3 passed**（表单配置草稿说明（安全表单定义/剥离 HTML/危险 style））。禁 /m。 |
 | Q3347 | done | 桌面空态 **3 passed**（流程设计器节点帮助再余（固定审批人/挂载后续节点/双向分支））。禁 /m。 |
 | Q3348 | done | 桌面空态 **3 passed**（流程通知开关业务类型（业务类型/样例启停 combobox/只读不执行启停））。禁 /m。 |
-| Q3349 | in_progress | 桌面空态：接口管理余项（配置校验仅验证元数据/未触发真实外部调用/请通过 V3 接口创建）。禁 /m。 |
-| Q3350 | pending | 桌面空态：邮件网关只读边界（no-send/no-network/no-secret）。禁 /m。 |
-| Q3351 | pending | 桌面空态：邮件网关 preview 字段（previewAccepted/runtimeEffect=false/cacheRefreshed=false）。禁 /m。 |
-| Q3352 | pending | 桌面空态：邮件网关连接边界（credentialExposed/smtpConnect/javaMailSenderUsed）。禁 /m。 |
-| Q3353 | pending | 桌面空态：邮件网关勾选（authConfigured/enabled/mailSenderProviderUsed）。禁 /m。 |
-| Q3354 | pending | 桌面空态：邮件网关其余（不代表邮件子系统完成/readonlyBoundary/acceptedFields）。禁 /m。 |
+| Q3349 | done | 桌面空态 **3 passed**（接口管理余项（配置校验仅验证元数据/未触发真实外部调用/请通过 V3 接口创建））。禁 /m。 |
+| Q3350 | done | 桌面空态 **3 passed**（邮件网关只读边界（no-send/no-network/no-secret））。禁 /m。 |
+| Q3351 | done | 桌面空态 **3 passed**（邮件网关 preview 字段（previewAccepted/runtimeEffect=false/cacheRefreshed=false））。禁 /m。 |
+| Q3352 | done | 桌面空态 **3 passed**（邮件网关连接边界（credentialExposed/smtpConnect/javaMailSenderUsed））。禁 /m。 |
+| Q3353 | done | 桌面空态 **3 passed**（邮件网关勾选（authConfigured/enabled/mailSenderProviderUsed））。禁 /m。 |
+| Q3354 | done | 桌面空态 **3 passed**（邮件网关其余（不代表邮件子系统完成/readonlyBoundary/acceptedFields））。禁 /m。 |
+| Q3355 | in_progress | 桌面空态：外部系统表单余项（系统名称/系统类型/认证方式）。禁 /m。 |
+| Q3356 | pending | 桌面空态：外部系统认证余项（BEARER_TOKEN/OAUTH_CLIENT/一次性认证材料）。禁 /m。 |
+| Q3357 | pending | 桌面空态：外部系统操作余项（操作人 ID/基础地址/启用外部系统）。禁 /m。 |
+| Q3358 | pending | 桌面空态：外部系统说明余项（V3 创建目录项/未触发真实外部调用/config-only）。禁 /m。 |
