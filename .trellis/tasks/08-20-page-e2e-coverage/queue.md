@@ -2023,4 +2023,5 @@
 | Q2833 | done | 桌面空态 **3 passed**（/budgets/new 创建预算/返回列表/取消）。禁 /m。 |
 | Q2834 | done | 桌面空态 **3 passed**（/budgets/new 预算年度/类型/总额）。禁 /m。 |
 | Q2835 | done | 桌面空态 **3 passed**（/budgets/new 部门ID/分类ID/创建记录）。禁 /m。 |
-| Q2836 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2836 | done | 桌面空态 **3 passed**（/insurances/new 保存/返回/新增保险）。禁 /m。 |
+| Q2837 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
