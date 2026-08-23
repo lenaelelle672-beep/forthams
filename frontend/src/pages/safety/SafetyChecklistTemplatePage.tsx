@@ -484,7 +484,7 @@ const SafetyChecklistTemplatePage: React.FC = () => {
                   <FileText className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部模板</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部模板</h3>
                   <p className="text-lg font-bold text-slate-900">{totalCount}</p>
                 </div>
               </div>

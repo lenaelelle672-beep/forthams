@@ -200,7 +200,7 @@ export default function SystemAuditLogWorkbenchPage({
             <h4 className="font-semibold">只读审计事件</h4>
             <span className="text-xs text-slate-500">显示 {page.records.length} / {page.total} 条，before/after/raw 均为脱敏摘要</span>
           </div>
-          {page.records.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无审计日志。</div> : null}
+          {page.records.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无审计日志。</h3> : null}
           <div className="space-y-2">
             {page.records.map((log) => (
               <button key={log.id} type="button" className="w-full rounded-2xl border border-slate-200 p-4 text-left text-sm hover:border-blue-200 hover:bg-blue-50" onClick={() => openDetail(log)}>

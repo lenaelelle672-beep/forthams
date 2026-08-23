@@ -363,7 +363,7 @@ export default function CategoryManagerPage() {
                 <Layers className="h-4.5 w-4.5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">总分类数</p>
+                <h3 className="text-xs font-medium text-slate-500">总分类数</h3>
                 <p className="text-lg font-bold text-slate-900">{totalCategories}</p>
               </div>
             </div>
@@ -372,7 +372,7 @@ export default function CategoryManagerPage() {
                 <FolderTree className="h-4.5 w-4.5 text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">根分类</p>
+                <h3 className="text-xs font-medium text-slate-500">根分类</h3>
                 <p className="text-lg font-bold text-slate-900">{rootCount}</p>
               </div>
             </div>
@@ -381,7 +381,7 @@ export default function CategoryManagerPage() {
                 <FolderOpen className="h-4.5 w-4.5 text-violet-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">当前选中</p>
+                <h3 className="text-xs font-medium text-slate-500">当前选中</h3>
                 <p className="text-lg font-bold text-slate-900">{selectedNode?.categoryName ?? '—'}</p>
               </div>
             </div>
@@ -390,7 +390,7 @@ export default function CategoryManagerPage() {
                 <Folder className="h-4.5 w-4.5 text-amber-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">子分类数</p>
+                <h3 className="text-xs font-medium text-slate-500">子分类数</h3>
                 <p className="text-lg font-bold text-slate-900">{selectedNode?.children?.length ?? 0}</p>
               </div>
             </div>

@@ -369,7 +369,7 @@ const RiskMatrixPage: React.FC = () => {
                   <Grid3X3 className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部评估</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部评估</h3>
                   <p className="text-lg font-bold text-slate-900">{totalCount}</p>
                 </div>
               </div>
@@ -378,7 +378,7 @@ const RiskMatrixPage: React.FC = () => {
                   <ShieldAlert className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">重大风险</p>
+                  <h3 className="text-xs font-medium text-slate-500">重大风险</h3>
                   <p className="text-lg font-bold text-red-600">{criticalCount}</p>
                 </div>
               </div>

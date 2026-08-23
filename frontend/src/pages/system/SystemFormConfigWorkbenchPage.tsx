@@ -742,7 +742,7 @@ export default function SystemFormConfigWorkbenchPage({
                   从草稿移除字段
                 </button>
               </div>
-            ) : <p className="rounded-2xl bg-white p-3 text-sm text-slate-500">暂无可配置字段，请先新增字段。</p>}
+            ) : <h3 className="rounded-2xl bg-white p-3 text-sm font-medium text-slate-500">暂无可配置字段，请先新增字段。</h3>}
           </aside>
         </div>
       </div>

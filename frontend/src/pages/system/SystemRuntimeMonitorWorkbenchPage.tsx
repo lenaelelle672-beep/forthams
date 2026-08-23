@@ -168,7 +168,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">待处理数量</p>
+          <h3 className="text-xs font-medium text-slate-500">待处理数量</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{pendingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -176,7 +176,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <p className="mt-2 text-2xl font-semibold text-slate-900">{records.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">总实例</p>
+          <h3 className="text-xs font-medium text-slate-500">总实例</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -230,7 +230,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">运行监控加载中...</div> : null}
       {!loading && !error && records.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无审批实例。</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无审批实例。</h3>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 p-4">

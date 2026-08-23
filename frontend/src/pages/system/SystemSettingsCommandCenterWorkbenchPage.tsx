@@ -336,7 +336,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <span className="text-xs text-slate-500">显示 {visibleDefinitions.length} / {definitions.length} 条</span>
             </div>
             {!loading && !error && visibleDefinitions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无符合条件的流程模板。</div>
+              <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无符合条件的流程模板。</h3>
             ) : null}
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
@@ -370,7 +370,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <span className="text-xs text-slate-500">第 {runtimePage.current ?? 1} / {runtimePage.pages ?? 0} 页</span>
             </div>
             {!loading && !error && visibleRuntimeRecords.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无符合条件的运行实例。</div>
+              <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无符合条件的运行实例。</h3>
             ) : null}
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
@@ -406,7 +406,7 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
               <span className="text-xs text-slate-500">脱敏展示 {slaTimeoutRecords.length} 条</span>
             </div>
             {slaTimeoutRecords.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无 SLA 超时记录。</div>
+              <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无 SLA 超时记录。</h3>
             ) : null}
             <div className="space-y-2">
               {slaTimeoutRecords.slice(0, 5).map((record) => (

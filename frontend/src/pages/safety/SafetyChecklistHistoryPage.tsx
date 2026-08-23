@@ -269,7 +269,7 @@ const SafetyChecklistHistoryPage: React.FC = () => {
                   <ClipboardList className="h-4.5 w-4.5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">全部执行</p>
+                  <h3 className="text-xs font-medium text-slate-500">全部执行</h3>
                   <p className="text-lg font-bold text-slate-900">{total}</p>
                 </div>
               </div>
@@ -278,7 +278,7 @@ const SafetyChecklistHistoryPage: React.FC = () => {
                   <CheckCircle2 className="h-4.5 w-4.5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">已完成</p>
+                  <h3 className="text-xs font-medium text-slate-500">已完成</h3>
                   <p className="text-lg font-bold text-slate-900">{completedCount}</p>
                 </div>
               </div>
