@@ -74776,6 +74776,35 @@ test.describe('Q4062 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4063 桌面报废/调拨未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/scrap/new heading「选择需要报废的资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByRole('heading', { name: '选择需要报废的资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/transfer/new heading「选择需要调拨的资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/transfer/new');
+    await expect(page.getByRole('heading', { name: '选择需要调拨的资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/FOURTH heading「FOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/FOURTH');
+    await expect(page.getByRole('heading', { name: 'FOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
