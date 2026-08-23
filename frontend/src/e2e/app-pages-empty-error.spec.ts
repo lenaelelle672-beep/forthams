@@ -42901,6 +42901,34 @@ test.describe('Q2954 桌面报废描述与审批类型空态', () => {
   });
 });
 
+test.describe('Q2955 桌面备件待确认与重估类型空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/spare-parts/new 空态「待确认」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/new');
+    await expect(page.getByText('待确认').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations/new 空态「类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations/new');
+    await expect(page.getByText('类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations/new 空态「资产价值调整申请」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations/new');
+    await expect(page.getByText('资产价值调整申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
