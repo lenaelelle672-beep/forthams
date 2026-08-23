@@ -2214,4 +2214,5 @@
 | Q3024 | done | 桌面空态 **3 passed**（/audit 筛选/显示/项共）。禁 /m。 |
 | Q3025 | done | 桌面空态 **3 passed**（/audit 7天汇总/趋势heading/分布heading）。禁 /m。 |
 | Q3026 | done | 桌面空态 **3 passed**（/audit 最近操作heading/审计日志/导出）。禁 /m。 |
-| Q3027 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3027 | done | 桌面空态 **3 passed**（/intake/new 资产#1/入库资产heading/品牌）。禁 /m。 |
+| Q3028 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

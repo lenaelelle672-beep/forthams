@@ -1134,5 +1134,6 @@
 - Q3023：/audit 全部日志/告警/总计 **3 passed**。`d5d0af3ec`
 - Q3024：/audit 筛选/显示/项共 **3 passed**。`a1849603c`
 - Q3025：/audit 7天汇总/趋势heading/分布heading **3 passed**。`d147568e3`
-- Q3026：/audit 最近操作heading/审计日志/导出 **3 passed**。
+- Q3026：/audit 最近操作heading/审计日志/导出 **3 passed**。`544ccd5ac`
+- Q3027：/intake/new 资产#1/入库资产heading/品牌 **3 passed**。工作台带入/告警处理/核对告警来源不在默认 /notifications。
 
