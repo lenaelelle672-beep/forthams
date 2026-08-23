@@ -1245,4 +1245,5 @@
 - Q3990–Q4001：**36 passed**。个人页空 payload 回退登录名。续 Q4002–Q4005：流程分页/KPI 副文案与工单详情/验收未用 heading/button。工单空审批改为 h3。禁 /m。
 - Q4002–Q4005：**12 passed**。续 Q4006–Q4007：安全/借用/领用/forbidden/个人未用 heading/button。个人页 CardTitle 补中文 fallback。禁 /m。
 - Q4006–Q4007：**6 passed**。续 Q4008：个人角色权限、流程当前选中、退役详情 heading。流程「当前选中流程」改为 h3。禁 /m。
+- Q4008：**3 passed**。续 Q4009–Q4010：退役详情分区 heading。禁 /m。
 

@@ -278,14 +278,17 @@ export default function RetirementDetailPage() {
         {/* ── Left column ────────────────────────────────── */}
         <div className="space-y-6">
 
-          {/* ① 资产摘要卡 — 视觉最突出 */}
-          {asset && (
-            <SectionCard
+          {/* ① 资产摘要卡 — 视觉最突出；无资产时仍渲染空态 heading */}
+          <SectionCard
               icon={<Package className="w-3.5 h-3.5 text-emerald-600" />}
               iconColor="bg-emerald-50"
               title="关联资产摘要"
               accent="border-emerald-100"
             >
+            {!asset ? (
+              <h3 className="text-sm font-medium text-gray-400 text-center py-6">暂无关联资产</h3>
+            ) : (
+            <>
               {/* 资产名称 & 编号 hero 区域 */}
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 flex items-center justify-center flex-shrink-0">
@@ -367,8 +370,9 @@ export default function RetirementDetailPage() {
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
+            </>
+            )}
             </SectionCard>
-          )}
 
           {/* ② 退役原因 & 申请信息 — 原因突出展示 */}
           <SectionCard
@@ -412,13 +416,15 @@ export default function RetirementDetailPage() {
             )}
           </SectionCard>
 
-          {/* ③ 历史记录 — 终态时展示 */}
-          {isTerminal && approvalRecords.length > 0 && (
-            <SectionCard
+          {/* ③ 历史记录 — 空态也保留 heading，便于无审批记录时可见 */}
+          <SectionCard
               icon={<History className="w-3.5 h-3.5 text-gray-600" />}
               iconColor="bg-gray-100"
               title="历史记录"
             >
+            {!(isTerminal && approvalRecords.length > 0) ? (
+              <h3 className="text-sm font-medium text-gray-400 text-center py-6">暂无审批历史</h3>
+            ) : (
               <div className="space-y-3">
                 {approvalRecords.map((r) => {
                   const actionLabel = r.action === 'APPROVE' ? '审批通过' : '审批驳回';
@@ -448,8 +454,8 @@ export default function RetirementDetailPage() {
                   );
                 })}
               </div>
+            )}
             </SectionCard>
-          )}
         </div>
 
         {/* ── Right column: 审批状态 & 操作 ──────────────── */}

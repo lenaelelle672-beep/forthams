@@ -73259,10 +73259,10 @@ test.describe('Q4010 桌面退役详情未用审批 heading 空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/retirement/2 heading「审批状态」', async ({ page }) => {
+  test('/retirement/3 heading「退役申请 #3」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/retirement/2');
-    await expect(page.getByRole('heading', { name: '审批状态' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/retirement/3');
+    await expect(page.getByRole('heading', { name: '退役申请 #3' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
