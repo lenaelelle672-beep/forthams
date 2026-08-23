@@ -1125,5 +1125,7 @@
 - Q3014：/notifications 通知中心/全部已读/暂无通知 **3 passed**。`6e54f5b25`
 - Q3015：/notifications 审批/预警/系统通知 **3 passed**。`14238555d`
 - Q3016：/notifications 共0条/全部/所有通知 **3 passed**。`2d85dfa1a`
-- Q3017：/audit 审计日志/搜索/导出 **3 passed**。
+- Q3017：/audit 审计日志/搜索/导出 **3 passed**。`917ca473b`
+- Q3018：/audit 总操作数/今日操作/活跃用户 **3 passed**。`2fefdf633`
+- Q3019：/audit 风险事件/最近7天/操作趋势 **3 passed**。
 
