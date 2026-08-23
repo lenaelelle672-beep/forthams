@@ -63751,6 +63751,238 @@ test.describe('Q3682 桌面用户管理状态筛选说明余项空态', () => {
 
 });
 
+test.describe('Q3683 桌面位置管理检索说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「返回的位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('返回的位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「/locations/list 与 /locations/root 返回的位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('/locations/list 与 /locations/root 返回的位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3684 桌面位置管理接口路径余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「只读展示 /locations/list 与 /locations/root」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('只读展示 /locations/list 与 /locations/root').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「root 返回的位置，搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('root 返回的位置，搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3685 桌面供应商管理检索说明余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockVendorsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「返回的供应商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('返回的供应商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「/vendors/list 返回的供应商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('/vendors/list 返回的供应商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3686 桌面供应商管理接口路径余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockVendorsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「只读展示 /vendors/list 返回的供应商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('只读展示 /vendors/list 返回的供应商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「list 返回的供应商，搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('list 返回的供应商，搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3687 桌面位置管理前端筛选余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「与 /locations/root」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('与 /locations/root').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「位置，搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('位置，搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3688 桌面供应商管理前端筛选余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockVendorsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「供应商，搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('供应商，搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3689 桌面位置管理 list/root 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「/locations/list 与 /locations/root」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('/locations/list 与 /locations/root').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「返回的位置，搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('返回的位置，搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 「只读展示 /locations/list 与 /locations/root 返回的位置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('只读展示 /locations/list 与 /locations/root 返回的位置').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3690 桌面供应商 list 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockVendorsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「只读展示 /vendors/list」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('只读展示 /vendors/list').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「返回的供应商，搜索与状态筛选在前端结果内完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('返回的供应商，搜索与状态筛选在前端结果内完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management 「/vendors/list 返回的供应商，搜索与状态筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByText('/vendors/list 返回的供应商，搜索与状态筛选').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
