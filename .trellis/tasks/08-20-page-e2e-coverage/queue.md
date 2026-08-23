@@ -2017,4 +2017,5 @@
 | Q2827 | done | 桌面空态 **3 passed**（/intake/new 返回/取消/添加按钮）。禁 /m。 |
 | Q2828 | done | 桌面空态 **3 passed**（/intake/new 验收检查项heading/总金额/检查项）。禁 /m。 |
 | Q2829 | done | 桌面空态 **3 passed**（/retirement/new 提交申请/返回/标题）。禁 /m。 |
-| Q2830 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2830 | done | 桌面空态 **3 passed**（/retirement/new 取消/资产选择/退役原因）。禁 /m。 |
+| Q2831 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
