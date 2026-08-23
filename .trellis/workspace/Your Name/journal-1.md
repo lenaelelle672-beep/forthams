@@ -979,5 +979,6 @@
 - Q2868：/disposals/transfer/new 提交申请/保存草稿/取消 **3 passed**。`58b9f13ff`
 - Q2869：/disposals/transfer/new 返回/添加资产/计算处理人 **3 passed**。`a53de727d`
 - Q2870：/disposals/transfer/new 基本信息/单据信息/资产选择 heading **3 passed**。`590b8759d`
-- Q2871：/disposals/transfer/new 转出方/转入方/审批配置 **3 passed**。转出/转入非 heading。
+- Q2871：/disposals/transfer/new 转出方/转入方/审批配置 **3 passed**。转出/转入非 heading。`d3f5981f8`
+- Q2872：/disposals/transfer/new 调拨编号/申请人/调拨日期 **3 passed**。
 
