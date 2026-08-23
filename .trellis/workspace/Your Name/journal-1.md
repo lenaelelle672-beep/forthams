@@ -1088,5 +1088,6 @@
 - Q2977：/login 2026/©/· **3 passed**。`555170ae4`
 - Q2978：/login4 设备健康/连接MES/安全SSO **3 passed**。/login4 亦无「固定资产智能运维中枢」。`ae7ffcbd7`
 - Q2979：/login4 运维闭环/开发体验/UNIVIEW **3 passed**。`e72bb004c`
-- Q2980：/login4 登录系统/组织账号/固定资产平台 **3 passed**。
+- Q2980：/login4 登录系统/组织账号/固定资产平台 **3 passed**。`fc8fb6696`
+- Q2981：/login4 用户名/密码/记住用户名 **3 passed**。
 
