@@ -2194,4 +2194,5 @@
 | Q3004 | done | 桌面空态 **3 passed**（/dashboard 总价值/分类分布/维保预警）。禁 /m。 |
 | Q3005 | done | 桌面空态 **3 passed**（/dashboard 最近工单/净值/Top5部门）。禁 /m。 |
 | Q3006 | done | 桌面空态 **3 passed**（/dashboard 运营首页/待审批/欢迎管理员）。禁 /m。 |
-| Q3007 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3007 | done | 桌面空态 **3 passed**（/dashboard 查看全部/12个月趋势/导出数据）。禁 /m。 |
+| Q3008 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
