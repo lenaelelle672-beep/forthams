@@ -79083,6 +79083,242 @@ test.describe('Q4210 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4211 桌面邮件网关/日志/通知开关未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway heading「真实调用 /system/mail-gateways、/system/mail-gateways/{id}、/system/mail-gateways/meta 与 /system/mail-gateways/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('heading', { name: '真实调用 /system/mail-gateways、/system/mail-gateways/{id}、/system/mail-gateways/meta 与 /system/mail-gateways/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs heading「真实调用 /mail-logs/list、/mail-logs/{id}、/mail-logs/biz 与 /mail-logs/meta；页面不触发重试、导出、发送、SMTP/mail gateway、workflow mail 或 notification pipeline。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByRole('heading', { name: '真实调用 /mail-logs/list、/mail-logs/{id}、/mail-logs/biz 与 /mail-logs/meta；页面不触发重试、导出、发送、SMTP/mail gateway、workflow mail 或 notification pipeline。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch heading「真实调用 /notification-switches/list、/notification-switches/biz-type/{bizType}、/notification-switches/meta 与 /notification-switches/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByRole('heading', { name: '真实调用 /notification-switches/list、/notification-switches/biz-type/{bizType}、/notification-switches/meta 与 /notification-switches/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4212 桌面自定义字段/岗位/字段集未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields heading「真实调用 /system/custom-fields、/system/custom-fields/all、/system/custom-fields/{id}、/system/custom-fields/meta 与 /system/custom-fields/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByRole('heading', { name: '真实调用 /system/custom-fields、/system/custom-fields/all、/system/custom-fields/{id}、/system/custom-fields/meta 与 /system/custom-fields/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-post-management heading「真实调用 /system/posts、/system/posts/all、/system/posts/{id}、/system/posts/meta 与 /system/posts/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-post-management');
+    await expect(page.getByRole('heading', { name: '真实调用 /system/posts、/system/posts/all、/system/posts/{id}、/system/posts/meta 与 /system/posts/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets heading「真实调用 /system/custom-fieldsets、/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByRole('heading', { name: '真实调用 /system/custom-fieldsets、/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4213 桌面渠道/偏好/编号规则未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels heading「真实调用 /system/channel-configs、/system/channel-configs/{id}、/system/channel-configs/meta 与 /system/channel-configs/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByRole('heading', { name: '真实调用 /system/channel-configs、/system/channel-configs/{id}、/system/channel-configs/meta 与 /system/channel-configs/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences heading「真实调用 /notification-preferences、/notification-preferences/{category}、/notification-preferences/meta 与 /notification-preferences/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockNotificationPreferencesEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByRole('heading', { name: '真实调用 /notification-preferences、/notification-preferences/{category}、/notification-preferences/meta 与 /notification-preferences/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules heading「真实调用 /numbering-rules、/numbering-rules/{ruleKey}、/numbering-rules/meta 与 /numbering-rules/preview。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('heading', { name: '真实调用 /numbering-rules、/numbering-rules/{ruleKey}、/numbering-rules/meta 与 /numbering-rules/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4214 桌面邮件模板/通知模板/基础参数未用副文案 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-templates heading「真实调用 /mail-templates/list、/mail-templates/{id}、/mail-templates/code/{code}、/mail-templates/meta 与 /mail-templates/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-templates');
+    await expect(page.getByRole('heading', { name: '真实调用 /mail-templates/list、/mail-templates/{id}、/mail-templates/code/{code}、/mail-templates/meta 与 /mail-templates/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-templates heading「真实调用 /notification-templates/list、/notification-templates/{id}、/notification-templates/code/{code}、/notification-templates/meta 与 /notification-templates/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-templates');
+    await expect(page.getByRole('heading', { name: '真实调用 /notification-templates/list、/notification-templates/{id}、/notification-templates/code/{code}、/notification-templates/meta 与 /notification-templates/preview。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params heading「真实调用 /system-config/system 与 /system/configs；仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('heading', { name: '真实调用 /system-config/system 与 /system/configs；仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4215 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYFIFTH heading「HUNDREDSEVENTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYSIXTH heading「HUNDREDSEVENTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYSEVENTH heading「HUNDREDSEVENTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4216 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYEIGHTH heading「HUNDREDSEVENTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYNINTH heading「HUNDREDSEVENTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYNINTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTIETH heading「HUNDREDEIGHTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTIETH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4217 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTYFIRST heading「HUNDREDEIGHTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTYFIRST');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTYSECOND heading「HUNDREDEIGHTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTYSECOND');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTYTHIRD heading「HUNDREDEIGHTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4218 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTYFOURTH heading「HUNDREDEIGHTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTYFIFTH heading「HUNDREDEIGHTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTYSIXTH heading「HUNDREDEIGHTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
