@@ -77155,16 +77155,16 @@ test.describe('Q4144 桌面审计日志未用空态 heading', () => {
 
 });
 
-test.describe('Q4145 桌面表单配置未用空态 heading', () => {
+test.describe('Q4145 桌面流程表单未用业务编码 heading', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/**', mockFormDefinitionsEmpty);
     await seedSession(page, adminUser);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-form-config heading「暂无可配置字段，请先新增字段。」', async ({ page }) => {
+  test('/workflow-form/HUNDREDFIFTEENTH heading「HUNDREDFIFTEENTH」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
-    await expect(page.getByRole('heading', { name: '暂无可配置字段，请先新增字段。' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/workflow-form/HUNDREDFIFTEENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -77208,6 +77208,238 @@ test.describe('Q4146 桌面流程表单未用业务编码 heading', () => {
     const errors = collectBrowserErrors(page);
     await page.goto('/workflow-form/HUNDREDFOURTEENTH');
     await expect(page.getByRole('heading', { name: 'HUNDREDFOURTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4147 桌面流程控制台未用统计 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCommandCenterEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center heading「流程模板总数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByRole('heading', { name: '流程模板总数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center heading「已配置模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByRole('heading', { name: '已配置模板' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center heading「运行实例总数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByRole('heading', { name: '运行实例总数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4148 桌面流程控制台未用 SLA heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCommandCenterEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center heading「SLA 风险」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByRole('heading', { name: 'SLA 风险', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center heading「SLA 策略」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByRole('heading', { name: 'SLA 策略', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSIXTEENTH heading「HUNDREDSIXTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSIXTEENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSIXTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4149 桌面运行监控未用统计 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockRuntimeMonitorEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor heading「当前页实例」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByRole('heading', { name: '当前页实例' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor heading「SLA 超时」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByRole('heading', { name: 'SLA 超时', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor heading「SLA 预警」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByRole('heading', { name: 'SLA 预警', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4150 桌面运行监控未用轨迹 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockRuntimeMonitorEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor heading「高风险轨迹」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByRole('heading', { name: '高风险轨迹' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTEENTH heading「HUNDREDSEVENTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTEENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDEIGHTEENTH heading「HUNDREDEIGHTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDEIGHTEENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDEIGHTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4151 桌面安全检查未用统计 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/config heading「已启用」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByRole('heading', { name: '已启用', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/config heading「已禁用」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByRole('heading', { name: '已禁用', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/history heading「通过」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByRole('heading', { name: '通过', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4152 桌面安全检查/风险评估未用统计 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/history heading「不通过」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/history');
+    await expect(page.getByRole('heading', { name: '不通过', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments heading「高危风险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await expect(page.getByRole('heading', { name: '高危风险' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-assessments heading「中/低危」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-assessments');
+    await expect(page.getByRole('heading', { name: '中/低危' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4153 桌面审计日志未用统计 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockAuditLogsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log heading「命中日志」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByRole('heading', { name: '命中日志' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log heading「统计总数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByRole('heading', { name: '统计总数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log heading「操作类型」exact', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByRole('heading', { name: '操作类型', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4154 桌面 SLA 配置未用统计 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config heading「策略总数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByRole('heading', { name: '策略总数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config heading「启用策略」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByRole('heading', { name: '启用策略' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config heading「运行风险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByRole('heading', { name: '运行风险' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 

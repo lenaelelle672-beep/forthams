@@ -172,7 +172,7 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <p className="mt-2 text-2xl font-semibold text-slate-900">{pendingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">当前页实例</p>
+          <h3 className="text-xs font-medium text-slate-500">当前页实例</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{records.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -180,15 +180,15 @@ export default function SystemRuntimeMonitorWorkbenchPage({
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 超时</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 超时</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{slaSummary.overdueCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 预警</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 预警</h3>
           <p className="mt-2 text-2xl font-semibold text-amber-600">{slaSummary.warningCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">高风险轨迹</p>
+          <h3 className="text-xs font-medium text-slate-500">高风险轨迹</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{slaSummary.criticalCount ?? 0}</p>
         </div>
       </div>

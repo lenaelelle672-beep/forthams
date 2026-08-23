@@ -287,7 +287,7 @@ const SafetyChecklistHistoryPage: React.FC = () => {
                   <PlayCircle className="h-4.5 w-4.5 text-emerald-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">通过</p>
+                  <h3 className="text-xs font-medium text-slate-500">通过</h3>
                   <p className="text-lg font-bold text-emerald-600">{passCount}</p>
                 </div>
               </div>
@@ -296,7 +296,7 @@ const SafetyChecklistHistoryPage: React.FC = () => {
                   <XCircle className="h-4.5 w-4.5 text-red-600" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">不通过</p>
+                  <h3 className="text-xs font-medium text-slate-500">不通过</h3>
                   <p className="text-lg font-bold text-red-600">{failCount}</p>
                 </div>
               </div>

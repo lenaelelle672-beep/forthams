@@ -188,9 +188,9 @@ export default function SystemAuditLogWorkbenchPage({
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">审计日志加载中...</div> : null}
 
       <div className="grid gap-3 md:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">命中日志</p><p className="mt-1 text-2xl font-semibold">{page.total}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">统计总数</p><p className="mt-1 text-2xl font-semibold">{stats?.totalCount ?? 0}</p></div>
-        <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">操作类型</p><p className="mt-1 text-2xl font-semibold">{distribution?.distribution.length ?? 0}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><h3 className="text-xs font-medium text-slate-500">命中日志</h3><p className="mt-1 text-2xl font-semibold">{page.total}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><h3 className="text-xs font-medium text-slate-500">统计总数</h3><p className="mt-1 text-2xl font-semibold">{stats?.totalCount ?? 0}</p></div>
+        <div className="rounded-2xl border border-slate-200 p-4"><h3 className="text-xs font-medium text-slate-500">操作类型</h3><p className="mt-1 text-2xl font-semibold">{distribution?.distribution.length ?? 0}</p></div>
         <div className="rounded-2xl border border-slate-200 p-4"><p className="text-xs text-slate-500">操作人排行</p><p className="mt-1 text-2xl font-semibold">{ranking.length}</p></div>
       </div>
 

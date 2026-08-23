@@ -258,11 +258,11 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4 xl:grid-cols-6">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">流程模板总数</p>
+          <h3 className="text-xs font-medium text-slate-500">流程模板总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{definitions.length}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">已配置模板</p>
+          <h3 className="text-xs font-medium text-slate-500">已配置模板</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{configuredDefinitions}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
@@ -270,15 +270,15 @@ export default function SystemSettingsCommandCenterWorkbenchPage({
           <p className="mt-2 text-2xl font-semibold text-slate-900">{pendingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">运行实例总数</p>
+          <h3 className="text-xs font-medium text-slate-500">运行实例总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{runtimePage.total ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 风险</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 风险</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{slaSummary.overdueCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">SLA 策略</p>
+          <h3 className="text-xs font-medium text-slate-500">SLA 策略</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{slaSummary.activeConfigs ?? 0}/{slaSummary.totalConfigs ?? 0}</p>
         </div>
       </div>
