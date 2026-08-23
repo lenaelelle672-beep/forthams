@@ -2169,4 +2169,5 @@
 | Q2979 | done | 桌面空态 **3 passed**（/login4 运维闭环/开发体验/UNIVIEW）。禁 /m。 |
 | Q2980 | done | 桌面空态 **3 passed**（/login4 登录系统/组织账号/固定资产平台）。禁 /m。 |
 | Q2981 | done | 桌面空态 **3 passed**（/login4 用户名/密码/记住用户名）。禁 /m。 |
-| Q2982 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2982 | done | 桌面空态 **3 passed**（/login4 忘记密码/进入工作台/统一认证）。禁 /m。 |
+| Q2983 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
