@@ -56803,10 +56803,10 @@ test.describe('Q3443 桌面审计日志列表余项空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-audit-log region「审计日志详情」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「before/after/raw 均为脱敏摘要」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
-    await expect(page.getByRole('region', { name: '审计日志详情' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('before/after/raw 均为脱敏摘要').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
