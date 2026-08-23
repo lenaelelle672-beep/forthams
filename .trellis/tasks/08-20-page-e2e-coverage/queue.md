@@ -3148,8 +3148,12 @@
 | Q3958 | done | 桌面空态 **3 passed**（合同未用类型/状态筛选 button）。禁 /m。 |
 | Q3959 | done | 桌面空态 **3 passed**（闲置资产未用筛选 button）。禁 /m。 |
 | Q3960 | done | 桌面空态 **3 passed**（闲置/采购未用筛选 button）。禁 /m。 |
-| Q3961 | pending | 桌面空态 采购/领用未用筛选 button。禁 /m。 |
-| Q3962 | pending | 桌面空态 领用未用状态/类型筛选 button。禁 /m。 |
-| Q3963 | pending | 桌面空态 领用未用类型筛选 button。禁 /m。 |
-| Q3964 | pending | 桌面空态 借用/维保未用筛选 button。禁 /m。 |
-| Q3965 | pending | 桌面空态 维保未用筛选 button。禁 /m。 |
+| Q3961 | done | 桌面空态 **3 passed**（采购/领用未用筛选 button）。禁 /m。 |
+| Q3962 | done | 桌面空态 **3 passed**（领用未用状态/类型筛选 button）。禁 /m。 |
+| Q3963 | done | 桌面空态 **3 passed**（领用未用类型筛选 button）。禁 /m。 |
+| Q3964 | done | 桌面空态 **3 passed**（借用/维保未用筛选 button）。禁 /m。 |
+| Q3965 | done | 桌面空态 **3 passed**（维保未用筛选 button）。禁 /m。 |
+| Q3966 | pending | 桌面空态 退役/重估未用筛选 button。禁 /m。 |
+| Q3967 | pending | 桌面空态 折旧未用方法筛选 button。禁 /m。 |
+| Q3968 | pending | 桌面空态 折旧/处置未用 heading/button。禁 /m。 |
+| Q3969 | pending | 桌面空态 处置未用类型/筛选 button。禁 /m。 |
