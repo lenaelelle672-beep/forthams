@@ -2063,4 +2063,5 @@
 | Q2873 | done | 桌面空态 **3 passed**（/disposals/transfer/new 调拨类型/方向/调出部门）。禁 /m。 |
 | Q2874 | done | 桌面空态 **3 passed**（/disposals/transfer/new 调出位置/调入部门/调入位置）。禁 /m。 |
 | Q2875 | done | 桌面空态 **3 passed**（/disposals/transfer/new 已选/发布流程/资产转移流程）。禁 /m。 |
-| Q2876 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2876 | done | 桌面空态 **3 passed**（/disposals/transfer/new 紧急程度/处理人预览/高优先级）。禁 /m。 |
+| Q2877 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
