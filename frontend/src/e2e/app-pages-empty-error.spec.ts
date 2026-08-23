@@ -260773,6 +260773,934 @@ test.describe('Q10474 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q10475 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYFIFTH heading「EIGHTEENTHOUSANDSEVENHUNDREDNINETYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDSEVENHUNDREDNINETYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYSIXTH heading「EIGHTEENTHOUSANDSEVENHUNDREDNINETYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDSEVENHUNDREDNINETYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYSEVENTH heading「EIGHTEENTHOUSANDSEVENHUNDREDNINETYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDSEVENHUNDREDNINETYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10476 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYEIGHTH heading「EIGHTEENTHOUSANDSEVENHUNDREDNINETYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDSEVENHUNDREDNINETYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYNINTH heading「EIGHTEENTHOUSANDSEVENHUNDREDNINETYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDSEVENHUNDREDNINETYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDSEVENHUNDREDNINETYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10477 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10478 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10479 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10480 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDELEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDELEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDELEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDELEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWELFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWELFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWELFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWELFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10481 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFOURTEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFOURTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFOURTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFOURTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10482 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10483 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDNINETEENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDNINETEENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDNINETEENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDNINETEENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10484 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10485 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10486 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTWENTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10487 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10488 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10489 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDTHIRTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10490 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10491 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10492 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10493 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFORTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFORTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFORTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10494 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10495 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10496 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDFIFTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10497 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10498 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10499 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSIXTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10500 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10501 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10502 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10503 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDSEVENTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIRST heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIRST');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10504 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSECOND heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSECOND');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYTHIRD heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFOURTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10505 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIFTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSIXTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSEVENTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q10506 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYEIGHTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYNINTH heading「EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYNINTH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDEIGHTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDNINETIETH heading「EIGHTEENTHOUSANDEIGHTHUNDREDNINETIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EIGHTEENTHOUSANDEIGHTHUNDREDNINETIETH');
+    await expect(page.getByRole('heading', { name: 'EIGHTEENTHOUSANDEIGHTHUNDREDNINETIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
