@@ -945,5 +945,6 @@
 - Q2834：/budgets/new 预算年度/类型/总额 **3 passed**。`5884dd75b`
 - Q2835：/budgets/new 部门ID/分类ID/创建记录 **3 passed**。`1e89dbb0b`
 - Q2836：/insurances/new 保存/返回/新增保险 **3 passed**。 heading 新增保险不存在。`de3975f09`
-- Q2837：/spare-parts/new 提交申请/返回/备件申请 **3 passed**。
+- Q2837：/spare-parts/new 提交申请/返回/备件申请 **3 passed**。`d4270a57c`
+- Q2838：/spare-parts/new 备件编码/名称/申请信息 **3 passed**。
 
