@@ -446,10 +446,10 @@ export default function DeptManagement() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">{t('user:dept.title')}</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-cyan-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-cyan-200 bg-cyan-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-cyan-700">
                 <Building2 className="h-3 w-3" />
                 组织架构
-              </span>
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={() => openCreate()}>
