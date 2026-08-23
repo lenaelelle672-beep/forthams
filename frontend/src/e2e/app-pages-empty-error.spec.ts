@@ -67697,6 +67697,238 @@ test.describe('Q3818 桌面自定义字段端点与 preview 余项空态', () =>
 
 });
 
+test.describe('Q3819 桌面字段集端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「真实调用 /system/custom-fieldsets、/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('真实调用 /system/custom-fieldsets、/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('/system/custom-fieldsets/{id}/fields、/system/custom-fieldsets/by-category/{categoryId}').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「与 /system/custom-fieldsets/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('与 /system/custom-fieldsets/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3820 桌面字段集 preview 诊断上下文空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「preview 仅校验当前租户字段 ID 与字段集/分类诊断上下文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('preview 仅校验当前租户字段 ID 与字段集/分类诊断上下文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「返回 valid、missingFields、rejectedFields、usedFields、wouldBindCategory」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('返回 valid、missingFields、rejectedFields、usedFields、wouldBindCategory').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「tenantScoped、noPersistence、runtimeEffect=false、readonlyBoundary 与 errors」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('tenantScoped、noPersistence、runtimeEffect=false、readonlyBoundary 与 errors').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3821 桌面自定义字段 catalog + 校验预览边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「只读自定义字段定义目录 + 无持久化校验预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('只读自定义字段定义目录 + 无持久化校验预览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「无持久化校验预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('无持久化校验预览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不完成字段集、分类绑定、资产字段值链路」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('不完成字段集、分类绑定、资产字段值链路').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3822 桌面自定义字段加密标记与 preview 校验空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「加密字段只展示安全标记，不回显样例原文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('加密字段只展示安全标记，不回显样例原文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「preview 仅按当前租户字段定义校验 required/type/options/regex」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('preview 仅按当前租户字段定义校验 required/type/options/regex').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「返回 valid、missing、rejected、errors、usedFields」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('返回 valid、missing、rejected、errors、usedFields').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3823 桌面字段集 missingFields 诊断组合空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「missingFields、rejectedFields、usedFields、wouldBindCategory」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('missingFields、rejectedFields、usedFields、wouldBindCategory').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「字段集/分类诊断上下文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('字段集/分类诊断上下文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「readonlyBoundary 与 errors」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('readonlyBoundary 与 errors').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3824 桌面自定义字段运行时 schema 边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「运行时表单 schema、加密值存储或 secret handling」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('运行时表单 schema、加密值存储或 secret handling').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不回显样例原文」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('不回显样例原文').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「tenantScoped、noPersistence 与 runtimeEffect=false」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('tenantScoped、noPersistence 与 runtimeEffect=false').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3825 桌面字段集 by-category 长路径组合空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('/system/custom-fieldsets/all、/system/custom-fieldsets/{id}、/system/custom-fieldsets/{id}/fields').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「by-category/{categoryId}、/system/custom-fieldsets/meta」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('by-category/{categoryId}、/system/custom-fieldsets/meta').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('/system/custom-fieldsets/by-category/{categoryId}、/system/custom-fieldsets/meta 与 /system/custom-fieldsets/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3826 桌面自定义字段 secret handling 边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「加密值存储或 secret handling」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('加密值存储或 secret handling').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「资产字段值链路、运行时表单 schema」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('资产字段值链路、运行时表单 schema').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「required/type/options/regex」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText('required/type/options/regex').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

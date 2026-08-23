@@ -2998,11 +2998,19 @@
 | Q3808 | done | 桌面空态 **3 passed**（邮件网关 {id}/meta/preview 端点）。禁 /m。 |
 | Q3809 | done | 桌面空态 **3 passed**（邮件网关 metadata-only 加号边界）。禁 /m。 |
 | Q3810 | done | 桌面空态 **3 passed**（流程通知开关 no-send 边界余项）。禁 /m。 |
-| Q3811 | pending | 桌面空态：邮件日志 {id}/biz/meta 端点。禁 /m。 |
-| Q3812 | pending | 桌面空态：邮件日志不触发发送管线。禁 /m。 |
-| Q3813 | pending | 桌面空态：自定义字段 all/{id}/preview 端点。禁 /m。 |
-| Q3814 | pending | 桌面空态：自定义字段端点族组合。禁 /m。 |
-| Q3815 | pending | 桌面空态：字段集 all/{id}/fields 端点。禁 /m。 |
-| Q3816 | pending | 桌面空态：字段集 by-category/meta/preview 端点。禁 /m。 |
-| Q3817 | pending | 桌面空态：邮件日志 redacted/tenantScoped 边界。禁 /m。 |
-| Q3818 | pending | 桌面空态：自定义字段端点与 preview 余项。禁 /m。 |
+| Q3811 | done | 桌面空态 **3 passed**（邮件日志 {id}/biz/meta 端点）。禁 /m。 |
+| Q3812 | done | 桌面空态 **3 passed**（邮件日志不触发发送管线）。禁 /m。 |
+| Q3813 | done | 桌面空态 **3 passed**（自定义字段 all/{id}/preview 端点）。禁 /m。 |
+| Q3814 | done | 桌面空态 **3 passed**（自定义字段端点族组合）。禁 /m。 |
+| Q3815 | done | 桌面空态 **3 passed**（字段集 all/{id}/fields 端点）。禁 /m。 |
+| Q3816 | done | 桌面空态 **3 passed**（字段集 by-category/meta/preview 端点）。禁 /m。 |
+| Q3817 | done | 桌面空态 **3 passed**（邮件日志 redacted/tenantScoped 边界）。禁 /m。 |
+| Q3818 | done | 桌面空态 **3 passed**（自定义字段端点与 preview 余项）。禁 /m。 |
+| Q3819 | pending | 桌面空态：字段集端点族整句。禁 /m。 |
+| Q3820 | pending | 桌面空态：字段集 preview 诊断上下文。禁 /m。 |
+| Q3821 | pending | 桌面空态：自定义字段 catalog + 校验预览边界。禁 /m。 |
+| Q3822 | pending | 桌面空态：自定义字段加密标记与 preview 校验。禁 /m。 |
+| Q3823 | pending | 桌面空态：字段集 missingFields 诊断组合。禁 /m。 |
+| Q3824 | pending | 桌面空态：自定义字段运行时 schema 边界。禁 /m。 |
+| Q3825 | pending | 桌面空态：字段集 by-category 长路径组合。禁 /m。 |
+| Q3826 | pending | 桌面空态：自定义字段 secret handling 边界。禁 /m。 |
