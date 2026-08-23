@@ -3470,11 +3470,11 @@
 | Q4280 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4281 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4282 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4283 | pending | 桌面空态 退役/验收/设备表格空态 heading。禁 /m。 |
-| Q4284 | pending | 桌面空态 SAM 扫描历史/设备维保/部门空态 heading。禁 /m。 |
-| Q4285 | pending | 桌面空态 菜单空态与流程表单未用编码 heading。禁 /m。 |
-| Q4286 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4287 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4288 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4289 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4290 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4283 | done | 桌面空态 **3 passed**（退役/验收/设备表格空态 heading）。禁 /m。 |
+| Q4284 | done | 桌面空态 **3 passed**（SAM 扫描历史/设备维保/部门空态 heading）。禁 /m。 |
+| Q4285 | done | 桌面空态 **3 passed**（菜单空态与流程表单未用编码 heading）。禁 /m。 |
+| Q4286 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4287 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4288 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4289 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4290 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
