@@ -1002,5 +1002,6 @@
 - Q2891：/contracts 生效中/30天内到期/时间轴 **3 passed**。`28eec74d8`
 - Q2892：/contracts 合同编号/名称/到期日期 **3 passed**。`d95b9da23`
 - Q2893：/contracts 类型/金额/操作 **3 passed**。`2b607d3ea`
-- Q2894：/depreciation 全部方法/直线法/双倍余额 **3 passed**。
+- Q2894：/depreciation 全部方法/直线法/双倍余额 **3 passed**。`2faf8c9fc`
+- Q2895：/depreciation 年数总和/工作量 + /budgets/new 状态 **3 passed**。清退「紧急」为关闭 option。
 
