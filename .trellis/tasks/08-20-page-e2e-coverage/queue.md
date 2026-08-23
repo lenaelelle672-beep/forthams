@@ -2119,4 +2119,5 @@
 | Q2929 | done | 桌面空态 **3 passed**（/system/menus 路由/按钮/菜单）。禁 /m。 |
 | Q2930 | done | 桌面空态 **3 passed**（/system/menus 类型/排序/状态）。禁 /m。 |
 | Q2931 | done | 桌面空态 **3 passed**（/system/menus 操作 + /retirement 资产ID + /assignments 归还日期）。禁 /m。 |
-| Q2932 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2932 | done | 桌面空态 **3 passed**（/assignments 资产 + /transfer 普通 + /depts 新增）。禁 /m。 |
+| Q2933 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
