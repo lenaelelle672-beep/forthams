@@ -1201,4 +1201,5 @@
 - Q3731–Q3738：**24 passed**。续 Q3739–Q3746：字段映射转换白名单、接口管理元数据校验、菜单权限 catalog 余项。禁 /m。
 - Q3739–Q3746：**24 passed**。续 Q3747–Q3754：角色权限 catalog、数据权限 dataScope、运行监控 SLA 路径、审计导出端点余项。禁 /m。
 - Q3747–Q3754：续写角色/数据权限/运行监控/审计说明余项。禁 /m。
+- Q3747–Q3754：**24 passed**。续 Q3755–Q3762：运行监控 timeout-records/审批实例摘要、审计 stats/trends/meta/GET 族、岗位 posts 端点与 metadata-only 标志。禁 /m。
 

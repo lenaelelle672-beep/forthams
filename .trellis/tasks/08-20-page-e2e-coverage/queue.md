@@ -2934,12 +2934,19 @@
 | Q3744 | done | 桌面空态 **3 passed**（菜单权限编码库存余项）。禁 /m。 |
 | Q3745 | done | 桌面空态 **3 passed**（菜单权限只读目录余项）。禁 /m。 |
 | Q3746 | done | 桌面空态 **3 passed**（菜单权限覆盖视图余项）。禁 /m。 |
-| Q3747 | pending | 桌面空态：角色权限 catalog 返回余项。禁 /m。 |
-| Q3748 | pending | 桌面空态：角色权限绑定目录余项。禁 /m。 |
-| Q3749 | pending | 桌面空态：角色权限库存绑定余项。禁 /m。 |
-| Q3750 | pending | 桌面空态：数据权限 dataScope 整句余项。禁 /m。 |
-| Q3751 | pending | 桌面空态：数据权限 CUSTOM 组合余项。禁 /m。 |
-| Q3752 | pending | 桌面空态：数据权限部门清单余项。禁 /m。 |
-| Q3753 | pending | 桌面空态：运行监控审批 SLA 路径余项。禁 /m。 |
-| Q3754 | pending | 桌面空态：审计日志导出与端点余项。禁 /m。 |
-| Q3755 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
+| Q3747 | done | 桌面空态 **3 passed**（角色权限 catalog 返回余项）。禁 /m。 |
+| Q3748 | done | 桌面空态 **3 passed**（角色权限绑定目录余项）。禁 /m。 |
+| Q3749 | done | 桌面空态 **3 passed**（角色权限库存绑定余项）。禁 /m。 |
+| Q3750 | done | 桌面空态 **3 passed**（数据权限 dataScope 整句余项）。禁 /m。 |
+| Q3751 | done | 桌面空态 **3 passed**（数据权限 CUSTOM 组合余项）。禁 /m。 |
+| Q3752 | done | 桌面空态 **3 passed**（数据权限部门清单余项）。禁 /m。 |
+| Q3753 | done | 桌面空态 **3 passed**（运行监控审批 SLA 路径余项）。禁 /m。 |
+| Q3754 | done | 桌面空态 **3 passed**（审计日志导出与端点余项）。禁 /m。 |
+| Q3755 | pending | 桌面空态：运行监控 timeout-records 与审批实例摘要。禁 /m。 |
+| Q3756 | pending | 桌面空态：运行监控审批与 SLA 摘要路径组合。禁 /m。 |
+| Q3757 | pending | 桌面空态：运行监控 subtitle 长组合与只读动作。禁 /m。 |
+| Q3758 | pending | 桌面空态：审计日志 stats/trends/ranking 端点。禁 /m。 |
+| Q3759 | pending | 桌面空态：审计日志 meta 与只读写入边界。禁 /m。 |
+| Q3760 | pending | 桌面空态：审计日志 GET 族与 tenant-scoped 子串。禁 /m。 |
+| Q3761 | pending | 桌面空态：岗位管理 posts 端点族余项。禁 /m。 |
+| Q3762 | pending | 桌面空态：岗位管理 metadata-only 与只读标志。禁 /m。 |
