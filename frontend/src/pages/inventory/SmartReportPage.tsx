@@ -162,7 +162,7 @@ function MissingTaskId() {
         <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center">
           <AlertCircle className="w-7 h-7 text-[#94a3b8]" />
         </div>
-        <p className="text-sm font-medium text-[#64748b]">未指定盘点任务 ID</p>
+        <h3 className="text-sm font-medium text-[#64748b]">未指定盘点任务 ID</h3>
         <button
           onClick={() => navigate('/inventory')}
           className="px-5 py-2.5 bg-[#2563eb] hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-md active:scale-[0.98]"
