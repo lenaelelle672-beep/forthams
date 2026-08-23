@@ -46718,11 +46718,11 @@ test.describe('Q3093 桌面新增岗位排序操作空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/system/posts 点新增岗位 heading「新增岗位」', async ({ page }) => {
+  test('/system/posts 点新增岗位 placeholder「如：CEO、CTO」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/system/posts');
     await page.getByRole('button', { name: '新增岗位' }).first().click();
-    await expect(page.getByRole('heading', { name: '新增岗位' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByPlaceholder('如：CEO、CTO').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 });
@@ -46958,11 +46958,11 @@ test.describe('Q3101 桌面新增用户标题密码空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/system/users 点新增用户 heading「新增用户」', async ({ page }) => {
+  test('/system/users 点新增用户「分配角色」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/system/users');
     await page.getByRole('button', { name: '新增用户' }).first().click();
-    await expect(page.getByRole('heading', { name: '新增用户' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('分配角色').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
@@ -47123,11 +47123,11 @@ test.describe('Q3106 桌面维保每周岗位部门空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/system/depts 点新增部门 heading「新增部门」', async ({ page }) => {
+  test('/system/depts 点新增部门「部门类型」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/system/depts');
     await page.getByRole('button', { name: '新增部门' }).first().click();
-    await expect(page.getByRole('heading', { name: '新增部门' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('部门类型').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 });
@@ -47185,11 +47185,11 @@ test.describe('Q3108 桌面新增菜单占位标题空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/system/menus 点新增菜单 heading「新增菜单」', async ({ page }) => {
+  test('/system/menus 点新增菜单 placeholder「如：system/user/index」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/system/menus');
     await page.getByRole('button', { name: '新增菜单' }).first().click();
-    await expect(page.getByRole('heading', { name: '新增菜单' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByPlaceholder('如：system/user/index').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 });
