@@ -969,5 +969,6 @@
 - Q2858：/disposals/scrap/new 变卖/拆解/捐赠 **3 passed**。`22ce805ad`
 - Q2859：/disposals/clearance/new 取消/添加资产/保存草稿 **3 passed**。`ec0ced23c`
 - Q2860：/disposals/clearance/new 基本信息/清退编号/申请人 **3 passed**。`d58bcb293`
-- Q2861：/disposals/clearance/new 申请日期/清退原因/资产选择 **3 passed**。
+- Q2861：/disposals/clearance/new 申请日期/清退原因/资产选择 **3 passed**。`57b55bcf6`
+- Q2862：/disposals/clearance/new 清退配置/处理方式/暂未选择 **3 passed**。
 
