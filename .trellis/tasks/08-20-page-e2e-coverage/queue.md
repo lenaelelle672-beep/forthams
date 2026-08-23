@@ -3116,4 +3116,12 @@
 | Q3926 | done | 桌面空态 **3 passed**（退役列表未用空态余句）。禁 /m。 |
 | Q3927 | done | 桌面空态 **3 passed**（退役列表未用指标余句）。禁 /m。 |
 | Q3928 | done | 桌面空态 **3 passed**（借用/领用/验收未用 button）。禁 /m。 |
-| Q3929 | pending | 桌面空态 保险/备件未用 button。禁 /m。 |
+| Q3929 | done | 桌面空态 **3 passed**（保险/备件未用 button）。禁 /m。 |
+| Q3930 | pending | 桌面空态 GIS 未用 heading/整句/空态。禁 /m。 |
+| Q3931 | pending | 桌面空态 重估/风险/平面图未用 heading。禁 /m。 |
+| Q3932 | pending | 桌面空态 平面图/许可证/制造商未用 heading。禁 /m。 |
+| Q3933 | pending | 桌面空态 故障空态/ABC/平面图未用 heading。禁 /m。 |
+| Q3934 | pending | 桌面空态 转移/工单未用 heading/余句。禁 /m。 |
+| Q3935 | pending | 桌面空态 ABC 分类未用 heading。禁 /m。 |
+| Q3936 | pending | 桌面空态 ABC/循环盘点未用 button。禁 /m。 |
+| Q3937 | pending | 桌面空态 位置/SAM 未用 button/heading。禁 /m。 |
