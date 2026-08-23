@@ -3438,11 +3438,11 @@
 | Q4248 | done | 桌面空态 **3 passed**（总检验数/待检验/已过期不通过 heading）。禁 /m。 |
 | Q4249 | done | 桌面空态 **3 passed**（菜单目录/菜单/按钮 heading）。禁 /m。 |
 | Q4250 | done | 桌面空态 **3 passed**（盘点周期总周期/进行中/已计划 heading）。禁 /m。 |
-| Q4251 | pending | 桌面空态 菜单总计/树形/角色 RBAC heading。禁 /m。 |
-| Q4252 | pending | 桌面空态 岗位/用户/减值重估合计 heading。禁 /m。 |
-| Q4253 | pending | 桌面空态 重估副文案 heading。禁 /m。 |
-| Q4254 | pending | 桌面空态 处置结案合计/预算合同锁定 heading。禁 /m。 |
-| Q4255 | pending | 桌面空态 已借出/已逾期/0 项预算 heading。禁 /m。 |
-| Q4256 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4257 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4258 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4251 | done | 桌面空态 **3 passed**（菜单总计/树形/角色 RBAC heading）。禁 /m。 |
+| Q4252 | done | 桌面空态 **3 passed**（岗位/用户/减值重估合计 heading）。禁 /m。 |
+| Q4253 | done | 桌面空态 **3 passed**（重估副文案 heading）。禁 /m。 |
+| Q4254 | done | 桌面空态 **3 passed**（处置结案合计/预算合同锁定 heading）。禁 /m。 |
+| Q4255 | done | 桌面空态 **3 passed**（已借出/已逾期/0 项预算 heading）。禁 /m。 |
+| Q4256 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4257 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4258 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
