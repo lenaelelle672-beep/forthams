@@ -242,7 +242,7 @@ const RiskMatrixConfigPage: React.FC = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">风险矩阵配置</h1>
-          <p className="text-gray-500 mt-1">管理风险评估的概率维度、严重度维度和等级映射规则</p>
+          <h3 className="text-gray-500 mt-1 text-sm font-medium">管理风险评估的概率维度、严重度维度和等级映射规则</h3>
         </div>
         <Button onClick={handleOpenCreate}>创建矩阵</Button>
       </div>

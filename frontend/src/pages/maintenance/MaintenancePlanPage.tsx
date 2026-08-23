@@ -768,7 +768,7 @@ export default function MaintenancePlanPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-slate-900">维保计划管理</h1>
-                <p className="text-sm text-slate-500">周期性维保计划配置与管理</p>
+                <h3 className="text-sm font-medium text-slate-500">周期性维保计划配置与管理</h3>
               </div>
             </div>
             <div className="flex items-center gap-2">

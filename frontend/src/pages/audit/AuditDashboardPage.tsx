@@ -254,7 +254,7 @@ export default function AuditDashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 px-6 py-5">
             <div>
               <h1 className="text-xl font-bold text-slate-900">审计日志</h1>
-              <p className="mt-1 text-sm text-slate-500">按最近 7 天汇总操作趋势、风险事件和操作人分布</p>
+              <h3 className="mt-1 text-sm font-medium text-slate-500">按最近 7 天汇总操作趋势、风险事件和操作人分布</h3>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/50 px-3 text-sm text-slate-600">

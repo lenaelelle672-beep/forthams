@@ -237,9 +237,9 @@ export default function AssetHealthPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[var(--surface-heading)]">资产健康评分</h1>
-          <p className="text-sm text-[var(--surface-muted-text)]">
+          <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">
             基于年龄、维修频率、故障率、利用率、折旧进度的多维度评估
-          </p>
+          </h3>
         </div>
         <div className="flex items-center gap-2">
           <Button

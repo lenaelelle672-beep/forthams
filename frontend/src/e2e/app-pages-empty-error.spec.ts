@@ -78378,6 +78378,238 @@ test.describe('Q4186 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4187 桌面验收/维保计划/定时报表未用副文案 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/intake heading「管理资产入库验收全流程」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('heading', { name: '管理资产入库验收全流程' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/maintenance/plans heading「周期性维保计划配置与管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance/plans');
+    await expect(page.getByRole('heading', { name: '周期性维保计划配置与管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports/scheduled heading「管理定时报表调度和邮件推送」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByRole('heading', { name: '管理定时报表调度和邮件推送' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4188 桌面健康评分未用副文案/KPI heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/health heading「多维度资产健康度评估」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '多维度资产健康度评估' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health heading「平均健康分」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '平均健康分' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health heading「健康资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '健康资产', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4189 桌面健康评分 KPI/资产健康未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/health heading「警告资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '警告资产', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/health heading「危险资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/health');
+    await expect(page.getByRole('heading', { name: '危险资产', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-health heading「基于年龄、维修频率、故障率、利用率、折旧进度的多维度评估」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-health');
+    await expect(page.getByRole('heading', { name: '基于年龄、维修频率、故障率、利用率、折旧进度的多维度评估' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4190 桌面审计/风险矩阵/流程中心未用副文案 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/audit heading「按最近 7 天汇总操作趋势、风险事件和操作人分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit');
+    await expect(page.getByRole('heading', { name: '按最近 7 天汇总操作趋势、风险事件和操作人分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-matrix heading「管理风险评估的概率维度、严重度维度和等级映射规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await expect(page.getByRole('heading', { name: '管理风险评估的概率维度、严重度维度和等级映射规则' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows heading「集中维护审批流程、发布状态、版本快照和业务入口。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('heading', { name: '集中维护审批流程、发布状态、版本快照和业务入口。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4191 桌面盘点周期/退役/报表中心未用副文案 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/stocktaking-cycles heading「管理库存盘点计划与执行周期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles');
+    await expect(page.getByRole('heading', { name: '管理库存盘点计划与执行周期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement heading「管理资产生命周期终止、处置流程和退役记录。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByRole('heading', { name: '管理资产生命周期终止、处置流程和退役记录。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports heading「预定义报表查看与数据可视化」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { name: '预定义报表查看与数据可视化' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4192 桌面检验列表/记录未用副文案 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections heading「管理设备检验记录与年检计划」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections');
+    await expect(page.getByRole('heading', { name: '管理设备检验记录与年检计划' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspection-records heading「创建、编辑和追踪设备检验记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-records');
+    await expect(page.getByRole('heading', { name: '创建、编辑和追踪设备检验记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYTHIRD heading「HUNDREDFIFTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4193 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYFOURTH heading「HUNDREDFIFTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYFIFTH heading「HUNDREDFIFTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYSIXTH heading「HUNDREDFIFTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4194 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYSEVENTH heading「HUNDREDFIFTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYEIGHTH heading「HUNDREDFIFTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDFIFTYNINTH heading「HUNDREDFIFTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDFIFTYNINTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDFIFTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

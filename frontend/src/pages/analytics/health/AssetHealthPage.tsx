@@ -84,7 +84,7 @@ export default function AssetHealthPage() {
       {/* 页面标题 */}
       <div>
         <h1 className="text-xl font-bold text-[var(--surface-heading)]">资产健康评分</h1>
-        <p className="text-sm text-[var(--surface-muted-text)]">多维度资产健康度评估</p>
+        <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">多维度资产健康度评估</h3>
       </div>
 
       {/* KPI 卡片 */}
@@ -93,7 +93,7 @@ export default function AssetHealthPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--surface-muted-text)]">平均健康分</p>
+                <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">平均健康分</h3>
                 <p className="text-2xl font-bold text-[var(--surface-heading)]">{isLoading ? '-' : averageScore}</p>
               </div>
               <Heart className="w-8 h-8 text-[var(--brand-primary)] opacity-60" />
@@ -104,7 +104,7 @@ export default function AssetHealthPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--surface-muted-text)]">健康资产</p>
+                <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">健康资产</h3>
                 <p className="text-2xl font-bold text-green-500">{isLoading ? '-' : healthyCount}</p>
               </div>
               <Activity className="w-8 h-8 text-green-500 opacity-60" />
@@ -115,7 +115,7 @@ export default function AssetHealthPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--surface-muted-text)]">警告资产</p>
+                <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">警告资产</h3>
                 <p className="text-2xl font-bold text-amber-500">{isLoading ? '-' : warningCount}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-amber-500 opacity-60" />
@@ -126,7 +126,7 @@ export default function AssetHealthPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[var(--surface-muted-text)]">危险资产</p>
+                <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">危险资产</h3>
                 <p className="text-2xl font-bold text-red-500">{isLoading ? '-' : criticalCount}</p>
               </div>
               <AlertTriangle className="w-8 h-8 text-red-500 opacity-60" />

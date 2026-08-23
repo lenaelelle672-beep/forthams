@@ -328,7 +328,7 @@ export default function RetirementListPage() {
                 <span className="text-[#004191] font-bold">资产退役</span>
               </nav>
               <h1 className="text-xl font-bold text-[#161c27]">资产退役管理</h1>
-              <p className="mt-0.5 text-xs text-[#64748b]">管理资产生命周期终止、处置流程和退役记录。</p>
+              <h3 className="mt-0.5 text-xs font-medium text-[#64748b]">管理资产生命周期终止、处置流程和退役记录。</h3>
             </div>
             <Button size="md" onClick={() => navigate('/retirement/new')}>
               <Plus className="w-4 h-4" />

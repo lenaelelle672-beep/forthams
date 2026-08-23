@@ -119,7 +119,7 @@ export default function IntakeListPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold tracking-tight text-[#0f172a]">入库验收</h1>
-                <p className="text-sm text-[#64748b]">管理资产入库验收全流程</p>
+                <h3 className="text-sm font-medium text-[#64748b]">管理资产入库验收全流程</h3>
               </div>
             </div>
             <Button onClick={() => navigate('/intake/new')}>

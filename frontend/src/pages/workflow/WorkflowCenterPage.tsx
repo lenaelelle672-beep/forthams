@@ -426,7 +426,7 @@ export default function WorkflowCenterPage() {
           <div className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div className="min-w-0">
               <h1 className="text-xl font-bold tracking-tight text-slate-900">业务流程管理</h1>
-              <p className="mt-1 text-sm text-slate-500">集中维护审批流程、发布状态、版本快照和业务入口。</p>
+              <h3 className="mt-1 text-sm font-medium text-slate-500">集中维护审批流程、发布状态、版本快照和业务入口。</h3>
             </div>
             <div className="flex items-center gap-2">
               <Button type="button" variant="outline" onClick={() => navigate('/disposals')}>

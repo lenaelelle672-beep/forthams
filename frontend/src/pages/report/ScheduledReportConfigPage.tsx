@@ -52,7 +52,7 @@ export default function ScheduledReportConfigPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-[var(--surface-heading)]">定时报表配置</h1>
-          <p className="text-sm text-[var(--surface-muted-text)]">管理定时报表调度和邮件推送</p>
+          <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">管理定时报表调度和邮件推送</h3>
         </div>
         <Button
           onClick={() => toast.info('新建报表功能即将开放')}
