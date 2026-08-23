@@ -433,7 +433,7 @@ export default function AssetDetailPage() {
                   </div>
                 </div>
                 <div className="col-span-4">
-                  <p className="text-sm font-semibold text-gray-600 mb-2">趋势 (近12个月)</p>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-2">趋势 (近12个月)</h3>
                   {tcoTrend && tcoTrend.length > 0 ? (
                     <ResponsiveContainer width="100%" height={180}>
                       <LineChart data={tcoTrend}>

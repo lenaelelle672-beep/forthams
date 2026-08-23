@@ -632,7 +632,7 @@ export default function AnalyticsPage() {
         <div className="rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/80 to-indigo-50/50 px-5 py-4 text-sm leading-6 text-blue-700 shadow-sm">
           <div className="flex items-start gap-2">
             <Activity className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" />
-            <span>{t('analytics:footer')}</span>
+            <h3 className="font-medium">{t('analytics:footer')}</h3>
           </div>
         </div>
       </div>
