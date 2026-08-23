@@ -1068,5 +1068,6 @@
 - Q2957：/reports 导出CSV/PDF/标题 **3 passed**。`7a317f678`
 - Q2958：/reports 资产/财务/运维报表 **3 passed**。`a86f18a51`
 - Q2959：/reports 工单报表/资产汇总/分类统计 **3 passed**。`0b8578205`
-- Q2960：/reports 状态分布/部门排行/增长趋势 **3 passed**。
+- Q2960：/reports 状态分布/部门排行/增长趋势 **3 passed**。`e9f786e3a`
+- Q2961：/reports 核心指标/分类分布/状态占比描述 **3 passed**。
 
