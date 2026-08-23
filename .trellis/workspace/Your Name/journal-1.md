@@ -954,5 +954,6 @@
 - Q2843：/risk-assessments/new 资产ID/可能性/影响程度 **3 passed**。`0f6732265`
 - Q2844：/risk-assessments/new 缓解措施/评审日期/评估人 **3 passed**。`086762470`
 - Q2845：/risk-assessments/new 风险等级/LOW/资产ID placeholder **3 passed**。`393dcf8e6`
-- Q2846：risk 缓解/评估人 placeholder + /compensation/new 标题 **3 passed**。
+- Q2846：risk 缓解/评估人 placeholder + /compensation/new 标题 **3 passed**。`287243229`
+- Q2847：/compensation/new 赔偿编号/配置/总金额 **3 passed**。
 
