@@ -3478,11 +3478,11 @@
 | Q4288 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4289 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4290 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4291 | pending | 桌面空态 自定义字段/资产/平面图空态描述 heading。禁 /m。 |
-| Q4292 | pending | 桌面空态 SAM 空态描述 heading。禁 /m。 |
-| Q4293 | pending | 桌面空态 分类与默认空态描述 heading。禁 /m。 |
-| Q4294 | pending | 桌面空态 部门空态提示与流程表单 heading。禁 /m。 |
-| Q4295 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4296 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4297 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4298 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4291 | done | 桌面空态 **3 passed**（自定义字段/资产/平面图空态描述 heading）。禁 /m。 |
+| Q4292 | done | 桌面空态 **3 passed**（SAM 空态描述 heading）。禁 /m。 |
+| Q4293 | done | 桌面空态 **3 passed**（分类与默认空态描述 heading）。禁 /m。 |
+| Q4294 | done | 桌面空态 **3 passed**（部门空态提示与流程表单 heading）。禁 /m。 |
+| Q4295 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4296 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4297 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4298 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
