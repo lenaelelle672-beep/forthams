@@ -938,5 +938,6 @@
 - Q2827：/intake/new 返回/取消/添加按钮 **3 passed**。`277c2ba89`
 - Q2828：/intake/new 验收检查项heading/总金额/检查项 **3 passed**。`58371fdc6`
 - Q2829：/retirement/new 提交申请/返回/标题 **3 passed**。`9e8c9a2ad`
-- Q2830：/retirement/new 取消/资产选择/退役原因 **3 passed**。
+- Q2830：/retirement/new 取消/资产选择/退役原因 **3 passed**。`e9f404ec8`
+- Q2831：/retirement/new 残值评估/备注说明/折旧时间线 **3 passed**。
 
