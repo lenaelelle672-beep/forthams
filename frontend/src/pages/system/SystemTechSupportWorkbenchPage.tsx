@@ -128,7 +128,7 @@ export default function SystemTechSupportWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">技术支持</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示技术支持工单、优先级、处理状态与诊断包脱敏标记。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示技术支持工单、优先级、处理状态与诊断包脱敏标记。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"

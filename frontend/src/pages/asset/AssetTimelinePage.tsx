@@ -271,7 +271,7 @@ const AssetTimelinePage: React.FC = () => {
               <div className="flex flex-col items-center justify-center py-12">
                 <Activity className="h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">暂无履历记录</h3>
-                <p className="text-sm text-gray-500">该资产暂无任何履历事件</p>
+                <h3 className="text-sm font-medium text-gray-500">该资产暂无任何履历事件</h3>
               </div>
             </div>
           </div>

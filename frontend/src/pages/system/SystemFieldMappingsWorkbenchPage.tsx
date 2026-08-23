@@ -60,7 +60,7 @@ export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench =
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>
       <div>
         <h3 className="text-lg font-semibold">字段映射</h3>
-        <p className="mt-1 text-sm text-slate-500">转换表达式仅允许 trim(value)、upper(value)、lower(value)，预览不写库、不外呼。</p>
+        <h3 className="mt-1 text-sm font-medium text-slate-500">转换表达式仅允许 trim(value)、upper(value)、lower(value)，预览不写库、不外呼。</h3>
       </div>
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">加载中...</div> : null}

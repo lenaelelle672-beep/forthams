@@ -131,7 +131,7 @@ export default function SystemImportExportWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">导入导出</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示导入导出任务历史、错误报告摘要与只读边界。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示导入导出任务历史、错误报告摘要与只读边界。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"

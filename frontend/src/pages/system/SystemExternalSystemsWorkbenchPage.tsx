@@ -216,7 +216,7 @@ export default function SystemExternalSystemsWorkbenchPage({
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>
       <div>
         <h3 className="text-lg font-semibold">外部系统</h3>
-        <p className="mt-1 text-sm text-slate-500">真实调用 /system/external-systems；只展示目录、状态、认证掩码和 config-only 校验结果，未触发真实外部调用。</p>
+        <h3 className="mt-1 text-sm font-medium text-slate-500">真实调用 /system/external-systems；只展示目录、状态、认证掩码和 config-only 校验结果，未触发真实外部调用。</h3>
       </div>
       {notice ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">{notice}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}

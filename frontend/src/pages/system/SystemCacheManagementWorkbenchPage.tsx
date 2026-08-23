@@ -120,7 +120,7 @@ export default function SystemCacheManagementWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">缓存管理</h3>
-          <p className="mt-1 text-sm text-slate-500">只管理应用内白名单 CacheManager 命名空间，空缓存不会被报告为普通成功。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只管理应用内白名单 CacheManager 命名空间，空缓存不会被报告为普通成功。</h3>
         </div>
         <button
           className="rounded-xl bg-slate-900 px-3 py-2 text-sm text-white disabled:cursor-not-allowed disabled:bg-slate-300"

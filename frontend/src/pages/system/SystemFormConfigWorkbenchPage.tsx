@@ -582,7 +582,7 @@ export default function SystemFormConfigWorkbenchPage({
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
             <h4 className="font-semibold text-slate-900">表单字段布局工作台</h4>
-            <p className="mt-1 text-sm text-slate-500">表单对象、字段列表、桌面预览、钉钉 H5 预览和字段属性同屏联动。</p>
+            <h3 className="mt-1 text-sm font-medium text-slate-500">表单对象、字段列表、桌面预览、钉钉 H5 预览和字段属性同屏联动。</h3>
           </div>
           <div className="flex flex-wrap gap-2 text-xs text-blue-700">
             <span className="rounded-full bg-blue-50 px-3 py-1">字段表</span>

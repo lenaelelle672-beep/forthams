@@ -125,7 +125,7 @@ export default function SystemTenantManagementWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">租户管理</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /tenants 与 /tenants/meta 返回的租户主数据、套餐与状态。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示 /tenants 与 /tenants/meta 返回的租户主数据、套餐与状态。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"

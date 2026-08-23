@@ -182,7 +182,7 @@ export default function SystemWebhookConfigWorkbenchPage({
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>
       <div>
         <h3 className="text-lg font-semibold">Webhook 配置</h3>
-        <p className="mt-1 text-sm text-slate-500">只加载 /system/webhook-configs 配置，配置校验仅做 config-only 验证，未触发真实外部调用。</p>
+        <h3 className="mt-1 text-sm font-medium text-slate-500">只加载 /system/webhook-configs 配置，配置校验仅做 config-only 验证，未触发真实外部调用。</h3>
       </div>
       {notice ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">{notice}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
