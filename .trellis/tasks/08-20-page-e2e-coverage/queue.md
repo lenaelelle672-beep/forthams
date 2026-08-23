@@ -2036,4 +2036,5 @@
 | Q2846 | done | 桌面空态 **3 passed**（risk placeholders + /compensation/new 标题）。禁 /m。 |
 | Q2847 | done | 桌面空态 **3 passed**（/compensation/new 赔偿编号/配置/总金额）。禁 /m。 |
 | Q2848 | done | 桌面空态 **3 passed**（/compensation/new 赔偿方式/预估金额/赔偿申请）。禁 /m。 |
-| Q2849 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2849 | done | 桌面空态 **3 passed**（/compensation/new 现金/等价物/标准流程）。禁 /m。 |
+| Q2850 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
