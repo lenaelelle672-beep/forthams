@@ -74689,6 +74689,93 @@ test.describe('Q4059 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4060 桌面检验上传分区未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections/1/upload heading「上传新照片」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/upload');
+    await expect(page.getByRole('heading', { name: '上传新照片' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/upload heading「已上传照片」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/upload');
+    await expect(page.getByRole('heading', { name: '已上传照片' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/1/upload heading「共 0 张」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/1/upload');
+    await expect(page.getByRole('heading', { name: '共 0 张' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4061 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/MOCK heading「MOCK」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/MOCK');
+    await expect(page.getByRole('heading', { name: 'MOCK' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/UNUSED heading「UNUSED」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/UNUSED');
+    await expect(page.getByRole('heading', { name: 'UNUSED' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/NEXT heading「NEXT」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/NEXT');
+    await expect(page.getByRole('heading', { name: 'NEXT' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4062 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/FIRST heading「FIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/FIRST');
+    await expect(page.getByRole('heading', { name: 'FIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/SECOND heading「SECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/SECOND');
+    await expect(page.getByRole('heading', { name: 'SECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/THIRD heading「THIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/THIRD');
+    await expect(page.getByRole('heading', { name: 'THIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

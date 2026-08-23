@@ -3243,7 +3243,10 @@
 | Q4053 | done | 桌面空态 **3 passed**（分析页脚与流程表单未用 heading）。禁 /m。 |
 | Q4054 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4055 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4056 | pending | 桌面空态 检验上传/资产趋势未用角色。禁 /m。 |
-| Q4057 | pending | 桌面空态 检验编号与流程表单未用 heading。禁 /m。 |
-| Q4058 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4059 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4056 | done | 桌面空态 **3 passed**（检验上传/资产趋势未用角色）。禁 /m。 |
+| Q4057 | done | 桌面空态 **3 passed**（检验编号与流程表单未用 heading）。禁 /m。 |
+| Q4058 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4059 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4060 | pending | 桌面空态 检验上传分区未用 heading。禁 /m。 |
+| Q4061 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4062 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
