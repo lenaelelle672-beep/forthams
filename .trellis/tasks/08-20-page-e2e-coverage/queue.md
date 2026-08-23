@@ -3223,4 +3223,11 @@
 | Q4033 | done | 桌面空态 **3 passed**（保险详情未用 heading）。禁 /m。 |
 | Q4034 | done | 桌面空态 **3 passed**（健康评分/测试结果未用空态 heading）。禁 /m。 |
 | Q4035 | done | 桌面空态 **3 passed**（备件详情未用空态 heading）。禁 /m。 |
-| Q4036 | pending | 桌面空态 下一未用 heading/button。禁 /m。 |
+| Q4036 | pending | 桌面空态 TCO 未用空态 heading。禁 /m。 |
+| Q4037 | pending | 桌面空态 TCO/验收未用空态 heading。禁 /m。 |
+| Q4038 | pending | 桌面空态 健康/资产详情未用空态 heading。禁 /m。 |
+| Q4039 | pending | 桌面空态 可靠性 KPI 未用 heading。禁 /m。 |
+| Q4040 | pending | 桌面空态 可靠性 KPI 副文案未用 heading。禁 /m。 |
+| Q4041 | pending | 桌面空态 可靠性空态/可用率未用 heading。禁 /m。 |
+| Q4042 | pending | 桌面空态 盘点/通知未用空态 heading。禁 /m。 |
+| Q4043 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

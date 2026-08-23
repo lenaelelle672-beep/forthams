@@ -412,7 +412,7 @@ export default function AssetDetailPage() {
                         <Tooltip formatter={(v: number) => formatCurrency(v)} />
                       </PieChart>
                     </ResponsiveContainer>
-                  ) : <p className="text-gray-400 text-sm text-center py-10">暂无成本数据</p>}
+                  ) : <h3 className="text-gray-400 text-sm font-medium text-center py-10">暂无成本数据</h3>}
                 </div>
                 <div className="col-span-3">
                   <p className="text-sm font-semibold text-gray-600 mb-2">成本明细</p>
@@ -442,7 +442,7 @@ export default function AssetDetailPage() {
                         <Line type="monotone" dataKey="totalCost" stroke="#004ac6" strokeWidth={2} dot={false} />
                       </LineChart>
                     </ResponsiveContainer>
-                  ) : <p className="text-gray-400 text-sm text-center py-8">暂无趋势数据</p>}
+                  ) : <h3 className="text-gray-400 text-sm font-medium text-center py-8">暂无趋势数据</h3>}
                   {tcoCompareRows.length > 0 && (
                     <div className="mt-2">
                       <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">同类对比 (前5)</p>

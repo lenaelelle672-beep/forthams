@@ -363,7 +363,7 @@ export default function AssetHealthPage() {
           ) : sortedList.length === 0 ? (
             <div className="text-center py-16 text-[var(--surface-muted-text)]">
               <Heart className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">暂无不健康资产，所有资产状态良好</p>
+              <h3 className="text-sm font-medium">暂无不健康资产，所有资产状态良好</h3>
             </div>
           ) : (
             <div className="overflow-x-auto">

@@ -13,9 +13,9 @@ interface RankingTableProps {
 export default function RankingTable({ data, sortBy }: RankingTableProps) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-32 text-gray-400 text-sm">
+      <h3 className="flex items-center justify-center h-32 text-gray-400 text-sm font-medium">
         暂无排名数据
-      </div>
+      </h3>
     );
   }
 

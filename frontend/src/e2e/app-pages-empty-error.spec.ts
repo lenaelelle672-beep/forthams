@@ -73993,6 +73993,238 @@ test.describe('Q4035 桌面备件详情未用空态 heading', () => {
 
 });
 
+test.describe('Q4036 桌面 TCO 未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/tco heading「请先查询资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '请先查询资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco heading「请输入部门ID查询」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '请输入部门ID查询' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/tco heading「请输入分类ID查询」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '请输入分类ID查询' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4037 桌面 TCO/验收未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/tco heading「请输入资产ID查询」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/tco');
+    await expect(page.getByRole('heading', { name: '请输入资产ID查询' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 heading「暂无入库资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByRole('heading', { name: '暂无入库资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake/1 heading「暂无检查项」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake/1');
+    await expect(page.getByRole('heading', { name: '暂无检查项' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4038 桌面健康/资产详情未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/asset-health heading「暂无不健康资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-health');
+    await expect(page.getByRole('heading', { name: '暂无不健康资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/1 heading「暂无成本数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/1');
+    await expect(page.getByRole('heading', { name: '暂无成本数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/1 heading「暂无趋势数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/1');
+    await expect(page.getByRole('heading', { name: '暂无趋势数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4039 桌面可靠性 KPI 未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/reliability heading「MTBF」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: 'MTBF', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability heading「MTTR」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: 'MTTR', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability heading「可用性」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '可用性', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4040 桌面可靠性 KPI 副文案未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/reliability heading「月均故障率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '月均故障率' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability heading「平均故障间隔」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '平均故障间隔' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability heading「平均修复时间」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '平均修复时间' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4041 桌面可靠性空态/可用率未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics/reliability heading「设备可用率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '设备可用率' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability heading「总故障 0 次」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '总故障 0 次' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics/reliability heading「暂无排名数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics/reliability');
+    await expect(page.getByRole('heading', { name: '暂无排名数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4042 桌面盘点/通知未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/tasks/1 heading「暂无盘盈记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/tasks/1');
+    await expect(page.getByRole('heading', { name: '暂无盘盈记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/tasks/1 heading「暂无盘亏记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/tasks/1');
+    await expect(page.getByRole('heading', { name: '暂无盘亏记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/notifications heading「暂无通知」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/notifications');
+    await expect(page.getByRole('heading', { name: '暂无通知' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4043 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/DELTA heading「DELTA」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/DELTA');
+    await expect(page.getByRole('heading', { name: 'DELTA' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/EPSILON heading「EPSILON」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/EPSILON');
+    await expect(page.getByRole('heading', { name: 'EPSILON' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/ZETA heading「ZETA」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ZETA');
+    await expect(page.getByRole('heading', { name: 'ZETA' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
