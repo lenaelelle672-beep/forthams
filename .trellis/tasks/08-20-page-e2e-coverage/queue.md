@@ -3422,3 +3422,11 @@
 | Q4232 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4233 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4234 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4235 | pending | 桌面空态 重估价值调整/已通过/已拒绝 heading。禁 /m。 |
+| Q4236 | pending | 桌面空态 盘点 RFID/实时同步/平均进度 heading。禁 /m。 |
+| Q4237 | pending | 桌面空态 预算资产预算/总预算/已使用 heading。禁 /m。 |
+| Q4238 | pending | 桌面空态 审批/我发起的/已驳回 heading。禁 /m。 |
+| Q4239 | pending | 桌面空态 故障节点总数/现象/原因 heading。禁 /m。 |
+| Q4240 | pending | 桌面空态 处置总量/回收价值/领用 heading。禁 /m。 |
+| Q4241 | pending | 桌面空态 已盘资产/盘亏预警/解决措施 heading。禁 /m。 |
+| Q4242 | pending | 桌面空态 已承诺/执行率/资产总净值 heading。禁 /m。 |
