@@ -336,7 +336,7 @@ export default function AnalyticsPage() {
                       <Icon className="w-5 h-5 text-white" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-medium text-slate-500 truncate">{kpi.title}</p>
+                      <h3 className="text-xs font-medium text-slate-500 truncate">{kpi.title}</h3>
                       <p className="text-lg font-bold text-slate-900 tabular-nums">{kpi.value}</p>
                       <p className="text-xs text-slate-400 truncate">{kpi.subtitle}</p>
                     </div>

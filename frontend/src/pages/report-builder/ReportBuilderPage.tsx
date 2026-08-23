@@ -424,7 +424,7 @@ export default function ReportBuilderPage() {
       return (
         <div className="flex flex-col items-center justify-center h-64 text-sm text-[var(--surface-muted-text)]">
           <Eye className="w-10 h-10 mb-2 opacity-40" />
-          <span>点击"生成预览"查看数据</span>
+          <h3 className="font-medium">点击"生成预览"查看数据</h3>
         </div>
       );
     }
