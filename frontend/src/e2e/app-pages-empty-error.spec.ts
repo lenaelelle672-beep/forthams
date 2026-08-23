@@ -57865,7 +57865,7 @@ test.describe('Q3479 桌面用户管理计数空态', () => {
 
 test.describe('Q3480 桌面部门组织状态筛空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockDeptsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -57894,7 +57894,7 @@ test.describe('Q3480 桌面部门组织状态筛空态', () => {
 
 test.describe('Q3481 桌面部门组织状态筛余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockDeptsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -57923,7 +57923,7 @@ test.describe('Q3481 桌面部门组织状态筛余项空态', () => {
 
 test.describe('Q3482 桌面部门组织表头空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockDeptsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -57952,7 +57952,7 @@ test.describe('Q3482 桌面部门组织表头空态', () => {
 
 test.describe('Q3483 桌面部门组织表头余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockDeptsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -57981,7 +57981,7 @@ test.describe('Q3483 桌面部门组织表头余项空态', () => {
 
 test.describe('Q3484 桌面部门组织计数空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockDeptsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58010,7 +58010,7 @@ test.describe('Q3484 桌面部门组织计数空态', () => {
 
 test.describe('Q3485 桌面位置管理状态筛空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockLocationsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58039,7 +58039,7 @@ test.describe('Q3485 桌面位置管理状态筛空态', () => {
 
 test.describe('Q3486 桌面位置管理状态筛余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockLocationsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58068,7 +58068,7 @@ test.describe('Q3486 桌面位置管理状态筛余项空态', () => {
 
 test.describe('Q3487 桌面位置管理表头空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockLocationsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58097,7 +58097,7 @@ test.describe('Q3487 桌面位置管理表头空态', () => {
 
 test.describe('Q3488 桌面位置管理表头余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockLocationsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58126,7 +58126,7 @@ test.describe('Q3488 桌面位置管理表头余项空态', () => {
 
 test.describe('Q3489 桌面供应商管理状态筛空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockVendorsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58155,7 +58155,7 @@ test.describe('Q3489 桌面供应商管理状态筛空态', () => {
 
 test.describe('Q3490 桌面供应商管理表头空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockVendorsListEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -58184,7 +58184,7 @@ test.describe('Q3490 桌面供应商管理表头空态', () => {
 
 test.describe('Q3491 桌面供应商管理表头余项空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockVendorsListEmpty);
     await seedSession(page, adminUser);
   });
 
