@@ -1133,5 +1133,6 @@
 - Q3022：/audit 描述/IP地址/状态表头 **3 passed**。`6fd207a3d`
 - Q3023：/audit 全部日志/告警/总计 **3 passed**。`d5d0af3ec`
 - Q3024：/audit 筛选/显示/项共 **3 passed**。`a1849603c`
-- Q3025：/audit 7天汇总/趋势heading/分布heading **3 passed**。
+- Q3025：/audit 7天汇总/趋势heading/分布heading **3 passed**。`d147568e3`
+- Q3026：/audit 最近操作heading/审计日志/导出 **3 passed**。
 
