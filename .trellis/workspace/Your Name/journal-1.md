@@ -967,5 +967,6 @@
 - Q2856：/disposals/scrap/new 自动保存/申请日期/新建申请 **3 passed**。`f3773ae72`
 - Q2857：/disposals/scrap/new 风险提示/选填/补充说明 **3 passed**。`790ecbeb6`
 - Q2858：/disposals/scrap/new 变卖/拆解/捐赠 **3 passed**。`22ce805ad`
-- Q2859：/disposals/clearance/new 取消/添加资产/保存草稿 **3 passed**。
+- Q2859：/disposals/clearance/new 取消/添加资产/保存草稿 **3 passed**。`ec0ced23c`
+- Q2860：/disposals/clearance/new 基本信息/清退编号/申请人 **3 passed**。
 
