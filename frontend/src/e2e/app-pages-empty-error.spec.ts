@@ -43227,6 +43227,29 @@ test.describe('Q2966 桌面登录页操作空态', () => {
   });
 });
 
+test.describe('Q2967 桌面登录页演示账户空态', () => {
+  test('/login 空态「演示账户」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('演示账户').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「资产管理员」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('资产管理员').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「全域权限」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('全域权限').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

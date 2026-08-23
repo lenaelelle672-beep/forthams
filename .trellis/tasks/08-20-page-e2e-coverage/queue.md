@@ -2154,4 +2154,5 @@
 | Q2964 | done | 桌面空态 **3 passed**（/reports/scheduled 标题/暂无配置/开始创建）。禁 /m。 |
 | Q2965 | done | 桌面空态 **3 passed**（/login 运行稳定/宇视科技/智能运维入口）。禁 /m。 |
 | Q2966 | done | 桌面空态 **3 passed**（/login 欢迎回来/登录系统/记住用户名）。禁 /m。 |
-| Q2967 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2967 | done | 桌面空态 **3 passed**（/login 演示账户/资产管理员/全域权限）。禁 /m。 |
+| Q2968 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

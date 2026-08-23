@@ -1073,5 +1073,7 @@
 - Q2962：/reports 部门排名/月度趋势/预定义描述 **3 passed**。`db5b2a5fd`
 - Q2963：/reports/scheduled 新建/描述 + /reports 近12个月 **3 passed**。`746965d5d`
 - Q2964：/reports/scheduled 标题/暂无配置/开始创建 **3 passed**。`74e05717c`
-- Q2965：/login 运行稳定/宇视科技/智能运维入口 **3 passed**。默认 /login 无「固定资产智能运维中枢」。
+- Q2965：/login 运行稳定/宇视科技/智能运维入口 **3 passed**。默认 /login 无「固定资产智能运维中枢」。`23e16359d`
+- Q2966：/login 欢迎回来/登录系统/记住用户名 **3 passed**。`2620ecac4`
+- Q2967：/login 演示账户/资产管理员/全域权限 **3 passed**。
 
