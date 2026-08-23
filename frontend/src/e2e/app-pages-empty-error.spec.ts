@@ -70890,6 +70890,35 @@ test.describe('Q3928 桌面借用/领用/验收未用 button 空态', () => {
 
 });
 
+test.describe('Q3929 桌面保险/备件未用 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/insurances button「新增保险」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances');
+    await expect(page.getByRole('button', { name: '新增保险' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts button「新增备件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts');
+    await expect(page.getByRole('button', { name: '新增备件' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances button「重置筛选」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances');
+    await expect(page.getByRole('button', { name: '重置筛选' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
