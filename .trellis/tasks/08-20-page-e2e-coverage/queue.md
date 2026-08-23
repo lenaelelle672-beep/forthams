@@ -2112,4 +2112,5 @@
 | Q2922 | done | 桌面空态 **3 passed**（/system/posts 岗位信息维护/列表/总量）。禁 /m。 |
 | Q2923 | done | 桌面空态 **3 passed**（/system/posts 岗位编码/名称/创建时间）。禁 /m。 |
 | Q2924 | done | 桌面空态 **3 passed**（/system/posts 备注/岗位/搜索）。禁 /m。 |
-| Q2925 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2925 | done | 桌面空态 **3 passed**（/system/posts 正常/停用 + /system/menus 新增菜单）。禁 /m。 |
+| Q2926 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
