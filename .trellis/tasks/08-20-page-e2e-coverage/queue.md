@@ -3446,3 +3446,11 @@
 | Q4256 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4257 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4258 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4259 | pending | 桌面空态 占比0%/减值重估列表/菜单列表 heading。禁 /m。 |
+| Q4260 | pending | 桌面空态 预算/岗位/角色列表 heading。禁 /m。 |
+| Q4261 | pending | 桌面空态 盘点任务/领用列表/备件列表 heading。禁 /m。 |
+| Q4262 | pending | 桌面空态 折旧计划/借用列表/保单列表 heading。禁 /m。 |
+| Q4263 | pending | 桌面空态 维保列表/账号权限/菜单目录 heading。禁 /m。 |
+| Q4264 | pending | 桌面空态 岗位信息/角色权限/流程表单 heading。禁 /m。 |
+| Q4265 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4266 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

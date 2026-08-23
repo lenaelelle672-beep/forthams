@@ -80483,6 +80483,242 @@ test.describe('Q4258 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4259 桌面预算重估菜单未用列表 heading', () => {
+  test('/budgets heading「占比 0%」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('heading', { name: '占比 0%' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/revaluations heading「减值/重估列表」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/revaluations');
+    await expect(page.getByRole('heading', { name: '减值/重估列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus heading「菜单列表」', async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByRole('heading', { name: '菜单列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4260 桌面预算岗位角色未用列表 heading', () => {
+  test('/budgets heading「预算列表」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/budgets');
+    await expect(page.getByRole('heading', { name: '预算列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/posts heading「岗位列表」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByRole('heading', { name: '岗位列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles heading「角色列表」', async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByRole('heading', { name: '角色列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4261 桌面盘点领用备件未用列表 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory heading「盘点任务」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory');
+    await expect(page.getByRole('heading', { name: '盘点任务' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments heading「领用列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments');
+    await expect(page.getByRole('heading', { name: '领用列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/spare-parts heading「备件列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts');
+    await expect(page.getByRole('heading', { name: '备件列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4262 桌面折旧借用保险未用列表 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/depreciation heading「折旧计划」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/depreciation');
+    await expect(page.getByRole('heading', { name: '折旧计划' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows heading「借用列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows');
+    await expect(page.getByRole('heading', { name: '借用列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/insurances heading「保单列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/insurances');
+    await expect(page.getByRole('heading', { name: '保单列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4263 桌面维保用户菜单未用 heading', () => {
+  test('/maintenance heading「维保列表」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/maintenance');
+    await expect(page.getByRole('heading', { name: '维保列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users heading「账号与权限管理」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByRole('heading', { name: '账号与权限管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/menus heading「系统菜单目录与按钮权限」', async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/menus');
+    await expect(page.getByRole('heading', { name: '系统菜单目录与按钮权限' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4264 桌面岗位角色未用分区 heading', () => {
+  test('/system/posts heading「岗位信息维护」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/posts');
+    await expect(page.getByRole('heading', { name: '岗位信息维护' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/roles heading「角色与权限管理」', async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await expect(page.getByRole('heading', { name: '角色与权限管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYTHIRD heading「TWOHUNDREDTWENTYTHIRD」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4265 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYFOURTH heading「TWOHUNDREDTWENTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYFIFTH heading「TWOHUNDREDTWENTYFIFTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYFIFTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYFIFTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYSIXTH heading「TWOHUNDREDTWENTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4266 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYSEVENTH heading「TWOHUNDREDTWENTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYEIGHTH heading「TWOHUNDREDTWENTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/TWOHUNDREDTWENTYNINTH heading「TWOHUNDREDTWENTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/TWOHUNDREDTWENTYNINTH');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDTWENTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

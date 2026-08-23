@@ -383,10 +383,10 @@ export default function MenuManagement() {
           <div className="border-b border-slate-100 bg-gradient-to-r from-white via-[#fbfdff] to-[#f8fbff] px-5 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                   <FolderTree className="h-3.5 w-3.5" />
                   菜单列表
-                </div>
+                </h3>
                 <h2 className="mt-1 text-lg font-bold text-slate-900">
                   系统菜单目录与按钮权限
                 </h2>

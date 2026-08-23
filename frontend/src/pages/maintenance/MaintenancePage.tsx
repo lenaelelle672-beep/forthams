@@ -778,10 +778,10 @@ export default function MaintenancePage() {
             {/* 标题行 */}
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
+                <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-blue-600">
                   <Search className="h-3.5 w-3.5" />
                   维保列表
-                </div>
+                </h3>
                 <h2 className="mt-1 text-xl font-bold text-slate-900">
                   维保记录管理
                 </h2>
