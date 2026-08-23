@@ -345,10 +345,10 @@ export default function MenuManagement() {
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4">
             <div className="flex items-center gap-3">
               <h1 className="text-xl font-bold text-slate-900">菜单管理</h1>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+              <h3 className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700">
                 <FolderTree className="h-3 w-3" />
                 树形
-              </span>
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Button variant="primary" size="md" onClick={handleNew}>

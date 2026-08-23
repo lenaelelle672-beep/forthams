@@ -447,7 +447,7 @@ export default function DisposalListPage() {
                       {stat.value}
                       {stat.unit && <span className="ml-0.5 text-xs font-medium text-slate-400">{stat.unit}</span>}
                     </p>
-                    <p className="text-[10px] text-slate-400">{stat.sub}</p>
+                    <h3 className="text-[10px] text-slate-400">{stat.sub}</h3>
                   </div>
                 </div>
               );

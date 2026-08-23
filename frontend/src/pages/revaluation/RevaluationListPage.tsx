@@ -253,7 +253,7 @@ export default function RevaluationListPage() {
                   <div>
                     <h3 className="text-[11px] font-medium text-slate-400">{stat.label}</h3>
                     <p className="text-lg font-bold text-slate-900">{stat.value}</p>
-                    <p className="text-[10px] text-slate-400">{stat.sub}</p>
+                    <h3 className="text-[10px] text-slate-400">{stat.sub}</h3>
                   </div>
                 </div>
               );
