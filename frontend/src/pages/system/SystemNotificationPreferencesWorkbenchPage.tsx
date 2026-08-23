@@ -167,7 +167,7 @@ export default function SystemNotificationPreferencesWorkbenchPage({
             <h4 className="font-semibold">偏好 catalog</h4>
             <span className="text-xs text-slate-500">显示 {preferences.length} 条，只读展示</span>
           </div>
-          {preferences.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无通知偏好。</div> : null}
+          {preferences.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无通知偏好。</h3> : null}
           <div className="space-y-2">
             {preferences.map((preference) => (
               <button

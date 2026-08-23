@@ -178,7 +178,7 @@ export default function SystemNotificationChannelsWorkbenchPage({
             <h4 className="font-semibold">渠道 catalog</h4>
             <span className="text-xs text-slate-500">显示 {configs.length} 条，只读展示</span>
           </div>
-          {configs.length === 0 && !loading ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无通知渠道配置；空态不代表真实发送链闭环。</div> : null}
+          {configs.length === 0 && !loading ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无通知渠道配置；空态不代表真实发送链闭环。</h3> : null}
           <div className="space-y-2">
             {configs.map((config) => (
               <button

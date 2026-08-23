@@ -66,7 +66,7 @@ export default function SystemFieldMappingsWorkbenchPage({ embeddedInWorkbench =
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">加载中...</div> : null}
       <button className="rounded-xl bg-blue-600 px-3 py-2 text-sm text-white" type="button" disabled={submitting} onClick={handlePreview}>预览转换</button>
       {preview ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">预览结果：{preview}</div> : null}
-      {!loading && items.length === 0 ? <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无字段映射。</div> : null}
+      {!loading && items.length === 0 ? <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无字段映射。</h3> : null}
       <div className="grid gap-3">
         {items.map((item) => (
           <article key={item.id} className="rounded-2xl border border-slate-200 p-4">

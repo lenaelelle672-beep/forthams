@@ -286,7 +286,7 @@ export default function SystemExternalSystemsWorkbenchPage({
       </form>
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">外部系统加载中...</div> : null}
       {!loading && !error && items.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">暂无外部系统，请通过 V3 创建目录项。</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">暂无外部系统，请通过 V3 创建目录项。</h3>
       ) : null}
       <div className="grid gap-3">
         {items.map((item) => (
