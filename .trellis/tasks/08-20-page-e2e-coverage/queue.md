@@ -3326,11 +3326,27 @@
 | Q4136 | done | 桌面空态 **3 passed**（字段集/基础参数/分类未用空态 heading）。禁 /m。 |
 | Q4137 | done | 桌面空态 **3 passed**（邮件日志/岗位/网关未用空态 heading）。禁 /m。 |
 | Q4138 | done | 桌面空态 **3 passed**（流程通知开关未用空态 heading）。禁 /m。 |
-| Q4139 | pending | 桌面空态 分类未用统计 heading。禁 /m。 |
-| Q4140 | pending | 桌面空态 分类/安全检查未用统计 heading。禁 /m。 |
-| Q4141 | pending | 桌面空态 安全历史/风险评估未用统计 heading。禁 /m。 |
-| Q4142 | pending | 桌面空态 流程控制台未用空态 heading。禁 /m。 |
-| Q4143 | pending | 桌面空态 运行监控未用空态 heading。禁 /m。 |
-| Q4144 | pending | 桌面空态 审计整句空态与流程表单未用编码。禁 /m。 |
-| Q4145 | pending | 桌面空态 表单配置空态与流程表单未用编码。禁 /m。 |
-| Q4146 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4139 | done | 桌面空态 **3 passed**（分类未用统计 heading）。禁 /m。 |
+| Q4140 | done | 桌面空态 **3 passed**（分类/安全检查未用统计 heading）。禁 /m。 |
+| Q4141 | done | 桌面空态 **3 passed**（安全历史/风险评估未用统计 heading）。禁 /m。 |
+| Q4142 | done | 桌面空态 **3 passed**（流程控制台未用空态 heading）。禁 /m。 |
+| Q4143 | done | 桌面空态 **3 passed**（运行监控未用空态 heading）。禁 /m。 |
+| Q4144 | done | 桌面空态 **3 passed**（审计整句空态与流程表单未用编码）。禁 /m。 |
+| Q4145 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4146 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4147 | done | 桌面空态 **3 passed**（流程控制台未用统计 heading）。禁 /m。 |
+| Q4148 | done | 桌面空态 **3 passed**（流程控制台未用 SLA heading）。禁 /m。 |
+| Q4149 | done | 桌面空态 **3 passed**（运行监控未用统计 heading）。禁 /m。 |
+| Q4150 | done | 桌面空态 **3 passed**（运行监控未用轨迹 heading）。禁 /m。 |
+| Q4151 | done | 桌面空态 **3 passed**（安全检查未用统计 heading）。禁 /m。 |
+| Q4152 | done | 桌面空态 **3 passed**（安全检查/风险评估未用统计 heading）。禁 /m。 |
+| Q4153 | done | 桌面空态 **3 passed**（审计日志未用统计 heading）。禁 /m。 |
+| Q4154 | done | 桌面空态 **3 passed**（SLA 配置未用统计 heading）。禁 /m。 |
+| Q4155 | pending | 桌面空态 角色权限未用统计 heading。禁 /m。 |
+| Q4156 | pending | 桌面空态 数据权限未用统计 heading。禁 /m。 |
+| Q4157 | pending | 桌面空态 文件存储未用统计 heading。禁 /m。 |
+| Q4158 | pending | 桌面空态 租户管理未用统计 heading。禁 /m。 |
+| Q4159 | pending | 桌面空态 技术支持/文档中心未用统计 heading。禁 /m。 |
+| Q4160 | pending | 桌面空态 文档/导入导出未用统计 heading。禁 /m。 |
+| Q4161 | pending | 桌面空态 交接/资产履历未用统计 heading。禁 /m。 |
+| Q4162 | pending | 桌面空态 资产履历未用事件 heading。禁 /m。 |

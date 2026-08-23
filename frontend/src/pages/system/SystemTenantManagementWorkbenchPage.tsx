@@ -143,15 +143,15 @@ export default function SystemTenantManagementWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">租户总数</p>
+          <h3 className="text-xs font-medium text-slate-500">租户总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">正常租户</p>
+          <h3 className="text-xs font-medium text-slate-500">正常租户</h3>
           <p className="mt-2 text-2xl font-semibold text-emerald-600">{activeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">当前过滤结果</p>
+          <h3 className="text-xs font-medium text-slate-500">当前过滤结果</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{visibleTenants.length}</p>
         </div>
       </div>

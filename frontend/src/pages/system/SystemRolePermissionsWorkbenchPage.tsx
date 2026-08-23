@@ -150,19 +150,19 @@ export default function SystemRolePermissionsWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">角色数量</p>
+          <h3 className="text-xs font-medium text-slate-500">角色数量</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.roleCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">权限库存</p>
+          <h3 className="text-xs font-medium text-slate-500">权限库存</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.permissionInventoryCount} 项</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">角色-权限绑定数量</p>
+          <h3 className="text-xs font-medium text-slate-500">角色-权限绑定数量</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.rolePermissionBindingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">未绑定权限</p>
+          <h3 className="text-xs font-medium text-slate-500">未绑定权限</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.unboundPermissionCount}</p>
         </div>
       </div>

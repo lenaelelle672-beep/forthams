@@ -212,19 +212,19 @@ export default function SystemDataPermissionsWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">角色总数</p>
+          <h3 className="text-xs font-medium text-slate-500">角色总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{catalogMeta.summary.roleCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">全部数据（ALL）</p>
+          <h3 className="text-xs font-medium text-slate-500">全部数据（ALL）</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{catalogMeta.summary.allScopeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">已收紧范围</p>
+          <h3 className="text-xs font-medium text-slate-500">已收紧范围</h3>
           <p className="mt-2 text-2xl font-semibold text-emerald-600">{catalogMeta.summary.restrictedScopeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">自定义（CUSTOM）</p>
+          <h3 className="text-xs font-medium text-slate-500">自定义（CUSTOM）</h3>
           <p className="mt-2 text-2xl font-semibold text-amber-600">{catalogMeta.summary.customScopeCount}</p>
         </div>
       </div>

@@ -1273,5 +1273,7 @@
 - Q4115–Q4122：**24 passed**。续 Q4123–Q4130：通知偏好/编号规则/Webhook/渠道/外部系统/字段映射/缓存暂无空态。编号规则须双 route。待跑 `-g 'Q4123|...|Q4130'`。下一票 Q4131。禁 /m。
 - Q4123–Q4130：**24 passed**。下一票 Q4131：继续桌面真页未用 heading/button。禁 /m。
 - 续写 Q4131–Q4138：许可证/合同/制造商统计 heading 与工作台暂无空态。自定义字段须 `mockCustomFieldsEmptyCatalog`，通知开关须 `mockNotificationSwitchesEmpty`。待跑 `-g 'Q4131|...|Q4138'`。下一票 Q4139。禁 /m。
-- Q4131–Q4138：**24 passed**。续 Q4139–Q4146：分类/安全检查/风险评估统计 heading 与控制台/运行监控/审计/表单配置空态及流程表单未用编码。控制台须 `mockCommandCenterEmpty`，运行监控须 `mockRuntimeMonitorEmpty`，审计须 `mockAuditLogsEmpty`，表单配置须 `mockFormDefinitionsEmpty`。待跑 `-g 'Q4139|...|Q4146'`。下一票 Q4147。禁 /m。
+- Q4131–Q4138：**24 passed**。续 Q4139–Q4146：分类/安全检查/风险评估统计 heading 与控制台/运行监控/审计空态及流程表单未用编码。勿测表单配置「暂无可配置字段」（默认 schema 有字段）。待跑 `-g 'Q4139|...|Q4146'`。下一票 Q4147。禁 /m。
+- 续写 Q4147–Q4154：控制台/运行监控/安全检查/风险/审计/SLA 未用统计 heading。SLA 须 `mockSlaConfigEmptyCatalog`。短名须 exact。待跑 `-g 'Q4147|...|Q4154'`。下一票 Q4155。禁 /m。
+- Q4139–Q4146：**24 passed**。Q4147–Q4154：**24 passed**。续 Q4155–Q4162：角色/数据权限/文件存储/租户/技术支持/文档/导入导出/交接/履历统计 heading。待跑 `-g 'Q4155|...|Q4162'`。下一票 Q4163。禁 /m。
 

@@ -139,11 +139,11 @@ export default function SystemDocCenterWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">文档总数</p>
+          <h3 className="text-xs font-medium text-slate-500">文档总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">已发布</p>
+          <h3 className="text-xs font-medium text-slate-500">已发布</h3>
           <p className="mt-2 text-2xl font-semibold text-emerald-600">{publishedCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">

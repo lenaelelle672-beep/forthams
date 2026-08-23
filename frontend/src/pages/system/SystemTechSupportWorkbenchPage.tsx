@@ -146,11 +146,11 @@ export default function SystemTechSupportWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">工单总数</p>
+          <h3 className="text-xs font-medium text-slate-500">工单总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">待处理/处理中</p>
+          <h3 className="text-xs font-medium text-slate-500">待处理/处理中</h3>
           <p className="mt-2 text-2xl font-semibold text-amber-600">{openCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">

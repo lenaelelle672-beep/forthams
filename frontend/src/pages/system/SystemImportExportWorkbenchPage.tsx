@@ -149,11 +149,11 @@ export default function SystemImportExportWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">任务总数</p>
+          <h3 className="text-xs font-medium text-slate-500">任务总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">失败任务</p>
+          <h3 className="text-xs font-medium text-slate-500">失败任务</h3>
           <p className="mt-2 text-2xl font-semibold text-red-600">{failedCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">

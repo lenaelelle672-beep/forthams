@@ -191,19 +191,19 @@ export default function SystemFileStorageWorkbenchPage({
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">附件总数</p>
+          <h3 className="text-xs font-medium text-slate-500">附件总数</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.totalAttachmentCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">总容量</p>
+          <h3 className="text-xs font-medium text-slate-500">总容量</h3>
           <p className="mt-1 text-2xl font-semibold">{formatFileSize(catalog.summary.totalFileSize)}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">业务类型</p>
+          <h3 className="text-xs font-medium text-slate-500">业务类型</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.businessTypeCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">文件类型</p>
+          <h3 className="text-xs font-medium text-slate-500">文件类型</h3>
           <p className="mt-1 text-2xl font-semibold">{catalog.summary.fileTypeCount}</p>
         </div>
       </div>

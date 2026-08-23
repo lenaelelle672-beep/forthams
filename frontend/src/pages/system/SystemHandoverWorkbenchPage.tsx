@@ -138,11 +138,11 @@ export default function SystemHandoverWorkbenchPage({
 
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">交接任务总数</p>
+          <h3 className="text-xs font-medium text-slate-500">交接任务总数</h3>
           <p className="mt-2 text-2xl font-semibold text-slate-900">{total}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
-          <p className="text-xs text-slate-500">待处理/进行中</p>
+          <h3 className="text-xs font-medium text-slate-500">待处理/进行中</h3>
           <p className="mt-2 text-2xl font-semibold text-amber-600">{pendingCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200 p-4">
