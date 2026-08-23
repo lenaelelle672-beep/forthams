@@ -3143,4 +3143,4 @@
 | Q3953 | done | 桌面空态 **3 passed**（分类 EmptyState heading 与平面图未用 button；勿测 JSX action「添加分类」）。禁 /m。 |
 | Q3954 | done | 桌面空态 **3 passed**（资产列表 EmptyState heading/button 与报表卡片 heading）。禁 /m。 |
 | Q3955 | done | 桌面空态 **3 passed**（报表中心未用卡片 heading）。禁 /m。 |
-| Q3956 | pending | 桌面空态 报表中心未用 heading/button。禁 /m。 |
+| Q3956 | done | 桌面空态 **3 passed**（报表中心未用 heading/button）。禁 /m。 |
