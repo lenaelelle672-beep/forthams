@@ -2088,4 +2088,5 @@
 | Q2898 | done | 桌面空态 **3 passed**（/vendors 合作中/已停用/刷新）。禁 /m。 |
 | Q2899 | done | 桌面空态 **3 passed**（/locations 新增顶级位置/标题/暂无数据）。禁 /m。 |
 | Q2900 | done | 桌面空态 **3 passed**（/locations 描述/总位置数/顶级位置）。禁 /m。 |
-| Q2901 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2901 | done | 桌面空态 **3 passed**（/locations 折叠/展开 + /categories 标题）。禁 /m。 |
+| Q2902 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
