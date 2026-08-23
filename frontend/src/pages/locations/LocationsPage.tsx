@@ -422,7 +422,7 @@ export default function LocationsPage() {
             ) : tree.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-[#94a3b8]">
                 <FolderTree className="w-12 h-12 mb-3 opacity-30" />
-                <p className="text-sm">暂无位置数据</p>
+                <h3 className="text-sm font-medium">暂无位置数据</h3>
                 <Button variant="primary" size="sm" className="mt-4" onClick={() => handleOpenCreate(null)}>
                   <Plus className="w-4 h-4" />
                   新增顶级位置

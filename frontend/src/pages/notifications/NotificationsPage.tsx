@@ -419,9 +419,9 @@ export default function NotificationsPage() {
                 <Inbox className="w-8 h-8 text-blue-400" />
               </div>
               <h3 className="text-base font-medium mb-1 text-[#0f172a]">暂无通知</h3>
-              <p className="text-sm text-slate-400">
+              <h3 className="text-sm font-medium text-slate-400">
                 {activeTab === 'all' ? '所有通知都会显示在这里' : '当前筛选条件下没有通知'}
-              </p>
+              </h3>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">

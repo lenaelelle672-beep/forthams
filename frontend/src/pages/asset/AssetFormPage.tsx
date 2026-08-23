@@ -585,7 +585,7 @@ export default function AssetFormPage() {
                 </div>
                 <div>
                   <CardTitle>父子关系</CardTitle>
-                  <p className="text-xs text-gray-500 mt-0.5">资产主附属关系管理</p>
+                  <h3 className="text-xs font-medium text-gray-500 mt-0.5">资产主附属关系管理</h3>
                 </div>
               </div>
             </CardHeader>
@@ -595,7 +595,7 @@ export default function AssetFormPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-6 text-[#94a3b8] gap-2">
                   <GitBranch className="w-8 h-8 opacity-40" />
-                  <p className="text-sm font-medium">请先保存资产后再管理父子关系</p>
+                  <h3 className="text-sm font-medium">请先保存资产后再管理父子关系</h3>
                 </div>
               )}
             </CardContent>

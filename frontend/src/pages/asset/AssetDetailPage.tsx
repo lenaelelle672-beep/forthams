@@ -402,7 +402,7 @@ export default function AssetDetailPage() {
             {tcoResult ? (
               <div className="grid grid-cols-12 gap-6">
                 <div className="col-span-5">
-                  <p className="text-sm font-semibold text-gray-600 mb-2">成本构成</p>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-2">成本构成</h3>
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height={220}>
                       <PieChart>
@@ -415,7 +415,7 @@ export default function AssetDetailPage() {
                   ) : <h3 className="text-gray-400 text-sm font-medium text-center py-10">暂无成本数据</h3>}
                 </div>
                 <div className="col-span-3">
-                  <p className="text-sm font-semibold text-gray-600 mb-2">成本明细</p>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-2">成本明细</h3>
                   <div className="space-y-2">
                     {Object.entries(TCO_LABELS).map(([key, label]) => {
                       const val = (tcoResult as any)[key] ?? 0;

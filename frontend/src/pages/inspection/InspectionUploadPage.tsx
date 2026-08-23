@@ -219,7 +219,7 @@ const InspectionUploadPage: React.FC = () => {
         {!(photos as Photo[]) || (photos as Photo[]).length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <CheckCircleOutlined className="text-4xl mb-2" />
-            <p>暂无已上传的照片</p>
+            <h3 className="text-sm font-medium">暂无已上传的照片</h3>
           </div>
         ) : (
           <Row gutter={[16, 16]}>
