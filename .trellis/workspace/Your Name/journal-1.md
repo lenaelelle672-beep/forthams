@@ -1249,4 +1249,5 @@
 - Q4009–Q4010：**6 passed**。退役详情空态也渲染资产摘要/历史 heading。续 Q4011：暂无关联资产/暂无审批历史。禁 /m。
 - Q4011：**3 passed**。续 Q4012–Q4024：盘点报告/任务/RFID/处置/流程表单/领用未用 heading/button/link。领用空态分区、RFID 空列表、流程未配置表单改为 heading。禁 /m。
 - Q4012–Q4024：**39 passed**。续 Q4025–Q4030：审计详情/资产详情未用 heading/button/link。资产空折旧/子资产/变更记录改为 heading。禁 /m。
+- Q4025–Q4030：**18 passed**。续 Q4031–Q4033：检验/保险详情未用 heading。检验照片/历史与保险详情改为 heading。禁 /m。
 

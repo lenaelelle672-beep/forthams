@@ -71,7 +71,7 @@ const InsuranceDetailPage: React.FC = () => {
   }
 
   if (!insurance) {
-    return <div className="p-6">未找到保险记录</div>;
+    return <div className="p-6"><h3>未找到保险记录</h3></div>;
   }
 
   const statusInfo = statusMap[insurance.status] || { text: insurance.status, color: 'default' };
@@ -79,7 +79,7 @@ const InsuranceDetailPage: React.FC = () => {
   return (
     <div className="p-6">
       <Card
-        title="保险详情"
+        title={<h1 className="text-lg font-semibold m-0">保险详情</h1>}
         extra={
           <Space>
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/insurance')}>
@@ -135,7 +135,14 @@ const InsuranceDetailPage: React.FC = () => {
               showSizeChanger: true,
               showQuickJumper: true
             }}
+            locale={{ emptyText: '暂无理赔数据' }}
           />
+          {!(
+            (Array.isArray((claimsData as any)?.records) && (claimsData as any).records.length > 0)
+            || (Array.isArray((claimsData as any)?.list) && (claimsData as any).list.length > 0)
+          ) && (
+            <h3 className="text-sm font-medium text-center text-gray-400 py-4">暂无理赔记录</h3>
+          )}
         </div>
       </Card>
     </div>

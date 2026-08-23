@@ -3212,9 +3212,12 @@
 | Q4022 | done | 桌面空态 **3 passed**（领用详情未用空态 heading）。禁 /m。 |
 | Q4023 | done | 桌面空态 **3 passed**（RFID 扫描未用 button）。禁 /m。 |
 | Q4024 | done | 桌面空态 **3 passed**（RFID/流程未用空态 heading/link）。禁 /m。 |
-| Q4025 | pending | 桌面空态 审计详情未用 heading。禁 /m。 |
-| Q4026 | pending | 桌面空态 审计详情未用 heading/button。禁 /m。 |
-| Q4027 | pending | 桌面空态 资产详情未用分区 heading。禁 /m。 |
-| Q4028 | pending | 桌面空态 资产/审计未用 heading/link。禁 /m。 |
-| Q4029 | pending | 桌面空态 资产详情未用空态 heading。禁 /m。 |
-| Q4030 | pending | 桌面空态 资产/流程未用空态 heading。禁 /m。 |
+| Q4025 | done | 桌面空态 **3 passed**（审计详情未用 heading）。禁 /m。 |
+| Q4026 | done | 桌面空态 **3 passed**（审计详情未用 heading/button）。禁 /m。 |
+| Q4027 | done | 桌面空态 **3 passed**（资产详情未用分区 heading）。禁 /m。 |
+| Q4028 | done | 桌面空态 **3 passed**（资产/审计未用 heading/link）。禁 /m。 |
+| Q4029 | done | 桌面空态 **3 passed**（资产详情未用空态 heading）。禁 /m。 |
+| Q4030 | done | 桌面空态 **3 passed**（资产/流程未用空态 heading）。禁 /m。 |
+| Q4031 | pending | 桌面空态 检验详情未用 heading。禁 /m。 |
+| Q4032 | pending | 桌面空态 检验详情未用空态 heading。禁 /m。 |
+| Q4033 | pending | 桌面空态 保险详情未用 heading。禁 /m。 |
