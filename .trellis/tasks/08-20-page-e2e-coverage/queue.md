@@ -3218,6 +3218,7 @@
 | Q4028 | done | 桌面空态 **3 passed**（资产/审计未用 heading/link）。禁 /m。 |
 | Q4029 | done | 桌面空态 **3 passed**（资产详情未用空态 heading）。禁 /m。 |
 | Q4030 | done | 桌面空态 **3 passed**（资产/流程未用空态 heading）。禁 /m。 |
-| Q4031 | pending | 桌面空态 检验详情未用 heading。禁 /m。 |
-| Q4032 | pending | 桌面空态 检验详情未用空态 heading。禁 /m。 |
-| Q4033 | pending | 桌面空态 保险详情未用 heading。禁 /m。 |
+| Q4031 | done | 桌面空态 **3 passed**（检验详情未用 heading）。禁 /m。 |
+| Q4032 | done | 桌面空态 **3 passed**（检验详情未用空态 heading）。禁 /m。 |
+| Q4033 | done | 桌面空态 **3 passed**（保险详情未用 heading）。禁 /m。 |
+| Q4034 | pending | 桌面空态 健康评分/测试结果未用空态 heading。禁 /m。 |

@@ -73935,6 +73935,35 @@ test.describe('Q4033 桌面保险详情未用 heading 空态', () => {
 
 });
 
+test.describe('Q4034 桌面健康评分/测试结果未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/asset-health heading「维度评分明细」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-health');
+    await expect(page.getByRole('heading', { name: '维度评分明细' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/asset-health heading「暂无维度评分明细」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-health');
+    await expect(page.getByRole('heading', { name: '暂无维度评分明细' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/test-results heading「加载测试结果失败」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/test-results');
+    await expect(page.getByRole('heading', { name: '加载测试结果失败' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

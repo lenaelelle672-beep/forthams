@@ -418,6 +418,15 @@ export default function AssetHealthPage() {
         </CardContent>
       </Card>
 
+      {sortedList.length === 0 && !isLoading && (
+        <Card>
+          <CardContent className="p-6">
+            <h3 className="text-sm font-semibold text-[var(--surface-heading)]">维度评分明细</h3>
+            <h3 className="text-sm font-medium text-gray-400 text-center py-6">暂无维度评分明细</h3>
+          </CardContent>
+        </Card>
+      )}
+
       {/* 详情弹窗 */}
       {detailAssetId !== null && (
         <HealthDetailDialog
