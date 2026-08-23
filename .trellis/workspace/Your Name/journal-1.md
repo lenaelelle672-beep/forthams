@@ -996,5 +996,6 @@
 - Q2885：/depreciation 折旧方法/搜索/刷新 **3 passed**。`426038716`
 - Q2886：/depreciation 当期折旧/累计折旧/折旧率 **3 passed**。`6485d5bf9`
 - Q2887：/depreciation 原值/净值/状态 **3 passed**。`8a6736668`
-- Q2888：/depreciation 已完成/直线双倍/折旧 **3 passed**。
+- Q2888：/depreciation 已完成/直线双倍/折旧 **3 passed**。`9240c154b`
+- Q2889：/contracts 新增合同/标题/搜索 **3 passed**。
 

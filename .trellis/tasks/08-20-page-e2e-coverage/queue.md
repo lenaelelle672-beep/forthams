@@ -2076,4 +2076,5 @@
 | Q2886 | done | 桌面空态 **3 passed**（/depreciation 当期折旧/累计折旧/折旧率）。禁 /m。 |
 | Q2887 | done | 桌面空态 **3 passed**（/depreciation 原值/净值/状态）。禁 /m。 |
 | Q2888 | done | 桌面空态 **3 passed**（/depreciation 已完成/直线双倍/折旧）。禁 /m。 |
-| Q2889 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2889 | done | 桌面空态 **3 passed**（/contracts 新增合同/标题/搜索）。禁 /m。 |
+| Q2890 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
