@@ -67929,6 +67929,238 @@ test.describe('Q3826 桌面自定义字段 secret handling 边界空态', () => 
 
 });
 
+test.describe('Q3827 桌面表单配置 form-definitions 端点族空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「真实调用 /form-definitions、/schema/validate、/publish、/disable、/versions/{version}/rollback、/preview 与 /references。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('真实调用 /form-definitions、/schema/validate、/publish、/disable、/versions/{version}/rollback、/preview 与 /references。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「/form-definitions、/schema/validate、/publish、/disable」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('/form-definitions、/schema/validate、/publish、/disable').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「/versions/{version}/rollback、/preview 与 /references」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('/versions/{version}/rollback、/preview 与 /references').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3828 桌面表单配置 schema 白名单剥离边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFormDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「schema 只保留 sections/fields 白名单结构」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('schema 只保留 sections/fields 白名单结构').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「剥离 HTML/source/script/on*、javascript URL 和危险 style」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('剥离 HTML/source/script/on*、javascript URL 和危险 style').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「敏感字段默认值仅展示遮罩预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
+    await expect(page.getByText('敏感字段默认值仅展示遮罩预览').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3829 桌面流程设计器 designer/draft 端点族空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「真实调用 /workflows、/workflows/{businessType}/designer/draft、/designer/validate、/publish 与 /versions/{version}/rollback。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('真实调用 /workflows、/workflows/{businessType}/designer/draft、/designer/validate、/publish 与 /versions/{version}/rollback。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「/workflows/{businessType}/designer/draft」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('/workflows/{businessType}/designer/draft').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「/designer/validate、/publish 与 /versions/{version}/rollback」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('/designer/validate、/publish 与 /versions/{version}/rollback').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3830 桌面流程设计器发布 fail-closed 边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「发布与版本恢复均要求后端权限 fail-closed、confirmed=true、operatorId」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('发布与版本恢复均要求后端权限 fail-closed、confirmed=true、operatorId').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「影响范围与回滚预案」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('影响范围与回滚预案').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer 「前端按钮仅作体验辅助」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByText('前端按钮仅作体验辅助').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3831 桌面 Webhook config-only 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockWebhookConfigsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「只加载 /system/webhook-configs 配置，配置校验仅做 config-only 验证，未触发真实外部调用。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText('只加载 /system/webhook-configs 配置，配置校验仅做 config-only 验证，未触发真实外部调用。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「配置校验仅做 config-only 验证，未触发真实外部调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText('配置校验仅做 config-only 验证，未触发真实外部调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-webhook-config 「webhook-configs 配置，配置校验仅做 config-only」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-webhook-config');
+    await expect(page.getByText('webhook-configs 配置，配置校验仅做 config-only').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3832 桌面同步规则队列摘要组合空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSystemSyncRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules 「待处理 0，运行中 0，失败 0」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('待处理 0，运行中 0，失败 0').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules 「只读队列摘要：待处理 0，运行中 0」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('只读队列摘要：待处理 0，运行中 0').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules 「dryRun 默认 true；只保留 dry-run、单条日志重试、只读队列摘要，批处理队列消费入口不开放。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByText('dryRun 默认 true；只保留 dry-run、单条日志重试、只读队列摘要，批处理队列消费入口不开放。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3833 桌面流程定义 /workflows 只读目录空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockWorkflowDefinitionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-definition 「只读展示 /workflows 与 /workflows/{businessType} 返回的流程模板、版本状态和节点摘要。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-definition');
+    await expect(page.getByText('只读展示 /workflows 与 /workflows/{businessType} 返回的流程模板、版本状态和节点摘要。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-definition 「返回的流程模板、版本状态和节点摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-definition');
+    await expect(page.getByText('返回的流程模板、版本状态和节点摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-definition 「/workflows 与 /workflows/{businessType} 返回的流程模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-definition');
+    await expect(page.getByText('/workflows 与 /workflows/{businessType} 返回的流程模板').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3834 桌面文件存储 catalog 生命周期闭环整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「当前仅为 /system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('当前仅为 /system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「/system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('/system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除，不访问文件系统').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

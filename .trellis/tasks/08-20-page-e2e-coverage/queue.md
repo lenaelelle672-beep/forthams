@@ -3006,11 +3006,19 @@
 | Q3816 | done | 桌面空态 **3 passed**（字段集 by-category/meta/preview 端点）。禁 /m。 |
 | Q3817 | done | 桌面空态 **3 passed**（邮件日志 redacted/tenantScoped 边界）。禁 /m。 |
 | Q3818 | done | 桌面空态 **3 passed**（自定义字段端点与 preview 余项）。禁 /m。 |
-| Q3819 | pending | 桌面空态：字段集端点族整句。禁 /m。 |
-| Q3820 | pending | 桌面空态：字段集 preview 诊断上下文。禁 /m。 |
-| Q3821 | pending | 桌面空态：自定义字段 catalog + 校验预览边界。禁 /m。 |
-| Q3822 | pending | 桌面空态：自定义字段加密标记与 preview 校验。禁 /m。 |
-| Q3823 | pending | 桌面空态：字段集 missingFields 诊断组合。禁 /m。 |
-| Q3824 | pending | 桌面空态：自定义字段运行时 schema 边界。禁 /m。 |
-| Q3825 | pending | 桌面空态：字段集 by-category 长路径组合。禁 /m。 |
-| Q3826 | pending | 桌面空态：自定义字段 secret handling 边界。禁 /m。 |
+| Q3819 | done | 桌面空态 **3 passed**（字段集端点族整句）。禁 /m。 |
+| Q3820 | done | 桌面空态 **3 passed**（字段集 preview 诊断上下文）。禁 /m。 |
+| Q3821 | done | 桌面空态 **3 passed**（自定义字段 catalog + 校验预览边界）。禁 /m。 |
+| Q3822 | done | 桌面空态 **3 passed**（自定义字段加密标记与 preview 校验）。禁 /m。 |
+| Q3823 | done | 桌面空态 **3 passed**（字段集 missingFields 诊断组合）。禁 /m。 |
+| Q3824 | done | 桌面空态 **3 passed**（自定义字段运行时 schema 边界）。禁 /m。 |
+| Q3825 | done | 桌面空态 **3 passed**（字段集 by-category 长路径组合）。禁 /m。 |
+| Q3826 | done | 桌面空态 **3 passed**（自定义字段 secret handling 边界）。禁 /m。 |
+| Q3827 | pending | 桌面空态：表单配置 form-definitions 端点族。禁 /m。 |
+| Q3828 | pending | 桌面空态：表单配置 schema 白名单剥离边界。禁 /m。 |
+| Q3829 | pending | 桌面空态：流程设计器 designer/draft 端点族。禁 /m。 |
+| Q3830 | pending | 桌面空态：流程设计器发布 fail-closed 边界。禁 /m。 |
+| Q3831 | pending | 桌面空态：Webhook config-only 整句。禁 /m。 |
+| Q3832 | pending | 桌面空态：同步规则队列摘要组合。禁 /m。 |
+| Q3833 | pending | 桌面空态：流程定义 /workflows 只读目录。禁 /m。 |
+| Q3834 | pending | 桌面空态：文件存储 catalog 生命周期闭环整句。禁 /m。 |

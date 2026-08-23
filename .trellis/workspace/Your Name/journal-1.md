@@ -1210,4 +1210,5 @@
 - Q3795–Q3802：**24 passed**。续 Q3803–Q3810：邮件/通知模板端点、流程通知开关 biz-type、邮件网关 metadata-only。禁 /m。
 - Q3803–Q3810：**24 passed**。续 Q3811–Q3818：邮件日志端点/管线、自定义字段与字段集端点族。禁 /m。
 - Q3811–Q3818：**24 passed**。续 Q3819–Q3826：字段集 preview 诊断与自定义字段加密/schema 边界。禁 /m。
+- Q3819–Q3826：**24 passed**。续 Q3827–Q3834：表单配置端点/schema 白名单、流程设计器 draft/fail-closed、Webhook config-only、同步规则队列、流程定义目录、文件存储闭环。禁 /m。
 
