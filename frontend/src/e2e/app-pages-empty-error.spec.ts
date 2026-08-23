@@ -45714,6 +45714,366 @@ test.describe('Q3060 桌面退役预算未用角色空态', () => {
   });
 });
 
+test.describe('Q3061 桌面新建检验编号角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections/new 空态 textbox「检验编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('textbox', { name: '检验编号' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 空态 textbox「证书编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('textbox', { name: '证书编号' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 空态 textbox「检查发现」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('textbox', { name: '检查发现' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3062 桌面新建检验机构角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections/new 空态 textbox「检验机构」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('textbox', { name: '检验机构' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 空态 textbox「检验人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('textbox', { name: '检验人' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 空态 textbox「报告附件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('textbox', { name: '报告附件' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3063 桌面新建检验费用类型空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspections/new 空态 spinbutton「检验费用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('spinbutton', { name: '检验费用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 空态 combobox「检验类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('combobox', { name: '检验类型' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inspections/new 空态 combobox「检验结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspections/new');
+    await expect(page.getByRole('combobox', { name: '检验结果' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3064 桌面新增合同角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/contracts 点新增合同 textbox「合同名称 *」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).click();
+    await expect(page.getByRole('textbox', { name: '合同名称 *' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/contracts 点新增合同 textbox「合同编号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).click();
+    await expect(page.getByRole('textbox', { name: '合同编号' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/contracts 点新增合同 spinbutton「金额」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).click();
+    await expect(page.getByRole('spinbutton', { name: '金额' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3065 桌面新增供应商角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/vendors 点新增供应商 textbox「供应商名称 *」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).click();
+    await expect(page.getByRole('textbox', { name: '供应商名称 *' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/vendors 点新增供应商 textbox「供应商编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).click();
+    await expect(page.getByRole('textbox', { name: '供应商编码' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/vendors 点新增供应商 textbox「联系人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).click();
+    await expect(page.getByRole('textbox', { name: '联系人' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3066 桌面新增供应商联系角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/vendors 点新增供应商 textbox「联系电话」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).click();
+    await expect(page.getByRole('textbox', { name: '联系电话' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/vendors 点新增供应商 textbox「邮箱」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).click();
+    await expect(page.getByRole('textbox', { name: '邮箱' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/vendors 点新增供应商 textbox「地址」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await page.getByRole('button', { name: '新增供应商' }).click();
+    await expect(page.getByRole('textbox', { name: '地址' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3067 桌面新增制造商角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/manufacturers 点新增制造商 textbox「名称 *」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByRole('textbox', { name: '名称 *' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商 textbox「编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByRole('textbox', { name: '编码' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商 textbox「联系人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByRole('textbox', { name: '联系人' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3068 桌面新增制造商联系角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/manufacturers 点新增制造商 textbox「电话」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByRole('textbox', { name: '电话' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商 textbox「邮箱」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByRole('textbox', { name: '邮箱' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/manufacturers 点新增制造商 textbox「官网」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).click();
+    await expect(page.getByRole('textbox', { name: '官网' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3069 桌面新建资产占位角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态 placeholder「例：Dell」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByPlaceholder('例：Dell').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态 placeholder「例：PowerEdge R740」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByPlaceholder('例：PowerEdge R740').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态 placeholder「例：SN-2024-001234」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByPlaceholder('例：SN-2024-001234').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3070 桌面新增角色操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/roles 点新增角色 button「保存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '新增角色' }).click();
+    await expect(page.getByRole('button', { name: /保\s*存/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/roles 点新增角色「数据权限范围」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '新增角色' }).click();
+    await expect(page.getByText('数据权限范围').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/system/roles 点新增角色 button「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/roles');
+    await page.getByRole('button', { name: '新增角色' }).click();
+    await expect(page.getByRole('button', { name: /取\s*消/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3071 桌面新增资产模型其余空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/asset-models 点新增模型 button「取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).click();
+    await expect(page.getByRole('button', { name: /取\s*消/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/asset-models 点新增模型「选择分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).click();
+    await expect(page.getByText('选择分类').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/asset-models 点新增模型「选择制造商」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/asset-models');
+    await page.getByRole('button', { name: '新增模型' }).click();
+    await expect(page.getByText('选择制造商').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3072 桌面新增采购合同标题空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/purchase-orders 点新增采购单 heading「新增采购订单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await page.getByRole('button', { name: '新增采购单' }).click();
+    await expect(page.getByRole('heading', { name: '新增采购订单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/purchase-orders 点新增采购单 placeholder「规格型号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await page.getByRole('button', { name: '新增采购单' }).click();
+    await expect(page.getByPlaceholder('规格型号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/contracts 点新增合同 heading「新增合同」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).click();
+    await expect(page.getByRole('heading', { name: '新增合同' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

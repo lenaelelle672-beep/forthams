@@ -2248,3 +2248,15 @@
 | Q3058 | pending | 桌面空态：菜单弹窗 textbox 名称/路由/组件。禁 /m。 |
 | Q3059 | pending | 桌面空态：菜单弹窗 spinbutton 排序 + button 保存 + 类型。禁 /m。 |
 | Q3060 | pending | 桌面空态：退役 spinbutton 资产ID + 预算 heading/返回。禁 /m。 |
+| Q3061 | pending | 桌面空态：/inspections/new textbox 编号/证书/发现。禁 /m。 |
+| Q3062 | pending | 桌面空态：/inspections/new textbox 机构/检验人/附件。禁 /m。 |
+| Q3063 | pending | 桌面空态：/inspections/new spinbutton 费用 + combobox 类型/结果。禁 /m。 |
+| Q3064 | pending | 桌面空态：合同弹窗 textbox 名称/编号 + spinbutton 金额。禁 /m。 |
+| Q3065 | pending | 桌面空态：供应商弹窗 textbox 名称/编码/联系人。禁 /m。 |
+| Q3066 | pending | 桌面空态：供应商弹窗 textbox 电话/邮箱/地址。禁 /m。 |
+| Q3067 | pending | 桌面空态：制造商弹窗 textbox 名称/编码/联系人。禁 /m。 |
+| Q3068 | pending | 桌面空态：制造商弹窗 textbox 电话/邮箱/官网。禁 /m。 |
+| Q3069 | pending | 桌面空态：/assets/new placeholder Dell/型号/序列号。禁 /m。 |
+| Q3070 | pending | 桌面空态：角色弹窗 button 保存/取消 + 数据权限范围。禁 /m。 |
+| Q3071 | pending | 桌面空态：模型弹窗 取消/选择分类/选择制造商。禁 /m。 |
+| Q3072 | pending | 桌面空态：采购 heading + 规格型号 + 合同 heading。禁 /m。 |
