@@ -2071,4 +2071,5 @@
 | Q2881 | done | 桌面空态 **3 passed**（/disposals/transfer/new 备注/新建/描述）。禁 /m。 |
 | Q2882 | done | 桌面空态 **3 passed**（/depreciation 批量计算/查询/重置）。禁 /m。 |
 | Q2883 | done | 桌面空态 **3 passed**（/depreciation 折旧管理/计划管理/暂无数据）。禁 /m。 |
-| Q2884 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2884 | done | 桌面空态 **3 passed**（/depreciation 折旧计划/本月总额/待计算）。禁 /m。 |
+| Q2885 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
