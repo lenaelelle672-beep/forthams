@@ -3534,11 +3534,11 @@
 | Q4344 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4345 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4346 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4347 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4348 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4349 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4350 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4351 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4352 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4353 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4354 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4347 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4348 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4349 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4350 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4351 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4352 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4353 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4354 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
