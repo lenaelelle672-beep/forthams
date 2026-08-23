@@ -71606,10 +71606,10 @@ test.describe('Q3953 桌面分类/平面图未用 heading/button 空态', () => 
     expect(errors).toEqual([]);
   });
 
-  test('/categories button「添加分类」', async ({ page }) => {
+  test('/categories heading「选择分类」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/categories');
-    await expect(page.getByRole('button', { name: '添加分类' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: '选择分类' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 

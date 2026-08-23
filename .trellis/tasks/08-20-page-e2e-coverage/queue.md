@@ -3140,4 +3140,4 @@
 | Q3950 | done | 桌面空态 **3 passed**（SAM/健康评分未用 heading）。禁 /m。 |
 | Q3951 | done | 桌面空态 **3 passed**（GIS/能耗 EmptyState 与预算年度未用 heading）。禁 /m。 |
 | Q3952 | pending | 桌面空态 平面图/SAM/导入导出未用 heading/button。禁 /m。 |
-| Q3953 | pending | 桌面空态 分类/平面图未用 heading/button。禁 /m。 |
+| Q3953 | pending | 桌面空态 分类/平面图未用 heading/button（勿测 EmptyState JSX action「添加分类」，组件只认 label）。禁 /m。 |
