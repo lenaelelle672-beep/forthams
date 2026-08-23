@@ -43125,6 +43125,34 @@ test.describe('Q2962 桌面报表中心其余描述空态', () => {
   });
 });
 
+test.describe('Q2963 桌面定时报表操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports/scheduled 空态 button「新建定时报表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByRole('button', { name: /新\s*建\s*定\s*时\s*报\s*表/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports/scheduled 空态「管理定时报表调度和邮件推送」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByText('管理定时报表调度和邮件推送').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 空态「近 12 个月」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByText('近 12 个月').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

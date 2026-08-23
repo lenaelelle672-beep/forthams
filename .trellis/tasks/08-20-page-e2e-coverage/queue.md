@@ -2150,4 +2150,5 @@
 | Q2960 | done | 桌面空态 **3 passed**（/reports 状态分布/部门排行/增长趋势）。禁 /m。 |
 | Q2961 | done | 桌面空态 **3 passed**（/reports 核心指标/分类分布/状态占比描述）。禁 /m。 |
 | Q2962 | done | 桌面空态 **3 passed**（/reports 部门排名/月度趋势/预定义描述）。禁 /m。 |
-| Q2963 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2963 | done | 桌面空态 **3 passed**（/reports/scheduled 新建/描述 + /reports 近12个月）。禁 /m。 |
+| Q2964 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
