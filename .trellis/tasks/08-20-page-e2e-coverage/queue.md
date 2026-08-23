@@ -2094,4 +2094,5 @@
 | Q2904 | done | 桌面空态 **3 passed**（/categories 当前选中/子分类数/选择分类）。禁 /m。 |
 | Q2905 | done | 桌面空态 **3 passed**（/categories 选树提示/添加根分类 + /retirement/new 审批提示）。禁 /m。 |
 | Q2906 | done | 桌面空态 **3 passed**（/system/depts 新增部门/暂无数据/选部门）。禁 /m。 |
-| Q2907 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2907 | done | 桌面空态 **3 passed**（/system/depts 部门管理/组织架构/部门总数）。禁 /m。 |
+| Q2908 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
