@@ -950,5 +950,6 @@
 - Q2839：/spare-parts/new 规格型号/当前库存/安全库存 **3 passed**。`1d2aad0e5`
 - Q2840：/spare-parts/new 计量单位/补足缺口/到货时间 **3 passed**。`eb7bc7a73`
 - Q2841：/spare-parts/new 单价/描述/编码placeholder **3 passed**。`b19ad0eb8`
-- Q2842：/risk-assessments/new 创建/取消/标题 **3 passed**。 heading 新增风险评估不存在。
+- Q2842：/risk-assessments/new 创建/取消/标题 **3 passed**。 heading 新增风险评估不存在。`ad230c302`
+- Q2843：/risk-assessments/new 资产ID/可能性/影响程度 **3 passed**。
 

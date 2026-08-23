@@ -2030,4 +2030,5 @@
 | Q2840 | done | 桌面空态 **3 passed**（/spare-parts/new 计量单位/补足缺口/到货时间）。禁 /m。 |
 | Q2841 | done | 桌面空态 **3 passed**（/spare-parts/new 单价/描述/编码placeholder）。禁 /m。 |
 | Q2842 | done | 桌面空态 **3 passed**（/risk-assessments/new 创建/取消/标题）。禁 /m。 |
-| Q2843 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2843 | done | 桌面空态 **3 passed**（/risk-assessments/new 资产ID/可能性/影响程度）。禁 /m。 |
+| Q2844 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
