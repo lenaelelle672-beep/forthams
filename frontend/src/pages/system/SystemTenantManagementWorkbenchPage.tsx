@@ -188,7 +188,7 @@ export default function SystemTenantManagementWorkbenchPage({
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
       {loading ? <div role="status" aria-live="polite" className="text-sm text-slate-500">租户管理加载中...</div> : null}
       {!loading && !error && visibleTenants.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">{emptyMessage}</div>
+        <h3 className="rounded-2xl border border-dashed border-slate-200 p-6 text-sm font-medium text-slate-500">{emptyMessage}</h3>
       ) : null}
 
       <div className="rounded-2xl border border-slate-200 p-4">
