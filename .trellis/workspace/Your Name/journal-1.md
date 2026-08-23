@@ -1057,5 +1057,6 @@
 - Q2946：/approvals 至 + /users 全部 + /insurances 保单号 **3 passed**。`4751e5f81`
 - Q2947：/insurances/new 保险名称/类型/公司 **3 passed**。`65ef91a91`
 - Q2948：/insurances/new 保费/保额/免赔额 **3 passed**。`ec3d2c1a1`
-- Q2949：/insurances/new 开始日期/结束日期/状态 **3 passed**。
+- Q2949：/insurances/new 开始日期/结束日期/状态 **3 passed**。`2a5ce6a34`
+- Q2950：/insurances/new 备注/财产险/生效中 **3 passed**。
 
