@@ -1011,5 +1011,6 @@
 - Q2900：/locations 描述/总位置数/顶级位置 **3 passed**。`1fab03dda`
 - Q2901：/locations 折叠/展开 + /categories 标题 **3 passed**。`895571fdd`
 - Q2902：/categories 添加根分类/描述/暂无分类 **3 passed**。`42adbaf06`
-- Q2903：/categories 总分类数/根分类/分类结构 **3 passed**。
+- Q2903：/categories 总分类数/根分类/分类结构 **3 passed**。`9ef6c7d71`
+- Q2904：/categories 当前选中/子分类数/选择分类 **3 passed**。
 
