@@ -3145,3 +3145,6 @@
 | Q3955 | done | 桌面空态 **3 passed**（报表中心未用卡片 heading）。禁 /m。 |
 | Q3956 | done | 桌面空态 **3 passed**（报表中心未用 heading/button）。禁 /m。 |
 | Q3957 | done | 桌面空态 **3 passed**（合同未用类型筛选 button；Radix tab 不是 button）。禁 /m。 |
+| Q3958 | pending | 桌面空态 合同未用类型/状态筛选 button。禁 /m。 |
+| Q3959 | pending | 桌面空态 闲置资产未用筛选 button。禁 /m。 |
+| Q3960 | pending | 桌面空态 闲置/采购未用筛选 button。禁 /m。 |
