@@ -73181,6 +73181,35 @@ test.describe('Q4007 桌面权限/个人未用 heading/button 空态', () => {
 
 });
 
+test.describe('Q4008 桌面个人/流程/退役未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/profile heading「角色与权限明细」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/profile');
+    await expect(page.getByRole('heading', { name: '角色与权限明细' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows heading「当前选中流程」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('heading', { name: '当前选中流程' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement/1 heading「退役申请 #1」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement/1');
+    await expect(page.getByRole('heading', { name: '退役申请 #1' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
