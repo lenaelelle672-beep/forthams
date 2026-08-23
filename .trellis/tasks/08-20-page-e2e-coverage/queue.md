@@ -2044,4 +2044,5 @@
 | Q2854 | done | 桌面空态 **3 passed**（/disposals/scrap/new 处置方式/暂无资产/预估残值）。禁 /m。 |
 | Q2855 | done | 桌面空态 **3 passed**（/disposals/scrap/new 审批流程/先选资产/不可逆）。禁 /m。 |
 | Q2856 | done | 桌面空态 **3 passed**（/disposals/scrap/new 自动保存/申请日期/新建申请）。禁 /m。 |
-| Q2857 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2857 | done | 桌面空态 **3 passed**（/disposals/scrap/new 风险提示/选填/补充说明）。禁 /m。 |
+| Q2858 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
