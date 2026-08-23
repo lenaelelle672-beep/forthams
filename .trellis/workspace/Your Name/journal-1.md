@@ -982,5 +982,6 @@
 - Q2871：/disposals/transfer/new 转出方/转入方/审批配置 **3 passed**。转出/转入非 heading。`d3f5981f8`
 - Q2872：/disposals/transfer/new 调拨编号/申请人/调拨日期 **3 passed**。`f0e897ac5`
 - Q2873：/disposals/transfer/new 调拨类型/方向/调出部门 **3 passed**。`a3f479c46`
-- Q2874：/disposals/transfer/new 调出位置/调入部门/调入位置 **3 passed**。
+- Q2874：/disposals/transfer/new 调出位置/调入部门/调入位置 **3 passed**。`718a9ec65`
+- Q2875：/disposals/transfer/new 已选/发布流程/资产转移流程 **3 passed**。
 
