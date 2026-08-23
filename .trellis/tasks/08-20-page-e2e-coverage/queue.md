@@ -2084,4 +2084,5 @@
 | Q2894 | done | 桌面空态 **3 passed**（/depreciation 全部方法/直线法/双倍余额）。禁 /m。 |
 | Q2895 | done | 桌面空态 **3 passed**（/depreciation 年数总和/工作量 + /budgets/new 状态）。禁 /m。 |
 | Q2896 | done | 桌面空态 **3 passed**（/vendors 新增供应商/标题/搜索）。禁 /m。 |
-| Q2897 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2897 | done | 桌面空态 **3 passed**（/vendors 描述/全部供应商/暂无数据）。禁 /m。 |
+| Q2898 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
