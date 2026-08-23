@@ -42957,6 +42957,34 @@ test.describe('Q2956 桌面新建备件占位空态', () => {
   });
 });
 
+test.describe('Q2957 桌面报表中心操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports 空态 button「导出 CSV」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('button', { name: /导\s*出\s*CSV/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 空态 button「导出 PDF」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('button', { name: /导\s*出\s*PDF/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports 空态 heading「报表中心」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { name: '报表中心' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
