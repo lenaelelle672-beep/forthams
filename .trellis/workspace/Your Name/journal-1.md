@@ -984,5 +984,6 @@
 - Q2873：/disposals/transfer/new 调拨类型/方向/调出部门 **3 passed**。`a3f479c46`
 - Q2874：/disposals/transfer/new 调出位置/调入部门/调入位置 **3 passed**。`718a9ec65`
 - Q2875：/disposals/transfer/new 已选/发布流程/资产转移流程 **3 passed**。`1d2fe6497`
-- Q2876：/disposals/transfer/new 紧急程度/处理人预览/高优先级 **3 passed**。
+- Q2876：/disposals/transfer/new 紧急程度/处理人预览/高优先级 **3 passed**。`2abc33fff`
+- Q2877：/disposals/transfer/new 所属部门/目标部门/自动保存 **3 passed**。
 
