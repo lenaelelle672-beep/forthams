@@ -3454,7 +3454,7 @@
 | Q4264 | done | 桌面空态 **3 passed**（岗位信息/角色权限/流程表单 heading）。禁 /m。 |
 | Q4265 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4266 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4267 | pending | 桌面空态 资产调拨/资产调拨列表/流程表单 heading。禁 /m。 |
+| Q4267 | pending | 桌面空态 资产清退/流程表单 heading。禁 /m。 |
 | Q4268 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
 | Q4269 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
 | Q4270 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

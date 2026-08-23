@@ -80725,17 +80725,17 @@ test.describe('Q4267 桌面处置未用列表 heading', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/disposals heading「资产调拨」', async ({ page }) => {
+  test('/disposals heading「资产清退」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/disposals');
-    await expect(page.getByRole('heading', { name: '资产调拨', exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: '资产清退', exact: true }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/disposals heading「资产调拨列表」', async ({ page }) => {
+  test('/workflow-form/TWOHUNDREDFIFTYSECOND heading「TWOHUNDREDFIFTYSECOND」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/disposals');
-    await expect(page.getByRole('heading', { name: '资产调拨列表' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/workflow-form/TWOHUNDREDFIFTYSECOND');
+    await expect(page.getByRole('heading', { name: 'TWOHUNDREDFIFTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
