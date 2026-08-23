@@ -974,5 +974,6 @@
 - Q2863：/disposals/clearance/new 入库保管/预估残值/紧急程度 **3 passed**。`eedaaf90c`
 - Q2864：/disposals/clearance/new 标题/风险提示/不可逆 **3 passed**。`e579b5df9`
 - Q2865：/disposals/clearance/new 确认提交/先选资产/审批流程 **3 passed**。`45525a638`
-- Q2866：/disposals/clearance/new 备注/说明/提交审批文案 **3 passed**。
+- Q2866：/disposals/clearance/new 备注/说明/提交审批文案 **3 passed**。`27e1a8d30`
+- Q2867：/disposals/clearance/new 变卖/捐赠/普通 **3 passed**。
 

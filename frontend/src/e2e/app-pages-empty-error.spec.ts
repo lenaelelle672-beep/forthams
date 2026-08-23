@@ -40437,6 +40437,34 @@ test.describe('Q2866 桌面新建清退申请备注空态', () => {
   });
 });
 
+test.describe('Q2867 桌面新建清退申请选项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/clearance/new 空态「变卖处理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('变卖处理').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/clearance/new 空态「捐赠」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('捐赠').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/clearance/new 空态「普通」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/clearance/new');
+    await expect(page.getByText('普通').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
