@@ -3157,15 +3157,23 @@
 | Q3967 | done | 桌面空态 **3 passed**（折旧未用方法筛选 button）。禁 /m。 |
 | Q3968 | done | 桌面空态 **3 passed**（折旧/处置未用 heading/button）。禁 /m。 |
 | Q3969 | done | 桌面空态 **3 passed**（处置未用类型/筛选 button）。禁 /m。 |
-| Q3970 | pending | 桌面空态 保险未用状态/类型筛选 button。禁 /m。 |
-| Q3971 | pending | 桌面空态 保险/设备未用筛选 button。禁 /m。 |
-| Q3972 | pending | 桌面空态 设备未用状态筛选 button。禁 /m。 |
-| Q3973 | pending | 桌面空态 合同/处置/审批未用 heading/button。禁 /m。 |
-| Q3974 | pending | 桌面空态 审批/盘点周期未用筛选 button。禁 /m。 |
-| Q3975 | pending | 桌面空态 检验未用类型筛选 button。禁 /m。 |
-| Q3976 | pending | 桌面空态 检验未用结果筛选 button。禁 /m。 |
-| Q3977 | pending | 桌面空态 备件/盘点周期未用筛选 button。禁 /m。 |
-| Q3978 | pending | 桌面空态 预算未用类型筛选 button。禁 /m。 |
-| Q3979 | pending | 桌面空态 预算/验收未用 heading/button。禁 /m。 |
-| Q3980 | pending | 桌面空态 验收/保险未用状态筛选 button。禁 /m。 |
-| Q3981 | pending | 桌面空态 审批未用类型筛选 button。禁 /m。 |
+| Q3970 | done | 桌面空态 **3 passed**（保险未用状态/类型筛选 button）。禁 /m。 |
+| Q3971 | done | 桌面空态 **3 passed**（保险/设备未用筛选 button）。禁 /m。 |
+| Q3972 | done | 桌面空态 **3 passed**（设备未用状态筛选 button）。禁 /m。 |
+| Q3973 | done | 桌面空态 **3 passed**（合同/处置/审批未用 heading/button）。禁 /m。 |
+| Q3974 | done | 桌面空态 **3 passed**（审批/盘点周期未用筛选 button）。禁 /m。 |
+| Q3975 | done | 桌面空态 **3 passed**（检验未用类型筛选 button）。禁 /m。 |
+| Q3976 | done | 桌面空态 **3 passed**（检验未用结果筛选 button）。禁 /m。 |
+| Q3977 | done | 桌面空态 **3 passed**（备件/盘点周期未用筛选 button）。禁 /m。 |
+| Q3978 | done | 桌面空态 **3 passed**（预算未用类型筛选 button）。禁 /m。 |
+| Q3979 | done | 桌面空态 **3 passed**（预算/验收未用 heading/button）。禁 /m。 |
+| Q3980 | done | 桌面空态 **3 passed**（验收/保险未用状态筛选 button）。禁 /m。 |
+| Q3981 | done | 桌面空态 **3 passed**（审批未用类型筛选 button）。禁 /m。 |
+| Q3982 | pending | 桌面空态 资产未用状态筛选 button。禁 /m。 |
+| Q3983 | pending | 桌面空态 资产/维保计划未用筛选 button。禁 /m。 |
+| Q3984 | pending | 桌面空态 通知未用类型筛选 button。禁 /m。 |
+| Q3985 | pending | 桌面空态 盘点未用摘要/筛选 button。禁 /m。 |
+| Q3986 | pending | 桌面空态 资产/许可证未用 button。禁 /m。 |
+| Q3987 | pending | 桌面空态 检验记录/审计/处置未用 heading/button。禁 /m。 |
+| Q3988 | pending | 桌面空态 TCO 未用 heading。禁 /m。 |
+| Q3989 | pending | 桌面空态 TCO/GIS/许可证未用 heading/button。禁 /m。 |
