@@ -3462,3 +3462,11 @@
 | Q4272 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4273 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4274 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4275 | pending | 桌面空态 重估/预算/盘点周期表格空态 heading。禁 /m。 |
+| Q4276 | pending | 桌面空态 检验/折旧/清退表格空态 heading。禁 /m。 |
+| Q4277 | pending | 桌面空态 维保/保险/借用表格空态 heading。禁 /m。 |
+| Q4278 | pending | 桌面空态 角色/岗位/备件表格空态 heading。禁 /m。 |
+| Q4279 | pending | 桌面空态 用户/审批表格空态 heading。禁 /m。 |
+| Q4280 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4281 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4282 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
