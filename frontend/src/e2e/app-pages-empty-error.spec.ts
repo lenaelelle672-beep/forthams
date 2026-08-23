@@ -48946,6 +48946,258 @@ test.describe('Q3168 桌面供应商管理筛选计数空态', () => {
   });
 });
 
+test.describe('Q3169 桌面位置管理空表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management heading「位置管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('heading', { name: '位置管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management heading「位置列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('heading', { name: '位置列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 空态「暂无位置数据。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('暂无位置数据。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3170 桌面位置管理根位置空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management 空态「暂无根位置。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByText('暂无根位置。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management heading「根位置摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('heading', { name: '根位置摘要' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management placeholder「按名称、编码、描述或父级搜索」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByPlaceholder('按名称、编码、描述或父级搜索').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3171 桌面位置管理检索空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management textbox「位置关键词」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('textbox', { name: '位置关键词' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management button「搜索」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('button', { name: '搜索' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management button「重新加载」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('button', { name: '重新加载' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3172 桌面基础参数空表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params heading「基础参数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('heading', { name: '基础参数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params heading「SYSTEM 基础参数目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('heading', { name: 'SYSTEM 基础参数目录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 空态「暂无 SYSTEM 基础参数，请通过 V3 新增。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('暂无 SYSTEM 基础参数，请通过 V3 新增。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3173 桌面基础参数表单空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params heading「保存基础参数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('heading', { name: '保存基础参数' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params textbox「参数键」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('textbox', { name: '参数键' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params textbox「参数名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('textbox', { name: '参数名称' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3174 桌面基础参数操作空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params textbox「参数值」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('textbox', { name: '参数值' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params button「影响预演」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('button', { name: '影响预演' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params button「刷新缓存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByRole('button', { name: '刷新缓存' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3175 桌面基础参数默认键空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「公司名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('公司名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「系统名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('系统名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「默认时区」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('默认时区').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3176 桌面 SLA 配置计数文案空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「策略总数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('策略总数').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「导出仅返回脱敏摘要。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText('导出仅返回脱敏摘要。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config 「暂无 SLA 策略，请先由后端种子」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByText(/暂无 SLA 策略，请先由后端种子/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3177 桌面自定义字段边界文案空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCustomFieldsEmptyCatalog);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields textbox「预览样例（fieldName=value，每行一组）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByRole('textbox', { name: '预览样例（fieldName=value，每行一组）' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「真实调用 /system/custom-fields」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText(/真实调用 \/system\/custom-fields/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-fields 「不代表字段集完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-fields');
+    await expect(page.getByText(/不代表字段集完成/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
@@ -54845,6 +55097,18 @@ async function mockNotificationPreferencesEmpty(route: Route) {
   }
   if (path === '/notification-preferences/meta') {
     return fulfill(route, { categories: [], channelTypes: [], nonGoals: [] });
+  }
+  return mockApi(route);
+}
+
+async function mockLocationsListEmpty(route: Route) {
+  const url = new URL(route.request().url());
+  if (!url.pathname.startsWith('/api/')) {
+    return route.fallback();
+  }
+  const path = url.pathname.replace(/^\/api(?:\/v1)?/, '');
+  if (path === '/locations/list' || path === '/locations/root') {
+    return fulfill(route, []);
   }
   return mockApi(route);
 }
