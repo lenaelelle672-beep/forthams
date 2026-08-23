@@ -2667,27 +2667,48 @@
 | Q3477 | done | 桌面空态 **3 passed**（用户管理表头（账号/姓名/电话））。禁 /m。 |
 | Q3478 | done | 桌面空态 **3 passed**（用户管理表头余项（邮箱/部门 ID/状态））。禁 /m。 |
 | Q3479 | done | 桌面空态 **3 passed**（用户管理计数（显示 0 条/后端总数/前端状态筛选））。禁 /m。 |
-| Q3480 | pending | 桌面空态：部门组织状态筛（combobox/全部状态/正常）。禁 /m。 |
-| Q3481 | pending | 桌面空态：部门组织状态筛余项（停用/depts list/前端筛选）。禁 /m。 |
-| Q3482 | pending | 桌面空态：部门组织表头（名称/编码/父级 ID）。禁 /m。 |
-| Q3483 | pending | 桌面空态：部门组织表头余项（排序/负责人/状态）。禁 /m。 |
-| Q3484 | pending | 桌面空态：部门组织计数（0 条/搜索列表/depts tree）。禁 /m。 |
-| Q3485 | pending | 桌面空态：位置管理状态筛（combobox/全部状态/启用）。禁 /m。 |
-| Q3486 | pending | 桌面空态：位置管理状态筛余项（停用/locations list/root）。禁 /m。 |
-| Q3487 | pending | 桌面空态：位置管理表头（名称/编码/父级 ID）。禁 /m。 |
-| Q3488 | pending | 桌面空态：位置管理表头余项（排序/状态/显示 0 条）。禁 /m。 |
-| Q3489 | pending | 桌面空态：供应商管理状态筛（combobox/启用/停用）。禁 /m。 |
-| Q3490 | pending | 桌面空态：供应商管理表头（名称/编码/联系人）。禁 /m。 |
-| Q3491 | pending | 桌面空态：供应商管理表头余项（联系电话/状态/vendors list）。禁 /m。 |
-| Q3492 | pending | 桌面空态：岗位管理状态筛（岗位状态/metadata-only/no-assignment）。禁 /m。 |
-| Q3493 | pending | 桌面空态：岗位管理边界（元数据边界/不分配用户/真组件）。禁 /m。 |
-| Q3494 | pending | 桌面空态：岗位管理说明（previewAccepted/complementary/组织权限组）。禁 /m。 |
-| Q3495 | pending | 桌面空态：岗位管理计数余项（0 条只读/停用/runtime）。禁 /m。 |
-| Q3496 | pending | 桌面空态：基础参数操作余项（重新加载/保存/参数类型）。禁 /m。 |
-| Q3497 | pending | 桌面空态：基础参数类型筛（STRING/NUMBER/BOOLEAN）。禁 /m。 |
-| Q3498 | pending | 桌面空态：基础参数类型筛余项（SELECT/JSON/system-config）。禁 /m。 |
-| Q3499 | pending | 桌面空态：基础参数边界（SYSTEM 分组/44 项/V3 全量）。禁 /m。 |
-| Q3500 | pending | 桌面空态：基础参数预演说明（不持久化/DEGRADED/目录）。禁 /m。 |
-| Q3501 | pending | 桌面空态：基础参数默认键编码（companyName/timezone/currency）。禁 /m。 |
-| Q3502 | pending | 桌面空态：基础参数默认键余项（预警天数/备份频率/configs）。禁 /m。 |
-| Q3503 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3480 | done | 桌面空态 **3 passed**（部门组织状态筛（combobox/全部状态/正常））。禁 /m。 |
+| Q3481 | done | 桌面空态 **3 passed**（部门组织状态筛余项（停用/depts list/前端筛选））。禁 /m。 |
+| Q3482 | done | 桌面空态 **3 passed**（部门组织表头（名称/编码/父级 ID））。禁 /m。 |
+| Q3483 | done | 桌面空态 **3 passed**（部门组织表头余项（排序/负责人/状态））。禁 /m。 |
+| Q3484 | done | 桌面空态 **3 passed**（部门组织计数（0 条/搜索列表/depts tree））。禁 /m。 |
+| Q3485 | done | 桌面空态 **3 passed**（位置管理状态筛（combobox/全部状态/启用））。禁 /m。 |
+| Q3486 | done | 桌面空态 **3 passed**（位置管理状态筛余项（停用/locations list/root））。禁 /m。 |
+| Q3487 | done | 桌面空态 **3 passed**（位置管理表头（名称/编码/父级 ID））。禁 /m。 |
+| Q3488 | done | 桌面空态 **3 passed**（位置管理表头余项（排序/状态/显示 0 条））。禁 /m。 |
+| Q3489 | done | 桌面空态 **3 passed**（供应商管理状态筛（combobox/启用/停用））。禁 /m。 |
+| Q3490 | done | 桌面空态 **3 passed**（供应商管理表头（名称/编码/联系人））。禁 /m。 |
+| Q3491 | done | 桌面空态 **3 passed**（供应商管理表头余项（联系电话/状态/vendors list））。禁 /m。 |
+| Q3492 | done | 桌面空态 **3 passed**（岗位管理状态筛（岗位状态/metadata-only/no-assignment））。禁 /m。 |
+| Q3493 | done | 桌面空态 **3 passed**（岗位管理边界（元数据边界/不分配用户/真组件））。禁 /m。 |
+| Q3494 | done | 桌面空态 **3 passed**（岗位管理说明（previewAccepted/complementary/组织权限组））。禁 /m。 |
+| Q3495 | done | 桌面空态 **3 passed**（岗位管理计数余项（0 条只读/停用/runtime））。禁 /m。 |
+| Q3496 | done | 桌面空态 **3 passed**（基础参数操作余项（重新加载/保存/参数类型））。禁 /m。 |
+| Q3497 | done | 桌面空态 **3 passed**（基础参数类型筛（STRING/NUMBER/BOOLEAN））。禁 /m。 |
+| Q3498 | done | 桌面空态 **3 passed**（基础参数类型筛余项（SELECT/JSON/system-config））。禁 /m。 |
+| Q3499 | done | 桌面空态 **3 passed**（基础参数边界（SYSTEM 分组/44 项/V3 全量））。禁 /m。 |
+| Q3500 | done | 桌面空态 **3 passed**（基础参数预演说明（不持久化/DEGRADED/目录））。禁 /m。 |
+| Q3501 | done | 桌面空态 **3 passed**（基础参数默认键编码（companyName/timezone/currency））。禁 /m。 |
+| Q3502 | done | 桌面空态 **3 passed**（基础参数默认键余项（预警天数/备份频率/configs））。禁 /m。 |
+| Q3503 | pending | 桌面空态：邮件模板筛选（分类/内容类型/全部类型）。禁 /m。 |
+| Q3504 | pending | 桌面空态：邮件模板操作（查询/列表 region/详情 complementary）。禁 /m。 |
+| Q3505 | pending | 桌面空态：邮件模板计数（按编码查询/0 条/tenant-scoped）。禁 /m。 |
+| Q3506 | pending | 桌面空态：邮件模板边界（catalog/不发送/mail-templates list）。禁 /m。 |
+| Q3507 | pending | 桌面空态：邮件模板预览说明（HTML escaped/子系统/通知组）。禁 /m。 |
+| Q3508 | pending | 桌面空态：邮件模板元数据（边界/SMTP/敏感变量）。禁 /m。 |
+| Q3509 | pending | 桌面空态：邮件日志状态筛（状态 combobox/全部状态/查询）。禁 /m。 |
+| Q3510 | pending | 桌面空态：邮件日志检索（模板编码/业务类型/业务 ID）。禁 /m。 |
+| Q3511 | pending | 桌面空态：邮件日志列表（region/脱敏 complementary/0 条）。禁 /m。 |
+| Q3512 | pending | 桌面空态：邮件日志边界（redacted/mail-logs list/redacted=true）。禁 /m。 |
+| Q3513 | pending | 桌面空态：邮件日志脱敏说明（收件人抄送/采集链路）。禁 /m。 |
+| Q3514 | pending | 桌面空态：邮件日志业务查询（biz lookup/mail-logs biz/no retry）。禁 /m。 |
+| Q3515 | pending | 桌面空态：邮件日志覆盖说明（44/44/通知组/不重试）。禁 /m。 |
+| Q3516 | pending | 桌面空态：通知模板筛选（分类/渠道/全部分类）。禁 /m。 |
+| Q3517 | pending | 桌面空态：通知模板操作（全部渠道/查询/列表 region）。禁 /m。 |
+| Q3518 | pending | 桌面空态：通知模板详情（complementary/按编码/0 条）。禁 /m。 |
+| Q3519 | pending | 桌面空态：通知模板边界（catalog/不发送/list）。禁 /m。 |
+| Q3520 | pending | 桌面空态：通知模板非目标（不配置渠道/不修改偏好/开关）。禁 /m。 |
+| Q3521 | pending | 桌面空态：通知模板覆盖说明（通知组/元数据/不保存偏好）。禁 /m。 |
+| Q3522 | pending | 桌面空态：通知模板 heading 余项（catalog/safe preview/搜索）。禁 /m。 |
+| Q3523 | pending | 桌面空态：通知模板预览余项（预览变量/邮件网关/tenant-scoped）。禁 /m。 |
+| Q3524 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
