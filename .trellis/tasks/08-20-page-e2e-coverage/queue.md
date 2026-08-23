@@ -2805,5 +2805,5 @@
 | Q3615 | done | 桌面空态 **3 passed**（页脚 交接/用户/表单存储）。禁 /m。 |
 | Q3616 | done | 桌面空态 **3 passed**（页脚 审批规则/SLA/表单存储）。禁 /m。 |
 | Q3617 | done | 桌面空态 **3 passed**（六域导航 9/9 6/6 5/5 已接入）。禁 /m。 |
-| Q3618 | pending | 桌面空态（子项导航 complementary/同步 dry-run 说明）。禁 /m。 |
+| Q3618 | done | 桌面空态 **3 passed**（子项导航 complementary/同步 dry-run 说明）。禁 /m。 |
 | Q3619 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
