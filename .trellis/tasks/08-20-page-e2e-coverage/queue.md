@@ -2205,4 +2205,5 @@
 | Q3015 | done | 桌面空态 **3 passed**（/notifications 审批/预警/系统通知）。禁 /m。 |
 | Q3016 | done | 桌面空态 **3 passed**（/notifications 共0条/全部/所有通知）。禁 /m。 |
 | Q3017 | done | 桌面空态 **3 passed**（/audit 审计日志/搜索/导出）。禁 /m。 |
-| Q3018 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3018 | done | 桌面空态 **3 passed**（/audit 总操作数/今日操作/活跃用户）。禁 /m。 |
+| Q3019 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
