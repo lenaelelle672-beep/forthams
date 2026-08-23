@@ -962,5 +962,6 @@
 - Q2851：/disposals/scrap/new 取消/返回/添加资产 **3 passed**。`e448cce80`
 - Q2852：/disposals/scrap/new 基本信息/选择资产/报废配置 **3 passed**。选择资产非 heading。`3b65a1d95`
 - Q2853：/disposals/scrap/new 报废编号/申请人/报废原因 **3 passed**。`dcdfadbe6`
-- Q2854：/disposals/scrap/new 处置方式/暂无资产/预估残值 **3 passed**。
+- Q2854：/disposals/scrap/new 处置方式/暂无资产/预估残值 **3 passed**。`65ced8b33`
+- Q2855：/disposals/scrap/new 审批流程/先选资产/不可逆 **3 passed**。
 
