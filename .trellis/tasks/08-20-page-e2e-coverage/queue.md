@@ -3177,15 +3177,19 @@
 | Q3987 | done | 桌面空态 **3 passed**（检验记录/审计/处置未用 heading/button）。禁 /m。 |
 | Q3988 | done | 桌面空态 **3 passed**（TCO 未用 heading）。禁 /m。 |
 | Q3989 | done | 桌面空态 **3 passed**（TCO/GIS/许可证未用 heading/button）。禁 /m。 |
-| Q3990 | pending | 桌面空态 履历/盘点报告未用 heading/button。禁 /m。 |
-| Q3991 | pending | 桌面空态 个人/盘点周期未用 heading。禁 /m。 |
-| Q3992 | pending | 桌面空态 盘点周期未用 heading/button。禁 /m。 |
-| Q3993 | pending | 桌面空态 盘点/健康/维保未用 button。禁 /m。 |
-| Q3994 | pending | 桌面空态 流程中心未用 heading/button。禁 /m。 |
-| Q3995 | pending | 桌面空态 流程中心未用 KPI/新建 button。禁 /m。 |
-| Q3996 | pending | 桌面空态 流程中心未用回滚/入口 button。禁 /m。 |
-| Q3997 | pending | 桌面空态 流程/审批未用 button。禁 /m。 |
-| Q3998 | pending | 桌面空态 风险未用等级筛选 button。禁 /m。 |
-| Q3999 | pending | 桌面空态 风险/通知未用筛选 button。禁 /m。 |
-| Q4000 | pending | 桌面空态 流程定义未用 heading。禁 /m。 |
-| Q4001 | pending | 桌面空态 流程/周期/盘点报告未用 heading。禁 /m。 |
+| Q3990 | done | 桌面空态 **3 passed**（履历/盘点报告未用 heading/button）。禁 /m。 |
+| Q3991 | done | 桌面空态 **3 passed**（个人/盘点周期未用 heading）。禁 /m。 |
+| Q3992 | done | 桌面空态 **3 passed**（盘点周期未用 heading/button）。禁 /m。 |
+| Q3993 | done | 桌面空态 **3 passed**（盘点/健康/维保未用 heading/button）。禁 /m。 |
+| Q3994 | done | 桌面空态 **3 passed**（流程中心未用 heading/button）。禁 /m。 |
+| Q3995 | done | 桌面空态 **3 passed**（流程中心未用 KPI/新建 button）。禁 /m。 |
+| Q3996 | done | 桌面空态 **3 passed**（流程中心未用回滚/入口 button）。禁 /m。 |
+| Q3997 | done | 桌面空态 **3 passed**（流程/审批未用 heading/button）。禁 /m。 |
+| Q3998 | done | 桌面空态 **3 passed**（风险未用等级筛选 button）。禁 /m。 |
+| Q3999 | done | 桌面空态 **3 passed**（风险/通知未用筛选 button）。禁 /m。 |
+| Q4000 | done | 桌面空态 **3 passed**（流程定义未用 heading）。禁 /m。 |
+| Q4001 | done | 桌面空态 **3 passed**（流程/周期/盘点报告未用 heading）。禁 /m。 |
+| Q4002 | pending | 桌面空态 流程中心未用分页 button。禁 /m。 |
+| Q4003 | pending | 桌面空态 流程中心未用 KPI 副文案 button。禁 /m。 |
+| Q4004 | pending | 桌面空态 工单详情未用 heading。禁 /m。 |
+| Q4005 | pending | 桌面空态 工单验收/详情未用 heading。禁 /m。 |

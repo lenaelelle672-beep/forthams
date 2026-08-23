@@ -401,7 +401,7 @@ export default function WorkOrderDetailPage() {
                 </div>
               )}
               {approvalRecords.length === 0 && (
-                <p className="text-sm text-[#94a3b8] dark:text-gray-500 text-center py-4">暂无审批记录</p>
+                <h3 className="text-sm font-medium text-[#94a3b8] dark:text-gray-500 text-center py-4">暂无审批记录</h3>
               )}
             </CardContent>
           </Card>

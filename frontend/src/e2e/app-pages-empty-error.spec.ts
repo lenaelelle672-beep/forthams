@@ -73007,6 +73007,122 @@ test.describe('Q4001 桌面流程/周期/盘点报告未用 heading 空态', () 
 
 });
 
+test.describe('Q4002 桌面流程中心未用分页 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflows button「首页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('button', { name: '首页' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows button「末页」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('button', { name: '末页' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows button「全部业务流程」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('button', { name: '全部业务流程' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4003 桌面流程中心未用 KPI 副文案 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflows button「可用于发起」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('button', { name: '可用于发起' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows button「待完善发布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('button', { name: '待完善发布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflows button「暂停发起」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflows');
+    await expect(page.getByRole('button', { name: '暂停发起' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4004 桌面工单详情未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/1 heading「工单详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByRole('heading', { name: '工单详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 heading「工单信息」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByRole('heading', { name: '工单信息' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 heading「审批记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByRole('heading', { name: '审批记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4005 桌面工单验收/详情未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workorders/1/acceptance heading「工单验收」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1/acceptance');
+    await expect(page.getByRole('heading', { name: '工单验收' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1/acceptance heading「验收操作」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1/acceptance');
+    await expect(page.getByRole('heading', { name: '验收操作' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workorders/1 heading「暂无审批记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workorders/1');
+    await expect(page.getByRole('heading', { name: '暂无审批记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
