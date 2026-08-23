@@ -78846,6 +78846,243 @@ test.describe('Q4202 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4203 桌面运行监控/SLA/审计未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor heading「只读展示 /approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records 返回的审批实例、SLA 风险摘要和超时记录。」', async ({ page }) => {
+    await page.route('**/api/**', mockRuntimeMonitorEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByRole('heading', { name: '只读展示 /approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records 返回的审批实例、SLA 风险摘要和超时记录。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-sla-config heading「真实调用 /sla-config 策略列表、详情、更新、启停、simulate、runtime-summary、timeout-records 与 export 接口。」', async ({ page }) => {
+    await page.route('**/api/**', mockSlaConfigEmptyCatalog);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sla-config');
+    await expect(page.getByRole('heading', { name: '真实调用 /sla-config 策略列表、详情、更新、启停、simulate、runtime-summary、timeout-records 与 export 接口。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log heading「真实调用 /audit-logs、/audit-logs/{id}、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。」', async ({ page }) => {
+    await page.route('**/api/**', mockAuditLogsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByRole('heading', { name: '真实调用 /audit-logs、/audit-logs/{id}、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4204 桌面同步规则/审批规则/流程定义未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-sync-rules heading「dryRun 默认 true；只保留 dry-run、单条日志重试、只读队列摘要，批处理队列消费入口不开放。」', async ({ page }) => {
+    await page.route('**/api/**', mockSystemSyncRulesEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-sync-rules');
+    await expect(page.getByRole('heading', { name: 'dryRun 默认 true；只保留 dry-run、单条日志重试、只读队列摘要，批处理队列消费入口不开放。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-approval-rules heading「真实调用 /approval-rules 列表、详情、创建、更新、启用、停用、模拟与冲突检测接口。」', async ({ page }) => {
+    await page.route('**/api/**', mockApprovalRulesEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-approval-rules');
+    await expect(page.getByRole('heading', { name: '真实调用 /approval-rules 列表、详情、创建、更新、启用、停用、模拟与冲突检测接口。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-definition heading「只读展示 /workflows 与 /workflows/{businessType} 返回的流程模板、版本状态和节点摘要。」', async ({ page }) => {
+    await page.route('**/api/**', mockWorkflowDefinitionsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-definition');
+    await expect(page.getByRole('heading', { name: '只读展示 /workflows 与 /workflows/{businessType} 返回的流程模板、版本状态和节点摘要。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4205 桌面待办字段/位置/部门未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-todo-fields heading「真实调用 /todo-fields 列表、保存、排序、角色覆盖、默认恢复与预览接口。」', async ({ page }) => {
+    await page.route('**/api/**', mockTodoFieldsEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-todo-fields');
+    await expect(page.getByRole('heading', { name: '真实调用 /todo-fields 列表、保存、排序、角色覆盖、默认恢复与预览接口。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-location-management heading「只读展示 /locations/list 与 /locations/root 返回的位置，搜索与状态筛选在前端结果内完成。」', async ({ page }) => {
+    await page.route('**/api/**', mockLocationsListEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-location-management');
+    await expect(page.getByRole('heading', { name: '只读展示 /locations/list 与 /locations/root 返回的位置，搜索与状态筛选在前端结果内完成。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-dept-org heading「只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成。」', async ({ page }) => {
+    await page.route('**/api/**', mockDeptsListEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-dept-org');
+    await expect(page.getByRole('heading', { name: '只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4206 桌面用户/供应商/控制台未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-user-management heading「只读展示 /user-management/list 返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-user-management');
+    await expect(page.getByRole('heading', { name: '只读展示 /user-management/list 返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-vendor-management heading「只读展示 /vendors/list 返回的供应商，搜索与状态筛选在前端结果内完成。」', async ({ page }) => {
+    await page.route('**/api/**', mockVendorsListEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-vendor-management');
+    await expect(page.getByRole('heading', { name: '只读展示 /vendors/list 返回的供应商，搜索与状态筛选在前端结果内完成。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-settings-command-center heading「只读聚合 /workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records，展示流程模板、运行实例、SLA 风险摘要与超时记录。」', async ({ page }) => {
+    await page.route('**/api/**', mockCommandCenterEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-settings-command-center');
+    await expect(page.getByRole('heading', { name: '只读聚合 /workflows、/approvals/list、/approvals/pending/count、/sla-config/runtime-summary 与 /sla-config/timeout-records，展示流程模板、运行实例、SLA 风险摘要与超时记录。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4207 桌面表单存储/设计器/安全策略未用副文案 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-form-storage heading「真实调用 /form-storage 列表、详情、创建、更新、归档、删除留痕、附件引用与导出脱敏接口。」', async ({ page }) => {
+    await page.route('**/api/**', mockFormStorageEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-form-storage');
+    await expect(page.getByRole('heading', { name: '真实调用 /form-storage 列表、详情、创建、更新、归档、删除留痕、附件引用与导出脱敏接口。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-flow-designer heading「真实调用 /workflows、/workflows/{businessType}/designer/draft、/designer/validate、/publish 与 /versions/{version}/rollback。」', async ({ page }) => {
+    await page.route('**/api/**', mockFlowDesignerEmpty);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-flow-designer');
+    await expect(page.getByRole('heading', { name: '真实调用 /workflows、/workflows/{businessType}/designer/draft、/designer/validate、/publish 与 /versions/{version}/rollback。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-security-policy heading「真实调用 /system-config/security 与 /system-config/security/preview；本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖，也不是 Workbench V3 全量完成。」', async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-security-policy');
+    await expect(page.getByRole('heading', { name: '真实调用 /system-config/security 与 /system-config/security/preview；本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖，也不是 Workbench V3 全量完成。' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4208 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDSIXTYSIXTH heading「HUNDREDSIXTYSIXTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSIXTYSIXTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSIXTYSIXTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSIXTYSEVENTH heading「HUNDREDSIXTYSEVENTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSIXTYSEVENTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSIXTYSEVENTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSIXTYEIGHTH heading「HUNDREDSIXTYEIGHTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSIXTYEIGHTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSIXTYEIGHTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4209 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDSIXTYNINTH heading「HUNDREDSIXTYNINTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSIXTYNINTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSIXTYNINTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTIETH heading「HUNDREDSEVENTIETH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTIETH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTIETH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYFIRST heading「HUNDREDSEVENTYFIRST」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYFIRST');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYFIRST' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4210 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYSECOND heading「HUNDREDSEVENTYSECOND」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYSECOND');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYSECOND' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYTHIRD heading「HUNDREDSEVENTYTHIRD」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYTHIRD');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYTHIRD' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/HUNDREDSEVENTYFOURTH heading「HUNDREDSEVENTYFOURTH」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/HUNDREDSEVENTYFOURTH');
+    await expect(page.getByRole('heading', { name: 'HUNDREDSEVENTYFOURTH' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

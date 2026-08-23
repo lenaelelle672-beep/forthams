@@ -245,9 +245,9 @@ export default function SystemFormStorageWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">表单存储</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <h3 className="mt-1 text-sm font-medium text-slate-500">
             真实调用 /form-storage 列表、详情、创建、更新、归档、删除留痕、附件引用与导出脱敏接口。
-          </p>
+          </h3>
         </div>
         <button className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:bg-slate-100" disabled={loading || saving} type="button" onClick={() => void loadRecords()}>
           重新加载

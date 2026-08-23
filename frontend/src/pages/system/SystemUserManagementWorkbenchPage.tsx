@@ -106,7 +106,7 @@ export default function SystemUserManagementWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">用户管理</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /user-management/list 返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示 /user-management/list 返回的用户，搜索调用后端 keyword，状态筛选在前端结果内完成。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"

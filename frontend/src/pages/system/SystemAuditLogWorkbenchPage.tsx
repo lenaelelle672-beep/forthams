@@ -151,7 +151,7 @@ export default function SystemAuditLogWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">审计日志</h3>
-          <p className="mt-1 text-sm text-slate-500">真实调用 /audit-logs、/audit-logs/&#123;id&#125;、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">真实调用 /audit-logs、/audit-logs/&#123;id&#125;、/audit-logs/stats、/audit-logs/trends、/audit-logs/action-type-distribution、/audit-logs/operator-ranking 与 /audit-logs/meta。</h3>
         </div>
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">GET-only / tenant-scoped / masked</span>
       </div>

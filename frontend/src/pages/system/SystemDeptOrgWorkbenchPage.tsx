@@ -135,7 +135,7 @@ export default function SystemDeptOrgWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">部门组织</h3>
-          <p className="mt-1 text-sm text-slate-500">只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成。</p>
+          <h3 className="mt-1 text-sm font-medium text-slate-500">只读展示 /depts/list 与 /depts/tree 返回的组织部门，搜索调用列表接口，状态筛选在前端结果内完成。</h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"

@@ -420,9 +420,9 @@ export default function SystemFlowDesignerWorkbenchPage({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold">流程设计器</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <h3 className="mt-1 text-sm font-medium text-slate-500">
             真实调用 /workflows、/workflows/{'{businessType}'}/designer/draft、/designer/validate、/publish 与 /versions/{'{version}'}/rollback。
-          </p>
+          </h3>
         </div>
         <button
           className="rounded-xl border border-slate-200 px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"

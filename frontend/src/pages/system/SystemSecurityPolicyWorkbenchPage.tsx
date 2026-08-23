@@ -179,9 +179,9 @@ export default function SystemSecurityPolicyWorkbenchPage({
     <section className="space-y-4" data-embedded={embeddedInWorkbench} data-system-security-policy="workbench-v3">
       <div>
         <h3 className="text-lg font-semibold">安全策略</h3>
-        <p className="mt-1 text-sm text-slate-500">
+        <h3 className="mt-1 text-sm font-medium text-slate-500">
           真实调用 /system-config/security 与 /system-config/security/preview；本页只展示配置态、预览态和审计摘要，仍非 44 项全量覆盖，也不是 Workbench V3 全量完成。
-        </p>
+        </h3>
       </div>
 
       <div className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-800">

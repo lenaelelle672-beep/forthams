@@ -64,7 +64,7 @@ export default function SystemSyncRulesWorkbenchPage({ embeddedInWorkbench = fal
     <section className="space-y-4" data-embedded={embeddedInWorkbench}>
       <div>
         <h3 className="text-lg font-semibold">同步规则</h3>
-        <p className="mt-1 text-sm text-slate-500">dryRun 默认 true；只保留 dry-run、单条日志重试、只读队列摘要，批处理队列消费入口不开放。</p>
+        <h3 className="mt-1 text-sm font-medium text-slate-500">dryRun 默认 true；只保留 dry-run、单条日志重试、只读队列摘要，批处理队列消费入口不开放。</h3>
       </div>
       {notice ? <div className="rounded-2xl bg-blue-50 px-4 py-3 text-sm text-blue-700">{notice}</div> : null}
       {error ? <div role="alert" className="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div> : null}
