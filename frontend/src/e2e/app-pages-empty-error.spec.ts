@@ -68625,6 +68625,240 @@ test.describe('Q3850 桌面供应商 list 检索整句空态', () => {
 
 });
 
+test.describe('Q3851 桌面技术支持诊断包安全边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-tech-support 「安全边界：诊断包必须脱敏，禁止导出敏感配置原值。本页仅展示工单只读 catalog；创建、分配、处理、关闭工单与导出诊断包等写操作不在 V3 只读 catalog 范围内。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tech-support');
+    await expect(page.getByText('安全边界：诊断包必须脱敏，禁止导出敏感配置原值。本页仅展示工单只读 catalog；创建、分配、处理、关闭工单与导出诊断包等写操作不在 V3 只读 catalog 范围内。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-tech-support 「本页仅展示工单只读 catalog；创建、分配、处理、关闭工单与导出诊断包等写操作不在 V3 只读 catalog 范围内」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tech-support');
+    await expect(page.getByText('本页仅展示工单只读 catalog；创建、分配、处理、关闭工单与导出诊断包等写操作不在 V3 只读 catalog 范围内').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-tech-support 「禁止导出敏感配置原值。本页仅展示工单只读 catalog」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tech-support');
+    await expect(page.getByText('禁止导出敏感配置原值。本页仅展示工单只读 catalog').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3852 桌面租户写边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-tenant-management 「只读边界：本页仅展示租户主数据；新建、编辑、停用、启用等写操作不在 V3 只读 catalog 范围内。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tenant-management');
+    await expect(page.getByText('只读边界：本页仅展示租户主数据；新建、编辑、停用、启用等写操作不在 V3 只读 catalog 范围内。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-tenant-management 「本页仅展示租户主数据；新建、编辑、停用、启用等写操作不在 V3 只读 catalog 范围内」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tenant-management');
+    await expect(page.getByText('本页仅展示租户主数据；新建、编辑、停用、启用等写操作不在 V3 只读 catalog 范围内').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-tenant-management 「只读边界：本页仅展示租户主数据；新建、编辑、停用、启用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-tenant-management');
+    await expect(page.getByText('只读边界：本页仅展示租户主数据；新建、编辑、停用、启用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3853 桌面导入导出写边界整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-import-export 「只读边界：本页仅展示任务历史与脱敏错误摘要；执行导入、导出、重试、取消等写操作不在 V3 只读 catalog 范围内。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
+    await expect(page.getByText('只读边界：本页仅展示任务历史与脱敏错误摘要；执行导入、导出、重试、取消等写操作不在 V3 只读 catalog 范围内。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-import-export 「本页仅展示任务历史与脱敏错误摘要；执行导入、导出、重试、取消等写操作不在 V3 只读 catalog 范围内」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
+    await expect(page.getByText('本页仅展示任务历史与脱敏错误摘要；执行导入、导出、重试、取消等写操作不在 V3 只读 catalog 范围内').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-import-export 「任务历史与脱敏错误摘要；执行导入、导出、重试、取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-import-export');
+    await expect(page.getByText('任务历史与脱敏错误摘要；执行导入、导出、重试、取消').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3854 桌面编号规则端点族整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「真实调用 /numbering-rules、/numbering-rules/{ruleKey}、/numbering-rules/meta 与 /numbering-rules/preview。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('真实调用 /numbering-rules、/numbering-rules/{ruleKey}、/numbering-rules/meta 与 /numbering-rules/preview。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「/numbering-rules/{ruleKey}、/numbering-rules/meta 与 /numbering-rules/preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('/numbering-rules/{ruleKey}、/numbering-rules/meta 与 /numbering-rules/preview').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「真实调用 /numbering-rules、/numbering-rules/{ruleKey}、/numbering-rules/meta」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('真实调用 /numbering-rules、/numbering-rules/{ruleKey}、/numbering-rules/meta').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3855 桌面编号规则 preview 不持久化整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「read-only numbering rule catalog + no-persistence deterministic preview；预览不会持久化、不刷新缓存、不预留或占用序号。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('read-only numbering rule catalog + no-persistence deterministic preview；预览不会持久化、不刷新缓存、不预留或占用序号。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「no-persistence deterministic preview；预览不会持久化、不刷新缓存、不预留或占用序号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('no-persistence deterministic preview；预览不会持久化、不刷新缓存、不预留或占用序号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「deterministic preview；预览不会持久化、不刷新缓存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('deterministic preview；预览不会持久化、不刷新缓存').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3856 桌面缓存白名单整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockCacheNamespacesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-cache-management 「只管理应用内白名单 CacheManager 命名空间，空缓存不会被报告为普通成功。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-cache-management');
+    await expect(page.getByText('只管理应用内白名单 CacheManager 命名空间，空缓存不会被报告为普通成功。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-cache-management 「只管理应用内白名单 CacheManager 命名空间，空缓存不会被报告」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-cache-management');
+    await expect(page.getByText('只管理应用内白名单 CacheManager 命名空间，空缓存不会被报告').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-cache-management 「CacheManager 命名空间，空缓存不会被报告为普通成功」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-cache-management');
+    await expect(page.getByText('CacheManager 命名空间，空缓存不会被报告为普通成功').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3857 桌面基础参数 SYSTEM 覆盖整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「真实调用 /system-config/system 与 /system/configs；仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('真实调用 /system-config/system 与 /system/configs；仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('仅覆盖 SYSTEM 分组基础参数，仍非 44 项全量覆盖，也不代表 Workbench V3 全量完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「/system/configs；仅覆盖 SYSTEM 分组基础参数」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('/system/configs；仅覆盖 SYSTEM 分组基础参数').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3858 桌面基础参数 DEGRADED 预演整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「本页展示基础参数目录、保存、影响预演与缓存刷新结果；预演不会持久化，缓存刷新无真实缓存时必须显示 DEGRADED。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('本页展示基础参数目录、保存、影响预演与缓存刷新结果；预演不会持久化，缓存刷新无真实缓存时必须显示 DEGRADED。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「影响预演与缓存刷新结果；预演不会持久化，缓存刷新无真实缓存时必须显示 DEGRADED」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('影响预演与缓存刷新结果；预演不会持久化，缓存刷新无真实缓存时必须显示 DEGRADED').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-base-params 「保存、影响预演与缓存刷新结果；预演不会持久化」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-base-params');
+    await expect(page.getByText('保存、影响预演与缓存刷新结果；预演不会持久化').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

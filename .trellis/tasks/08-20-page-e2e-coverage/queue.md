@@ -3030,11 +3030,19 @@
 | Q3840 | done | 桌面空态 **3 passed**（流程控制台只读风险整句）。禁 /m。 |
 | Q3841 | done | 桌面空态 **3 passed**（SLA 运行态安全边界整句）。禁 /m。 |
 | Q3842 | done | 桌面空态 **3 passed**（交接写边界与未闭环整句）。禁 /m。 |
-| Q3843 | pending | 桌面空态：安全策略 no-login-chain 整句。禁 /m。 |
-| Q3844 | pending | 桌面空态：安全策略配置态/审计摘要整句。禁 /m。 |
-| Q3845 | pending | 桌面空态：流程邮件写边界与零调用风险整句。禁 /m。 |
-| Q3846 | pending | 桌面空态：文档中心写边界与附件留痕整句。禁 /m。 |
-| Q3847 | pending | 桌面空态：控制台 SLA 联动 9/9 整句。禁 /m。 |
-| Q3848 | pending | 桌面空态：部门组织 list/tree 检索整句。禁 /m。 |
-| Q3849 | pending | 桌面空态：位置 list/root 检索整句。禁 /m。 |
-| Q3850 | pending | 桌面空态：供应商 list 检索整句。禁 /m。 |
+| Q3843 | done | 桌面空态 **3 passed**（安全策略 no-login-chain 整句）。禁 /m。 |
+| Q3844 | done | 桌面空态 **3 passed**（安全策略配置态/审计摘要整句）。禁 /m。 |
+| Q3845 | done | 桌面空态 **3 passed**（流程邮件写边界与零调用风险整句）。禁 /m。 |
+| Q3846 | done | 桌面空态 **3 passed**（文档中心写边界与附件留痕整句）。禁 /m。 |
+| Q3847 | done | 桌面空态 **3 passed**（控制台 SLA 联动 9/9 整句）。禁 /m。 |
+| Q3848 | done | 桌面空态 **3 passed**（部门组织 list/tree 检索整句）。禁 /m。 |
+| Q3849 | done | 桌面空态 **3 passed**（位置 list/root 检索整句）。禁 /m。 |
+| Q3850 | done | 桌面空态 **3 passed**（供应商 list 检索整句）。禁 /m。 |
+| Q3851 | pending | 桌面空态：技术支持诊断包安全边界整句。禁 /m。 |
+| Q3852 | pending | 桌面空态：租户写边界整句。禁 /m。 |
+| Q3853 | pending | 桌面空态：导入导出写边界整句。禁 /m。 |
+| Q3854 | pending | 桌面空态：编号规则端点族整句。禁 /m。 |
+| Q3855 | pending | 桌面空态：编号规则 preview 不持久化整句。禁 /m。 |
+| Q3856 | pending | 桌面空态：缓存白名单整句。禁 /m。 |
+| Q3857 | pending | 桌面空态：基础参数 SYSTEM 覆盖整句。禁 /m。 |
+| Q3858 | pending | 桌面空态：基础参数 DEGRADED 预演整句。禁 /m。 |
