@@ -2744,12 +2744,20 @@
 | Q3554 | done | 桌面空态 **3 passed**（邮件网关计数余项（0 条/metadata-only/mail-gateways））。禁 /m。 |
 | Q3555 | done | 桌面空态 **3 passed**（邮件网关边界余项（真组件/元数据/port））。禁 /m。 |
 | Q3556 | done | 桌面空态 **3 passed**（邮件网关表单余项（tlsMode/priority/STARTTLS））。禁 /m。 |
-| Q3557 | pending | 桌面空态（安全策略 landmark 配置态/审计摘要/STRING）。禁 /m。 |
-| Q3558 | pending | 桌面空态（安全策略类型筛 NUMBER/BOOLEAN/no-direct-effect）。禁 /m。 |
-| Q3559 | pending | 桌面空态（安全策略覆盖说明 不直接生效/44 项/V3 全量）。禁 /m。 |
-| Q3560 | pending | 桌面空态（安全策略默认键 credential/session/signIn）。禁 /m。 |
-| Q3561 | pending | 桌面空态（安全策略开关键 mfa/audit/provided）。禁 /m。 |
-| Q3562 | pending | 桌面空态（安全策略审计要求 reason/保存必须携带/服务端只记录）。禁 /m。 |
-| Q3563 | pending | 桌面空态（安全策略链路边界 不接登录/MFA 移动端/preview）。禁 /m。 |
-| Q3564 | pending | 桌面空态（安全策略预览边界 本页只展示/移动端运行/runtimeEffect false）。禁 /m。 |
-| Q3565 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3557 | done | 桌面空态 **3 passed**（安全策略 landmark 配置态/审计摘要/STRING）。禁 /m。 |
+| Q3558 | done | 桌面空态 **3 passed**（安全策略类型筛 NUMBER/BOOLEAN/no-direct-effect）。禁 /m。 |
+| Q3559 | done | 桌面空态 **3 passed**（安全策略覆盖说明 不直接生效/44 项/V3 全量）。禁 /m。 |
+| Q3560 | done | 桌面空态 **3 passed**（安全策略默认键 credential/session/signIn）。禁 /m。 |
+| Q3561 | done | 桌面空态 **3 passed**（安全策略开关键 mfa/audit/provided）。禁 /m。 |
+| Q3562 | done | 桌面空态 **3 passed**（安全策略审计要求 reason/保存必须携带/服务端只记录）。禁 /m。 |
+| Q3563 | done | 桌面空态 **3 passed**（安全策略链路边界 不接登录/MFA 移动端/preview）。禁 /m。 |
+| Q3564 | done | 桌面空态 **3 passed**（安全策略预览边界 本页只展示/移动端运行/runtimeEffect false）。禁 /m。 |
+| Q3565 | pending | 桌面空态（文件存储边界 note/不访问文件系统/生命周期）。禁 /m。 |
+| Q3566 | pending | 桌面空态（文件存储覆盖 导入导出/catalog 路径/统计摘要）。禁 /m。 |
+| Q3567 | pending | 桌面空态（文件存储计数 下载预览/共 0 页/当前仅为）。禁 /m。 |
+| Q3568 | pending | 桌面空态（基础参数默认键 systemName/预演刷新说明）。禁 /m。 |
+| Q3569 | pending | 桌面空态（邮件网关覆盖 消息组/rejectedInputs/noPersistence）。禁 /m。 |
+| Q3570 | pending | 桌面空态（邮件网关预览字段 note/邮件子系统/acceptedFields）。禁 /m。 |
+| Q3571 | pending | 桌面空态（邮件网关旗标 noSend/noNetwork/tenantScoped）。禁 /m。 |
+| Q3572 | pending | 桌面空态（资产分类查询 /categories/list）。禁 /m。 |
+| Q3573 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
