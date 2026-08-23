@@ -1066,5 +1066,6 @@
 - Q2955：备件待确认 + 重估类型/描述 **3 passed**。workbench「全屏」非可见文本。`38086a640`
 - Q2956：备件名称/规格 placeholder + /intake 供应商 **3 passed**。`4700849a9`
 - Q2957：/reports 导出CSV/PDF/标题 **3 passed**。`7a317f678`
-- Q2958：/reports 资产/财务/运维报表 **3 passed**。
+- Q2958：/reports 资产/财务/运维报表 **3 passed**。`a86f18a51`
+- Q2959：/reports 工单报表/资产汇总/分类统计 **3 passed**。
 
