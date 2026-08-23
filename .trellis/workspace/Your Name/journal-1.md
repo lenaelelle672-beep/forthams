@@ -1115,5 +1115,6 @@
 - Q3004：/dashboard 总价值/分类分布/维保预警 **3 passed**。`c6b703ee5`
 - Q3005：/dashboard 最近工单/净值/Top5部门 **3 passed**。`2aac5d633`
 - Q3006：/dashboard 运营首页/待审批/欢迎管理员 **3 passed**。`617ada034`
-- Q3007：/dashboard 查看全部/12个月趋势/导出数据 **3 passed**。
+- Q3007：/dashboard 查看全部/12个月趋势/导出数据 **3 passed**。`43942c121`
+- Q3008：/dashboard 刷新视图 + /approvals 待我审批 + /intake 验收日期 **3 passed**。
 
