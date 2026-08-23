@@ -3231,9 +3231,15 @@
 | Q4041 | done | 桌面空态 **3 passed**（可靠性空态/可用率未用 heading）。禁 /m。 |
 | Q4042 | done | 桌面空态 **3 passed**（盘点/通知未用空态 heading）。禁 /m。 |
 | Q4043 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4044 | pending | 桌面空态 资产新建/检验上传未用空态 heading。禁 /m。 |
-| Q4045 | pending | 桌面空态 通知/资产详情未用 heading。禁 /m。 |
-| Q4046 | pending | 桌面空态 位置空态与流程表单未用 heading。禁 /m。 |
-| Q4047 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4048 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4049 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4044 | done | 桌面空态 **3 passed**（资产新建/检验上传未用空态 heading）。禁 /m。 |
+| Q4045 | done | 桌面空态 **3 passed**（通知/资产详情未用 heading）。禁 /m。 |
+| Q4046 | done | 桌面空态 **3 passed**（位置空态与流程表单未用 heading）。禁 /m。 |
+| Q4047 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4048 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4049 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4050 | pending | 桌面空态 定时报表/风险矩阵未用空态 heading。禁 /m。 |
+| Q4051 | pending | 桌面空态 盘点周期/供应商/报废未用空态 heading。禁 /m。 |
+| Q4052 | pending | 桌面空态 审计/分析未用空态 heading。禁 /m。 |
+| Q4053 | pending | 桌面空态 分析统计与流程表单未用 heading。禁 /m。 |
+| Q4054 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4055 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

@@ -301,7 +301,7 @@ const RiskMatrixConfigPage: React.FC = () => {
                 {(!matrixList?.records || matrixList.records.length === 0) && (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-gray-500">
-                      暂无矩阵配置
+                      <h3 className="text-sm font-medium">暂无矩阵配置</h3>
                     </TableCell>
                   </TableRow>
                 )}

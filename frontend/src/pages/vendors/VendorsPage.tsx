@@ -655,9 +655,9 @@ export default function VendorsPage() {
                 {vendors.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-[#94a3b8]">
                     <Building2 className="w-12 h-12 mb-3 opacity-30" />
-                    <p className="text-sm">
+                    <h3 className="text-sm font-medium">
                       {searchTerm ? `未找到包含"${searchTerm}"的供应商` : '暂无供应商数据'}
-                    </p>
+                    </h3>
                     {!searchTerm && (
                       <Button variant="primary" size="sm" className="mt-4" onClick={handleOpenCreate}>
                         <Plus className="w-4 h-4" />

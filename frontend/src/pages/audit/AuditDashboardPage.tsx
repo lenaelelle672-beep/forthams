@@ -541,7 +541,9 @@ export default function AuditDashboardPage() {
                   </tr>
                 ) : records.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-16 text-center text-sm text-slate-400 font-medium">暂无审计日志</td>
+                    <td colSpan={6} className="px-6 py-16 text-center text-sm text-slate-400 font-medium">
+                      <h3 className="text-sm font-medium">暂无审计日志</h3>
+                    </td>
                   </tr>
                 ) : (
                   records.map((log) => {

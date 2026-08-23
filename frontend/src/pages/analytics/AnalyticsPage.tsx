@@ -92,7 +92,7 @@ function ChartEmptyState({ message }: { message: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-60 text-slate-400">
       <BarChart3 className="w-10 h-10 mb-3 text-slate-200" />
-      <span className="text-sm font-medium">{message}</span>
+      <h3 className="text-sm font-medium">{message}</h3>
     </div>
   );
 }

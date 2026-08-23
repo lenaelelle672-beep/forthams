@@ -72,8 +72,8 @@ export default function ScheduledReportConfigPage() {
           ) : reports.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-sm text-[var(--surface-muted-text)]">
               <Clock className="w-12 h-12 mb-3 opacity-40" />
-              <span>暂无定时报表配置</span>
-              <span className="mt-1">点击"新建定时报表"开始创建</span>
+              <h3 className="font-medium">暂无定时报表配置</h3>
+              <h3 className="mt-1 font-medium">点击"新建定时报表"开始创建</h3>
             </div>
           ) : (
             <div className="overflow-x-auto">

@@ -74399,6 +74399,180 @@ test.describe('Q4049 桌面流程表单未用业务编码 heading', () => {
 
 });
 
+test.describe('Q4050 桌面定时报表/风险矩阵未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports/scheduled heading「暂无定时报表配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByRole('heading', { name: '暂无定时报表配置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports/scheduled heading「点击"新建定时报表"开始创建」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports/scheduled');
+    await expect(page.getByRole('heading', { name: '点击"新建定时报表"开始创建' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/risk-matrix heading「暂无矩阵配置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/risk-matrix');
+    await expect(page.getByRole('heading', { name: '暂无矩阵配置' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4051 桌面盘点周期/供应商/报废未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/stocktaking-cycles/1 heading「暂无盘点任务」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/stocktaking-cycles/1');
+    await expect(page.getByRole('heading', { name: '暂无盘点任务' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/vendors heading「暂无供应商数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendors');
+    await expect(page.getByRole('heading', { name: '暂无供应商数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/disposals/scrap/new heading「暂无已选资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByRole('heading', { name: '暂无已选资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4052 桌面审计/分析未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/audit heading「暂无审计日志」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/audit');
+    await expect(page.getByRole('heading', { name: '暂无审计日志' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics heading「暂无分类数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByRole('heading', { name: '暂无分类数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/analytics heading「暂无部门排行数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByRole('heading', { name: '暂无部门排行数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4053 桌面分析统计与流程表单未用 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/analytics heading「暂无统计数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/analytics');
+    await expect(page.getByRole('heading', { name: '暂无统计数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/NU heading「NU」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/NU');
+    await expect(page.getByRole('heading', { name: 'NU' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/XI heading「XI」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/XI');
+    await expect(page.getByRole('heading', { name: 'XI' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4054 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/ETA heading「ETA」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/ETA');
+    await expect(page.getByRole('heading', { name: 'ETA' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/MU heading「MU」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/MU');
+    await expect(page.getByRole('heading', { name: 'MU' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/UPSILON heading「UPSILON」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/UPSILON');
+    await expect(page.getByRole('heading', { name: 'UPSILON' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4055 桌面流程表单未用业务编码 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-form/PI heading「PI」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/PI');
+    await expect(page.getByRole('heading', { name: 'PI' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/OMICRON heading「OMICRON」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/OMICRON');
+    await expect(page.getByRole('heading', { name: 'OMICRON' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/SANDBOX heading「SANDBOX」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/SANDBOX');
+    await expect(page.getByRole('heading', { name: 'SANDBOX' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
