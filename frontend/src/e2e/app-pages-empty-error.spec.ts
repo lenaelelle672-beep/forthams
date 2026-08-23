@@ -44009,6 +44009,29 @@ test.describe('Q3000 桌面供应商门户操作空态', () => {
   });
 });
 
+test.describe('Q3001 桌面供应商门户文案空态', () => {
+  test('/vendor-portal 空态「供应商门户」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/vendor-portal');
+    await expect(page.getByText('供应商门户').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「记住用户名」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('记住用户名').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/login 空态「欢迎回来」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/login');
+    await expect(page.getByText('欢迎回来').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
