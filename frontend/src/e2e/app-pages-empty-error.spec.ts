@@ -64215,6 +64215,238 @@ test.describe('Q3698 桌面部门组织 list/tree 余项空态', () => {
 
 });
 
+test.describe('Q3699 桌面外部系统真实调用路径余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「真实调用 /system/external-systems」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('真实调用 /system/external-systems').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「只展示目录、状态、认证掩码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('只展示目录、状态、认证掩码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「认证掩码和 config-only 校验结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('认证掩码和 config-only 校验结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3700 桌面外部系统目录掩码余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「目录、状态、认证掩码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('目录、状态、认证掩码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「config-only 校验结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('config-only 校验结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「/system/external-systems」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('/system/external-systems').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3701 桌面外部系统只展示目录余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「只展示目录、状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('只展示目录、状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「认证掩码和 config-only」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('认证掩码和 config-only').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「真实调用 /system/external-systems；只展示目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('真实调用 /system/external-systems；只展示目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3702 桌面外部系统校验结果余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「状态、认证掩码和 config-only 校验结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('状态、认证掩码和 config-only 校验结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「目录、状态、认证掩码和 config-only」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('目录、状态、认证掩码和 config-only').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「只展示目录、状态、认证掩码和 config-only 校验结果，未触发真实外部调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('只展示目录、状态、认证掩码和 config-only 校验结果，未触发真实外部调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3703 桌面外部系统目录状态余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「只展示目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('只展示目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「状态、认证掩码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('状态、认证掩码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「校验结果，未触发真实外部调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('校验结果，未触发真实外部调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3704 桌面外部系统 config-only 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「只展示目录、状态、认证掩码和 config-only 校验结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('只展示目录、状态、认证掩码和 config-only 校验结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「config-only 校验结果，未触发真实外部调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('config-only 校验结果，未触发真实外部调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「状态、认证掩码和 config-only」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('状态、认证掩码和 config-only').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3705 桌面外部系统路径与掩码余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockExternalSystemsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「真实调用 /system」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('真实调用 /system').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「认证掩码和 config-only 校验结果，未触发真实外部调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('认证掩码和 config-only 校验结果，未触发真实外部调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-external-systems 「/system/external-systems；只展示目录、状态」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-external-systems');
+    await expect(page.getByText('/system/external-systems；只展示目录、状态').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3706 桌面流程设计器处理人预览未用角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/workflow-designer label「处理人预览面板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByLabel('处理人预览面板').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer button「计算处理人」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByRole('button', { name: '计算处理人' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-designer textbox「业务数据 JSON」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-designer');
+    await expect(page.getByRole('textbox', { name: '业务数据 JSON' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
