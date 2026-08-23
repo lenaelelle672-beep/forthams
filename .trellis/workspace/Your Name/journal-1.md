@@ -993,5 +993,6 @@
 - Q2882：/depreciation 批量计算/查询/重置 **3 passed**。`130d1e663`
 - Q2883：/depreciation 折旧管理/计划管理/暂无数据 **3 passed**。`6f1e68453`
 - Q2884：/depreciation 折旧计划/本月总额/待计算 **3 passed**。`1dfbcde6b`
-- Q2885：/depreciation 折旧方法/搜索/刷新 **3 passed**。
+- Q2885：/depreciation 折旧方法/搜索/刷新 **3 passed**。`426038716`
+- Q2886：/depreciation 当期折旧/累计折旧/折旧率 **3 passed**。
 
