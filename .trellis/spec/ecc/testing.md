@@ -61,4 +61,4 @@ See `.trellis/spec/dwk/dev-runtime.md`. Probe health, start missing frontend/bac
 - `/analytics/health` 空态不渲染表头（`unhealthyList` 空只显示「暂无数据」）；饼图三档 value 全 0 时 Pie label 不可靠。Q1978 切 `/analytics/reliability` 测「可靠性分析」「MTBF」「MTTR」。排名表空同样无列头。
 - textarea 的 `aria-label` 对 `getByText` 不可见（Q2015：`/workflow-designer`「业务数据 JSON」）。用 `getByLabel`。
 - `/energy` 默认 mock 对象在 `!effectiveData` 时只渲染 EmptyState「暂无能耗数据／尚未采集到能耗数据」，主界面「能耗监控与数据分析」「总能耗」不可见（Q2026）。
-- workbenchv3 桌面空态 Q3261+：流程控制台用 `mockCommandCenterEmpty`（`/workflows` 必须数组）；流程设计器用 `mockFlowDesignerEmpty`（`/workflows` 与 `*/versions` 必须数组）；表单配置用 `mockFormDefinitionsEmpty`（`/form-definitions` 必须数组）；资产分类可用默认 `mockApi`（`/categories/tree` 已是 `[]`）。Q3271–Q3305 覆盖控制台 KPI/健康摘要、设计器节点面板与属性、表单配置字段/预览/引用。禁 `/m`。
+- workbenchv3 桌面空态 Q3261+：流程控制台用 `mockCommandCenterEmpty`（`/workflows` 必须数组）；流程设计器用 `mockFlowDesignerEmpty`（`/workflows` 与 `*/versions` 必须数组）；表单配置用 `mockFormDefinitionsEmpty`（`/form-definitions` 必须数组）；资产分类可用默认 `mockApi`（`/categories/tree` 已是 `[]`）。Q3271–Q3305 覆盖控制台 KPI/健康摘要、设计器节点面板与属性、表单配置字段/预览/引用。Q3306–Q3335 覆盖文件存储 KPI/表头、缓存白名单、同步规则只读队列、安全策略 MFA/会话。禁 `/m`。
