@@ -2060,4 +2060,5 @@
 | Q2870 | done | 桌面空态 **3 passed**（/disposals/transfer/new 基本信息/单据信息/资产选择 heading）。禁 /m。 |
 | Q2871 | done | 桌面空态 **3 passed**（/disposals/transfer/new 转出方/转入方/审批配置）。禁 /m。 |
 | Q2872 | done | 桌面空态 **3 passed**（/disposals/transfer/new 调拨编号/申请人/调拨日期）。禁 /m。 |
-| Q2873 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2873 | done | 桌面空态 **3 passed**（/disposals/transfer/new 调拨类型/方向/调出部门）。禁 /m。 |
+| Q2874 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
