@@ -3494,11 +3494,11 @@
 | Q4304 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4305 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4306 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4307 | pending | 桌面空态 GIS/能耗描述与角色菜单空态 heading。禁 /m。 |
-| Q4308 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4309 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4310 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4311 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4312 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4313 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4314 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4307 | done | 桌面空态 **3 passed**（GIS/能耗描述与角色菜单空态 heading）。禁 /m。 |
+| Q4308 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4309 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4310 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4311 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4312 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4313 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4314 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
