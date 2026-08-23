@@ -2227,11 +2227,13 @@
 | Q3037 | done | 桌面空态 **3 passed**（/insurances/new textbox 公司/备注 + spinbutton 保费）。禁 /m。 |
 | Q3038 | done | 桌面空态 **3 passed**（/insurances/new spinbutton 保额/免赔额 + button 保存）。禁 /m。 |
 | Q3039 | done | 桌面空态 **3 passed**（/insurances/new combobox 类型/状态 + button 取消）。禁 /m。 |
-| Q3040 | in_progress | 桌面空态：/assets/new textbox 品牌/规格/序列号。禁 /m。 |
-| Q3041 | pending | 桌面空态：/assets/new textbox 供应商/存放位置/RFID。禁 /m。 |
-| Q3042 | pending | 桌面空态：/assets/new spinbutton 纬度/经度 + GIS说明。禁 /m。 |
-| Q3043 | pending | 桌面空态：/assets/new spinbutton 原值/净值/保修期。禁 /m。 |
-| Q3044 | pending | 桌面空态：/compensation/new textbox 编号/申请人/发现人。禁 /m。 |
-| Q3045 | pending | 桌面空态：/disposals/transfer/new textbox 编号/申请人/日期。禁 /m。 |
-| Q3046 | pending | 桌面空态：/insurances/new button 返回 + 开始/结束日期。禁 /m。 |
-| Q3047 | pending | 桌面空态：备件 安全库存(件)/优先本仓调拨/到货日期。禁 /m。 |
+| Q3040 | done | 桌面空态 **3 passed**（/assets/new textbox 品牌/规格/序列号）。禁 /m。 |
+| Q3041 | done | 桌面空态 **3 passed**（/assets/new textbox 供应商/存放位置/RFID）。禁 /m。 |
+| Q3042 | done | 桌面空态 **3 passed**（/assets/new spinbutton 纬度/经度 + GIS说明）。禁 /m。 |
+| Q3043 | done | 桌面空态 **3 passed**（/assets/new spinbutton 原值/净值/保修期）。禁 /m。 |
+| Q3044 | done | 桌面空态 **3 passed**（/compensation/new textbox 编号/申请人/发现人）。禁 /m。 |
+| Q3045 | done | 桌面空态 **3 passed**（/disposals/transfer/new textbox 编号/申请人/日期）。禁 /m。 |
+| Q3046 | done | 桌面空态 **3 passed**（/insurances/new button 返回 + 开始/结束日期）。禁 /m。 |
+| Q3047 | done | 桌面空态 **3 passed**（备件 安全库存(件)/优先本仓调拨/到货日期）。禁 /m。 |
+| Q3048 | done | 桌面空态 **3 passed**（/assets/new 购置日期/折旧率/部门select）。禁 /m。 |
+| Q3049 | in_progress | 桌面空态：继续桌面未用角色/空态票。禁 /m。 |
