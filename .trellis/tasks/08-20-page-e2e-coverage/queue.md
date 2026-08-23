@@ -2542,7 +2542,8 @@
 | Q3352 | done | 桌面空态 **3 passed**（邮件网关连接边界（credentialExposed/smtpConnect/javaMailSenderUsed））。禁 /m。 |
 | Q3353 | done | 桌面空态 **3 passed**（邮件网关勾选（authConfigured/enabled/mailSenderProviderUsed））。禁 /m。 |
 | Q3354 | done | 桌面空态 **3 passed**（邮件网关其余（不代表邮件子系统完成/readonlyBoundary/acceptedFields））。禁 /m。 |
-| Q3355 | in_progress | 桌面空态：外部系统表单余项（系统名称/系统类型/认证方式）。禁 /m。 |
-| Q3356 | pending | 桌面空态：外部系统认证余项（BEARER_TOKEN/OAUTH_CLIENT/一次性认证材料）。禁 /m。 |
-| Q3357 | pending | 桌面空态：外部系统操作余项（操作人 ID/基础地址/启用外部系统）。禁 /m。 |
-| Q3358 | pending | 桌面空态：外部系统说明余项（V3 创建目录项/未触发真实外部调用/config-only）。禁 /m。 |
+| Q3355 | done | 桌面空态 **3 passed**（外部系统表单余项（系统名称/系统类型/认证方式））。禁 /m。 |
+| Q3356 | done | 桌面空态 **3 passed**（外部系统认证余项（BEARER_TOKEN/OAUTH_CLIENT/一次性认证材料））。禁 /m。 |
+| Q3357 | done | 桌面空态 **3 passed**（外部系统操作余项（操作人 ID/基础地址/启用外部系统））。禁 /m。 |
+| Q3358 | done | 桌面空态 **3 passed**（外部系统说明余项（V3 创建目录项/未触发真实外部调用/config-only））。禁 /m。 |
+| Q3359 | pending | 桌面空态：下一票继续 workbenchv3 未用角色（交接/文档/技术支持余项）。禁 /m。 |
