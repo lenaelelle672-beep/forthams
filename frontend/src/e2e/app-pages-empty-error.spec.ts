@@ -49536,7 +49536,7 @@ test.describe('Q3189 桌面部门组织检索空态', () => {
 
 test.describe('Q3190 桌面通知渠道空表空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -49564,7 +49564,7 @@ test.describe('Q3190 桌面通知渠道空表空态', () => {
 
 test.describe('Q3191 桌面通知渠道详情空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -49592,7 +49592,7 @@ test.describe('Q3191 桌面通知渠道详情空态', () => {
 
 test.describe('Q3192 桌面通知渠道预览空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
     await seedSession(page, adminUser);
   });
 
@@ -55517,6 +55517,21 @@ async function mockNotificationPreferencesEmpty(route: Route) {
   }
   if (path === '/notification-preferences/meta') {
     return fulfill(route, { categories: [], channelTypes: [], nonGoals: [] });
+  }
+  return mockApi(route);
+}
+
+async function mockNotificationChannelsEmpty(route: Route) {
+  const url = new URL(route.request().url());
+  if (!url.pathname.startsWith('/api/')) {
+    return route.fallback();
+  }
+  const path = url.pathname.replace(/^\/api(?:\/v1)?/, '');
+  if (path === '/system/channel-configs/meta') {
+    return fulfill(route, { channelTypes: [] });
+  }
+  if (path === '/system/channel-configs') {
+    return fulfill(route, { records: [], total: 0, size: 20, current: 1, pages: 0 });
   }
   return mockApi(route);
 }
