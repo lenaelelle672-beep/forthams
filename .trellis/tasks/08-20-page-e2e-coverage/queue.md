@@ -2740,8 +2740,8 @@
 | Q3550 | done | 桌面空态 **3 passed**（SLA 安全边界（运行态/不发通知/目标脱敏））。禁 /m。 |
 | Q3551 | done | 桌面空态 **3 passed**（SLA 详情余项（响应解决/阈值/变量遮罩））。禁 /m。 |
 | Q3552 | done | 桌面空态 **3 passed**（SLA 导出余项（不返回联系方式/命中策略/0 条））。禁 /m。 |
-| Q3553 | pending | 桌面空态：邮件网关筛选余项（TLS/region/complementary）。禁 /m。 |
-| Q3554 | pending | 桌面空态：邮件网关计数余项（0 条/metadata-only/mail-gateways）。禁 /m。 |
-| Q3555 | pending | 桌面空态：邮件网关边界余项（真组件/元数据/port）。禁 /m。 |
-| Q3556 | pending | 桌面空态：邮件网关表单余项（tlsMode/priority/STARTTLS）。禁 /m。 |
+| Q3553 | done | 桌面空态 **3 passed**（邮件网关筛选余项（TLS/region/complementary））。禁 /m。 |
+| Q3554 | done | 桌面空态 **3 passed**（邮件网关计数余项（0 条/metadata-only/mail-gateways））。禁 /m。 |
+| Q3555 | done | 桌面空态 **3 passed**（邮件网关边界余项（真组件/元数据/port））。禁 /m。 |
+| Q3556 | done | 桌面空态 **3 passed**（邮件网关表单余项（tlsMode/priority/STARTTLS））。禁 /m。 |
 | Q3557 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
