@@ -933,5 +933,6 @@
 - Q2822：/assignments/new 基本信息/领用类型/使用人 **3 passed**。`219d3bd26`
 - Q2823：/assignments/new 长期领用/短期借用/取消 **3 passed**。`65206a7fc`
 - Q2824：/assignments/new 归还入库/调拨转移/部门ID **3 passed**。`514543a2f`
-- Q2825：/assignments/new 使用人ID/部门ID/备注placeholder **3 passed**。
+- Q2825：/assignments/new 使用人ID/部门ID/备注placeholder **3 passed**。`9d50f3cc3`
+- Q2826：/intake/new 创建验收单/标题/验收单信息 **3 passed**。
 
