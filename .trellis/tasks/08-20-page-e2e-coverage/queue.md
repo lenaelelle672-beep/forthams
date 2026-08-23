@@ -2982,11 +2982,19 @@
 | Q3792 | done | 桌面空态 **3 passed**（SLA simulate/runtime-summary 路径余项）。禁 /m。 |
 | Q3793 | done | 桌面空态 **3 passed**（审批规则白名单整段余项）。禁 /m。 |
 | Q3794 | done | 桌面空态 **3 passed**（流程邮件写操作与零调用风险）。禁 /m。 |
-| Q3795 | pending | 桌面空态：通知偏好 category/meta/preview 端点。禁 /m。 |
-| Q3796 | pending | 桌面空态：通知偏好 metadata-only 边界加号。禁 /m。 |
-| Q3797 | pending | 桌面空态：通知渠道 {id}/meta/preview 端点。禁 /m。 |
-| Q3798 | pending | 桌面空态：通知渠道无发送无外联边界。禁 /m。 |
-| Q3799 | pending | 桌面空态：编号规则 ruleKey/meta/preview 端点。禁 /m。 |
-| Q3800 | pending | 桌面空态：编号规则 catalog + dry-run 边界。禁 /m。 |
-| Q3801 | pending | 桌面空态：通知偏好 preview 端点组合。禁 /m。 |
-| Q3802 | pending | 桌面空态：通知渠道 preview 端点组合。禁 /m。 |
+| Q3795 | done | 桌面空态 **3 passed**（通知偏好 category/meta/preview 端点）。禁 /m。 |
+| Q3796 | done | 桌面空态 **3 passed**（通知偏好 metadata-only 边界加号）。禁 /m。 |
+| Q3797 | done | 桌面空态 **3 passed**（通知渠道 {id}/meta/preview 端点）。禁 /m。 |
+| Q3798 | done | 桌面空态 **3 passed**（通知渠道无发送无外联边界）。禁 /m。 |
+| Q3799 | done | 桌面空态 **3 passed**（编号规则 ruleKey/meta/preview 端点）。禁 /m。 |
+| Q3800 | done | 桌面空态 **3 passed**（编号规则 catalog + dry-run 边界）。禁 /m。 |
+| Q3801 | done | 桌面空态 **3 passed**（通知偏好 preview 端点组合）。禁 /m。 |
+| Q3802 | done | 桌面空态 **3 passed**（通知渠道 preview 端点组合）。禁 /m。 |
+| Q3803 | pending | 桌面空态：邮件模板 {id}/code/meta 端点。禁 /m。 |
+| Q3804 | pending | 桌面空态：邮件模板 catalog + safe preview 边界。禁 /m。 |
+| Q3805 | pending | 桌面空态：通知模板 {id}/code/meta 端点。禁 /m。 |
+| Q3806 | pending | 桌面空态：通知模板 catalog + safe preview 边界。禁 /m。 |
+| Q3807 | pending | 桌面空态：流程通知开关 biz-type 端点。禁 /m。 |
+| Q3808 | pending | 桌面空态：邮件网关 {id}/meta/preview 端点。禁 /m。 |
+| Q3809 | pending | 桌面空态：邮件网关 metadata-only 加号边界。禁 /m。 |
+| Q3810 | pending | 桌面空态：流程通知开关 no-send 边界余项。禁 /m。 |
