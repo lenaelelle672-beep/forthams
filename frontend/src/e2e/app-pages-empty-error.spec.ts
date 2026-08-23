@@ -47983,6 +47983,297 @@ test.describe('Q3134 桌面弹窗备注与模板名称空态', () => {
   });
 });
 
+test.describe('Q3135 桌面检验模板检查项占位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inspection-templates 点新增模板 placeholder「外观检查」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: '新增模板' }).first().click();
+    await expect(page.getByPlaceholder(/外观检查/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板 placeholder「性能测试」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: '新增模板' }).first().click();
+    await expect(page.getByPlaceholder(/性能测试/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板 placeholder「精度校验」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: '新增模板' }).first().click();
+    await expect(page.getByPlaceholder(/精度校验/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3136 桌面采购其余状态筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/purchase-orders 空态「已收货」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByRole('button', { name: '已收货' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/purchase-orders 空态「已取消」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByRole('button', { name: '已取消' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/purchase-orders 空态「草稿」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/purchase-orders');
+    await expect(page.getByRole('button', { name: '草稿' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3137 桌面编号规则 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules heading「编号规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('heading', { name: '编号规则' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules heading「编号规则 catalog」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('heading', { name: '编号规则 catalog' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules heading「详情读取与 no-persistence preview」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('heading', { name: '详情读取与 no-persistence preview' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3138 桌面编号规则 textbox 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules textbox「模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('textbox', { name: '模板' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules textbox「样例时间」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('textbox', { name: '样例时间' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules textbox「样例序号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('textbox', { name: '样例序号' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3139 桌面编号规则操作与空表空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules button「读取规则详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('button', { name: '读取规则详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules button「运行无持久化编号预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('button', { name: '运行无持久化编号预览' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 空态「暂无编号规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('暂无编号规则；空态不代表序列分配、并发唯一或创建链路闭环。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3140 桌面编号规则编码与计数空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「规则编码」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('规则编码').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules select「资产编号规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.locator('select').filter({ hasText: '资产编号规则' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「显示 0 条，只读展示」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('显示 0 条，只读展示').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3141 桌面编号规则 landmark 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules region「编号规则只读列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByRole('region', { name: '编号规则只读列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「编号规则详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByLabel('编号规则详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「变量说明」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/变量说明：/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3142 桌面编号规则边界文案空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「真实调用 /numbering-rules」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/真实调用 \/numbering-rules/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「不会持久化」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/不会持久化、不刷新缓存、不预留或占用序号/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「当前不保证并发唯一」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/当前不保证并发唯一/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3143 桌面编号规则覆盖边界空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「未接入资产/工单/流程创建链路」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/未接入资产\/工单\/流程创建链路/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「不代表基础资料组完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/不代表基础资料组完成/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「不代表 44/44」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/不代表 44\/44 或 Workbench V3 全量完成/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3144 桌面编号规则只读徽标空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「read-only / tenantScoped=true」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('read-only / tenantScoped=true / sequenceAllocated=false').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「元数据未加载」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/元数据未加载/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「不分配或预留序列号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText(/不分配或预留序列号/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
@@ -53869,6 +54160,47 @@ async function mockApiWithFailure(route: Route, failPath: string) {
     return fulfill(route, null, 500, '获取数据失败');
   }
   return mockApi(route);
+}
+
+async function mockNumberingRulesEmpty(route: Route) {
+  const url = new URL(route.request().url());
+  if (!url.pathname.startsWith('/api/')) {
+    return route.fallback();
+  }
+  const path = url.pathname.replace(/^\/api(?:\/v1)?/, '');
+  if (path === '/numbering-rules' || path === '/numbering-rules/') {
+    return fulfill(route, []);
+  }
+  if (path === '/numbering-rules/meta') {
+    return fulfill(route, {
+      defaultRules: [],
+      allowedVariables: [],
+      tenantScoped: true,
+      readOnly: true,
+    });
+  }
+  if (path === '/numbering-rules/preview') {
+    return fulfill(route, {
+      previewValue: '',
+      usedVariables: [],
+      missingVariables: [],
+      rejectedVariables: [],
+      tenantScoped: true,
+      noPersistence: true,
+      noSequenceReserved: true,
+      runtimeEffect: false,
+      cacheRefreshed: false,
+      sequenceAllocated: false,
+      persistent: false,
+    });
+  }
+  return fulfill(route, {
+    ruleKey: 'numbering.rule.asset',
+    name: '资产编号规则',
+    template: 'AUTO-{YYYYMMDD}-{SEQ}',
+    tenantScoped: true,
+    readOnly: true,
+  });
 }
 
 async function mockApi(route: Route) {
