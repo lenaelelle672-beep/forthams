@@ -66218,7 +66218,7 @@ test.describe('Q3767 桌面岗位管理 preview 字段组合余项空态', () =>
 
 test.describe('Q3768 桌面缓存管理白名单命名空间说明空态', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+    await page.route('**/api/**', mockCacheNamespacesEmpty);
     await seedSession(page, adminUser);
   });
 
