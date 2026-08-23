@@ -995,5 +995,6 @@
 - Q2884：/depreciation 折旧计划/本月总额/待计算 **3 passed**。`1dfbcde6b`
 - Q2885：/depreciation 折旧方法/搜索/刷新 **3 passed**。`426038716`
 - Q2886：/depreciation 当期折旧/累计折旧/折旧率 **3 passed**。`6485d5bf9`
-- Q2887：/depreciation 原值/净值/状态 **3 passed**。
+- Q2887：/depreciation 原值/净值/状态 **3 passed**。`8a6736668`
+- Q2888：/depreciation 已完成/直线双倍/折旧 **3 passed**。
 
