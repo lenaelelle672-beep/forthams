@@ -1194,5 +1194,6 @@
 - Q3675–Q3682：**24 passed**。下一票 Q3683：继续真页未用角色/空态。禁 /m。
 - Q3683–Q3690：**24 passed**。续 Q3691–Q3698：部门组织 list/tree 检索说明余项。须 `mockDeptsListEmpty`。禁 /m。
 - Q3691–Q3698：**24 passed**。续 Q3699–Q3706：外部系统目录/掩码余项 + 流程设计器处理人预览未用角色。外部系统须 `mockExternalSystemsEmpty`。禁 /m。
-- Q3699–Q3706：续写外部系统真实调用路径与处理人预览面板。禁 /m。
+- Q3699–Q3706：**24 passed**。续 Q3707–Q3714：文件存储 catalog/上传下载边界余项。须 `mockFileStorageCatalogEmpty`。禁 /m。
+- Q3707–Q3714：续写文件存储附件元数据与只读目录余项。禁 /m。
 

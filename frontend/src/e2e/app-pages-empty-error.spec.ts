@@ -64447,6 +64447,238 @@ test.describe('Q3706 桌面流程设计器处理人预览未用角色空态', ()
 
 });
 
+test.describe('Q3707 桌面文件存储附件元数据余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「返回的附件元数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('返回的附件元数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「附件元数据、统计摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('附件元数据、统计摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「不支持上传/下载/预览/删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('不支持上传/下载/预览/删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3708 桌面文件存储只读目录余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「当前仅为 /system/file-storage/attachments/catalog」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('当前仅为 /system/file-storage/attachments/catalog').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「上传/下载/预览/删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('上传/下载/预览/删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「/system/file-storage/attachments/catalog 返回的附件元数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('/system/file-storage/attachments/catalog 返回的附件元数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3709 桌面文件存储统计摘要余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「返回的附件元数据、统计摘要与筛选结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('返回的附件元数据、统计摘要与筛选结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「附件元数据、统计摘要与筛选结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('附件元数据、统计摘要与筛选结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「当前仅为 /system/file-storage」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('当前仅为 /system/file-storage').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3710 桌面文件存储上传下载边界余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「只读展示 /system/file-storage/attachments/catalog 返回的附件元数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('只读展示 /system/file-storage/attachments/catalog 返回的附件元数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「不支持上传/下载/预览/删除，不访问文件系统」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('不支持上传/下载/预览/删除，不访问文件系统').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「只读元数据目录，不支持上传/下载/预览/删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('只读元数据目录，不支持上传/下载/预览/删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3711 桌面文件存储 catalog 返回余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「catalog 返回的附件元数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('catalog 返回的附件元数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「返回的附件元数据、统计摘要」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('返回的附件元数据、统计摘要').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「当前仅为 /system/file-storage/attachments/catalog 只读元数据目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('当前仅为 /system/file-storage/attachments/catalog 只读元数据目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3712 桌面文件存储预览删除边界余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「上传/下载/预览/删除，不访问文件系统」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('上传/下载/预览/删除，不访问文件系统').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「/system/file-storage/attachments/catalog 只读元数据目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('/system/file-storage/attachments/catalog 只读元数据目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「不支持上传/下载」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('不支持上传/下载').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3713 桌面文件存储生命周期边界余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「预览/删除，不访问文件系统」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('预览/删除，不访问文件系统').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('不支持上传/下载/预览/删除，不访问文件系统，不代表文件生命周期闭环').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「下载/预览/删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('下载/预览/删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3714 桌面文件存储只读说明整句余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「本页不包含导入/导出或执行动作，仅展示附件元数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('本页不包含导入/导出或执行动作，仅展示附件元数据').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「当前仅为 /system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('当前仅为 /system/file-storage/attachments/catalog 只读元数据目录，不支持上传/下载/预览/删除').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-file-storage 「只读展示 /system/file-storage/attachments/catalog 返回的附件元数据、统计摘要与筛选结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByText('只读展示 /system/file-storage/attachments/catalog 返回的附件元数据、统计摘要与筛选结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
