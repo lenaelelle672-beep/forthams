@@ -2814,12 +2814,20 @@
 | Q3624 | done | 桌面空态 **3 passed**（通知偏好 note/quietWindowMatched）。禁 /m。 |
 | Q3625 | done | 桌面空态 **3 passed**（编号规则 note/missingVariables）。禁 /m。 |
 | Q3626 | done | 桌面空态 **3 passed**（岗位管理 note/duplicateRisk）。禁 /m。 |
-| Q3627 | pending | 桌面空态：通知模板 note/HTML escaped。禁 /m。 |
-| Q3628 | pending | 桌面空态：通知渠道 note/webhookUrlMasked。禁 /m。 |
-| Q3629 | pending | 桌面空态：邮件模板 note/rejectedVariables。禁 /m。 |
-| Q3630 | pending | 桌面空态：邮件日志 note/供应商标识。禁 /m。 |
-| Q3631 | pending | 桌面空态：自定义字段 note/usedFields。禁 /m。 |
-| Q3632 | pending | 桌面空态：字段集 note/wouldBindCategory。禁 /m。 |
-| Q3633 | pending | 桌面空态：角色权限 note/catalog 说明。禁 /m。 |
-| Q3634 | pending | 桌面空态：菜单权限 note/覆盖视图。禁 /m。 |
-| Q3635 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
+| Q3627 | done | 桌面空态 **3 passed**（通知模板 note/HTML escaped）。禁 /m。 |
+| Q3628 | done | 桌面空态 **3 passed**（通知渠道 note/webhookUrlMasked）。禁 /m。 |
+| Q3629 | done | 桌面空态 **3 passed**（邮件模板 note/rejectedVariables）。禁 /m。 |
+| Q3630 | done | 桌面空态 **3 passed**（邮件日志 note/供应商标识）。禁 /m。 |
+| Q3631 | done | 桌面空态 **3 passed**（自定义字段 note/usedFields）。禁 /m。 |
+| Q3632 | done | 桌面空态 **3 passed**（字段集 note/wouldBindCategory）。禁 /m。 |
+| Q3633 | done | 桌面空态 **3 passed**（角色权限 note/catalog 说明）。禁 /m。 |
+| Q3634 | done | 桌面空态 **3 passed**（菜单权限 note/覆盖视图）。禁 /m。 |
+| Q3635 | pending | 桌面空态：审计日志 note/GET 族端点。禁 /m。 |
+| Q3636 | pending | 桌面空态：编号规则预览旗标余项。禁 /m。 |
+| Q3637 | pending | 桌面空态：通知渠道预览字段余项。禁 /m。 |
+| Q3638 | pending | 桌面空态：岗位管理预览旗标余项。禁 /m。 |
+| Q3639 | pending | 桌面空态：SLA 运行态边界余项。禁 /m。 |
+| Q3640 | pending | 桌面空态：邮件日志脱敏余项。禁 /m。 |
+| Q3641 | pending | 桌面空态：自定义字段预览字段余项。禁 /m。 |
+| Q3642 | pending | 桌面空态：字段集预览字段余项。禁 /m。 |
+| Q3643 | pending | 桌面空态：下一票继续真页未用角色。禁 /m。 |
