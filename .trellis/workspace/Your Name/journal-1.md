@@ -1136,4 +1136,5 @@
 - Q3025：/audit 7天汇总/趋势heading/分布heading **3 passed**。`d147568e3`
 - Q3026：/audit 最近操作heading/审计日志/导出 **3 passed**。`544ccd5ac`
 - Q3027：/intake/new 资产#1/入库资产heading/品牌 **3 passed**。工作台带入/告警处理/核对告警来源不在默认 /notifications。
+- Q3028：续桌面空态。/intake/new role 已尽；改测 /spare-parts/new 未用 textbox/spinbutton 与工作台预填、/insurances/new 未用 textbox/combobox。禁 /m。
 
