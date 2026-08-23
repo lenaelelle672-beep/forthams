@@ -2116,4 +2116,5 @@
 | Q2926 | done | 桌面空态 **3 passed**（/system/menus 标题/描述/暂无数据）。禁 /m。 |
 | Q2927 | done | 桌面空态 **3 passed**（/system/menus 树形/目录/总计）。禁 /m。 |
 | Q2928 | done | 桌面空态 **3 passed**（/system/menus 菜单列表/名称/权限标识）。禁 /m。 |
-| Q2929 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2929 | done | 桌面空态 **3 passed**（/system/menus 路由/按钮/菜单）。禁 /m。 |
+| Q2930 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
