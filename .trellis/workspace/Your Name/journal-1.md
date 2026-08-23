@@ -1113,5 +1113,6 @@
 - Q3002：/dashboard 导出数据/刷新视图/运营首页 **3 passed**。`771ee6c5b`
 - Q3003：/dashboard 总资产数/在用/闲置 **3 passed**。`4b0ce9e52`
 - Q3004：/dashboard 总价值/分类分布/维保预警 **3 passed**。`c6b703ee5`
-- Q3005：/dashboard 最近工单/净值/Top5部门 **3 passed**。
+- Q3005：/dashboard 最近工单/净值/Top5部门 **3 passed**。`2aac5d633`
+- Q3006：/dashboard 运营首页/待审批/欢迎管理员 **3 passed**。
 
