@@ -2732,12 +2732,16 @@
 | Q3542 | done | 桌面空态 **3 passed**（字段集边界（不新增/preview/单模块））。禁 /m。 |
 | Q3543 | done | 桌面空态 **3 passed**（字段集覆盖说明（基础资料组/44 项/元数据））。禁 /m。 |
 | Q3544 | done | 桌面空态 **3 passed**（字段集诊断（分类诊断/资产模型/不保存分配））。禁 /m。 |
-| Q3545 | pending | 桌面空态：编号规则详情余项（complementary/规则编码/sequenceAllocated）。禁 /m。 |
-| Q3546 | pending | 桌面空态：编号规则预览边界（不持久化/不刷新缓存/不占用序号）。禁 /m。 |
-| Q3547 | pending | 桌面空态：编号规则覆盖说明（单模块/previewValue/序列分配）。禁 /m。 |
-| Q3548 | pending | 桌面空态：编号规则当前规则（当前规则/不分配序号/badge）。禁 /m。 |
-| Q3549 | pending | 桌面空态：SLA KPI 余项（启用策略/运行风险/sla-config）。禁 /m。 |
-| Q3550 | pending | 桌面空态：SLA 安全边界（运行态/不发通知/目标脱敏）。禁 /m。 |
-| Q3551 | pending | 桌面空态：SLA 详情余项（响应解决/阈值/变量遮罩）。禁 /m。 |
-| Q3552 | pending | 桌面空态：SLA 导出余项（不返回联系方式/命中策略/0 条）。禁 /m。 |
-| Q3553 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |
+| Q3545 | done | 桌面空态 **3 passed**（编号规则详情余项（complementary/规则编码/sequenceAllocated））。禁 /m。 |
+| Q3546 | done | 桌面空态 **3 passed**（编号规则预览边界（不持久化/不刷新缓存/不占用序号））。禁 /m。 |
+| Q3547 | done | 桌面空态 **3 passed**（编号规则覆盖说明（单模块/previewValue/序列分配））。禁 /m。 |
+| Q3548 | done | 桌面空态 **3 passed**（编号规则当前规则（当前规则/不分配序号/badge））。禁 /m。 |
+| Q3549 | done | 桌面空态 **3 passed**（SLA KPI 余项（启用策略/运行风险/sla-config））。禁 /m。 |
+| Q3550 | done | 桌面空态 **3 passed**（SLA 安全边界（运行态/不发通知/目标脱敏））。禁 /m。 |
+| Q3551 | done | 桌面空态 **3 passed**（SLA 详情余项（响应解决/阈值/变量遮罩））。禁 /m。 |
+| Q3552 | done | 桌面空态 **3 passed**（SLA 导出余项（不返回联系方式/命中策略/0 条））。禁 /m。 |
+| Q3553 | pending | 桌面空态：邮件网关筛选余项（TLS/region/complementary）。禁 /m。 |
+| Q3554 | pending | 桌面空态：邮件网关计数余项（0 条/metadata-only/mail-gateways）。禁 /m。 |
+| Q3555 | pending | 桌面空态：邮件网关边界余项（真组件/元数据/port）。禁 /m。 |
+| Q3556 | pending | 桌面空态：邮件网关表单余项（tlsMode/priority/STARTTLS）。禁 /m。 |
+| Q3557 | pending | 桌面空态：下一票继续 workbenchv3 未用角色。禁 /m。 |

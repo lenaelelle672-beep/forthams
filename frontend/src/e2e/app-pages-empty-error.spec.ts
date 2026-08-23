@@ -59984,6 +59984,122 @@ test.describe('Q3552 桌面 SLA 导出余项空态', () => {
 
 });
 
+test.describe('Q3553 桌面邮件网关筛选余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway combobox「TLS 模式」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('combobox', { name: 'TLS 模式' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway region「邮件网关只读列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('region', { name: '邮件网关只读列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway complementary「邮件网关脱敏详情与预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('complementary', { name: '邮件网关脱敏详情与预览' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3554 桌面邮件网关计数余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「显示 0 / 0 条，只读展示」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText(/显示 0 \/ 0 条，只读展示/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「metadata-only mail gateway catalog」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('metadata-only mail gateway catalog').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「真实调用 /system/mail-gateways」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText(/真实调用 \/system\/mail-gateways/).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3555 桌面邮件网关边界余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「仅代表 system-mail-gateway 已接入真组件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('仅代表 system-mail-gateway 已接入真组件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「元数据边界」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('元数据边界').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway textbox「port」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('textbox', { name: 'port' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3556 桌面邮件网关表单余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway combobox「tlsMode」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('combobox', { name: 'tlsMode' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway textbox「priority」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByRole('textbox', { name: 'priority' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway select「STARTTLS 元数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.locator('select').filter({ hasText: 'STARTTLS 元数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
