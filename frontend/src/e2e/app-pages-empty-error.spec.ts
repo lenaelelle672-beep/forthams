@@ -64692,10 +64692,10 @@ test.describe('Q3715 桌面审批规则短数组与禁止 JS 余项空态', () =
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-approval-rules 「禁止 JS」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-approval-rules 「禁止 SpEL、JS」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-approval-rules');
-    await expect(page.getByText('禁止 JS').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('禁止 SpEL、JS').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -64888,10 +64888,10 @@ test.describe('Q3722 桌面审批规则接口路径整句余项空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-approval-rules 「禁止 JS、SQL、OGNL」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-approval-rules 「JS、SQL、OGNL、脚本引擎」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-approval-rules');
-    await expect(page.getByText('禁止 JS、SQL、OGNL').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('JS、SQL、OGNL、脚本引擎').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
