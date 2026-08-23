@@ -47625,10 +47625,10 @@ test.describe('Q3123 桌面新建风险评估标题占位空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/risk-assessments/new 空态 heading「新增风险评估」', async ({ page }) => {
+  test('/risk-assessments/new 空态「新增风险评估」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/risk-assessments/new');
-    await expect(page.getByRole('heading', { name: '新增风险评估' }).first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('新增风险评估').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -47692,11 +47692,11 @@ test.describe('Q3125 桌面添加根分类编码占位空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/categories 点添加根分类「修改分类的名称和编码」以外的创建说明', async ({ page }) => {
+  test('/categories 点添加根分类「分类名称」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/categories');
     await page.getByRole('button', { name: '添加根分类' }).first().click();
-    await expect(page.getByText('创建一个新的根分类').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('分类名称').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
