@@ -1106,5 +1106,6 @@
 - Q2995：/login5 密码placeholder/组织账号/显示密码 **3 passed**。`800a53598`
 - Q2996：/login5 button 系统/资产/运维 **3 passed**。`540540d8a`
 - Q2997：/login5 button 部门负责人/进入工作台/忘记密码 **3 passed**。`cef276153`
-- Q2998：/login5 checkbox/统一认证/工作台预览 link **3 passed**。
+- Q2998：/login5 checkbox/统一认证/工作台预览 link **3 passed**。`2bb96e0c3`
+- Q2999：/login5 label 用户名/密码 + /vendor-portal 标题 **3 passed**。
 
