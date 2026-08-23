@@ -2081,4 +2081,5 @@
 | Q2891 | done | 桌面空态 **3 passed**（/contracts 生效中/30天内到期/时间轴）。禁 /m。 |
 | Q2892 | done | 桌面空态 **3 passed**（/contracts 合同编号/名称/到期日期）。禁 /m。 |
 | Q2893 | done | 桌面空态 **3 passed**（/contracts 类型/金额/操作）。禁 /m。 |
-| Q2894 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2894 | done | 桌面空态 **3 passed**（/depreciation 全部方法/直线法/双倍余额）。禁 /m。 |
+| Q2895 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

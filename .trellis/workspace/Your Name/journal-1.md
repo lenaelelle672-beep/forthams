@@ -1001,5 +1001,6 @@
 - Q2890：/contracts 描述/全部合同/即将到期 **3 passed**。`2a3c56368`
 - Q2891：/contracts 生效中/30天内到期/时间轴 **3 passed**。`28eec74d8`
 - Q2892：/contracts 合同编号/名称/到期日期 **3 passed**。`d95b9da23`
-- Q2893：/contracts 类型/金额/操作 **3 passed**。
+- Q2893：/contracts 类型/金额/操作 **3 passed**。`2b607d3ea`
+- Q2894：/depreciation 全部方法/直线法/双倍余额 **3 passed**。
 
