@@ -2380,4 +2380,9 @@
 | Q3190 | done | 桌面空态 **3 passed**（通知渠道空表 通知渠道/渠道 catalog/暂无通知渠道）。禁 /m。 |
 | Q3191 | done | 桌面空态 **3 passed**（通知渠道详情 渠道详情/通知渠道配置/读取详情）。禁 /m。 |
 | Q3192 | done | 桌面空态 **3 passed**（通知渠道预览 配置名称/样例相对路径/无持久化预览）。禁 /m。 |
-| Q3193 | in_progress | 桌面空态：继续桌面未用角色/空态（通知渠道余项、字段集边界、Webhook/岗位/安全策略）。禁 /m。 |
+| Q3193 | in_progress | 桌面空态：通知渠道其余（请选择配置/地址已配置/预览渠道类型）。禁 /m。 |
+| Q3194 | pending | 桌面空态：字段集边界文案（详情预览 heading/真实调用/read-only 徽标）。禁 /m。 |
+| Q3195 | pending | 桌面空态：Webhook 空表（Webhook 配置/新增 heading/暂无配置）。禁 /m。 |
+| Q3196 | pending | 桌面空态：Webhook 表单（资产 Webhook/ASSET_SYNC/目标 URL）。禁 /m。 |
+| Q3197 | pending | 桌面空态：岗位管理空表（岗位管理/岗位 catalog/暂无可展示岗位）。禁 /m。 |
+| Q3198 | pending | 桌面空态：岗位管理检索预览（筛选占位/postCode/postName）。禁 /m。 |
