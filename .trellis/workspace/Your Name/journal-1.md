@@ -958,5 +958,6 @@
 - Q2847：/compensation/new 赔偿编号/配置/总金额 **3 passed**。`b66c9491a`
 - Q2848：/compensation/new 赔偿方式/预估金额/赔偿申请 **3 passed**。`1b3d33cb2`
 - Q2849：/compensation/new 现金/等价物/标准流程 **3 passed**。`42b655882`
-- Q2850：/compensation/new 责任人/发现人/资产搜索 placeholder **3 passed**。
+- Q2850：/compensation/new 责任人/发现人/资产搜索 placeholder **3 passed**。`98c1b1a00`
+- Q2851：/disposals/scrap/new 取消/返回/添加资产 **3 passed**。
 
