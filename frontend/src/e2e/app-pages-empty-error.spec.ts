@@ -42873,6 +42873,34 @@ test.describe('Q2953 桌面新建报废提示空态', () => {
   });
 });
 
+test.describe('Q2954 桌面报废描述与审批类型空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/disposals/scrap/new 空态「发起资产报废处置流程，提交后将进入审批环节。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/disposals/scrap/new');
+    await expect(page.getByText('发起资产报废处置流程，提交后将进入审批环节。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/approvals 空态「全部类型」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/approvals');
+    await expect(page.getByText('全部类型').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/compensation/new 空态「暂无可选部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/compensation/new');
+    await expect(page.getByText('暂无可选部门').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

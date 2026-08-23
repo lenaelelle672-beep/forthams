@@ -1061,5 +1061,6 @@
 - Q2950：/insurances/new 备注/财产险/生效中 **3 passed**。`11832d234`
 - Q2951：/revaluations/new 减值/重估/标题 **3 passed**。`e48acfafb`
 - Q2952：/disposals/scrap/new 填写信息/确认提交/标题 **3 passed**。`a0ae322fa`
-- Q2953：/disposals/scrap/new 部门经理/残值影响/备注 **3 passed**。
+- Q2953：/disposals/scrap/new 部门经理/残值影响/备注 **3 passed**。`bf32052c3`
+- Q2954：scrap 描述 + /approvals 全部类型 + 赔偿暂无部门 **3 passed**。
 
