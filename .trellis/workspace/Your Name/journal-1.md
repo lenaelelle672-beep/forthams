@@ -1031,5 +1031,6 @@
 - Q2920：/system/roles 数据权限/描述/ID **3 passed**。`60d6a3984`
 - Q2921：/system/posts 新增岗位/标题/暂无数据 **3 passed**。`993e7903b`
 - Q2922：/system/posts 岗位信息维护/列表/总量 **3 passed**。`003e54331`
-- Q2923：/system/posts 岗位编码/名称/创建时间 **3 passed**。
+- Q2923：/system/posts 岗位编码/名称/创建时间 **3 passed**。`377b84811`
+- Q2924：/system/posts 备注/岗位/搜索 **3 passed**。
 
