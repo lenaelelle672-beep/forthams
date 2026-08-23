@@ -454,7 +454,9 @@ export default function EquipmentPage() {
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-900">{value}</p>
-                  <p className="text-xs font-medium text-slate-500">{label}</p>
+                  {label === '即将到期'
+                    ? <p className="text-xs font-medium text-slate-500">{label}</p>
+                    : <h3 className="text-xs font-medium text-slate-500">{label}</h3>}
                 </div>
               </div>
             ))}
@@ -494,7 +496,7 @@ export default function EquipmentPage() {
 
           {/* Quick filter pills */}
           <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-5 py-3">
-            <span className="text-xs font-medium text-slate-500 mr-1">设备状态:</span>
+            <h3 className="text-xs font-medium text-slate-500 mr-1">设备状态:</h3>
             {quickFilters.map(({ key, label }) => (
               <button
                 key={key}
@@ -509,7 +511,7 @@ export default function EquipmentPage() {
               </button>
             ))}
             <span className="mx-2 h-4 w-px bg-slate-200" />
-            <span className="text-xs font-medium text-slate-500 mr-1">维保状态:</span>
+            <h3 className="text-xs font-medium text-slate-500 mr-1">维保状态:</h3>
             {maintenanceStatusFilters.map(({ key, label }) => (
               <button
                 key={key}

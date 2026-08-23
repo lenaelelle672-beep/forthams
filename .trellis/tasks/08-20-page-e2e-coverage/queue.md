@@ -3342,11 +3342,27 @@
 | Q4152 | done | 桌面空态 **3 passed**（安全检查/风险评估未用统计 heading）。禁 /m。 |
 | Q4153 | done | 桌面空态 **3 passed**（审计日志未用统计 heading）。禁 /m。 |
 | Q4154 | done | 桌面空态 **3 passed**（SLA 配置未用统计 heading）。禁 /m。 |
-| Q4155 | pending | 桌面空态 角色权限未用统计 heading。禁 /m。 |
-| Q4156 | pending | 桌面空态 数据权限未用统计 heading。禁 /m。 |
-| Q4157 | pending | 桌面空态 文件存储未用统计 heading。禁 /m。 |
-| Q4158 | pending | 桌面空态 租户管理未用统计 heading。禁 /m。 |
-| Q4159 | pending | 桌面空态 技术支持/文档中心未用统计 heading。禁 /m。 |
-| Q4160 | pending | 桌面空态 文档/导入导出未用统计 heading。禁 /m。 |
-| Q4161 | pending | 桌面空态 交接/资产履历未用统计 heading。禁 /m。 |
-| Q4162 | pending | 桌面空态 资产履历未用事件 heading。禁 /m。 |
+| Q4155 | done | 桌面空态 **3 passed**（角色权限未用统计 heading）。禁 /m。 |
+| Q4156 | done | 桌面空态 **3 passed**（数据权限未用统计 heading）。禁 /m。 |
+| Q4157 | done | 桌面空态 **3 passed**（文件存储未用统计 heading）。禁 /m。 |
+| Q4158 | done | 桌面空态 **3 passed**（租户管理未用统计 heading）。禁 /m。 |
+| Q4159 | done | 桌面空态 **3 passed**（技术支持/文档中心未用统计 heading）。禁 /m。 |
+| Q4160 | done | 桌面空态 **3 passed**（文档/导入导出未用统计 heading）。禁 /m。 |
+| Q4161 | done | 桌面空态 **3 passed**（交接/流程邮件未用统计 heading）。禁 /m。 |
+| Q4162 | done | 桌面空态 **3 passed**（角色/数据权限/文件存储余项 heading）。禁 /m。 |
+| Q4163 | done | 桌面空态 **3 passed**（菜单权限未用统计 heading）。禁 /m。 |
+| Q4164 | done | 桌面空态 **3 passed**（SAM 未用统计 heading）。禁 /m。 |
+| Q4165 | done | 桌面空态 **3 passed**（SAM/采购未用统计 heading）。禁 /m。 |
+| Q4166 | done | 桌面空态 **3 passed**（采购/型号/数据权限未用 heading）。禁 /m。 |
+| Q4167 | done | 桌面空态 **3 passed**（租户/表单存储未用 heading）。禁 /m。 |
+| Q4168 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4169 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4170 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4171 | pending | 桌面空态 重要设备未用统计 heading。禁 /m。 |
+| Q4172 | pending | 桌面空态 重要设备/表单存储未用 heading。禁 /m。 |
+| Q4173 | pending | 桌面空态 表单存储未用空态 heading。禁 /m。 |
+| Q4174 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4175 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4176 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4177 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4178 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

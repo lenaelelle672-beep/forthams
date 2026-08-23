@@ -307,7 +307,7 @@ export default function SystemFormStorageWorkbenchPage({
               <div>
                 <h5 className="mb-2 text-sm font-semibold">字段 maskedValue</h5>
                 <div className="space-y-2 text-sm text-slate-600">
-                  {selectedFields.length === 0 ? <p>暂无字段摘要。</p> : null}
+                  {selectedFields.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无字段摘要。</h3> : null}
                   {selectedFields.map((field) => (
                     <div key={field.id ?? field.fieldKey} className="rounded-xl border border-slate-100 px-3 py-2">
                       {field.fieldLabel ?? field.fieldKey}：{field.maskedValue}
@@ -318,7 +318,7 @@ export default function SystemFormStorageWorkbenchPage({
               <div>
                 <h5 className="mb-2 text-sm font-semibold">附件脱敏引用</h5>
                 <div className="space-y-2 text-sm text-slate-600">
-                  {visibleAttachments.length === 0 ? <p>暂无附件引用。</p> : null}
+                  {visibleAttachments.length === 0 ? <h3 className="text-sm font-medium text-slate-500">暂无附件引用。</h3> : null}
                   {visibleAttachments.map((attachment) => (
                     <div key={attachment.id ?? attachment.referenceKey} className="rounded-xl border border-slate-100 px-3 py-2">
                       <p>{attachment.fileName} · {attachment.contentType ?? '未知类型'} · {attachment.fileSize ?? 0} bytes</p>
