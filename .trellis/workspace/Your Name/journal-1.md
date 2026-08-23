@@ -1140,4 +1140,5 @@
 - Q3028–Q3039：**36 passed**。Linux 路由大小写修 WorkOrder/Approval。续 Q3040：/assets/new textbox/spinbutton + 赔偿/调拨角色。
 - Q3040–Q3048：**27 passed**。下一票 Q3049：继续桌面未用角色/空态。禁 /m。
 - Q3049：续桌面未用角色。赔偿日期、采购/维保/模型/角色/菜单弹窗 textbox/spinbutton、退役资产ID、预算 heading。禁 /m。
+- Q3049–Q3060：已绿 36 passed。Q3061–Q3072 已写；供应商双按钮改 `.first()`。续 Q3073：检验日期/模板、合同/制造商/许可证/用户/平面图/菜单/岗位/部门/位置未用角色。禁 /m。
 

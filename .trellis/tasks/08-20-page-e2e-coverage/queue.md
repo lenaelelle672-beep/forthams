@@ -2260,3 +2260,23 @@
 | Q3070 | pending | 桌面空态：角色弹窗 button 保存/取消 + 数据权限范围。禁 /m。 |
 | Q3071 | pending | 桌面空态：模型弹窗 取消/选择分类/选择制造商。禁 /m。 |
 | Q3072 | pending | 桌面空态：采购 heading + 规格型号 + 合同 heading。禁 /m。 |
+| Q3073 | pending | 桌面空态：检验 combobox 模板 + button 创建/取消。禁 /m。 |
+| Q3074 | pending | 桌面空态：检验 textbox 检验/下次/证书日期。禁 /m。 |
+| Q3075 | pending | 桌面空态：合同 placeholder 名称/编号/备注。禁 /m。 |
+| Q3076 | pending | 桌面空态：合同 button 取消/确认新增 + 合同类型。禁 /m。 |
+| Q3077 | pending | 桌面空态：制造商 textbox 国家/地址 + button 取消。禁 /m。 |
+| Q3078 | pending | 桌面空态：制造商 确认新增/heading + placeholder 国家。禁 /m。 |
+| Q3079 | pending | 桌面空态：许可证 textbox 名称/厂商/类型。禁 /m。 |
+| Q3080 | pending | 桌面空态：许可证 textbox 版本/采购单号 + spinbutton 席位。禁 /m。 |
+| Q3081 | pending | 桌面空态：许可证 spinbutton 价格 + heading/确认新增。禁 /m。 |
+| Q3082 | pending | 桌面空态：用户 textbox 用户名/姓名/邮箱。禁 /m。 |
+| Q3083 | pending | 桌面空态：用户 textbox 手机/备注 + button 确认新增。禁 /m。 |
+| Q3084 | pending | 桌面空态：平面图 placeholder 名称/楼栋/楼层。禁 /m。 |
+| Q3085 | pending | 桌面空态：平面图 placeholder 图片URL + heading/创建。禁 /m。 |
+| Q3086 | pending | 桌面空态：菜单 button 取消 + select 父级/可见。禁 /m。 |
+| Q3087 | pending | 桌面空态：菜单切按钮 权限标识 + select 正常。禁 /m。 |
+| Q3088 | pending | 桌面空态：岗位 textbox 编码/名称/备注。禁 /m。 |
+| Q3089 | pending | 桌面空态：部门 textbox 名称/编码/负责人。禁 /m。 |
+| Q3090 | pending | 桌面空态：位置 textbox 名称/编码 + heading。禁 /m。 |
+| Q3091 | pending | 桌面空态：供应商 button 取消/确认新增 + heading。禁 /m。 |
+| Q3092 | pending | 桌面空态：维保计划切每年/手动 spinbutton。禁 /m。 |
