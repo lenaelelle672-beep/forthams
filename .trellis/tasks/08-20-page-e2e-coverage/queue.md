@@ -2191,4 +2191,5 @@
 | Q3001 | done | 桌面空态 **3 passed**（/vendor-portal 标题 + /login 记住用户名/欢迎回来）。禁 /m。 |
 | Q3002 | done | 桌面空态 **3 passed**（/dashboard 导出数据/刷新视图/运营首页）。禁 /m。 |
 | Q3003 | done | 桌面空态 **3 passed**（/dashboard 总资产数/在用/闲置）。禁 /m。 |
-| Q3004 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3004 | done | 桌面空态 **3 passed**（/dashboard 总价值/分类分布/维保预警）。禁 /m。 |
+| Q3005 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
