@@ -69555,6 +69555,239 @@ test.describe('Q3882 桌面审计 trends/ranking 端点组合空态', () => {
 
 });
 
+test.describe('Q3883 桌面邮件日志业务查询结果未用 label 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs label「邮件日志业务查询结果」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByLabel('邮件日志业务查询结果').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「仅调用 /mail-logs/biz 获取同业务下的脱敏日志，不进行重试、重发、导出或发送。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('仅调用 /mail-logs/biz 获取同业务下的脱敏日志，不进行重试、重发、导出或发送。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-logs 「获取同业务下的脱敏日志，不进行重试、重发、导出或发送」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-logs');
+    await expect(page.getByText('获取同业务下的脱敏日志，不进行重试、重发、导出或发送').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3884 桌面通知偏好分类详情未用 label 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationPreferencesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences label「通知偏好分类详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByLabel('通知偏好分类详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「仅代表 system-notification-preferences 单模块候选；消息与通知组未全组完成，仍非 44/44，也不是 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('仅代表 system-notification-preferences 单模块候选；消息与通知组未全组完成，仍非 44/44，也不是 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-preferences 「preview 仅返回 wouldReceive、inAppEnabled、emailEnabled、quietWindowMatched、missingPreferences、rejectedInputs、tenantScoped、noPersistence 与 runtimeEffect=false。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-preferences');
+    await expect(page.getByText('preview 仅返回 wouldReceive、inAppEnabled、emailEnabled、quietWindowMatched、missingPreferences、rejectedInputs、tenantScoped、noPersistence 与 runtimeEffect=false。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3885 桌面字段集分类诊断未用 label 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets label「分类字段集诊断」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByLabel('分类字段集诊断').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「仅代表 system-custom-field-sets 的第 30 个真实模块候选；基础资料组未全组完成，未覆盖全部 44 项，也不是 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('仅代表 system-custom-field-sets 的第 30 个真实模块候选；基础资料组未全组完成，未覆盖全部 44 项，也不是 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-custom-field-sets 「第 30 个真实模块候选；基础资料组未全组完成，未覆盖全部 44 项」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-custom-field-sets');
+    await expect(page.getByText('第 30 个真实模块候选；基础资料组未全组完成，未覆盖全部 44 项').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3886 桌面通知开关业务类型详情未用 label 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch label「流程通知开关业务类型详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByLabel('流程通知开关业务类型详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「仅代表 system-workflow-notification-switch 单模块候选；not flow-platform acceptance，not message-notification group completion，not Workbench V3 full completion，消息与通知组未全组完成，仍非 44/44。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('仅代表 system-workflow-notification-switch 单模块候选；not flow-platform acceptance，not message-notification group completion，not Workbench V3 full completion，消息与通知组未全组完成，仍非 44/44。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「只读，不执行启停、不发送通知、不触发流程运行时。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('只读，不执行启停、不发送通知、不触发流程运行时。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3887 桌面通知渠道脱敏详情未用 label 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationChannelsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels label「通知渠道脱敏详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByLabel('通知渠道脱敏详情').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels 「不会显示或保存原始地址、签名材料、请求头或消息体。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('不会显示或保存原始地址、签名材料、请求头或消息体。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-notification-channels 「仅代表 system-notification-channels 单模块候选；消息与通知组未全组完成，仍非 44/44，也不是 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-notification-channels');
+    await expect(page.getByText('仅代表 system-notification-channels 单模块候选；消息与通知组未全组完成，仍非 44/44，也不是 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3888 桌面编号规则 coverage 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await page.route('**/numbering-rules*', mockNumberingRulesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「仅代表 system-numbering-rules 单模块候选；当前不保证并发唯一，未接入资产/工单/流程创建链路，不代表基础资料组完成，不代表 44/44 或 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('仅代表 system-numbering-rules 单模块候选；当前不保证并发唯一，未接入资产/工单/流程创建链路，不代表基础资料组完成，不代表 44/44 或 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「当前不保证并发唯一，未接入资产/工单/流程创建链路，不代表基础资料组完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('当前不保证并发唯一，未接入资产/工单/流程创建链路，不代表基础资料组完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-numbering-rules 「未接入资产/工单/流程创建链路，不代表基础资料组完成，不代表 44/44 或 Workbench V3 全量完成」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-numbering-rules');
+    await expect(page.getByText('未接入资产/工单/流程创建链路，不代表基础资料组完成，不代表 44/44 或 Workbench V3 全量完成').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3889 桌面邮件网关 coverage 整句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「仅代表 system-mail-gateway 已接入真组件；不代表消息与通知组、邮件子系统或 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('仅代表 system-mail-gateway 已接入真组件；不代表消息与通知组、邮件子系统或 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「不代表消息与通知组、邮件子系统或 Workbench V3 全量完成。」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('不代表消息与通知组、邮件子系统或 Workbench V3 全量完成。').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-mail-gateway 「已接入真组件；不代表消息与通知组、邮件子系统」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-mail-gateway');
+    await expect(page.getByText('已接入真组件；不代表消息与通知组、邮件子系统').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3890 桌面通知开关/偏好 coverage 余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockNotificationSwitchesEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「not flow-platform acceptance，not message-notification group completion，not Workbench V3 full completion」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('not flow-platform acceptance，not message-notification group completion，not Workbench V3 full completion').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「not message-notification group completion，not Workbench V3 full completion，消息与通知组未全组完成，仍非 44/44」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('not message-notification group completion，not Workbench V3 full completion，消息与通知组未全组完成，仍非 44/44').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch 「不执行启停、不发送通知、不触发流程运行时」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-notification-switch');
+    await expect(page.getByText('不执行启停、不发送通知、不触发流程运行时').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

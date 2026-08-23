@@ -3062,11 +3062,19 @@
 | Q3872 | done | 桌面空态 **3 passed**（通知模板 safe preview 边界整句）。禁 /m。 |
 | Q3873 | done | 桌面空态 **3 passed**（邮件日志不触发管线整句）。禁 /m。 |
 | Q3874 | done | 桌面空态 **3 passed**（邮件网关 credentialExposed 组合）。禁 /m。 |
-| Q3875 | pending | 桌面空态：邮件日志端点+管线整句。禁 /m。 |
-| Q3876 | pending | 桌面空态：自定义字段 CRUD/schema 边界整句。禁 /m。 |
-| Q3877 | pending | 桌面空态：自定义字段端点族整句。禁 /m。 |
-| Q3878 | pending | 桌面空态：字段集分配/绑定预览边界整句。禁 /m。 |
-| Q3879 | pending | 桌面空态：字段集端点族整句余项。禁 /m。 |
-| Q3880 | pending | 桌面空态：审计 GET 族端点整句。禁 /m。 |
-| Q3881 | pending | 桌面空态：审计只读写入/导出边界整句。禁 /m。 |
-| Q3882 | pending | 桌面空态：审计 trends/ranking 端点组合。禁 /m。 |
+| Q3875 | done | 桌面空态 **3 passed**（邮件日志端点+管线整句）。禁 /m。 |
+| Q3876 | done | 桌面空态 **3 passed**（自定义字段 CRUD/schema 边界整句）。禁 /m。 |
+| Q3877 | done | 桌面空态 **3 passed**（自定义字段端点族整句）。禁 /m。 |
+| Q3878 | done | 桌面空态 **3 passed**（字段集分配/绑定预览边界整句）。禁 /m。 |
+| Q3879 | done | 桌面空态 **3 passed**（字段集端点族整句余项）。禁 /m。 |
+| Q3880 | done | 桌面空态 **3 passed**（审计 GET 族端点整句）。禁 /m。 |
+| Q3881 | done | 桌面空态 **3 passed**（审计只读写入/导出边界整句）。禁 /m。 |
+| Q3882 | done | 桌面空态 **3 passed**（审计 trends/ranking 端点组合）。禁 /m。 |
+| Q3883 | pending | 桌面空态 邮件日志业务查询结果未用 label。禁 /m。 |
+| Q3884 | pending | 桌面空态 通知偏好分类详情未用 label + coverage。禁 /m。 |
+| Q3885 | pending | 桌面空态 字段集分类诊断未用 label + coverage。禁 /m。 |
+| Q3886 | pending | 桌面空态 通知开关业务类型详情未用 label。禁 /m。 |
+| Q3887 | pending | 桌面空态 通知渠道脱敏详情未用 label。禁 /m。 |
+| Q3888 | pending | 桌面空态 编号规则 coverage 整句。禁 /m。 |
+| Q3889 | pending | 桌面空态 邮件网关 coverage 整句。禁 /m。 |
+| Q3890 | pending | 桌面空态 通知开关/偏好 coverage 余项。禁 /m。 |
