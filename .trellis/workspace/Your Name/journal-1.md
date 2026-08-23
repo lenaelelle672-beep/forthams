@@ -1044,5 +1044,6 @@
 - Q2933：/fixed-assets/workbench 导出数据/刷新视图/运营首页 **3 passed**。`58bfb98b4`
 - Q2934：/fixed-assets/workbench 欢迎回来/总资产数/查看全部 **3 passed**。`3ba82f06e`
 - Q2935：/fixed-assets/workbench 在用/闲置/待审批 **3 passed**。`b6c40ac6d`
-- Q2936：/fixed-assets/workbench 价值趋势/分类分布/维保预警 **3 passed**。
+- Q2936：/fixed-assets/workbench 价值趋势/分类分布/维保预警 **3 passed**。`519cff420`
+- Q2937：/fixed-assets/workbench 最近工单/净值/部门统计 **3 passed**。
 
