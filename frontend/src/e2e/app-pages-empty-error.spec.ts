@@ -45312,10 +45312,38 @@ test.describe('Q3047 桌面备件库存单位与调拨建议空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/spare-parts/new 空态「SP-TEMP-201」', async ({ page }) => {
+  test('/spare-parts/new 空态「2026-06-18」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/spare-parts/new?source=spare-request');
-    await expect(page.getByText('SP-TEMP-201').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('2026-06-18').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3048 桌面新建资产日期折旧空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets/new 空态 textbox「购置日期」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByRole('textbox', { name: '购置日期' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态 spinbutton「折旧率（0~1）」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.getByRole('spinbutton', { name: '折旧率（0~1）' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/new 空态 select「请选择部门」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/new');
+    await expect(page.locator('select').filter({ hasText: '请选择部门' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 });

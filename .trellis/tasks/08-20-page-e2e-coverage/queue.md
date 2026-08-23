@@ -2234,4 +2234,4 @@
 | Q3044 | pending | 桌面空态：/compensation/new textbox 编号/申请人/发现人。禁 /m。 |
 | Q3045 | pending | 桌面空态：/disposals/transfer/new textbox 编号/申请人/日期。禁 /m。 |
 | Q3046 | pending | 桌面空态：/insurances/new button 返回 + 开始/结束日期。禁 /m。 |
-| Q3047 | pending | 桌面空态：备件 安全库存(件)/优先本仓调拨/SP-TEMP-201。禁 /m。 |
+| Q3047 | pending | 桌面空态：备件 安全库存(件)/优先本仓调拨/到货日期。禁 /m。 |
