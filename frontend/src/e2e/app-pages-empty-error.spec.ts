@@ -71151,6 +71151,180 @@ test.describe('Q3937 桌面位置/SAM 未用 button/heading 空态', () => {
 
 });
 
+test.describe('Q3938 桌面 ABC/SAM 未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/abc-classification heading「未分类资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByRole('heading', { name: '未分类资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification heading「资产列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByRole('heading', { name: '资产列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam button「触发合规扫描」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('button', { name: '触发合规扫描' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3939 桌面 SAM 未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam heading「合规率」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '合规率' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam heading「许可类型分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '许可类型分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam heading「席位使用率 TOP」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '席位使用率 TOP' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3940 桌面 SAM/ABC/循环盘点未用余句 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/sam heading「扫描历史」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '扫描历史' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「A 类（高价值）需月度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('A 类（高价值）需月度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/cycle-count 空态「A类（关键资产）：月度盘点 | B类（重要资产）：季度盘点 | C类（一般资产）：年度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('A类（关键资产）：月度盘点 | B类（重要资产）：季度盘点 | C类（一般资产）：年度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3941 桌面安全检查/报表构建器未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/config heading「安全检查表模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByRole('heading', { name: '安全检查表模板' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/safety-checklists/config heading「模板列表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByRole('heading', { name: '模板列表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder heading「自定义报表构建器」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '自定义报表构建器' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3942 桌面报表构建器/导入导出未用 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/report-builder heading「可用字段」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '可用字段' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/report-builder heading「数据预览」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/report-builder');
+    await expect(page.getByRole('heading', { name: '数据预览' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export heading「资产批量导入导出」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByRole('heading', { name: '资产批量导入导出' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3943 桌面 ABC/循环盘点未用余句 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/inventory/cycle-count 空态「暂无循环盘点规则」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/cycle-count');
+    await expect(page.getByText('暂无循环盘点规则').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「B 类（中价值）需季度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('B 类（中价值）需季度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/inventory/abc-classification 空态「C 类（低价值）需年度盘点」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inventory/abc-classification');
+    await expect(page.getByText('C 类（低价值）需年度盘点').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

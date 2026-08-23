@@ -1226,4 +1226,5 @@
 - Q3919–Q3926：**24 passed**。续 Q3927–Q3928：退役列表未用指标余句与借用/领用/验收未用 button。禁 /m。
 - Q3927–Q3928：**6 passed**。续 Q3929：保险/备件未用 button。禁 /m。
 - Q3929：**3 passed**。续 Q3930–Q3937：GIS/重估/风险/平面图/许可证/制造商/故障/ABC/转移/工单/循环盘点/位置/SAM 未用 heading/button/整句。位置须 `mockLocationsListEmpty`。禁 /m。
+- Q3930–Q3937：**24 passed**。续 Q3938–Q3943：ABC/SAM/安全检查/报表构建器/导入导出/循环盘点未用 heading/button/余句。禁 /m。
 
