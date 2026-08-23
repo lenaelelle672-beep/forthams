@@ -2298,15 +2298,21 @@
 | Q3108 | done | 桌面空态 **3 passed**（菜单 placeholder 名称/路由/组件）。禁 /m。 |
 | Q3109 | done | 桌面空态 **3 passed**（部门 确认新增/取消 + 顶级部门）。禁 /m。 |
 | Q3110 | done | 桌面空态 **3 passed**（平面图取消 + 所属部门 + 购买日期）。禁 /m。 |
-| Q3111 | in_progress | 桌面空态：风险评估 spinbutton 资产ID + combobox 可能/影响。禁 /m。 |
-| Q3112 | pending | 桌面空态：风险评估 textbox 缓解/评审 + spinbutton 评估人。禁 /m。 |
-| Q3113 | pending | 桌面空态：风险评估 button 创建/取消 + 请选择概率。禁 /m。 |
-| Q3114 | pending | 桌面空态：检验模板 placeholder + button 确定。禁 /m。 |
-| Q3115 | pending | 桌面空态：故障码 placeholder + button 创建。禁 /m。 |
-| Q3116 | pending | 桌面空态：分类 button 取消 + 创建一个新的根分类。禁 /m。 |
-| Q3117 | pending | 桌面空态：岗位 button 取消 + 状态 + 名称占位。禁 /m。 |
-| Q3118 | pending | 桌面空态：部门 领导/秘书/状态。禁 /m。 |
-| Q3119 | pending | 桌面空态：用户 分配岗位/状态 + 制造商联系人占位。禁 /m。 |
-| Q3120 | pending | 桌面空态：制造商 placeholder 电话/邮箱/官网。禁 /m。 |
-| Q3121 | pending | 桌面空态：供应商 placeholder 联系人/电话/邮箱。禁 /m。 |
-| Q3122 | pending | 桌面空态：检验模板 取消 + 合同到期日期 + 许可证到期日期。禁 /m。 |
+| Q3111 | done | 桌面空态 **3 passed**（风险评估 spinbutton 资产ID + combobox 可能/影响）。禁 /m。 |
+| Q3112 | done | 桌面空态 **3 passed**（风险评估 textbox 缓解/评审 + 评估人）。禁 /m。 |
+| Q3113 | done | 桌面空态 **3 passed**（风险评估 创建/取消 + 自动计算等级）。禁 /m。 |
+| Q3114 | done | 桌面空态 **3 passed**（检验模板 placeholder + 确定）。禁 /m。 |
+| Q3115 | done | 桌面空态 **3 passed**（故障码 placeholder + 创建）。禁 /m。 |
+| Q3116 | done | 桌面空态 **3 passed**（分类 取消 + 创建一个新的根分类）。禁 /m。 |
+| Q3117 | done | 桌面空态 **3 passed**（岗位 取消/状态 + 名称占位）。禁 /m。 |
+| Q3118 | done | 桌面空态 **3 passed**（部门 领导/秘书/状态）。禁 /m。 |
+| Q3119 | done | 桌面空态 **3 passed**（用户 分配岗位/状态 + 制造商联系人）。禁 /m。 |
+| Q3120 | done | 桌面空态 **3 passed**（制造商 placeholder 电话/邮箱/官网）。禁 /m。 |
+| Q3121 | done | 桌面空态 **3 passed**（供应商 placeholder 联系人/电话/邮箱）。禁 /m。 |
+| Q3122 | done | 桌面空态 **3 passed**（模板取消 + 合同/许可证到期日期）。禁 /m。 |
+| Q3123 | in_progress | 桌面空态：风险评估 heading/缓解占位 + LOW 低危。禁 /m。 |
+| Q3124 | pending | 桌面空态：故障码 取消/heading + 故障编码文案。禁 /m。 |
+| Q3125 | pending | 桌面空态：分类编码占位 + 位置编码占位。禁 /m。 |
+| Q3126 | pending | 桌面空态：部门 备注/搜索用户 + select 正常。禁 /m。 |
+| Q3127 | pending | 桌面空态：模型 placeholder 名称/型号 + 选择字段集。禁 /m。 |
+| Q3128 | pending | 桌面空态：用户 未分配/暂无角色/暂无岗位。禁 /m。 |
