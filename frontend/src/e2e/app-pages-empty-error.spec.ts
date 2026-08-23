@@ -77639,39 +77639,40 @@ test.describe('Q4161 桌面交接/资产履历未用统计 heading', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/assets/1/timeline heading「全部事件」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-workflow-mail heading「配置总数」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/assets/1/timeline');
-    await expect(page.getByRole('heading', { name: '全部事件' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-workflow-mail');
+    await expect(page.getByRole('heading', { name: '配置总数' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
 });
 
-test.describe('Q4162 桌面资产履历未用事件 heading', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route('**/api/**', mockApi);
+test.describe('Q4162 桌面角色/数据权限/文件存储余项 heading', () => {
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions heading「未绑定权限」', async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
     await seedSession(page, adminUser);
-  });
-
-  test('/assets/1/timeline heading「错误事件」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/assets/1/timeline');
-    await expect(page.getByRole('heading', { name: '错误事件' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByRole('heading', { name: '未绑定权限' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/assets/1/timeline heading「警告事件」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions heading「自定义（CUSTOM）」', async ({ page }) => {
+    await page.route('**/api/**', mockDataPermissionsEmpty);
+    await seedSession(page, adminUser);
     const errors = collectBrowserErrors(page);
-    await page.goto('/assets/1/timeline');
-    await expect(page.getByRole('heading', { name: '警告事件' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByRole('heading', { name: '自定义（CUSTOM）' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/assets/1/timeline heading「信息事件」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-file-storage heading「文件类型」exact', async ({ page }) => {
+    await page.route('**/api/**', mockFileStorageCatalogEmpty);
+    await seedSession(page, adminUser);
     const errors = collectBrowserErrors(page);
-    await page.goto('/assets/1/timeline');
-    await expect(page.getByRole('heading', { name: '信息事件' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/fixed-assets/workbenchv3?menu=system-file-storage');
+    await expect(page.getByRole('heading', { name: '文件类型', exact: true }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
