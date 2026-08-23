@@ -53852,10 +53852,10 @@ test.describe('Q3341 桌面表单配置遮罩预览空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-form-config displayValue「资产流程表单」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-form-config select「资产流程表单」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
-    await expect(page.getByDisplayValue('资产流程表单').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator('select').filter({ hasText: '资产流程表单' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -53983,10 +53983,10 @@ test.describe('Q3346 桌面表单配置草稿说明空态', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/fixed-assets/workbenchv3?menu=system-form-config displayValue「用于流程节点绑定的安全表单定义」', async ({ page }) => {
+  test('/fixed-assets/workbenchv3?menu=system-form-config 「javascript URL」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/fixed-assets/workbenchv3?menu=system-form-config');
-    await expect(page.getByDisplayValue('用于流程节点绑定的安全表单定义').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/javascript URL/).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
