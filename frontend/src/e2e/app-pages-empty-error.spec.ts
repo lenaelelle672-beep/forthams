@@ -47886,11 +47886,11 @@ test.describe('Q3131 桌面制造商备注与模型说明空态', () => {
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 
-  test('/locations 点新增顶级位置「创建一个新的顶级位置」', async ({ page }) => {
+  test('/locations 点新增顶级位置「位置名称 *」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/locations');
     await page.getByRole('button', { name: '新增顶级位置' }).first().click();
-    await expect(page.getByText('创建一个新的顶级位置').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('位置名称 *').first()).toBeVisible({ timeout: 15_000 });
     expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
   });
 });
