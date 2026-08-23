@@ -70620,10 +70620,10 @@ test.describe('Q3919 桌面工单/资产/退役未用角色空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/retirement/new textbox「资产 ID *」', async ({ page }) => {
+  test('/retirement button「新建退役申请」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/retirement/new');
-    await expect(page.getByRole('textbox', { name: '资产 ID *' }).first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/retirement');
+    await expect(page.getByRole('button', { name: '新建退役申请' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -70765,10 +70765,10 @@ test.describe('Q3924 桌面赔偿/转移未用流程余句空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/disposals/transfer/new 「处理人暂不可计算」', async ({ page }) => {
+  test('/retirement 「搜索申请」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
-    await page.goto('/disposals/transfer/new');
-    await expect(page.getByText('处理人暂不可计算').first()).toBeVisible({ timeout: 15_000 });
+    await page.goto('/retirement');
+    await expect(page.getByText('搜索申请').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -70794,10 +70794,10 @@ test.describe('Q3925 桌面转移未用计数/必填空态', () => {
     expect(errors).toEqual([]);
   });
 
-  test('/retirement placeholder「搜索申请编号或资产名称」', async ({ page }) => {
+  test('/retirement placeholder「2024/05/01 - 2024/05/31」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/retirement');
-    await expect(page.getByPlaceholder('搜索申请编号或资产名称').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByPlaceholder('2024/05/01 - 2024/05/31').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
@@ -70809,24 +70809,82 @@ test.describe('Q3926 桌面退役列表未用空态余句', () => {
     await seedSession(page, adminUser);
   });
 
-  test('/retirement 「状态筛选:」', async ({ page }) => {
+  test('/retirement 「日期范围」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/retirement');
-    await expect(page.getByText('状态筛选:').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('日期范围').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/retirement 「暂无报废申请」', async ({ page }) => {
+  test('/retirement 「暂无待审核」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/retirement');
-    await expect(page.getByText('暂无报废申请').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('暂无待审核').first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
-  test('/retirement 「创建第一个申请」', async ({ page }) => {
+  test('/retirement 「0 项申请」', async ({ page }) => {
     const errors = collectBrowserErrors(page);
     await page.goto('/retirement');
-    await expect(page.getByText('创建第一个申请').first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('0 项申请').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3927 桌面退役列表未用指标余句空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/retirement 「共 0 条记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('共 0 条记录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement 「回收率 0%」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('回收率 0%').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/retirement 「占全部退役的 0%」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/retirement');
+    await expect(page.getByText('占全部退役的 0%').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3928 桌面借用/领用/验收未用 button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/borrows button「新建借用单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows');
+    await expect(page.getByRole('button', { name: '新建借用单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments button「新建领用单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments');
+    await expect(page.getByRole('button', { name: '新建领用单' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/intake button「新建验收单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/intake');
+    await expect(page.getByRole('button', { name: '新建验收单' }).first()).toBeVisible({ timeout: 15_000 });
     expect(errors).toEqual([]);
   });
 
