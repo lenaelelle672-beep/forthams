@@ -1047,5 +1047,6 @@
 - Q2936：/fixed-assets/workbench 价值趋势/分类分布/维保预警 **3 passed**。`519cff420`
 - Q2937：/fixed-assets/workbench 最近工单/净值/部门统计 **3 passed**。`944469885`
 - Q2938：/fixed-assets/workbench 总价值/流程待办/Top5部门 **3 passed**。默认运营首页无「审批中心」「待我审批」。`20053fae9`
-- Q2939：/fixed-assets/workbench 设备/工单/巡检管理 **3 passed**。
+- Q2939：/fixed-assets/workbench 设备/工单/巡检管理 **3 passed**。`9e829a349`
+- Q2940：/fixed-assets/workbench 备件/数据监控/报表分析 **3 passed**。
 

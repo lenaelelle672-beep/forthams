@@ -2127,4 +2127,5 @@
 | Q2937 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 最近工单/净值/部门统计）。禁 /m。 |
 | Q2938 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 总价值/流程待办/Top5部门）。禁 /m。 |
 | Q2939 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 设备/工单/巡检管理）。禁 /m。 |
-| Q2940 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2940 | done | 桌面空态 **3 passed**（/fixed-assets/workbench 备件/数据监控/报表分析）。禁 /m。 |
+| Q2941 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
