@@ -2990,11 +2990,19 @@
 | Q3800 | done | 桌面空态 **3 passed**（编号规则 catalog + dry-run 边界）。禁 /m。 |
 | Q3801 | done | 桌面空态 **3 passed**（通知偏好 preview 端点组合）。禁 /m。 |
 | Q3802 | done | 桌面空态 **3 passed**（通知渠道 preview 端点组合）。禁 /m。 |
-| Q3803 | pending | 桌面空态：邮件模板 {id}/code/meta 端点。禁 /m。 |
-| Q3804 | pending | 桌面空态：邮件模板 catalog + safe preview 边界。禁 /m。 |
-| Q3805 | pending | 桌面空态：通知模板 {id}/code/meta 端点。禁 /m。 |
-| Q3806 | pending | 桌面空态：通知模板 catalog + safe preview 边界。禁 /m。 |
-| Q3807 | pending | 桌面空态：流程通知开关 biz-type 端点。禁 /m。 |
-| Q3808 | pending | 桌面空态：邮件网关 {id}/meta/preview 端点。禁 /m。 |
-| Q3809 | pending | 桌面空态：邮件网关 metadata-only 加号边界。禁 /m。 |
-| Q3810 | pending | 桌面空态：流程通知开关 no-send 边界余项。禁 /m。 |
+| Q3803 | done | 桌面空态 **3 passed**（邮件模板 {id}/code/meta 端点）。禁 /m。 |
+| Q3804 | done | 桌面空态 **3 passed**（邮件模板 catalog + safe preview 边界）。禁 /m。 |
+| Q3805 | done | 桌面空态 **3 passed**（通知模板 {id}/code/meta 端点）。禁 /m。 |
+| Q3806 | done | 桌面空态 **3 passed**（通知模板 catalog + safe preview 边界）。禁 /m。 |
+| Q3807 | done | 桌面空态 **3 passed**（流程通知开关 biz-type 端点）。禁 /m。 |
+| Q3808 | done | 桌面空态 **3 passed**（邮件网关 {id}/meta/preview 端点）。禁 /m。 |
+| Q3809 | done | 桌面空态 **3 passed**（邮件网关 metadata-only 加号边界）。禁 /m。 |
+| Q3810 | done | 桌面空态 **3 passed**（流程通知开关 no-send 边界余项）。禁 /m。 |
+| Q3811 | pending | 桌面空态：邮件日志 {id}/biz/meta 端点。禁 /m。 |
+| Q3812 | pending | 桌面空态：邮件日志不触发发送管线。禁 /m。 |
+| Q3813 | pending | 桌面空态：自定义字段 all/{id}/preview 端点。禁 /m。 |
+| Q3814 | pending | 桌面空态：自定义字段端点族组合。禁 /m。 |
+| Q3815 | pending | 桌面空态：字段集 all/{id}/fields 端点。禁 /m。 |
+| Q3816 | pending | 桌面空态：字段集 by-category/meta/preview 端点。禁 /m。 |
+| Q3817 | pending | 桌面空态：邮件日志 redacted/tenantScoped 边界。禁 /m。 |
+| Q3818 | pending | 桌面空态：自定义字段端点与 preview 余项。禁 /m。 |
