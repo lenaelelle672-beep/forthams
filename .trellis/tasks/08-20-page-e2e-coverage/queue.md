@@ -2215,15 +2215,23 @@
 | Q3025 | done | 桌面空态 **3 passed**（/audit 7天汇总/趋势heading/分布heading）。禁 /m。 |
 | Q3026 | done | 桌面空态 **3 passed**（/audit 最近操作heading/审计日志/导出）。禁 /m。 |
 | Q3027 | done | 桌面空态 **3 passed**（/intake/new 资产#1/入库资产heading/品牌）。禁 /m。 |
-| Q3028 | in_progress | 桌面空态：/spare-parts/new textbox 备件编码/名称/规格。禁 /m。 |
-| Q3029 | pending | 桌面空态：/spare-parts/new spinbutton 当前/安全库存/单价。禁 /m。 |
-| Q3030 | pending | 桌面空态：/spare-parts/new textbox 计量单位/申请说明 + button 取消。禁 /m。 |
-| Q3031 | pending | 桌面空态：/spare-parts/new 关联工单/关联资产/供应来源。禁 /m。 |
-| Q3032 | pending | 桌面空态：/spare-parts/new 待选择/申请说明/当前库存(件)。禁 /m。 |
-| Q3033 | pending | 桌面空态：/spare-parts/new?source=spare-request 工作台/传感器/heading。禁 /m。 |
-| Q3034 | pending | 桌面空态：备件预填 注塑机/工单号/备件仓。禁 /m。 |
-| Q3035 | pending | 桌面空态：备件预填 来自工作台/低储备件/预测维保。禁 /m。 |
-| Q3036 | pending | 桌面空态：备件未知来源 + /insurances/new textbox 保单号/名称。禁 /m。 |
-| Q3037 | pending | 桌面空态：/insurances/new textbox 公司/备注 + spinbutton 保费。禁 /m。 |
-| Q3038 | pending | 桌面空态：/insurances/new spinbutton 保额/免赔额 + button 保存。禁 /m。 |
-| Q3039 | pending | 桌面空态：/insurances/new combobox 类型/状态 + button 取消。禁 /m。 |
+| Q3028 | done | 桌面空态 **3 passed**（/spare-parts/new textbox 备件编码/名称/规格）。禁 /m。 |
+| Q3029 | done | 桌面空态 **3 passed**（/spare-parts/new spinbutton 当前/安全库存/单价）。禁 /m。 |
+| Q3030 | done | 桌面空态 **3 passed**（/spare-parts/new textbox 单位/说明 + button 取消）。禁 /m。 |
+| Q3031 | done | 桌面空态 **3 passed**（/spare-parts/new 关联工单/关联资产/供应来源）。禁 /m。 |
+| Q3032 | done | 桌面空态 **3 passed**（/spare-parts/new 待选择/申请说明/当前库存(件)）。禁 /m。 |
+| Q3033 | done | 桌面空态 **3 passed**（备件工作台预填 工作台/传感器/heading）。禁 /m。 |
+| Q3034 | done | 桌面空态 **3 passed**（备件预填 注塑机/工单号/备件仓）。禁 /m。 |
+| Q3035 | done | 桌面空态 **3 passed**（备件预填 来自工作台/低储备件/预测维保）。禁 /m。 |
+| Q3036 | done | 桌面空态 **3 passed**（备件未知来源 + 保险 textbox 保单号/名称）。禁 /m。 |
+| Q3037 | done | 桌面空态 **3 passed**（/insurances/new textbox 公司/备注 + spinbutton 保费）。禁 /m。 |
+| Q3038 | done | 桌面空态 **3 passed**（/insurances/new spinbutton 保额/免赔额 + button 保存）。禁 /m。 |
+| Q3039 | done | 桌面空态 **3 passed**（/insurances/new combobox 类型/状态 + button 取消）。禁 /m。 |
+| Q3040 | in_progress | 桌面空态：/assets/new textbox 品牌/规格/序列号。禁 /m。 |
+| Q3041 | pending | 桌面空态：/assets/new textbox 供应商/存放位置/RFID。禁 /m。 |
+| Q3042 | pending | 桌面空态：/assets/new spinbutton 纬度/经度 + GIS说明。禁 /m。 |
+| Q3043 | pending | 桌面空态：/assets/new spinbutton 原值/净值/保修期。禁 /m。 |
+| Q3044 | pending | 桌面空态：/compensation/new textbox 编号/申请人/发现人。禁 /m。 |
+| Q3045 | pending | 桌面空态：/disposals/transfer/new textbox 编号/申请人/日期。禁 /m。 |
+| Q3046 | pending | 桌面空态：/insurances/new button 返回 + 开始/结束日期。禁 /m。 |
+| Q3047 | pending | 桌面空态：备件 安全库存(件)/优先本仓调拨/SP-TEMP-201。禁 /m。 |
