@@ -47895,6 +47895,94 @@ test.describe('Q3131 桌面制造商备注与模型说明空态', () => {
   });
 });
 
+test.describe('Q3132 桌面自定义字段搜索角色空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/custom-fields 空态 textbox「搜索自定义字段」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByRole('textbox', { name: '搜索自定义字段' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fields 空态「共 0 条」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fields');
+    await expect(page.getByText('共 0 条').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fieldsets 空态 textbox「搜索字段集」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fieldsets');
+    await expect(page.getByRole('textbox', { name: '搜索字段集' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe('Q3133 桌面自定义字段集标题占位空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/custom-fieldsets 空态 heading「自定义字段集管理」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fieldsets');
+    await expect(page.getByRole('heading', { name: '自定义字段集管理' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/custom-fieldsets 空态 placeholder「搜索字段集名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/custom-fieldsets');
+    await expect(page.getByPlaceholder('搜索字段集名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/contracts 点新增合同「备注」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/contracts');
+    await page.getByRole('button', { name: '新增合同' }).first().click();
+    await expect(page.getByText('备注', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
+test.describe('Q3134 桌面弹窗备注与模板名称空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/manufacturers 点新增制造商「备注」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/manufacturers');
+    await page.getByRole('button', { name: '新增制造商' }).first().click();
+    await expect(page.getByText('备注', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/licenses 点新增许可证「备注」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/licenses');
+    await page.getByRole('button', { name: '新增许可证' }).first().click();
+    await expect(page.getByText('备注', { exact: true }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+
+  test('/inspection-templates 点新增模板「模板名称」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/inspection-templates');
+    await page.getByRole('button', { name: '新增模板' }).first().click();
+    await expect(page.getByText('模板名称').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors.filter((item) => !item.includes('DialogTitle'))).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
