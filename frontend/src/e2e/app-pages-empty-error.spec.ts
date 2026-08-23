@@ -73123,6 +73123,64 @@ test.describe('Q4005 桌面工单验收/详情未用 heading 空态', () => {
 
 });
 
+test.describe('Q4006 桌面安全/借用/领用未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/safety-checklists/config button「禁用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/safety-checklists/config');
+    await expect(page.getByRole('button', { name: '禁用' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/borrows/1 heading「借用详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/borrows/1');
+    await expect(page.getByRole('heading', { name: '借用详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assignments/1 heading「领用单详情」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assignments/1');
+    await expect(page.getByRole('heading', { name: '领用单详情' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q4007 桌面权限/个人未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/forbidden?reason=roles_missing heading「用户信息不完整」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByRole('heading', { name: '用户信息不完整' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/forbidden?reason=roles_missing button「重新登录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/forbidden?reason=roles_missing');
+    await expect(page.getByRole('button', { name: '重新登录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/profile heading「账号资料」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/profile');
+    await expect(page.getByRole('heading', { name: '账号资料' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

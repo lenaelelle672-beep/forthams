@@ -3193,3 +3193,5 @@
 | Q4003 | pending | 桌面空态 流程中心未用 KPI 副文案 button。禁 /m。 |
 | Q4004 | pending | 桌面空态 工单详情未用 heading。禁 /m。 |
 | Q4005 | pending | 桌面空态 工单验收/详情未用 heading。禁 /m。 |
+| Q4006 | pending | 桌面空态 安全/借用/领用未用 heading/button。禁 /m。 |
+| Q4007 | pending | 桌面空态 权限/个人未用 heading/button。禁 /m。 |

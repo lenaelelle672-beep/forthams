@@ -1243,4 +1243,5 @@
 - Q3970–Q3981：**36 passed**。续 Q3982–Q3989：资产/维保计划/通知/盘点/许可证/检验记录/审计/TCO/GIS 未用 heading/button。禁 /m。
 - Q3982–Q3989：**24 passed**。续 Q3990–Q4001：履历/盘点报告/个人/盘点周期/健康/维保/流程中心/审批/风险/通知未用 heading/button。MissingTaskId 标题改为 h3。禁 /m。
 - Q3990–Q4001：**36 passed**。个人页空 payload 回退登录名。续 Q4002–Q4005：流程分页/KPI 副文案与工单详情/验收未用 heading/button。工单空审批改为 h3。禁 /m。
+- Q4002–Q4005：**12 passed**。续 Q4006–Q4007：安全/借用/领用/forbidden/个人未用 heading/button。个人页 CardTitle 补中文 fallback。禁 /m。
 
