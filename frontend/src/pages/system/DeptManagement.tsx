@@ -545,9 +545,9 @@ export default function DeptManagement() {
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
                       <Building2 className="h-6 w-6 text-slate-300" />
                     </div>
-                    <p className="text-sm font-medium text-slate-500">
+                    <h3 className="text-sm font-medium text-slate-500">
                       {keyword ? '未找到匹配的部门' : '暂无部门数据'}
-                    </p>
+                    </h3>
                     <p className="text-xs text-slate-400 mt-1">
                       {keyword ? '请尝试更换关键词' : '点击下方按钮创建第一个部门'}
                     </p>

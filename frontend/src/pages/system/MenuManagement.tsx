@@ -413,7 +413,7 @@ export default function MenuManagement() {
                   {displayData.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="px-4 py-12 text-center text-sm text-slate-400">
-                        暂无菜单数据，请通过 DDL 初始化种子数据
+                        <h3 className="text-sm font-medium text-slate-400">暂无菜单数据，请通过 DDL 初始化种子数据</h3>
                       </td>
                     </tr>
                   ) : (
