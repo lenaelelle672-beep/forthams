@@ -3221,4 +3221,5 @@
 | Q4031 | done | 桌面空态 **3 passed**（检验详情未用 heading）。禁 /m。 |
 | Q4032 | done | 桌面空态 **3 passed**（检验详情未用空态 heading）。禁 /m。 |
 | Q4033 | done | 桌面空态 **3 passed**（保险详情未用 heading）。禁 /m。 |
-| Q4034 | pending | 桌面空态 健康评分/测试结果未用空态 heading。禁 /m。 |
+| Q4034 | done | 桌面空态 **3 passed**（健康评分/测试结果未用空态 heading）。禁 /m。 |
+| Q4035 | pending | 桌面空态 备件详情未用空态 heading。禁 /m。 |

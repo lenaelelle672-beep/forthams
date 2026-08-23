@@ -1251,4 +1251,5 @@
 - Q4012–Q4024：**39 passed**。续 Q4025–Q4030：审计详情/资产详情未用 heading/button/link。资产空折旧/子资产/变更记录改为 heading。禁 /m。
 - Q4025–Q4030：**18 passed**。续 Q4031–Q4033：检验/保险详情未用 heading。检验照片/历史与保险详情改为 heading。禁 /m。
 - Q4031–Q4033：**9 passed**。续 Q4034：健康评分/测试结果未用空态 heading。禁 /m。
+- Q4034：**3 passed**。续 Q4035：备件详情未用空态 heading。暂无领用记录改为 heading。禁 /m。
 

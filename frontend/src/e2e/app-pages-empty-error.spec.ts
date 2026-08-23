@@ -73964,6 +73964,35 @@ test.describe('Q4034 桌面健康评分/测试结果未用空态 heading', () =>
 
 });
 
+test.describe('Q4035 桌面备件详情未用空态 heading', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/spare-parts/1 heading「暂无领用记录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/spare-parts/1');
+    await expect(page.getByRole('heading', { name: '暂无领用记录' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/BETA heading「BETA」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/BETA');
+    await expect(page.getByRole('heading', { name: 'BETA' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/workflow-form/GAMMA heading「GAMMA」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/workflow-form/GAMMA');
+    await expect(page.getByRole('heading', { name: 'GAMMA' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

@@ -445,7 +445,7 @@ export default function SparePartDetailPage() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-400 text-center py-4">暂无领用记录</p>
+            <h3 className="text-sm font-medium text-gray-400 text-center py-4">暂无领用记录</h3>
           )}
         </CardContent>
       </Card>
