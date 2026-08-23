@@ -2027,4 +2027,5 @@
 | Q2837 | done | 桌面空态 **3 passed**（/spare-parts/new 提交申请/返回/备件申请）。禁 /m。 |
 | Q2838 | done | 桌面空态 **3 passed**（/spare-parts/new 备件编码/名称/申请信息）。禁 /m。 |
 | Q2839 | done | 桌面空态 **3 passed**（/spare-parts/new 规格型号/当前库存/安全库存）。禁 /m。 |
-| Q2840 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2840 | done | 桌面空态 **3 passed**（/spare-parts/new 计量单位/补足缺口/到货时间）。禁 /m。 |
+| Q2841 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
