@@ -2236,47 +2236,65 @@
 | Q3046 | done | 桌面空态 **3 passed**（/insurances/new button 返回 + 开始/结束日期）。禁 /m。 |
 | Q3047 | done | 桌面空态 **3 passed**（备件 安全库存(件)/优先本仓调拨/到货日期）。禁 /m。 |
 | Q3048 | done | 桌面空态 **3 passed**（/assets/new 购置日期/折旧率/部门select）。禁 /m。 |
-| Q3049 | in_progress | 桌面空态：/compensation/new textbox 申请/损坏日期 + 损坏类型。禁 /m。 |
-| Q3050 | pending | 桌面空态：采购弹窗 textbox 单号/名称/备注。禁 /m。 |
-| Q3051 | pending | 桌面空态：采购弹窗 textbox 日期/到货 + button 确认新增。禁 /m。 |
-| Q3052 | pending | 桌面空态：采购弹窗 button 添加行/取消 + placeholder 资产名称。禁 /m。 |
-| Q3053 | pending | 桌面空态：维保计划弹窗 textbox 名称/执行人/备注。禁 /m。 |
-| Q3054 | pending | 桌面空态：维保计划弹窗 起止日期 + spinbutton 每月第几天。禁 /m。 |
-| Q3055 | pending | 桌面空态：维保计划弹窗 费用 + button 确认新建/取消。禁 /m。 |
-| Q3056 | pending | 桌面空态：资产模型弹窗 textbox 名称/型号 + heading。禁 /m。 |
-| Q3057 | pending | 桌面空态：角色弹窗 textbox 名称/编码/描述。禁 /m。 |
-| Q3058 | pending | 桌面空态：菜单弹窗 textbox 名称/路由/组件。禁 /m。 |
-| Q3059 | pending | 桌面空态：菜单弹窗 spinbutton 排序 + button 保存 + 类型。禁 /m。 |
-| Q3060 | pending | 桌面空态：退役 spinbutton 资产ID + 预算 heading/返回。禁 /m。 |
-| Q3061 | pending | 桌面空态：/inspections/new textbox 编号/证书/发现。禁 /m。 |
-| Q3062 | pending | 桌面空态：/inspections/new textbox 机构/检验人/附件。禁 /m。 |
-| Q3063 | pending | 桌面空态：/inspections/new spinbutton 费用 + combobox 类型/结果。禁 /m。 |
-| Q3064 | pending | 桌面空态：合同弹窗 textbox 名称/编号 + spinbutton 金额。禁 /m。 |
-| Q3065 | pending | 桌面空态：供应商弹窗 textbox 名称/编码/联系人。禁 /m。 |
-| Q3066 | pending | 桌面空态：供应商弹窗 textbox 电话/邮箱/地址。禁 /m。 |
-| Q3067 | pending | 桌面空态：制造商弹窗 textbox 名称/编码/联系人。禁 /m。 |
-| Q3068 | pending | 桌面空态：制造商弹窗 textbox 电话/邮箱/官网。禁 /m。 |
-| Q3069 | pending | 桌面空态：/assets/new placeholder Dell/型号/序列号。禁 /m。 |
-| Q3070 | pending | 桌面空态：角色弹窗 button 保存/取消 + 数据权限范围。禁 /m。 |
-| Q3071 | pending | 桌面空态：模型弹窗 取消/选择分类/选择制造商。禁 /m。 |
-| Q3072 | pending | 桌面空态：采购 heading + 规格型号 + 合同 heading。禁 /m。 |
-| Q3073 | pending | 桌面空态：检验 combobox 模板 + button 创建/取消。禁 /m。 |
-| Q3074 | pending | 桌面空态：检验 textbox 检验/下次/证书日期。禁 /m。 |
-| Q3075 | pending | 桌面空态：合同 placeholder 名称/编号/备注。禁 /m。 |
-| Q3076 | pending | 桌面空态：合同 button 取消/确认新增 + 合同类型。禁 /m。 |
-| Q3077 | pending | 桌面空态：制造商 textbox 国家/地址 + button 取消。禁 /m。 |
-| Q3078 | pending | 桌面空态：制造商 确认新增/heading + placeholder 国家。禁 /m。 |
-| Q3079 | pending | 桌面空态：许可证 textbox 名称/厂商/类型。禁 /m。 |
-| Q3080 | pending | 桌面空态：许可证 textbox 版本/采购单号 + spinbutton 席位。禁 /m。 |
-| Q3081 | pending | 桌面空态：许可证 spinbutton 价格 + heading/确认新增。禁 /m。 |
-| Q3082 | pending | 桌面空态：用户 textbox 用户名/姓名/邮箱。禁 /m。 |
-| Q3083 | pending | 桌面空态：用户 textbox 手机/备注 + button 确认新增。禁 /m。 |
-| Q3084 | pending | 桌面空态：平面图 placeholder 名称/楼栋/楼层。禁 /m。 |
-| Q3085 | pending | 桌面空态：平面图 placeholder 图片URL + heading/创建。禁 /m。 |
-| Q3086 | pending | 桌面空态：菜单 button 取消 + select 父级/可见。禁 /m。 |
-| Q3087 | pending | 桌面空态：菜单切按钮 权限标识 + select 正常。禁 /m。 |
-| Q3088 | pending | 桌面空态：岗位 textbox 编码/名称/备注。禁 /m。 |
-| Q3089 | pending | 桌面空态：部门 textbox 名称/编码/负责人。禁 /m。 |
-| Q3090 | pending | 桌面空态：位置 textbox 名称/编码 + heading。禁 /m。 |
-| Q3091 | pending | 桌面空态：供应商 button 取消/确认新增 + heading。禁 /m。 |
-| Q3092 | pending | 桌面空态：维保计划切每年/手动 spinbutton。禁 /m。 |
+| Q3049 | done | 桌面空态 **3 passed**（赔偿 textbox 申请/损坏日期 + 损坏类型）。禁 /m。 |
+| Q3050 | done | 桌面空态 **3 passed**（采购弹窗 textbox 单号/名称/备注）。禁 /m。 |
+| Q3051 | done | 桌面空态 **3 passed**（采购弹窗 日期/到货 + 确认新增）。禁 /m。 |
+| Q3052 | done | 桌面空态 **3 passed**（采购弹窗 添加行/取消 + 资产名称）。禁 /m。 |
+| Q3053 | done | 桌面空态 **3 passed**（维保计划 textbox 名称/执行人/备注）。禁 /m。 |
+| Q3054 | done | 桌面空态 **3 passed**（维保计划 起止日期 + 每月第几天）。禁 /m。 |
+| Q3055 | done | 桌面空态 **3 passed**（维保计划 费用 + 确认新建/取消）。禁 /m。 |
+| Q3056 | done | 桌面空态 **3 passed**（资产模型 textbox 名称/型号 + heading）。禁 /m。 |
+| Q3057 | done | 桌面空态 **3 passed**（角色弹窗 textbox 名称/编码/描述）。禁 /m。 |
+| Q3058 | done | 桌面空态 **3 passed**（菜单弹窗 textbox 名称/路由/组件）。禁 /m。 |
+| Q3059 | done | 桌面空态 **3 passed**（菜单 spinbutton 排序 + 保存 + 类型）。禁 /m。 |
+| Q3060 | done | 桌面空态 **3 passed**（退役 资产ID + 预算 heading/返回）。禁 /m。 |
+| Q3061 | done | 桌面空态 **3 passed**（检验 textbox 编号/证书/发现）。禁 /m。 |
+| Q3062 | done | 桌面空态 **3 passed**（检验 textbox 机构/检验人/附件）。禁 /m。 |
+| Q3063 | done | 桌面空态 **3 passed**（检验 spinbutton 费用 + combobox 类型/结果）。禁 /m。 |
+| Q3064 | done | 桌面空态 **3 passed**（合同 textbox 名称/编号 + spinbutton 金额）。禁 /m。 |
+| Q3065 | done | 桌面空态 **3 passed**（供应商 textbox 名称/编码/联系人；双按钮 first）。禁 /m。 |
+| Q3066 | done | 桌面空态 **3 passed**（供应商 textbox 电话/邮箱/地址）。禁 /m。 |
+| Q3067 | done | 桌面空态 **3 passed**（制造商 textbox 名称/编码/联系人）。禁 /m。 |
+| Q3068 | done | 桌面空态 **3 passed**（制造商 textbox 电话/邮箱/官网）。禁 /m。 |
+| Q3069 | done | 桌面空态 **3 passed**（/assets/new placeholder Dell/型号/序列号）。禁 /m。 |
+| Q3070 | done | 桌面空态 **3 passed**（角色 button 保存/取消 + 数据权限范围）。禁 /m。 |
+| Q3071 | done | 桌面空态 **3 passed**（模型 取消/选择分类/选择制造商）。禁 /m。 |
+| Q3072 | done | 桌面空态 **3 passed**（采购 heading + 规格型号 + 合同 heading）。禁 /m。 |
+| Q3073 | done | 桌面空态 **3 passed**（检验 combobox 模板 + 创建/取消）。禁 /m。 |
+| Q3074 | done | 桌面空态 **3 passed**（检验 textbox 检验/下次/证书日期）。禁 /m。 |
+| Q3075 | done | 桌面空态 **3 passed**（合同 placeholder 名称/编号/备注）。禁 /m。 |
+| Q3076 | done | 桌面空态 **3 passed**（合同 取消/确认新增 + 合同类型）。禁 /m。 |
+| Q3077 | done | 桌面空态 **3 passed**（制造商 textbox 国家/地址 + 取消）。禁 /m。 |
+| Q3078 | done | 桌面空态 **3 passed**（制造商 确认新增/heading + 国家占位）。禁 /m。 |
+| Q3079 | done | 桌面空态 **3 passed**（许可证 textbox 名称/厂商/类型）。禁 /m。 |
+| Q3080 | done | 桌面空态 **3 passed**（许可证 版本/采购单号 + spinbutton 席位）。禁 /m。 |
+| Q3081 | done | 桌面空态 **3 passed**（许可证 价格 + heading/确认新增）。禁 /m。 |
+| Q3082 | done | 桌面空态 **3 passed**（用户 textbox 用户名/姓名/邮箱）。禁 /m。 |
+| Q3083 | done | 桌面空态 **3 passed**（用户 textbox 手机/备注 + 确认新增）。禁 /m。 |
+| Q3084 | done | 桌面空态 **3 passed**（平面图 placeholder 名称/楼栋/楼层）。禁 /m。 |
+| Q3085 | done | 桌面空态 **3 passed**（平面图 图片URL + heading/创建）。禁 /m。 |
+| Q3086 | done | 桌面空态 **3 passed**（菜单 取消 + select 父级/可见）。禁 /m。 |
+| Q3087 | done | 桌面空态 **3 passed**（菜单切按钮 权限标识 + select 正常）。禁 /m。 |
+| Q3088 | done | 桌面空态 **3 passed**（岗位 textbox 编码/名称/备注）。禁 /m。 |
+| Q3089 | done | 桌面空态 **3 passed**（部门 textbox 名称/编码/负责人）。禁 /m。 |
+| Q3090 | done | 桌面空态 **3 passed**（位置 textbox 名称/编码 + heading）。禁 /m。 |
+| Q3091 | done | 桌面空态 **3 passed**（供应商 取消/确认新增 + heading）。禁 /m。 |
+| Q3092 | done | 桌面空态 **3 passed**（维保计划切每年/手动 spinbutton）。禁 /m。 |
+| Q3093 | in_progress | 桌面空态：岗位 spinbutton 排序 + 确认新增 + heading。禁 /m。 |
+| Q3094 | pending | 桌面空态：部门 textbox 电话/邮箱 + spinbutton 排序。禁 /m。 |
+| Q3095 | pending | 桌面空态：位置 button 取消/确认新增 + placeholder。禁 /m。 |
+| Q3096 | pending | 桌面空态：故障码 textbox 编码/现象 + spinbutton 排序。禁 /m。 |
+| Q3097 | pending | 桌面空态：分类 textbox 名称/编码 + button 创建。禁 /m。 |
+| Q3098 | pending | 桌面空态：检验模板 textbox/combobox/spinbutton。禁 /m。 |
+| Q3099 | pending | 桌面空态：检验模板 textbox 类别/检查项 + 状态。禁 /m。 |
+| Q3100 | pending | 桌面空态：模型 字段集/状态 + 创建模型。禁 /m。 |
+| Q3101 | pending | 桌面空态：用户 取消/heading + 初始密码。禁 /m。 |
+| Q3102 | pending | 桌面空态：许可证 取消/授权类型 + 版本占位。禁 /m。 |
+| Q3103 | pending | 桌面空态：合同 货币/状态/开始日期。禁 /m。 |
+| Q3104 | pending | 桌面空态：制造商 placeholder 名称/编码/地址。禁 /m。 |
+| Q3105 | pending | 桌面空态：供应商 placeholder 名称/编码/地址。禁 /m。 |
+| Q3106 | pending | 桌面空态：维保切每周 星期几 + 岗位占位 + 部门 heading。禁 /m。 |
+| Q3107 | pending | 桌面空态：角色 placeholder 名称/编码/描述。禁 /m。 |
+| Q3108 | pending | 桌面空态：菜单 placeholder/heading。禁 /m。 |
+| Q3109 | pending | 桌面空态：部门 确认新增/取消 + select 顶级部门。禁 /m。 |
+| Q3110 | pending | 桌面空态：平面图取消 + 用户部门 + 许可证购买日期。禁 /m。 |
