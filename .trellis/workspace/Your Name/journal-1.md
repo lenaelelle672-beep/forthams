@@ -1027,5 +1027,7 @@
 - Q2916：/system/users 状态/用户 + /system/roles 新增角色 **3 passed**。`2b03d09a5`
 - Q2917：/system/roles 标题/描述/暂无数据 **3 passed**。`aeeddb845`
 - Q2918：/system/roles 角色列表/总数/RBAC **3 passed**。`6b48684b7`
-- Q2919：/system/roles 当前页/角色名称/角色编码 **3 passed**。
+- Q2919：/system/roles 当前页/角色名称/角色编码 **3 passed**。`3a83aa621`
+- Q2920：/system/roles 数据权限/描述/ID **3 passed**。`60d6a3984`
+- Q2921：/system/posts 新增岗位/标题/暂无数据 **3 passed**。
 
