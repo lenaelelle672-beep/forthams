@@ -3358,11 +3358,11 @@
 | Q4168 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4169 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4170 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
-| Q4171 | pending | 桌面空态 重要设备未用统计 heading。禁 /m。 |
-| Q4172 | pending | 桌面空态 重要设备/表单存储未用 heading。禁 /m。 |
-| Q4173 | pending | 桌面空态 表单存储未用空态 heading。禁 /m。 |
-| Q4174 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4175 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4176 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4177 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
-| Q4178 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4171 | done | 桌面空态 **3 passed**（重要设备未用统计 heading）。禁 /m。 |
+| Q4172 | done | 桌面空态 **3 passed**（重要设备/表单存储未用 heading）。禁 /m。 |
+| Q4173 | done | 桌面空态 **3 passed**（表单存储未用空态 heading）。禁 /m。 |
+| Q4174 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4175 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4176 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4177 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4178 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |

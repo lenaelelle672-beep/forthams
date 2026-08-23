@@ -1279,4 +1279,5 @@
 - Q4155–Q4162：**24 passed**。履历空列表不渲染 KPI。续 Q4163–Q4170：菜单/SAM/采购/型号/表单存储摘要。SAM「合规」须 exact。待跑 `-g 'Q4163|...|Q4170'`。下一票 Q4171。禁 /m。
 - Q4163–Q4170：**24 passed**。下一票 Q4171：继续桌面真页未用 heading。勿测 GIS 定位 KPI（需 effectiveAssets.length>0）、维保计划 KPI（需 records.length>0）、能耗 KPI（空/错提前返回）。禁 /m。
 - 续写 Q4171–Q4178：重要设备统计/筛选 heading、表单存储暂无字段/附件摘要。勿改设备「即将到期」为 heading。待跑 `-g 'Q4171|...|Q4178'`。下一票 Q4179。禁 /m。
+- Q4171–Q4178：**24 passed**。下一票 Q4179：继续桌面真页未用 heading/button。勿测 GIS/维保计划/能耗仅有数据才出现的 KPI。禁 /m。
 
