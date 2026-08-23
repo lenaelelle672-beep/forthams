@@ -3138,4 +3138,6 @@
 | Q3948 | done | 桌面空态 **3 passed**（报表/健康评分未用 button/heading）。禁 /m。 |
 | Q3949 | done | 桌面空态 **3 passed**（定时报表/可靠性未用 button/heading）。禁 /m。 |
 | Q3950 | done | 桌面空态 **3 passed**（SAM/健康评分未用 heading）。禁 /m。 |
-| Q3951 | pending | 桌面空态 GIS/能耗/预算未用 heading。禁 /m。 |
+| Q3951 | done | 桌面空态 **3 passed**（GIS/能耗 EmptyState 与预算年度未用 heading）。禁 /m。 |
+| Q3952 | pending | 桌面空态 平面图/SAM/导入导出未用 heading/button。禁 /m。 |
+| Q3953 | pending | 桌面空态 分类/平面图未用 heading/button。禁 /m。 |

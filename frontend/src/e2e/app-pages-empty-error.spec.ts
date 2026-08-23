@@ -71557,6 +71557,64 @@ test.describe('Q3951 桌面 GIS/能耗/预算未用 heading 空态', () => {
 
 });
 
+test.describe('Q3952 桌面平面图/SAM/导入导出未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/floorplans heading「暂无平面图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByRole('heading', { name: '暂无平面图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/sam heading「暂无数据」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/sam');
+    await expect(page.getByRole('heading', { name: '暂无数据' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets/import-export button「下载导入模板」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets/import-export');
+    await expect(page.getByRole('button', { name: '下载导入模板' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3953 桌面分类/平面图未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/categories heading「暂无分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByRole('heading', { name: '暂无分类' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/floorplans button「前往 GIS 地图」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/floorplans');
+    await expect(page.getByRole('button', { name: '前往 GIS 地图' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/categories button「添加分类」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/categories');
+    await expect(page.getByRole('button', { name: '添加分类' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

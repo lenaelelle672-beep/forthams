@@ -1231,4 +1231,5 @@
 - Q3944–Q3948：**15 passed**。Q3944 勿测 `/dashboard` 默认 mock（trends.slice 崩）。续 Q3949：定时报表/可靠性未用 button/heading。禁 /m。
 - Q3949：**3 passed**。续 Q3950：SAM/健康评分未用 heading。禁 /m。
 - Q3950：**3 passed**。续 Q3951：GIS/能耗 EmptyState 与预算年度未用 heading。禁 /m。
+- Q3951：**3 passed**。续 Q3952–Q3953：平面图/SAM/导入导出/分类未用 heading/button。禁 /m。
 
