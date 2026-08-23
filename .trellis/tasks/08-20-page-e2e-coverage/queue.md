@@ -2189,4 +2189,5 @@
 | Q2999 | done | 桌面空态 **3 passed**（/login5 label 用户名/密码 + /vendor-portal 标题）。禁 /m。 |
 | Q3000 | done | 桌面空态 **3 passed**（/vendor-portal 编码/密码 placeholder + 登录）。禁 /m。 |
 | Q3001 | done | 桌面空态 **3 passed**（/vendor-portal 标题 + /login 记住用户名/欢迎回来）。禁 /m。 |
-| Q3002 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q3002 | done | 桌面空态 **3 passed**（/dashboard 导出数据/刷新视图/运营首页）。禁 /m。 |
+| Q3003 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

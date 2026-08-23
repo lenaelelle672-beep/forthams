@@ -1109,5 +1109,6 @@
 - Q2998：/login5 checkbox/统一认证/工作台预览 link **3 passed**。`2bb96e0c3`
 - Q2999：/login5 label 用户名/密码 + /vendor-portal 标题 **3 passed**。`09c5385ae`
 - Q3000：/vendor-portal 编码/密码 placeholder + 登录 **3 passed**。`4d2c67bd6`
-- Q3001：/vendor-portal 标题 + /login 记住用户名/欢迎回来 **3 passed**。门户「供应商编码」「密码」仅 placeholder；/login「登录系统」首个 h1 隐藏。
+- Q3001：/vendor-portal 标题 + /login 记住用户名/欢迎回来 **3 passed**。门户「供应商编码」「密码」仅 placeholder；/login「登录系统」首个 h1 隐藏。`e6bbee46d`
+- Q3002：/dashboard 导出数据/刷新视图/运营首页 **3 passed**。
 
