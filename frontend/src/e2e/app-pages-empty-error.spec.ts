@@ -71615,6 +71615,64 @@ test.describe('Q3953 桌面分类/平面图未用 heading/button 空态', () => 
 
 });
 
+test.describe('Q3954 桌面资产列表/报表中心未用 heading/button 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/assets heading「暂无资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByRole('heading', { name: '暂无资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/assets button「新建资产」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/assets');
+    await expect(page.getByRole('button', { name: '新建资产' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports heading「资产汇总表」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { name: '资产汇总表' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3955 桌面报表中心未用卡片 heading 空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/reports heading「资产分类统计」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { name: '资产分类统计' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports heading「资产状态分布」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { name: '资产状态分布' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/reports heading「部门资产排行」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/reports');
+    await expect(page.getByRole('heading', { name: '部门资产排行' }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
