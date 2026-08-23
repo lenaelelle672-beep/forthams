@@ -2145,4 +2145,5 @@
 | Q2955 | done | 桌面空态 **3 passed**（备件待确认 + 重估类型/描述）。禁 /m。 |
 | Q2956 | done | 桌面空态 **3 passed**（备件名称/规格 placeholder + /intake 供应商）。禁 /m。 |
 | Q2957 | done | 桌面空态 **3 passed**（/reports 导出CSV/PDF/标题）。禁 /m。 |
-| Q2958 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |
+| Q2958 | done | 桌面空态 **3 passed**（/reports 资产/财务/运维报表）。禁 /m。 |
+| Q2959 | in_progress | 桌面空态：继续桌面空态票。禁 /m。 |

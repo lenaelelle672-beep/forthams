@@ -1065,5 +1065,6 @@
 - Q2954：scrap 描述 + /approvals 全部类型 + 赔偿暂无部门 **3 passed**。`4838bd587`
 - Q2955：备件待确认 + 重估类型/描述 **3 passed**。workbench「全屏」非可见文本。`38086a640`
 - Q2956：备件名称/规格 placeholder + /intake 供应商 **3 passed**。`4700849a9`
-- Q2957：/reports 导出CSV/PDF/标题 **3 passed**。
+- Q2957：/reports 导出CSV/PDF/标题 **3 passed**。`7a317f678`
+- Q2958：/reports 资产/财务/运维报表 **3 passed**。
 
