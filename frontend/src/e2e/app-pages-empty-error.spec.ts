@@ -65607,6 +65607,238 @@ test.describe('Q3746 桌面菜单权限覆盖视图余项空态', () => {
 
 });
 
+test.describe('Q3747 桌面角色权限 catalog 返回余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「/system/role-permissions/catalog 返回的角色-权限绑定目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('/system/role-permissions/catalog 返回的角色-权限绑定目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「绑定目录、权限库存与绑定数量」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('绑定目录、权限库存与绑定数量').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「只读展示 /system/role-permissions/catalog 返回的」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('只读展示 /system/role-permissions/catalog 返回的').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3748 桌面角色权限绑定目录余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「角色-权限绑定目录、权限库存」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('角色-权限绑定目录、权限库存').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「返回的角色-权限绑定目录、权限库存与绑定数量」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('返回的角色-权限绑定目录、权限库存与绑定数量').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「只读展示 /system/role-permissions/catalog 返回的角色-权限绑定目录、权限库存与绑定数量」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('只读展示 /system/role-permissions/catalog 返回的角色-权限绑定目录、权限库存与绑定数量').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3749 桌面角色权限库存绑定余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockRolePermissionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「catalog 返回的角色-权限绑定目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('catalog 返回的角色-权限绑定目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「catalog 返回的角色-权限绑定目录、权限库存与绑定数量」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('catalog 返回的角色-权限绑定目录、权限库存与绑定数量').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-role-permissions 「只读展示 /system/role-permissions/catalog 返回的角色-权限绑定目录」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-role-permissions');
+    await expect(page.getByText('只读展示 /system/role-permissions/catalog 返回的角色-权限绑定目录').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3750 桌面数据权限 dataScope 整句余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDataPermissionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「展示并收紧角色 dataScope；CUSTOM 部门规则仍未接入」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('展示并收紧角色 dataScope；CUSTOM 部门规则仍未接入').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「可调整角色数据范围，并为 CUSTOM 配置部门清单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('可调整角色数据范围，并为 CUSTOM 配置部门清单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「写入需 system:role-permission:edit。查询运行时仍未按部门清单过滤」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('写入需 system:role-permission:edit。查询运行时仍未按部门清单过滤').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3751 桌面数据权限 CUSTOM 组合余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDataPermissionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「角色 dataScope；CUSTOM」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('角色 dataScope；CUSTOM').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「可调整角色数据范围，并为 CUSTOM」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('可调整角色数据范围，并为 CUSTOM').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「写入需 system:role-permission:edit。查询运行时」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('写入需 system:role-permission:edit。查询运行时').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3752 桌面数据权限部门清单余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockDataPermissionsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「为 CUSTOM 配置部门清单。写入需」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('为 CUSTOM 配置部门清单。写入需').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「角色数据范围，并为 CUSTOM 配置部门清单」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('角色数据范围，并为 CUSTOM 配置部门清单').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-data-permissions 「展示并收紧角色 dataScope；CUSTOM」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-data-permissions');
+    await expect(page.getByText('展示并收紧角色 dataScope；CUSTOM').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3753 桌面运行监控审批 SLA 路径余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockRuntimeMonitorEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor 「只读展示 /approvals/list」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByText('只读展示 /approvals/list').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor 「/approvals/pending/count」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByText('/approvals/pending/count').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-runtime-monitor 「/sla-config/runtime-summary」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-runtime-monitor');
+    await expect(page.getByText('/sla-config/runtime-summary').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
+test.describe('Q3754 桌面审计日志导出与端点余项空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockAuditLogsEmpty);
+    await seedSession(page, adminUser);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「不生成真实导出文件」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('不生成真实导出文件').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「/audit-logs/action-type-distribution」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('/audit-logs/action-type-distribution').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/fixed-assets/workbenchv3?menu=system-audit-log 「只读审计日志：真实调用」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/fixed-assets/workbenchv3?menu=system-audit-log');
+    await expect(page.getByText('只读审计日志：真实调用').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },
