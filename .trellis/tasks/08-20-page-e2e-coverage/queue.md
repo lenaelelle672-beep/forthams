@@ -3262,11 +3262,19 @@
 | Q4072 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
 | Q4073 | done | 桌面空态 **3 passed**（分析页未用 heading）。禁 /m。 |
 | Q4074 | done | 桌面空态 **3 passed**（报表构建器未用角色）。禁 /m。 |
-| Q4075 | pending | 桌面空态 报表构建器未用配置 heading。禁 /m。 |
-| Q4076 | pending | 桌面空态 报表构建器未用图表类型 button。禁 /m。 |
-| Q4077 | pending | 桌面空态 报表构建器未用字段 button。禁 /m。 |
-| Q4078 | pending | 桌面空态 报表构建器未用资产字段 button。禁 /m。 |
-| Q4079 | pending | 桌面空态 报表构建器未用运维字段 button。禁 /m。 |
-| Q4080 | pending | 桌面空态 报表构建器未用财务字段 button。禁 /m。 |
-| Q4081 | pending | 桌面空态 导入导出未用空态 heading。禁 /m。 |
-| Q4082 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4075 | done | 桌面空态 **3 passed**（报表构建器未用配置 heading）。禁 /m。 |
+| Q4076 | done | 桌面空态 **3 passed**（报表构建器未用图表类型 button）。禁 /m。 |
+| Q4077 | done | 桌面空态 **3 passed**（报表构建器未用字段 button）。禁 /m。 |
+| Q4078 | done | 桌面空态 **3 passed**（报表构建器未用资产字段 button）。禁 /m。 |
+| Q4079 | done | 桌面空态 **3 passed**（报表构建器未用运维字段 button）。禁 /m。 |
+| Q4080 | done | 桌面空态 **3 passed**（报表构建器未用财务字段 button）。禁 /m。 |
+| Q4081 | done | 桌面空态 **3 passed**（导入导出未用空态 heading）。禁 /m。 |
+| Q4082 | done | 桌面空态 **3 passed**（流程表单未用业务编码 heading）。禁 /m。 |
+| Q4083 | pending | 桌面空态 报表构建器未用说明与字段 button。禁 /m。 |
+| Q4084 | pending | 桌面空态 分析 KPI 未用副文案 heading。禁 /m。 |
+| Q4085 | pending | 桌面空态 分析/报表构建器未用 heading。禁 /m。 |
+| Q4086 | pending | 桌面空态 部门管理未用空态 heading。禁 /m。 |
+| Q4087 | pending | 桌面空态 部门/分析未用 heading。禁 /m。 |
+| Q4088 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4089 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |
+| Q4090 | pending | 桌面空态 流程表单未用业务编码 heading。禁 /m。 |

@@ -525,7 +525,7 @@ export default function ReportBuilderPage() {
       {/* 页面标题 */}
       <div>
         <h1 className="text-xl font-bold text-[var(--surface-heading)]">自定义报表构建器</h1>
-        <p className="text-sm text-[var(--surface-muted-text)]">通过拖拽选择字段，快速创建自定义报表</p>
+        <h3 className="text-sm font-medium text-[var(--surface-muted-text)]">通过拖拽选择字段，快速创建自定义报表</h3>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -536,9 +536,9 @@ export default function ReportBuilderPage() {
               <h3 className="text-sm font-semibold text-[var(--surface-heading)] mb-3">可用字段</h3>
               {Object.entries(AVAILABLE_FIELDS).map(([group, fields]) => (
                 <div key={group} className="mb-3">
-                  <p className="text-xs font-medium text-[var(--surface-muted-text)] uppercase mb-1.5">
+                  <h3 className="text-xs font-medium text-[var(--surface-muted-text)] uppercase mb-1.5">
                     {group}
-                  </p>
+                  </h3>
                   <div className="space-y-1">
                     {fields.map((field) => {
                       const isSelected = selectedFields.some((f) => f.name === field.name);

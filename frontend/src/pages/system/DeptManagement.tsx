@@ -705,14 +705,14 @@ export default function DeptManagement() {
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 border border-slate-100">
                     <Building2 className="h-8 w-8 text-slate-200" />
                   </div>
-                  <p className="text-sm font-medium text-slate-500">请选择一个部门查看详情</p>
-                  <p className="text-xs text-slate-400 mt-1">点击左侧组织架构树中的节点即可查看</p>
+                  <h3 className="text-sm font-medium text-slate-500">请选择一个部门查看详情</h3>
+                  <h3 className="text-xs font-medium text-slate-400 mt-1">点击左侧组织架构树中的节点即可查看</h3>
                   <div className="flex items-center gap-2 mt-4 text-xs text-slate-400">
                     <ChevronRight className="w-3 h-3" />
-                    <span>支持展开/收起子级</span>
+                    <h3 className="text-xs font-medium">支持展开/收起子级</h3>
                     <span className="text-slate-300">·</span>
                     <Search className="w-3 h-3" />
-                    <span>支持搜索过滤</span>
+                    <h3 className="text-xs font-medium">支持搜索过滤</h3>
                   </div>
                 </div>
               )}

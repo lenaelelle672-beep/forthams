@@ -337,8 +337,8 @@ export default function AnalyticsPage() {
                     </div>
                     <div className="min-w-0">
                       <h3 className="text-xs font-medium text-slate-500 truncate">{kpi.title}</h3>
-                      <p className="text-lg font-bold text-slate-900 tabular-nums">{kpi.value}</p>
-                      <p className="text-xs text-slate-400 truncate">{kpi.subtitle}</p>
+                      <h3 className="text-lg font-bold text-slate-900 tabular-nums">{kpi.value}</h3>
+                      <h3 className="text-xs font-medium text-slate-400 truncate">{kpi.subtitle}</h3>
                     </div>
                   </div>
                 );
