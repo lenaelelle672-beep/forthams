@@ -41753,6 +41753,34 @@ test.describe('Q2913 桌面用户管理列表空态', () => {
   });
 });
 
+test.describe('Q2914 桌面用户管理筛选空态', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/api/**', mockApi);
+    await seedSession(page, adminUser);
+  });
+
+  test('/system/users 空态 placeholder「搜索用户名、姓名、邮箱或手机号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByPlaceholder('搜索用户名、姓名、邮箱或手机号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users 空态 button「重置」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByRole('button', { name: /重\s*置/ }).first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+
+  test('/system/users 空态「邮箱/手机号」', async ({ page }) => {
+    const errors = collectBrowserErrors(page);
+    await page.goto('/system/users');
+    await expect(page.getByText('邮箱/手机号').first()).toBeVisible({ timeout: 15_000 });
+    expect(errors).toEqual([]);
+  });
+});
+
 const errorPages: Array<{ path: string; failPath: string; error?: string }> = [
   { path: '/energy', failPath: '/energy/dashboard' },
   { path: '/gis', failPath: '/gis/assets' },

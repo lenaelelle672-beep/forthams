@@ -1021,5 +1021,6 @@
 - Q2910：/system/depts 创建提示/选树 + /retirement/new 残值提示 **3 passed**。`4cc003e97`
 - Q2911：/system/users 新增用户/标题/描述 **3 passed**。`a3ff2bbaa`
 - Q2912：/system/users 用户总量/角色数/岗位数 **3 passed**。`af70be9da`
-- Q2913：/system/users 总页数/用户列表/暂无数据 **3 passed**。
+- Q2913：/system/users 总页数/用户列表/暂无数据 **3 passed**。`eba1f3f03`
+- Q2914：/system/users 搜索/重置/邮箱手机号 **3 passed**。
 
